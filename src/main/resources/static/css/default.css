@@ -1,0 +1,67 @@
+@charset "utf-8";
+
+/* default */
+body {margin:0; padding:0; font-family:"맑은 고딕", Malgun Gothic, "돋움", dotum, AppleGothic, Sans-serif;font-size:.75em;color:#333} 
+img{border:0;vertical-align:top;}
+ul{list-style-type:none;}
+a {text-decoration:none;}
+a:hover{text-decoration:none;}
+*{margin:0;padding:0;}
+ 
+/* floating */
+.fl{float:left}
+.fr{float:right}
+
+/* align */
+.ar{text-align:right !important}
+.al{text-align:left !important}
+.ac{text-align:center !important}
+.aj{text-align:justify !important}
+.vt{vertical-align:top !important}
+.vb{vertical-align:bottom !important}
+.vm{vertical-align:middle !important}
+
+/* margin */
+.mgt5{margin-top:5px !important}
+.mgt10{margin-top:10px !important}
+.mgt12{margin-top:12px !important}
+.mgt15{margin-top:15px !important}
+.mgt20{margin-top:20px !important}
+.mgt25{margin-top:25px !important}
+.mgt30{margin-top:30px !important}
+.mgt60{margin-top:60px !important}
+.mgl5{margin-left:5px !important}
+.mgl10{margin-left:10px !important}
+.mgl15{margin-left:15px !important}
+.mgl20{margin-left:20px !important}
+.mgl30{margin-left:30px !important}
+.mgr20{margin-right:20px !important}
+.mgr40{margin-right:40px !important}
+.mgb5{margin-bottom:5px !important}
+.mgb10{margin-bottom:10px !important}
+.mgb15{margin-bottom:15px !important}
+.mgb30{margin-bottom:30px !important}
+.mgb60{margin-bottom:60px !important}
+
+/* padding */
+.pdt5{padding-top:5px !important}
+.pdt10{padding-top:10px !important}
+.pdt15{padding-top:15px !important}
+.pdt20{padding-top:20px !important}
+.pdt40{padding-top:40px !important}
+.pdl5{padding-left:5px !important}
+.pdl8{padding-left:8px !important}
+.pdl10{padding-left:10px !important}
+.pdl15{padding-left:15px !important}
+.pdl20{padding-left:20px !important}
+.pdl25{padding-left:25px !important}
+.pdl30{padding-left:30px !important}
+.pdr5{padding-right:5px !important}
+.pdr10{padding-right:10px !important}
+.pdr20{padding-right:20px !important}
+.pdr25{padding-right:25px !important}
+.pdb5{padding-bottom:5px !important}
+.pdb10{padding-bottom:10px !important}
+.pdb15{padding-bottom:15px !important}
+.pdb20{padding-bottom:20px !important}
+
