@@ -4,21 +4,23 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.modelmapper.ModelMapper;
 import org.openpaas.ieda.api.DirectorClient;
 import org.openpaas.ieda.api.DirectorClientBuilder;
 import org.openpaas.ieda.api.DirectorEndPoint;
 import org.openpaas.ieda.api.Info;
 import org.openpaas.ieda.common.IEDACommonException;
+import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
@@ -28,8 +30,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 @Transactional
 @Slf4j
+//@EnableConfigurationProperties(IEDAConfiguration.class)
 public class IEDADirectorConfigService {
-
+	
 	private DirectorEndPoint directorEndPoint = DirectorEndPoint.getInstance();
 
 	@Autowired
@@ -38,7 +41,15 @@ public class IEDADirectorConfigService {
 	@Autowired
 	private ModelMapper modelMapper;
 	
+//	@Autowired
+//	private IEDAConfiguration iedaConfiguration;
+	
 	public IEDADirectorConfig getDefaultDirector() {
+		
+//		log.info("getDeploymentDir : " + iedaConfiguration.getDeploymentDir());
+//		log.info("getReleaseDir    : " + iedaConfiguration.getReleaseDir());
+//		log.info("getStemcellDir   : " + iedaConfiguration.getStemcellDir());
+		
 		IEDADirectorConfig directorConfig = directorConfigRepository.findOneByDefaultYn("Y");
 
 		if ( directorConfig == null ) {
@@ -50,6 +61,7 @@ public class IEDADirectorConfigService {
 	}
 	
 	public List<IEDADirectorConfig> listDirector() {
+		
 		List<IEDADirectorConfig> directorConfigList = directorConfigRepository.findAll();
 		if ( directorConfigList.size() == 0 ) {
 			throw new IEDACommonException("nocontent.director.exception",
@@ -123,7 +135,7 @@ public class IEDADirectorConfigService {
 			throw new IEDACommonException("illigalArgument.director.exception",
 					"해당하는 디렉터가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
-
+		
 		return directorConfig;
 	}
 
