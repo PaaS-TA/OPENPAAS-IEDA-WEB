@@ -36,6 +36,7 @@ response.setDateHeader("Expires",0);
 
 <!-- Common -->
 <script type="text/javascript" src="<c:url value='/js/common.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/js/commonPopup.js'/>"></script>
 
 <script type="text/javascript">
 
