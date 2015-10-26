@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Transactional
 @Slf4j
-//@EnableConfigurationProperties(IEDAConfiguration.class)
+@EnableConfigurationProperties(IEDAConfiguration.class)
 public class IEDADirectorConfigService {
 	
 	private DirectorEndPoint directorEndPoint = DirectorEndPoint.getInstance();
@@ -41,14 +41,14 @@ public class IEDADirectorConfigService {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-//	@Autowired
-//	private IEDAConfiguration iedaConfiguration;
+	@Autowired
+	private IEDAConfiguration iedaConfiguration;
 	
 	public IEDADirectorConfig getDefaultDirector() {
 		
-//		log.info("getDeploymentDir : " + iedaConfiguration.getDeploymentDir());
-//		log.info("getReleaseDir    : " + iedaConfiguration.getReleaseDir());
-//		log.info("getStemcellDir   : " + iedaConfiguration.getStemcellDir());
+		log.info("getDeploymentDir : " + iedaConfiguration.getDeploymentDir());
+		log.info("getReleaseDir    : " + iedaConfiguration.getReleaseDir());
+		log.info("getStemcellDir   : " + iedaConfiguration.getStemcellDir());
 		
 		IEDADirectorConfig directorConfig = directorConfigRepository.findOneByDefaultYn("Y");
 
