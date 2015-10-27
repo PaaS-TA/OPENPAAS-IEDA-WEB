@@ -2,7 +2,7 @@
  * 공통 confirm 팝업
  */
 function commonCongirmPop( popTitle, popContents, buttonText, buttonEvent ){
-	if( !buttonEvent || buttonEvent = ''  )	buttonEvent = 'w2popup.close';
+	if( !buttonEvent ){	buttonEvent = 'w2popup.close';}
 	
 	w2popup.open({
 		title: '<b>' + popTitle + '</b>',
@@ -15,8 +15,8 @@ function commonCongirmPop( popTitle, popContents, buttonText, buttonEvent ){
  * 공통 Regist 팝업
  */
 function commonRegistPop( popTitle, popContents, regBtnText, regEvent, closeBtnText, closeEvent ){
-	if( !regEvent || regEvent = ''  )	regEvent = 'w2popup.close';
-	if( !closeEvent || closeEvent = '' ) closeEvent = 'w2popup.close';
+	if( !regEvent ){	regEvent = 'w2popup.close';}
+	if( !closeEvent ){ closeEvent = 'w2popup.close';}
 	
 	w2popup.open({
 		title: '<b>' + popTitle + '</b>',

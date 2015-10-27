@@ -24,10 +24,10 @@ $(function() {
 		style: 'text-align: center',
 		columns:[
 			 {field: 'iedaDirectorConfigSeq', caption: '레코드키', hidden: true}
-			,{field: 'defaultYn', caption: '기본관리자 여부', size: '10%'}
-			,{field: 'directorName', caption: '관리자 이름', size: '15%'}
+			,{field: 'defaultYn', caption: '기본관리자 여부', size: '15%'}
+			,{field: 'directorName', caption: '관리자 이름', size: '10%'}
 			,{field: 'userId', caption: '관리자 계정', size: '15%'}
-			,{field: 'directorUrl', caption: '관리자 URL', size: '35%',
+			,{field: 'directorUrl', caption: '관리자 URL', size: '30%',
 				render: function(record) {
 					return 'https://' + record.directorUrl + ':' + record.directorPort;
 				}
@@ -46,7 +46,11 @@ $(function() {
  	
  	$("#setDefaultDirector").click(function() {
  		var selected = w2ui['config_directorGrid'].getSelection();
- 		alert(selected);
+ 		
+ 		if( selected.length == 0 ){
+ 			alert("선택된 정보가 없습니다.");
+ 			return;
+ 		}
  		
  		var result = confirm("기본관리자로 설정하시겠습니까?");
  		if ( result ) {
@@ -55,6 +59,41 @@ $(function() {
  			//alert("do nothing")
  		}
  	});
+ 	
+ 	$("#addSetting").click(function() {
+ 		var selected = w2ui['config_directorGrid'].getSelection();
+ 		
+ 		if( selected.length == 0 ){
+ 			alert("선택된 정보가 없습니다.");
+ 			return;
+ 		}
+ 		
+ 		var result = confirm("현재 설정을 추가하시겠습니까?");
+ 		if ( result ) {
+ 			//alert("set");
+ 		} else {
+ 			//alert("do nothing")
+ 		}
+ 	});
+ 	
+ 	$("#deleteSetting").click(function() {
+ 		var selected = w2ui['config_directorGrid'].getSelection();
+ 		
+ 		if( selected.length == 0 ){
+ 			alert("선택된 정보가 없습니다.");
+ 			return;
+ 		}
+ 		
+ 		
+ 		var result = confirm("선택한 정보를 삭제하시겠습니까?");
+ 		if ( result ) {
+ 			//alert("set");
+ 		} else {
+ 			//alert("do nothing")
+ 		}
+ 	});
+ 	
+ 	
 	
 });
 
@@ -88,13 +127,13 @@ function clearMainPage() {
 	</table>
 	
 	<!-- 설치관리자 목록-->
-	<div class="pdt20"> 
+	<div class="pdt20">
 		<div class="title fl">설치관리자 목록</div>
 		<div class="fr"> 
 		<!-- Btn -->
 		<span class="boardBtn" id="setDefaultDirector"><a href="#" class="btn btn-primary" style="width:150px"><span>기본관리자로 설정</span></a></span>
-		<span class="boardBtn"><a href="#" class="btn btn-primary" style="width:130px"><span>설정 추가</span></a></span>
-		<span class="boardBtn"><a href="#" class="btn btn-danger" style="width:130px"><span>설정 삭제</span></a></span>
+		<span class="boardBtn" id="addSetting"><a href="#" class="btn btn-primary" style="width:130px"><span>설정 추가</span></a></span>
+		<span class="boardBtn" id="deleteSetting"><a href="#" class="btn btn-danger" style="width:130px"><span>설정 삭제</span></a></span>
 		<!-- //Btn -->
 	    </div>
 	</div>
