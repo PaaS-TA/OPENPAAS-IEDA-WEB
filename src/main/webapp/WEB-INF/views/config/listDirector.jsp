@@ -10,7 +10,7 @@ $(function() {
 		header: '<b>설치관리자 목록</b>',
  		method: 'GET',
 		show: {	lineNumbers: true,
-				//selectColumn: true,
+				selectColumn: true,
 				footer: true},
 //         show: {
 //             header         : true,
@@ -44,11 +44,16 @@ $(function() {
  	getDefaultDirector("<c:url value='/directors/default'/>");
  	doSearch();
  	
+ 	//기본관리자 설정 버튼
  	$("#setDefaultDirector").click(function() {
  		var selected = w2ui['config_directorGrid'].getSelection();
  		
  		if( selected.length == 0 ){
  			alert("선택된 정보가 없습니다.");
+ 			return;
+ 		}
+ 		else if ( selected.length > 1 ){
+ 			alert("기본관리자 설정은 하나만 선택 가능합니다.");
  			return;
  		}
  		
@@ -60,22 +65,21 @@ $(function() {
  		}
  	});
  	
+ 	//설정 추가 버튼
  	$("#addSetting").click(function() {
- 		var selected = w2ui['config_directorGrid'].getSelection();
+ 		var body 	= getAddSettingForm();
+ 		var buttons = getAddSettingButtons();
  		
- 		if( selected.length == 0 ){
- 			alert("선택된 정보가 없습니다.");
- 			return;
- 		}
- 		
- 		var result = confirm("현재 설정을 추가하시겠습니까?");
- 		if ( result ) {
- 			//alert("set");
- 		} else {
- 			//alert("do nothing")
- 		}
+ 		w2popup.open({
+			title 	: "<b>설치관리자 설정추가</b>",
+			width 	: 600,
+			height	: 250,
+			body	: body,
+			buttons : buttons
+		});
  	});
  	
+ 	//설정 삭제 버튼
  	$("#deleteSetting").click(function() {
  		var selected = w2ui['config_directorGrid'].getSelection();
  		
@@ -83,7 +87,6 @@ $(function() {
  			alert("선택된 정보가 없습니다.");
  			return;
  		}
- 		
  		
  		var result = confirm("선택한 정보를 삭제하시겠습니까?");
  		if ( result ) {
@@ -107,6 +110,56 @@ function clearMainPage() {
 	$().w2destroy('config_directorGrid');
 }
 
+function getAddSettingForm(){
+	var body = '<from id="addSettingForm">';
+	body += '<div class="w2ui-page page-0 style="width:90%;">';
+	body += '<label>● 설치관리자 설정 정보 </label>';
+	body += '<table id="settingAddForm" >';
+	body += '<tr style="heigth:25px;"><td style="width:40%;padding-left:10px;">관리자 계정명</td>';
+	body += '<td style="padding-top:5px;"><input name="userId" type="text" maxlength="100" size="50" value="TEST_ID"/></td></tr>';
+	
+	body += '<tr style="heigth:25px;"><td style="width:40%;padding-left:10px;">관리자 계정 비밀번호</td>';
+	body += '<td style="padding-top:5px;"><input name="userPassword" type="text" maxlength="100" size="50" value="TEST_PW"/></td></tr>';
+	
+	body += '<tr style="heigth:25px;"><td style="width:40%;padding-left:10px;">디텍터 URL</td>';
+	body += '<td style="padding-top:5px;"><input name="directorUrl" type="text" maxlength="100" size="50" value="11.111.11.111"/></td></tr>';
+	
+	body += '<tr style="heigth:25px;"><td style="width:40%;padding-left:10px;">디텍터 PORT</td>';
+	body += '<td style="padding-top:5px;"><input name="directorPort" type="text" maxlength="100" size="50" value="2555"/></td></tr>';
+	
+	body += '</table></div></form>';
+	return body;		
+}
+
+function getAddSettingButtons(){
+	var buttons = '<button class="btn" onclick="javascript:registSetting();">설정</button> '+
+					'<button class="btn" onclick="javascript:w2popup.close();">취소</button> ';
+	return buttons;
+}
+
+function registSetting(){
+	/*
+	var url = "";
+	var data = '';
+	alert( $('#addSettingForm').serialize() );
+	*/
+	
+	jQuery.ajax({
+		type: "post",
+		url: "/directors/registSetting",
+		data: $('#addSettingForm').serialize(),
+		dataType: "json",
+		async : false,
+		success: function(data) {
+			alert("success!");
+			w2popup.close();		
+		},
+		error:function(e) { 
+			// ajax가 실패할때 메세지... 
+			alert("잠시 후 다시 이용해 주시기 바랍니다.");  
+		} 
+	});	
+}
 </script>
 
 <div id="main">

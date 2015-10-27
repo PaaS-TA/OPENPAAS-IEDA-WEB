@@ -47,9 +47,12 @@ public class DirectorConfigurationController {
 	@Autowired
 	private ModelMapper modelMapper;
 	
+	/**
+	 * 설치관리자 설정
+	 * @return
+	 */
 	@RequestMapping(value="/config/listDirector", method=RequestMethod.GET)
 	public String List() {
-
 		return "/config/listDirector";
 	}
 	
@@ -151,7 +154,18 @@ public class DirectorConfigurationController {
 		return new ResponseEntity<>(errorResponse, e.getStatusCode());
 		
 	}
-
+	
+	@RequestMapping(value="/directors/registSetting", method=RequestMethod.POST)
+	//@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity registSetting( @RequestBody IEDADirectorConfigDto.Create createDto){
+		
+		log.debug("++++++++++++++++++++++++++++++");
+		log.debug("createDto : " + createDto.getUserId() + createDto.getDirectorUrl());
+		log.debug("++++++++++++++++++++++++++++++");
+		//IEDADirectorConfig directorConfig = service.createDirector( createDto );
+		
+		//return modelMapper.map(directorConfig, IEDADirectorConfigDto.Response.class); 
+		return new ResponseEntity(HttpStatus.OK);
+	} 
 
 }
-

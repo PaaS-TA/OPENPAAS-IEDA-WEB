@@ -36,9 +36,7 @@ public class IEDADirectorConfigDto {
 		
 		@NotBlank
 		private Integer directorPort;
-		
-		@NotBlank
-		private String  defaultYn;
+
 	}
 	
 	@Data

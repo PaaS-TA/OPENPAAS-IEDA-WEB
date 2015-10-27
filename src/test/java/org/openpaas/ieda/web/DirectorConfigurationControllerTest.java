@@ -70,7 +70,7 @@ public class DirectorConfigurationControllerTest {
 //	public void createDirector() throws Exception {
 //		IEDADirectorConfigDto.Create directorDto = CreateDirectorConfigDto();
 //		
-//		ResultActions result = mockMvc.perform(post("/config/directors")
+//		ResultActions result = mockMvc.perform(post("/directors")
 //				.contentType(MediaType.APPLICATION_JSON).content(
 //						objectMapper.writeValueAsString(directorDto)));
 //		result.andDo(print());
