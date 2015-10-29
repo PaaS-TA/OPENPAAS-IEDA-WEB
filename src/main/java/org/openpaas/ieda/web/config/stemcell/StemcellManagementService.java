@@ -173,4 +173,9 @@ public class StemcellManagementService {
 				.sorted(byLastModified)
 				.collect(Collectors.toList());
 	}
+	
+	// 다운로드 스템셀
+	public boolean doDownloadStemcell() {
+		return true;
+	}
 }

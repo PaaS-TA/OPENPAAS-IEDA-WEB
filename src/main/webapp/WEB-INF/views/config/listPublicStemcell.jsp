@@ -8,21 +8,39 @@ $(function() {
  	$('#config_opStemcellsGrid').w2grid({
 		name: 'config_opStemcellsGrid',
 		show: {selectColumn: true, footer: true},
+
 		multiSelect: false,
 		method: 'GET',
 		style: 'text-align:center',
 		columns:[
-			 {field: 'os', caption: '운영체계', size: '10%'}
+			 {field: 'recid', caption: '운영체계', size:'10%'}
+			,{field: 'os', caption: '운영체계', size: '10%'}
 			,{field: 'osVersion', caption: '버전', size: '10%'}
 			,{field: 'iaas', caption: 'IaaS', size: '10%', sortable: true}
 			,{field: 'stemcellVersion', caption: '스템셀버전', size: '10%'}
 			,{field: 'stemcellFileName', caption: '파일명', size: '40%'}
 			,{field: 'download', caption: '다운로드여부', size: '10%', style: 'text-align:left'}
 		]
+		
 	});
 
  	//  화면 초기화에 필요한 데이터 요청
  	initView();
+ 	
+ 	// 목록조회
+ 	$("#doSearch").click(function(){
+ 		doSearch();
+    });
+ 	
+ 	//  스템셀 다운로드
+ 	$("#doDownload").click(function(){
+    	doDownload();
+    });
+ 	
+ 	//	스템셀 삭제
+ 	$("#doDelete").click(function(){
+ 		doDelete();
+    });
 
 });
 
@@ -48,6 +66,48 @@ function changeOS() {
 	setCommonCode('<c:url value="/codes/child/"/>' + $("#os option:selected").val(), 'osVersion');
 }
 
+// 스템셀 다운로드
+function doDownload() {
+	var selected = w2ui['config_opStemcellsGrid'].getSelection();
+	if (selected == null || selected == '') {
+		alert("다운로드받을 스템셀을 선택하세요.");
+	}
+	
+	// 다운로드 요청
+	var record = w2ui['config_opStemcellsGrid'].get(selected);
+	alert(record.stemcellFileName);
+	
+/* 	$.ajax({
+	type: "POST",
+	url: "/downloadPublicStemcell",
+	contentType: "application/json",
+	//dataType: "json",
+	async : true,
+	data : JSON.stringify({
+			userId 			: $("[name='userId']").val(),
+			userPassword	: $("[name='userPassword']").val(),
+			directorUrl		: $("[name='directorUrl']").val(),
+			directorPort	: parseInt($("[name='directorPort']").val())
+	}),
+	success: function(data, status) {
+		alert(status);
+		w2popup.close();		
+	},
+	error:function(e) { 
+		alert("오류가 발생하였습니다.");
+		w2popup.close();
+	}  */
+}
+
+// 스템셀 삭제
+function doDelete() {
+	var selected = w2ui['config_opStemcellsGrid'].getSelection();
+	if (selected == null || selected == '') {
+		alert("삭제할 스템셀을 선택하세요.");
+	}
+}
+
+
 function doSearch() {
 	
 	var requestParam = "?os=" + $("#os option:selected").text();
@@ -55,22 +115,6 @@ function doSearch() {
 	requestParam += "&iaas=" + $("#iaas option:selected").text();
 
 	w2ui['config_opStemcellsGrid'].load("<c:url value='/publicStemcells'/>" + requestParam);
-
-	
-/*     $.ajax({
-        method : 'post',
-        type: 'json',
-        url : "<c:url value='/publicStemcells'/>",
-//        data : JSON.stringify(arg),
-		data : JSON.stringify(requetForm),
-        contentType : 'application/json',
-        dataType : 'json',
-        success : function(data) {
-            console.log(data);
-            var a = data.success;
-            console.log(data.success);  
-        }
-    }); */
 }
 
 //다른페이지 이동시 호출
@@ -91,10 +135,10 @@ $( window ).resize(function() {
 	<!-- OpenPaaS 스템셀 목록-->
 	<div class="title">스템셀 목록</div>
 	
-	<form id="searchPublicStemcell" method=post>
+<!-- 	<form id="searchPublicStemcell" method=post> -->
  	<div class="search_box" style align="center">
 		<span class="search_li">OS</span>&nbsp;&nbsp;&nbsp;
-		<select name="select" id="os" class="select" style="width:120px" onchange="changeOS();">
+		<select name="select" id="os" class="select" style="width:120px" onChange="changeOS();">
 		</select>
 		<span class="search_li">OS버전</span>&nbsp;&nbsp;&nbsp;
 		<select name="select" id="osVersion" class="select" style="width:120px">
@@ -103,13 +147,12 @@ $( window ).resize(function() {
 		<select name="select" id="iaas" class="select" style="width:120px">
 		</select>
 		&nbsp;&nbsp;&nbsp;
-		<!-- <span class="boardBtn">&nbsp;&nbsp;&nbsp;<a href="#" class="btn btn-info" style="width:100px"><span>조회</span></a></span> -->
-		<span class="btn btn-info" style="width:100px" onClick="doSearch();">조회</span>
-		<span class="btn btn-primary" style="width:100px">다운로드</span>
-		<span class="btn btn-danger" style="width:100px">삭제</span>
+		<span class="btn btn-info" style="width:100px" id="doSearch">조회</span>
+		<span class="btn btn-primary" style="width:100px" id="doDownload">다운로드</span>
+		<span class="btn btn-danger" style="width:100px" id="doDelete">삭제</span>
 	</div>
-	</form>
-	
+<!-- 	</form>
+ -->	
 	<div id="config_opStemcellsGrid" style="width:100%; height:500px"/>	
 	
 </div>

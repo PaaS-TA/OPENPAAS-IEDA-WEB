@@ -5,7 +5,6 @@ package org.openpaas.ieda.web.config.stemcell;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,13 +44,25 @@ public class StemcellManagementController {
 				.filter(t ->  t.getOs().toUpperCase().equals(requestMap.get("os").toUpperCase()))
 				.filter(t ->  t.getOsVersion().toUpperCase().equals(requestMap.get("osVersion").toUpperCase()))
 				.filter(t ->  t.getIaas().toUpperCase().equals(requestMap.get("iaas").toUpperCase()))
-				.collect(Collectors.toList()); 
+				.collect(Collectors.toList());
 		
+		int recid = 0;
+		for (StemcellContent stemcell : stemcellList) {
+			stemcell.setRecid(recid++);
+		}
 	
 		HashMap<String, Object> d = new HashMap<String, Object>();
 		d.put("total", stemcellList.size());
 		d.put("records", stemcellList);
 		
 		return new ResponseEntity<>(d, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/downloadPublicStemcell", method=RequestMethod.POST)
+	public ResponseEntity doDownloadStemcell(@RequestParam  HashMap<String, String> requestMap) {
+		
+		service.doDownloadStemcell();
+		
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

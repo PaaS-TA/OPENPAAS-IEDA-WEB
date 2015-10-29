@@ -10,6 +10,7 @@ public class StemcellContent {
 	private String size;
 	private String storageClass;
 	
+	private int recid;
 	private String os;
 	private String osVersion;
 	private String iaas;
