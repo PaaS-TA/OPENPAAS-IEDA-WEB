@@ -208,4 +208,8 @@ function registSetting(){
 <div id="regPopupBtnDiv" hidden="true">
 	<button class="btn" onclick="lock( '등록 중입니다.', true);">설정</button>
 	<button class="btn" onclick="w2popup.close();">취소</button>
+<<<<<<< HEAD
 </div>
+=======
+</div>
+>>>>>>> e71c90748dfa85ee2a93656ebfbdc85f9e2e47ba
