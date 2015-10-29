@@ -111,6 +111,7 @@ function lock (msg) {
     registSetting();
 }
 
+
 //등록처리
 function registSetting(){
 	$.ajax({
