@@ -33,7 +33,7 @@ function setCommonCode(url, id) {
 			
 			var $object = jQuery("#"+id);
 			
-			var optionString = $object.html() + '\n';
+			var optionString  = "";
 			for ( i=0; i < data.length; i++ ) {
 				if ( i == 0 ) {
 					optionString += "<option selected='selected' ";

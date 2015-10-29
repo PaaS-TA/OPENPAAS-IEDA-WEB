@@ -121,7 +121,8 @@ public class StemcellManagementService {
 			
 			String keyInfo = stemcell.getKey();
 			
-			if (!keyInfo.contains("go_agent") || keyInfo.contains("latest")) continue;
+			if (!keyInfo.contains("go_agent") || keyInfo.contains("latest") || keyInfo.contains("raw") || keyInfo.contains("centos-6"))
+				continue;
 			
 			StringTokenizer st = new StringTokenizer(keyInfo, "/");
 			st.nextToken();
@@ -145,20 +146,20 @@ public class StemcellManagementService {
 			stemcell.setStemcellVersion(stemcellVersion);
 
 			// OS 구분
-			if ( stemcellName.contains("ubuntu") ) stemcell.setOs("Ubuntu");
-			if ( stemcellName.contains("centos") ) stemcell.setOs("CentOS");
+			if ( replaceStemcellName.contains("ubuntu") ) stemcell.setOs("Ubuntu");
+			if ( replaceStemcellName.contains("centos") ) stemcell.setOs("CentOS");
 
 			// OS 버전 구분
-			if ( !stemcellName.contains("centos7") && stemcellName.contains("centos")) stemcell.setOsVersion("6.x");
-			if ( stemcellName.contains("centos7") ) stemcell.setOsVersion("7.x");
+			if ( replaceStemcellName.contains("centos7") ) stemcell.setOsVersion("7.x");
+			if ( !replaceStemcellName.contains("centos7") && replaceStemcellName.contains("centos")) stemcell.setOsVersion("6.x");
 			
-			if ( stemcellName.contains("trusty") ) stemcell.setOsVersion("Trusty");
-			if ( stemcellName.contains("lucid") ) stemcell.setOsVersion("lucid");
+			if ( replaceStemcellName.contains("trusty") ) stemcell.setOsVersion("Trusty");
+			if ( replaceStemcellName.contains("lucid") ) stemcell.setOsVersion("Lucid");
 			
 			// IaaS 구분
-			if ( stemcellName.contains("aws")) stemcell.setIaas("aws");
-			if ( stemcellName.contains("openastck")) stemcell.setIaas("openastck");
-			if ( stemcellName.contains("vsphere")) stemcell.setIaas("vsphere");			
+			if ( replaceStemcellName.contains("aws")) stemcell.setIaas("aws");
+			if ( replaceStemcellName.contains("openstack")) stemcell.setIaas("openstack");
+			if ( replaceStemcellName.contains("vsphere")) stemcell.setIaas("vsphere");			
 		}
 		
 		Comparator<StemcellContent> byLastModified = 

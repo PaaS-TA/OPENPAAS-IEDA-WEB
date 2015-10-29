@@ -43,16 +43,35 @@ function initView() {
 	doSearch();
 }
 
+function changeOS() {
+	alert('lala');
+	// OS버전 코드  (OS구분과 연관된 하위코드로 선택된 OS구분 코드의 값)
+	setCommonCode('<c:url value="/codes/child/"/>' + $("#os option:selected").val(), 'osVersion');
+}
+
 function doSearch() {
-	//alert($("#iaas option:selected").text());
-/*  	w2ui.config_opStemcellsGrid.postData['os']=$("#os option:selected").text();
-	w2ui.config_opStemcellsGrid.postData['osVersion']=$("#osVersion option:selected").text();
-	w2ui.config_opStemcellsGrid.postData['iaas']=$("#iaas option:selected").text();
- */	
-	var arg = "?os=" + $("#os option:selected").text();
- 	alert ( "<c:url value='/publicStemcells'/>" + arg );
-	w2ui['config_opStemcellsGrid'].load("<c:url value='/publicStemcells'/>" + arg);
-	//w2ui['config_opStemcellsGrid'].load("<c:url value='/publicStemcells'/>");
+	
+	var requestParam = "?os=" + $("#os option:selected").text();
+	requestParam += "&osVersion=" + $("#osVersion option:selected").text();
+	requestParam += "&iaas=" + $("#iaas option:selected").text();
+
+	w2ui['config_opStemcellsGrid'].load("<c:url value='/publicStemcells'/>" + requestParam);
+
+	
+/*     $.ajax({
+        method : 'post',
+        type: 'json',
+        url : "<c:url value='/publicStemcells'/>",
+//        data : JSON.stringify(arg),
+		data : JSON.stringify(requetForm),
+        contentType : 'application/json',
+        dataType : 'json',
+        success : function(data) {
+            console.log(data);
+            var a = data.success;
+            console.log(data.success);  
+        }
+    }); */
 }
 
 //다른페이지 이동시 호출
@@ -76,7 +95,7 @@ $( window ).resize(function() {
 	<form id="searchPublicStemcell" method=post>
  	<div class="search_box" style align="center">
 		<span class="search_li">OS</span>&nbsp;&nbsp;&nbsp;
-		<select name="select" id="os" class="select" style="width:120px">
+		<select name="select" id="os" class="select" style="width:120px" onchange="changeOS();">
 		</select>
 		<span class="search_li">OS버전</span>&nbsp;&nbsp;&nbsp;
 		<select name="select" id="osVersion" class="select" style="width:120px">
@@ -84,9 +103,11 @@ $( window ).resize(function() {
 		<span class="search_li">IaaS</span>&nbsp;&nbsp;&nbsp;
 		<select name="select" id="iaas" class="select" style="width:120px">
 		</select>
-		<span class="boardBtn">&nbsp;&nbsp;&nbsp;<a href="#" class="btn btn-info" style="width:100px"><span>조회</span></a></span>
-		<span class="boardBtn"><a href="#" class="btn btn-primary" style="width:100px"><span>다운로드</span></a></span>
-		<span class="boardBtn"><a href="#" class="btn btn-danger" style="width:100px"><span>삭제</span></a></span>
+		&nbsp;&nbsp;&nbsp;
+		<!-- <span class="boardBtn">&nbsp;&nbsp;&nbsp;<a href="#" class="btn btn-info" style="width:100px"><span>조회</span></a></span> -->
+		<span class="btn btn-info" style="width:100px" onClick="doSearch();">조회</span>
+		<span class="btn btn-primary" style="width:100px">다운로드</span>
+		<span class="btn btn-danger" style="width:100px">삭제</span>
 	</div>
 	</form>
 	

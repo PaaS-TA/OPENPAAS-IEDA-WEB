@@ -67,9 +67,8 @@ public class IEDACommonCodeController {
 	
 	@RequestMapping(value="/codes/child/{parentCodeIdx}", method=RequestMethod.GET)
 	public ResponseEntity getChildCodeList(@PathVariable int parentCodeIdx) {
-		log.info("1111");
+		
 		List<IEDACommonCode> contents = service.getChildCodeList(parentCodeIdx);
-		log.info("controller contens size : " + contents.size());
 		
 		return new ResponseEntity<>(contents, HttpStatus.OK);
 	}
