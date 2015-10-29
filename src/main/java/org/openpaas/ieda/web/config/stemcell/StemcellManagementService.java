@@ -1,6 +1,5 @@
 package org.openpaas.ieda.web.config.stemcell;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -175,9 +174,20 @@ public class StemcellManagementService {
 	}
 	
 	// 다운로드 스템셀
-	public List<String> doDownloadStemcell() {
+	public List<String> doDownloadStemcell(String stemcell) {
 		log.info("stemcell dir = " + iedaConfiguration.getStemcellDir());
-		// 명령어 실행
+		log.info("다운로드 받을 스템셀 : " + PUBLIC_STEMCELLS_BASE_URL + "/" + stemcell);
+		
+/*		try {
+			// 디렉토리 변경
+			log.info("다운로드 받을 스템셀 : " + PUBLIC_STEMCELLS_BASE_URL + "/" + stemcell);
+			
+			// 스템셀 다운로드
+			//Runtime.getRuntime().exec("bosh download public stemcells");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 		
 /*		
  * 		디렉토리 뷰어

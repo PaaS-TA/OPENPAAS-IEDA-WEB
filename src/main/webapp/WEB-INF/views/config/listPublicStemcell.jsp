@@ -75,13 +75,13 @@ function doDownload() {
 	
 	// 다운로드 요청
 	var record = w2ui['config_opStemcellsGrid'].get(selected);
-	alert(record.stemcellFileName);
+	//alert(record.key);
 	
 	$.ajax({
 		type: "post",
 		url: "/downloadPublicStemcell",
 		contentType: "application/json",
-		data : record.stemcellFileName,
+		data : record.key,
 		success: function(data, status) {
 			alert(status);
 		},
