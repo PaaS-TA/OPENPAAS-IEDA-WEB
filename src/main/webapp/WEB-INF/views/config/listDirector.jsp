@@ -67,15 +67,12 @@ $(function() {
  	
  	//설정 추가 버튼
  	$("#addSetting").click(function() {
- 		var body 	= getAddSettingForm();
- 		var buttons = getAddSettingButtons();
- 		
  		w2popup.open({
 			title 	: "<b>설치관리자 설정추가</b>",
 			width 	: 600,
 			height	: 250,
-			body	: body,
-			buttons : buttons
+			body	: $("#regPopupDiv").html(),
+			buttons : $("#regPopupBtnDiv").html()
 		});
  	});
  	
@@ -95,8 +92,6 @@ $(function() {
  			//alert("do nothing")
  		}
  	});
- 	
- 	
 	
 });
 
@@ -110,57 +105,38 @@ function clearMainPage() {
 	$().w2destroy('config_directorGrid');
 }
 
-function getAddSettingForm(){
-	var body = '<form id="addSettingForm">';
-	body += '<div class="w2ui-page page-0 style="width:90%;">';
-	body += '<label>● 설치관리자 설정 정보 </label>';
-	body += '<table id="settingAddForm" >';
-	body += '<tr style="heigth:25px;"><td style="width:40%;padding-left:10px;">관리자 계정명</td>';
-	body += '<td style="padding-top:5px;"><input name="userId" type="text" maxlength="100" size="50" value="TEST_ID"/></td></tr>';
-	
-	body += '<tr style="heigth:25px;"><td style="width:40%;padding-left:10px;">관리자 계정 비밀번호</td>';
-	body += '<td style="padding-top:5px;"><input name="userPassword" type="text" maxlength="100" size="50" value="TEST_PW"/></td></tr>';
-	
-	body += '<tr style="heigth:25px;"><td style="width:40%;padding-left:10px;">디텍터 URL</td>';
-	body += '<td style="padding-top:5px;"><input name="directorUrl" type="text" maxlength="100" size="50" value="52.21.37.184"/></td></tr>';
-	
-	body += '<tr style="heigth:25px;"><td style="width:40%;padding-left:10px;">디텍터 PORT</td>';
-	body += '<td style="padding-top:5px;"><input name="directorPort" type="text" maxlength="100" size="50" value="25555"/></td></tr>';
-	
-	body += '</table></div></form>';
-	return body;		
-}
 
-function getAddSettingButtons(){
-	var buttons = '<button class="btn" onclick="javascript:registSetting();">설정</button> '+
-					'<button class="btn" onclick="javascript:w2popup.close();">취소</button> ';
-	return buttons;
+function lock (msg) {
+    w2popup.lock(msg, true);
+    registSetting();
 }
 
 //등록처리
 function registSetting(){
 	$.ajax({
-		type: "POST",
-		url: "/directors",
-		contentType: "application/json",
+		type : "POST",
+		url : "/directors",
+		contentType : "application/json",
 		//dataType: "json",
 		async : true,
 		data : JSON.stringify({
-				userId 			: $("[name='userId']").val(),
-				userPassword	: $("[name='userPassword']").val(),
-				directorUrl		: $("[name='directorUrl']").val(),
-				directorPort	: parseInt($("[name='directorPort']").val())
+			userId : $("[name='userId']").val(),
+			userPassword : $("[name='userPassword']").val(),
+			directorUrl : $("[name='directorUrl']").val(),
+			directorPort : parseInt($("[name='directorPort']").val())
 		}),
-		success: function(data, status) {
+		success : function(data, status) {
 			// ajax가 성공할때 처리...
-			alert(status);
-			w2popup.close();		
-		},
-		error:function(e) { 
-			// ajax가 실패할때 처리... 
-			alert("등록 중 오류가 발생하였습니다.");
+			w2popup.unlock();
 			w2popup.close();
-		} 
+			doSearch();
+		},
+		error : function(e ) {
+			// ajax가 실패할때 처리...
+			alert(e);
+			//alert("등록 중 오류가 발생하였습니다." );
+			w2popup.unlock();
+		}
 	});
 }
 </script>
@@ -197,5 +173,39 @@ function registSetting(){
 	<div id="hMargin"/>
 	
 	<div id="config_directorGrid" style="width:100%; height:500px"/>	
-	
+</div>
+<div id="regPopupDiv" hidden="true">
+	<form id="addSettingForm" action="POST">
+		<div class="w2ui-page page-0" style="width: 100%">
+			<label>●&nbsp;설치관리자 설정 정보</label>
+			<div class="w2ui-field">
+				<label style="width:30%;text-align: left;padding-left: 20px;">관리자 계정명</label>
+				<div style="width: 70%">
+					<input name="userId" type="text" maxlength="100" style="width: 250px" required="required" value="test_id"/>
+				</div>
+			</div>
+			<div class="w2ui-field">
+				<label style="width:30%;text-align: left;padding-left: 20px;">관리자 계정 비밀번호</label>
+				<div style="width: 70%;">
+					<input name="userPassword" type="password" maxlength="100" style="width: 250px" required="required" value="testPass"/>
+				</div>
+			</div>
+			<div class="w2ui-field">
+				<label style="width:30%;text-align: left;padding-left: 20px;">디텍터 Url</label>
+				<div style="width: 70%;">
+					<input name="directorUrl" type="text" maxlength="100" style="width: 250px" required="required" value="52.21.37.184"/>
+				</div>
+			</div>
+			<div class="w2ui-field">
+				<label style="width:30%;text-align: left;padding-left: 20px;">디텍터 Port</label>
+				<div style="width: 70%;">
+					<input name="directorPort" type="number" maxlength="100" style="width: 250px" required="required" value="25555"/>
+				</div>
+			</div>
+		</div>
+	</form>	
+</div>
+<div id="regPopupBtnDiv" hidden="true">
+	<button class="btn" onclick="lock( '등록 중입니다.', true);">설정</button>
+	<button class="btn" onclick="w2popup.close();">취소</button>
 </div>
