@@ -44,7 +44,6 @@ function initView() {
 }
 
 function changeOS() {
-	alert('lala');
 	// OS버전 코드  (OS구분과 연관된 하위코드로 선택된 OS구분 코드의 값)
 	setCommonCode('<c:url value="/codes/child/"/>' + $("#os option:selected").val(), 'osVersion');
 }
