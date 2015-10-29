@@ -11,7 +11,7 @@ $(function() {
  	$('#us_uploadStemcellsGrid').w2grid({
 		name: 'us_uploadStemcellsGrid',
 		show: {selectColumn: true, footer: true},
-		multiSelect: false,
+//		multiSelect: false,
 		style: 'text-align:center',
 		columns:[
 			 {field: 'os', caption: '운영체계', size: '10%'}
@@ -32,6 +32,11 @@ $(function() {
 function clearMainPage() {
 	$().w2destroy('us_uploadStemcellsGrid');
 }
+
+//화면 리사이즈시 호출
+$( window ).resize(function() {
+	setLayoutContainerHeight();
+});
 
 </script>
 

@@ -80,6 +80,11 @@ function clearMainPage() {
 	$().w2destroy('deploy_deploymentsGrid');
 }
 
+//화면 리사이즈시 호출
+$( window ).resize(function() {
+	setLayoutContainerHeight();
+});
+
 </script>
 
 <div id="main">

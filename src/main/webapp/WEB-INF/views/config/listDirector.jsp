@@ -111,7 +111,7 @@ function clearMainPage() {
 }
 
 function getAddSettingForm(){
-	var body = '<from id="addSettingForm">';
+	var body = '<form id="addSettingForm">';
 	body += '<div class="w2ui-page page-0 style="width:90%;">';
 	body += '<label>● 설치관리자 설정 정보 </label>';
 	body += '<table id="settingAddForm" >';
@@ -144,7 +144,9 @@ function registSetting(){
 	alert( $('#addSettingForm').serialize() );
 	*/
 	
-	jQuery.ajax({
+	var formId = "#addSettingForm";
+	
+/* 	jQuery.ajax({
 		type: "post",
 		url: "/directors/registSetting",
 		data: $('#addSettingForm').serialize(),
@@ -158,7 +160,41 @@ function registSetting(){
 			// ajax가 실패할때 메세지... 
 			alert("잠시 후 다시 이용해 주시기 바랍니다.");  
 		} 
-	});	
+	});	 */
+	
+	var callUrl =  "<c:url value='/directors/registSetting'/>";
+	
+	$(formId).ajaxSubmit({
+	  	url: callUrl,
+		type: "POST",
+		data: $('#addSettingForm'),
+		contentType: "application/json; charset=utf-8",
+		datatype: "json",
+		success: function (data) {
+			alert('lala');
+/* 			var jsonData = $.parseJSON(data);
+               
+			if(jsonData != null && jsonData.resultMessage == 'MSG.SAVE.OK'){
+				jAlert('저장되었습니다.');
+				doSearch();
+				$().w2popup('close');
+			}
+			else if(!fIsNull(jsonData.resultText)){
+				jAlert(jsonData.resultText);
+			}
+			else
+				jAlert("시스템 오류가 발생하였습니다. 운영자에게 문의하시기 바랍니다."); */
+		},
+		error : function() {
+			alert('haha');
+			//jAlert("시스템 오류가 발생하였습니다. 운영자에게 문의하시기 바랍니다.");
+			return;
+		}        	        	
+	});
+	
+	
+	
+	
 }
 </script>
 
