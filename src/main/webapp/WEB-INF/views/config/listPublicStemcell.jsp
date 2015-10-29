@@ -77,26 +77,18 @@ function doDownload() {
 	var record = w2ui['config_opStemcellsGrid'].get(selected);
 	alert(record.stemcellFileName);
 	
-/* 	$.ajax({
-	type: "POST",
-	url: "/downloadPublicStemcell",
-	contentType: "application/json",
-	//dataType: "json",
-	async : true,
-	data : JSON.stringify({
-			userId 			: $("[name='userId']").val(),
-			userPassword	: $("[name='userPassword']").val(),
-			directorUrl		: $("[name='directorUrl']").val(),
-			directorPort	: parseInt($("[name='directorPort']").val())
-	}),
-	success: function(data, status) {
-		alert(status);
-		w2popup.close();		
-	},
-	error:function(e) { 
-		alert("오류가 발생하였습니다.");
-		w2popup.close();
-	}  */
+	$.ajax({
+		type: "post",
+		url: "/downloadPublicStemcell",
+		contentType: "application/json",
+		data : record.stemcellFileName,
+		success: function(data, status) {
+			alert(status);
+		},
+		error:function(e) { 
+			alert("오류가 발생하였습니다.");
+		}
+	});
 }
 
 // 스템셀 삭제
@@ -107,7 +99,7 @@ function doDelete() {
 	}
 }
 
-
+// 스템셀 목록 조회
 function doSearch() {
 	
 	var requestParam = "?os=" + $("#os option:selected").text();

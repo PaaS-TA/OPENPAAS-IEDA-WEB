@@ -12,6 +12,7 @@ $(function() {
 		show: {	lineNumbers: true,
 				selectColumn: true,
 				footer: true},
+				
 //         show: {
 //             header         : true,
 //             toolbar     : true,

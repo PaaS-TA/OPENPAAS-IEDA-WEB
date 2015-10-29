@@ -1,5 +1,6 @@
 package org.openpaas.ieda.web.config.stemcell;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +15,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.modelmapper.ModelMapper;
 import org.openpaas.ieda.common.IEDAConfiguration;
-import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -175,7 +175,20 @@ public class StemcellManagementService {
 	}
 	
 	// 다운로드 스템셀
-	public boolean doDownloadStemcell() {
-		return true;
+	public List<String> doDownloadStemcell() {
+		log.info("stemcell dir = " + iedaConfiguration.getStemcellDir());
+		// 명령어 실행
+		
+/*		
+ * 		디렉토리 뷰어
+ * 		File dir = new File(iedaConfiguration.getStemcellDir());
+		File[] files = dir.listFiles();
+
+		ArrayList filPaths = new ArrayList();
+		for (File file : files) {
+			log.info("내부 디렉토리 : " + file.getAbsolutePath() );
+			filPaths.add(file.getAbsolutePath());
+		}*/
+		return null;
 	}
 }

@@ -1,11 +1,14 @@
 package org.openpaas.ieda.web;
 
 import org.modelmapper.ModelMapper;
+import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
+@EnableConfigurationProperties(IEDAConfiguration.class)
 public class OpenpaasIedaWebApplication {
 
     public static void main(String[] args) {

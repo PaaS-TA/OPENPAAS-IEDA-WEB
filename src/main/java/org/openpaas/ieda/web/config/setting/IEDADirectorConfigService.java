@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Transactional
 @Slf4j
-@EnableConfigurationProperties(IEDAConfiguration.class)
 public class IEDADirectorConfigService {
 	
 	private DirectorEndPoint directorEndPoint = DirectorEndPoint.getInstance();
