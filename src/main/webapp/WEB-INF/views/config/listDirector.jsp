@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
 <script type="text/javascript">
 
 $(function() {
@@ -9,6 +8,7 @@ $(function() {
 		name: 'config_directorGrid',
 		header: '<b>설치관리자 목록</b>',
  		method: 'GET',
+ 		multiSelect: false,
 		show: {	lineNumbers: true,
 				selectColumn: true,
 				footer: true},
@@ -41,7 +41,7 @@ $(function() {
 	});
 
  	// 기본 설치 관리자 정보 조회
- 	getDefaultDirector("<c:url value='/directors/default'/>");
+ 	//getDefaultDirector("<c:url value='/directors/default'/>");
  	doSearch();
  	
  	//기본관리자 설정 버튼
@@ -111,7 +111,7 @@ function clearMainPage() {
 }
 
 function getAddSettingForm(){
-	var body = '<from id="addSettingForm">';
+	var body = '<form id="addSettingForm">';
 	body += '<div class="w2ui-page page-0 style="width:90%;">';
 	body += '<label>● 설치관리자 설정 정보 </label>';
 	body += '<table id="settingAddForm" >';
@@ -122,10 +122,10 @@ function getAddSettingForm(){
 	body += '<td style="padding-top:5px;"><input name="userPassword" type="text" maxlength="100" size="50" value="TEST_PW"/></td></tr>';
 	
 	body += '<tr style="heigth:25px;"><td style="width:40%;padding-left:10px;">디텍터 URL</td>';
-	body += '<td style="padding-top:5px;"><input name="directorUrl" type="text" maxlength="100" size="50" value="11.111.11.111"/></td></tr>';
+	body += '<td style="padding-top:5px;"><input name="directorUrl" type="text" maxlength="100" size="50" value="52.21.37.184"/></td></tr>';
 	
 	body += '<tr style="heigth:25px;"><td style="width:40%;padding-left:10px;">디텍터 PORT</td>';
-	body += '<td style="padding-top:5px;"><input name="directorPort" type="text" maxlength="100" size="50" value="2555"/></td></tr>';
+	body += '<td style="padding-top:5px;"><input name="directorPort" type="text" maxlength="100" size="50" value="25555"/></td></tr>';
 	
 	body += '</table></div></form>';
 	return body;		
@@ -137,28 +137,31 @@ function getAddSettingButtons(){
 	return buttons;
 }
 
+//등록처리
 function registSetting(){
-	/*
-	var url = "";
-	var data = '';
-	alert( $('#addSettingForm').serialize() );
-	*/
-	
-	jQuery.ajax({
-		type: "post",
-		url: "/directors/registSetting",
-		data: $('#addSettingForm').serialize(),
-		dataType: "json",
-		async : false,
-		success: function(data) {
-			alert("success!");
+	$.ajax({
+		type: "POST",
+		url: "/directors",
+		contentType: "application/json",
+		//dataType: "json",
+		async : true,
+		data : JSON.stringify({
+				userId 			: $("[name='userId']").val(),
+				userPassword	: $("[name='userPassword']").val(),
+				directorUrl		: $("[name='directorUrl']").val(),
+				directorPort	: parseInt($("[name='directorPort']").val())
+		}),
+		success: function(data, status) {
+			// ajax가 성공할때 처리...
+			alert(status);
 			w2popup.close();		
 		},
 		error:function(e) { 
-			// ajax가 실패할때 메세지... 
-			alert("잠시 후 다시 이용해 주시기 바랍니다.");  
+			// ajax가 실패할때 처리... 
+			alert("등록 중 오류가 발생하였습니다.");
+			w2popup.close();
 		} 
-	});	
+	});
 }
 </script>
 

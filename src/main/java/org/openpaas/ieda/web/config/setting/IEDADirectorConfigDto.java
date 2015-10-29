@@ -7,11 +7,12 @@ import java.util.Date;
 
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import lombok.Data;
-
 import org.hibernate.validator.constraints.NotBlank;
+
+import lombok.Data;
 
 
 /**
@@ -34,7 +35,7 @@ public class IEDADirectorConfigDto {
 		@NotBlank
 		private String  directorUrl;
 		
-		@NotBlank
+		@NotNull
 		private Integer directorPort;
 
 	}

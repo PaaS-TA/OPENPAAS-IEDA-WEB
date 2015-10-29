@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.modelmapper.ModelMapper;
 import org.openpaas.ieda.common.IEDACommonException;
@@ -21,11 +21,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
@@ -155,17 +160,4 @@ public class DirectorConfigurationController {
 		
 	}
 	
-	@RequestMapping(value="/directors/registSetting", method=RequestMethod.POST)
-	//@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity registSetting( @RequestBody IEDADirectorConfigDto.Create createDto){
-		
-		log.debug("++++++++++++++++++++++++++++++");
-		log.debug("createDto : " + createDto.getUserId() + createDto.getDirectorUrl());
-		log.debug("++++++++++++++++++++++++++++++");
-		//IEDADirectorConfig directorConfig = service.createDirector( createDto );
-		
-		//return modelMapper.map(directorConfig, IEDADirectorConfigDto.Response.class); 
-		return new ResponseEntity(HttpStatus.OK);
-	} 
-
 }

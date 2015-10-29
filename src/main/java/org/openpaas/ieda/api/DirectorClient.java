@@ -3,10 +3,9 @@ package org.openpaas.ieda.api;
 
 import java.net.URI;
 
-import lombok.Data;
-
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+
+import lombok.Data;
 
 /**
  * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
