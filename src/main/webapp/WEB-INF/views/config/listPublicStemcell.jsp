@@ -13,7 +13,7 @@ $(function() {
 		method: 'GET',
 		style: 'text-align:center',
 		columns:[
-			 {field: 'recid', caption: '운영체계', size:'10%'}
+			 {field: 'recid', caption: '운영체계', hidden:true}
 			,{field: 'os', caption: '운영체계', size: '10%'}
 			,{field: 'osVersion', caption: '버전', size: '10%'}
 			,{field: 'iaas', caption: 'IaaS', size: '10%', sortable: true}
@@ -75,13 +75,15 @@ function doDownload() {
 	
 	// 다운로드 요청
 	var record = w2ui['config_opStemcellsGrid'].get(selected);
-	//alert(record.key);
+	
+	var request = { key: record.key, fileName: record.stemcellFileName };
 	
 	$.ajax({
-		type: "post",
+		method: 'post',
+		type: "json",
 		url: "/downloadPublicStemcell",
 		contentType: "application/json",
-		data : record.key,
+		data : JSON.stringify(request),
 		success: function(data, status) {
 			alert(status);
 		},

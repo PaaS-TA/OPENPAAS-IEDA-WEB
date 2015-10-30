@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,9 @@ public class StemcellManagementController {
 	
 	@Autowired
 	private StemcellManagementService service;
+	
+	@Autowired
+	private IEDAConfiguration iedaConfiguration;
 
 	@RequestMapping(value="/config/listPublicStemcell", method=RequestMethod.GET)
 	public String List() {
@@ -61,11 +65,15 @@ public class StemcellManagementController {
 	}
 	
 	@RequestMapping(value="/downloadPublicStemcell", method=RequestMethod.POST)
-	public ResponseEntity doDownloadStemcell(@RequestBody String stemcellName) {
+	public ResponseEntity doDownloadStemcell(@RequestBody HashMap<String, String> requestMap ) {
 		
-		log.info("doDownloadStemcell : " + stemcellName);
+		log.info("stemcell dir : " + iedaConfiguration.getStemcellDir());
+		log.info("doDownloadStemcell key      : " + requestMap.get("key"));
+		log.info("doDownloadStemcell fileName : " + requestMap.get("fileName"));
+		
+/*		log.info("doDownloadStemcell : " + stemcellName);
 		List<String> directoryList = service.doDownloadStemcell();
-
+*/
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
