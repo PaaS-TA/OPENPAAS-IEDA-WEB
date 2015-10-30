@@ -16,6 +16,5 @@ public class StemcellContent {
 	private String iaas;
 	private String stemcellFileName;
 	private String stemcellVersion;
-
-
+	private String isExisted;
 }
