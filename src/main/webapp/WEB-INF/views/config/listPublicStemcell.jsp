@@ -13,14 +13,45 @@ $(function() {
 		method: 'GET',
 		style: 'text-align:center',
 		columns:[
-			 {field: 'recid', caption: '운영체계', hidden:true}
+			 {field: 'recid', caption: '운영체계', hidden: true}
 			,{field: 'os', caption: '운영체계', size: '10%'}
 			,{field: 'osVersion', caption: '버전', size: '10%'}
 			,{field: 'iaas', caption: 'IaaS', size: '10%', sortable: true}
 			,{field: 'stemcellVersion', caption: '스템셀버전', size: '10%'}
-			,{field: 'stemcellFileName', caption: '파일명', size: '40%'}
-			,{field: 'download', caption: '다운로드여부', size: '10%', style: 'text-align:left'}
-		]
+			,{field: 'stemcellFileName', caption: '파일명', size: '40%', style: 'text-align:left'}
+			,{field: 'isExisted', caption: '다운로드 여부', size: '10%',
+				render: function(record) {
+					if ( record.isExisted == 'Y')
+						return '<div class="btn btn-success btn-xs" style="width:70px;">' + '완료 ' + '</div>';
+				}
+			}
+		],
+		onClick: function(event) {
+			var grid = this;
+			event.onComplete = function() {
+				var sel = grid.getSelection();
+				if ( sel == null || sel == "") {
+					$('#doDownload').attr('disabled', true);
+					$('#doDelete').attr('disabled', true);
+					return;
+				}
+				
+				var record = grid.get(sel);
+				if ( record.isExisted == 'Y' ) {
+					// 다운로드 버튼 Disable
+					$('#doDownload').attr('disabled', true);
+					// 삭제 버튼 Enable
+					$('#doDelete').attr('disabled', false);
+				}
+				else {
+					// 다운로드 버튼 Enable
+					$('#doDownload').attr('disabled', false);
+					// 삭제 버튼 Disable
+					$('#doDelete').attr('disabled', true);
+				}
+			}
+			
+		}
 		
 	});
 
@@ -59,35 +90,54 @@ function initView() {
 	
 	// 스템셀 목록 조회
 	doSearch();
+	
+	// 다운로드 & 삭제버튼 Disable
+	$('#doDownload').attr('disabled', true);
+	$('#doDelete').attr('disabled', true);
+	
 }
 
+// OS버전 Option 목록 조회
 function changeOS() {
 	// OS버전 코드  (OS구분과 연관된 하위코드로 선택된 OS구분 코드의 값)
 	setCommonCode('<c:url value="/codes/child/"/>' + $("#os option:selected").val(), 'osVersion');
 }
 
+//스템셀 목록 조회
+function doSearch() {
+	var requestParam = "?os=" + $("#os option:selected").text();
+	requestParam += "&osVersion=" + $("#osVersion option:selected").text();
+	requestParam += "&iaas=" + $("#iaas option:selected").text();
+
+	w2ui['config_opStemcellsGrid'].load("<c:url value='/publicStemcells'/>"
+			+ requestParam);
+}
+
 // 스템셀 다운로드
 function doDownload() {
 	var selected = w2ui['config_opStemcellsGrid'].getSelection();
-	if (selected == null || selected == '') {
+/* 	if (selected == null || selected == '') {
 		alert("다운로드받을 스템셀을 선택하세요.");
 	}
-	
-	// 다운로드 요청
+ */	
 	var record = w2ui['config_opStemcellsGrid'].get(selected);
-	
-	var request = { key: record.key, fileName: record.stemcellFileName };
-	
+
+	var requestParameter = {
+			key : record.key,
+			fileName : record.stemcellFileName,
+			fileSize : record.size
+		};
+
 	$.ajax({
-		method: 'post',
-		type: "json",
-		url: "/downloadPublicStemcell",
-		contentType: "application/json",
-		data : JSON.stringify(request),
-		success: function(data, status) {
+		method : 'post',
+		type : "json",
+		url : "/downloadPublicStemcell",
+		contentType : "application/json",
+		data : JSON.stringify(requestParameter),
+		success : function(data, status) {
 			alert(status);
 		},
-		error:function(e) { 
+		error : function(e) {
 			alert("오류가 발생하였습니다.");
 		}
 	});
@@ -96,19 +146,38 @@ function doDownload() {
 // 스템셀 삭제
 function doDelete() {
 	var selected = w2ui['config_opStemcellsGrid'].getSelection();
-	if (selected == null || selected == '') {
-		alert("삭제할 스템셀을 선택하세요.");
-	}
-}
-
-// 스템셀 목록 조회
-function doSearch() {
+	var record = w2ui['config_opStemcellsGrid'].get(selected);
 	
-	var requestParam = "?os=" + $("#os option:selected").text();
-	requestParam += "&osVersion=" + $("#osVersion option:selected").text();
-	requestParam += "&iaas=" + $("#iaas option:selected").text();
-
-	w2ui['config_opStemcellsGrid'].load("<c:url value='/publicStemcells'/>" + requestParam);
+	var requestParameter = { stemcellFileName: record.stemcellFileName };
+	
+	w2confirm( { msg : '선택된 스템셀을 삭제하시겠습니까?'
+		, title : '스템셀 삭제'
+		, yes_text:'확인'
+		, no_text:'취소'
+		})
+		.yes(function() {
+			$.ajax({
+				method : 'delete',
+				type : "json",
+				url : "/deletePublicStemcell",
+				contentType : "application/json",
+				data : JSON.stringify(requestParameter),
+				success : function(data, status) {
+					record.isExisted = 'N';
+					w2ui['config_opStemcellsGrid'].reload();
+					$('#doDelete').attr('disabled', true);
+					w2ui['config_opStemcellsGrid'].selectNone();
+					w2alert("삭제 처리가 완료되었습니다.", "스템셀  삭제");
+				},
+				error : function(e) {
+					console.log(e);
+					w2alert("오류가 발생하였습니다.");
+				}
+			});
+		})
+		.no(function() {
+			// do nothing
+		});
 }
 
 //다른페이지 이동시 호출
@@ -117,10 +186,9 @@ function clearMainPage() {
 }
 
 //화면 리사이즈시 호출
-$( window ).resize(function() {
+$(window).resize(function() {
 	setLayoutContainerHeight();
 });
-
 </script>
 
 <div id="main">
@@ -129,10 +197,9 @@ $( window ).resize(function() {
 	<!-- OpenPaaS 스템셀 목록-->
 	<div class="title">스템셀 목록</div>
 	
-<!-- 	<form id="searchPublicStemcell" method=post> -->
  	<div class="search_box" style align="center">
 		<span class="search_li">OS</span>&nbsp;&nbsp;&nbsp;
-		<select name="select" id="os" class="select" style="width:120px" onChange="changeOS();">
+		<select name="select" id="os" class="select" style="width:120px">
 		</select>
 		<span class="search_li">OS버전</span>&nbsp;&nbsp;&nbsp;
 		<select name="select" id="osVersion" class="select" style="width:120px">
@@ -141,12 +208,12 @@ $( window ).resize(function() {
 		<select name="select" id="iaas" class="select" style="width:120px">
 		</select>
 		&nbsp;&nbsp;&nbsp;
-		<span class="btn btn-info" style="width:100px" id="doSearch">조회</span>
-		<span class="btn btn-primary" style="width:100px" id="doDownload">다운로드</span>
-		<span class="btn btn-danger" style="width:100px" id="doDelete">삭제</span>
+		<button type="button" class="btn btn-info" style="width:100px" id="doSearch">조회</button>
+		<button type="button" class="btn btn-primary" style="width:100px" id="doDownload">다운로드</button>
+		<button type="button" class="btn btn-danger" style="width:100px" id="doDelete">삭제</button>
 	</div>
-<!-- 	</form>
- -->	
+	
+	<!-- 그리드 영역 -->
 	<div id="config_opStemcellsGrid" style="width:100%; height:500px"/>	
 	
 </div>
