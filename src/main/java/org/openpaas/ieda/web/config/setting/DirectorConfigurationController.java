@@ -7,13 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAErrorResponse;
+import org.openpaas.ieda.web.config.stemcell.StemcellContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,13 +20,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +49,7 @@ public class DirectorConfigurationController {
 	private ModelMapper modelMapper;
 	
 	/**
-	 * 설치관리자 설정
+	 * 설치관리자 설정 화면
 	 * @return
 	 */
 	@RequestMapping(value="/config/listDirector", method=RequestMethod.GET)
@@ -67,6 +63,12 @@ public class DirectorConfigurationController {
 		return new ResponseEntity(content, HttpStatus.OK);
 	}
 
+	/**
+	 * 관리자 등록
+	 * @param directorDto
+	 * @param result
+	 * @return
+	 */
 	@RequestMapping(value="/directors", method=RequestMethod.POST)
 	public ResponseEntity createDirector(@RequestBody @Valid IEDADirectorConfigDto.Create directorDto, BindingResult result) {
 		if (result.hasErrors()) {
@@ -78,8 +80,6 @@ public class DirectorConfigurationController {
 			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 		}
 		
-		log.info("111");
-
 		IEDADirectorConfig newDirector = service.createDirector(directorDto);
 		
 		return new ResponseEntity<>(modelMapper.map(newDirector, IEDADirectorConfigDto.Response.class), HttpStatus.CREATED);
@@ -96,8 +96,12 @@ public class DirectorConfigurationController {
 		return new PageImpl<>(content, pageable, page.getTotalElements());
 	}*/
 	
+	/**
+	 * 관리자 리스트 조회
+	 * @param pageable
+	 * @return
+	 */
 	@RequestMapping(value="/directors", method=RequestMethod.GET)
-	//@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity listDirector(Pageable pageable) {
 		List<IEDADirectorConfig> contents = service.listDirector();
 		
@@ -105,8 +109,13 @@ public class DirectorConfigurationController {
 											.map(code -> modelMapper.map(code, IEDADirectorConfigDto.Response.class))
 											.collect(Collectors.toList());
 		
-
+		int recid = 0;
+		for (IEDADirectorConfigDto.Response directionConfig : result) {
+			directionConfig.setRecid(recid++);
+		}
+		
 		HashMap<String, Object> d = new HashMap<String, Object>();
+		
 		d.put("total", result.size());
 		d.put("records", result);
 		
@@ -125,6 +134,11 @@ public class DirectorConfigurationController {
 	}*/
 	
 
+	/**
+	 * 관리자 기본정보(상단 상세?)
+	 * @param seq
+	 * @return
+	 */
 	@RequestMapping(value="/directors/{seq}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
 	public IEDADirectorConfigDto.Response getDirector(@PathVariable int seq) {
@@ -133,6 +147,12 @@ public class DirectorConfigurationController {
 		return modelMapper.map(directorConfig, IEDADirectorConfigDto.Response.class);  
 	}
 	
+	/**
+	 * 관리자 정보 수정
+	 * @param seq
+	 * @param updateDto
+	 * @return
+	 */
 	@RequestMapping(value="/director/{seq}", method=RequestMethod.PUT)
 	@ResponseStatus(HttpStatus.OK)
 	public IEDADirectorConfigDto.Response updateDirector(@PathVariable int seq,
@@ -142,6 +162,11 @@ public class DirectorConfigurationController {
 		return modelMapper.map(directorConfig, IEDADirectorConfigDto.Response.class); 
 	}
 	
+	/**
+	 * 관리자 정보 삭제
+	 * @param seq
+	 * @return
+	 */
 	@RequestMapping(value="/director/{seq}", method=RequestMethod.DELETE)
 	public ResponseEntity deleteDirector(@PathVariable int seq) {
 		service.deleteDirectorConfig(seq);
@@ -160,4 +185,11 @@ public class DirectorConfigurationController {
 		
 	}
 	
+	@RequestMapping(value="/director/setDefault", method=RequestMethod.PUT)
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity setDefaultDirector(@PathVariable int seq) {
+		service.setDefaultDirector(seq);
+		
+		return new ResponseEntity<> (HttpStatus.NO_CONTENT); 
+	}
 }

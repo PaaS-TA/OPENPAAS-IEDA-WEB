@@ -118,7 +118,8 @@ public class IEDADirectorConfigService {
 		director.setDirectorUuid(info.getUuid());
 		director.setDirectorCpi(info.getCpi());
 		director.setDirectorVersion(info.getVersion());
-
+		
+		director.setDefaultYn((directorConfigList.size() ==0 ) ? "Y":"N");
 		director.setUpdatedDate(now);
 		director.setCreatedDate(now);
 
@@ -190,7 +191,24 @@ public class IEDADirectorConfigService {
 					"해당하는 디렉터가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 
-//		directorConfigRepository.delete(seq);
+		directorConfigRepository.delete(seq);
 	}
 
+	public void setDefaultDirector(int seq) {
+		IEDADirectorConfig directorConfig = directorConfigRepository
+				.findByIedaDirectorConfigSeq(seq);
+
+		if (directorConfig == null) {
+			throw new IEDACommonException("illigalArgument.director.exception",
+					"해당하는 디렉터가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+		}
+		directorConfig.setDefaultYn("Y");
+		directorConfigRepository.save(directorConfig);
+		
+		IEDADirectorConfig oldDefaultDiretor = directorConfigRepository.findOneByDefaultYn("Y");
+		if (oldDefaultDiretor != null) {
+			oldDefaultDiretor.setDefaultYn("N");
+			directorConfigRepository.save(oldDefaultDiretor);
+		}
+	}
 }

@@ -56,6 +56,8 @@ public class IEDADirectorConfigDto {
 
 	@Data
 	public static class Response {
+		private int recid;
+		
 		private Integer iedaDirectorConfigSeq;
 		
 		private String  userId;

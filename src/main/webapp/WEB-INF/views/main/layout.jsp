@@ -24,9 +24,6 @@ response.setDateHeader("Expires",0);
 <link rel="stylesheet" type="text/css" href="<c:url value='/webjars/bootstrap/3.3.5/css/bootstrap.min.css'/>"/>
 <link rel="stylesheet" type="text/css" href="<c:url value='/css/default.css'/>"/>
 <link rel="stylesheet" type="text/css" href="<c:url value='/css/guide.css'/>"/>
-<!-- JAlert CSS  -->
-<link rel="stylesheet" type="text/css" href="<c:url value='/css/jAlert-FB.css'/>"/>
-<link rel="stylesheet" type="text/css" href="<c:url value='/css/jAlert-v3.css'/>"/>
 
 <!-- JQuery -->
 <script type="text/javascript" src="<c:url value='/webjars/jquery/2.1.1/jquery.min.js'/>"></script>
@@ -40,13 +37,6 @@ response.setDateHeader("Expires",0);
 <!-- Common -->
 <script type="text/javascript" src="<c:url value='/js/common.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/js/commonPopup.js'/>"></script>
-
-<!-- JAlert js -->
-<script type="text/javascript" src="<c:url value='/js/jAlert-FB.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/js/jAlert-functions.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/js/jAlert-functions.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/js/jAlert-v3.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/js/jAlert-v3.min.js'/>"></script>
 
 <script type="text/javascript">
 
