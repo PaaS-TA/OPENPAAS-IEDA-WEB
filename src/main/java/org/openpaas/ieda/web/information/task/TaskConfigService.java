@@ -2,6 +2,7 @@ package org.openpaas.ieda.web.information.task;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openpaas.ieda.api.DirectorClient;
@@ -42,11 +43,11 @@ public class TaskConfigService  {
 			System.out.println("########111111111111");
 			URI tasksUri = UriComponentsBuilder.fromUri(client.getRoot())
 					.pathSegment("tasks").build().toUri();
-/*			ResponseEntity<ArrayList<Task>> response = client.getRestTemplate()
-					.getForEntity(infoUri, (Class<? extends ArrayList<Task>)ArrayList.class);*/
+			ResponseEntity response = client.getRestTemplate()
+					.getForEntity(tasksUri, Task.class);
 			System.out.println("########22222222222222  : " + tasksUri);
 			
-			ParameterizedTypeReference<List<Task>> myBean = new ParameterizedTypeReference<List<Task>>() {};
+/*			ParameterizedTypeReference<List<Task>> myBean = new ParameterizedTypeReference<List<Task>>() {};
 
 			System.out.println("########33333333333333  : " + myBean);
 			
@@ -54,12 +55,12 @@ public class TaskConfigService  {
 //			        client.getRestTemplate().exchange( tasksUri ,
 //			                    HttpMethod.GET, null, new ParameterizedTypeReference<List<Task>>() {});
 			
-			ResponseEntity<Task[]> rateResponse = client.getRestTemplate().getForEntity(tasksUri, Task[].class);
+			ResponseEntity<Task[]> rateResponse = client.getRestTemplate().getForEntity(tasksUri, Task[].class);*/
 			
 //			List<Task> tasksList = rateResponse.getBody();
-			Task[] tasks = rateResponse.getBody();
+			List<Task>tasks = Arrays.asList((Task)response.getBody());
 			
-			System.out.println(tasks.length);
+			System.out.println(tasks.size());
 			for (Task task : tasks) {
 				log.info("id : " + task.getId() + ", desc : " + task.getDescription());
 			}
