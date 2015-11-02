@@ -1,10 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+
 <script type="text/javascript">
 
 $(function() {
-	
  	$('#config_opStemcellsGrid').w2grid({
 		name: 'config_opStemcellsGrid',
 		show: {selectColumn: true, footer: true},
@@ -50,7 +50,6 @@ $(function() {
 					$('#doDelete').attr('disabled', true);
 				}
 			}
-			
 		}
 		
 	});
@@ -94,7 +93,6 @@ function initView() {
 	// 다운로드 & 삭제버튼 Disable
 	$('#doDownload').attr('disabled', true);
 	$('#doDelete').attr('disabled', true);
-	
 }
 
 // OS버전 Option 목록 조회
@@ -116,10 +114,7 @@ function doSearch() {
 // 스템셀 다운로드
 function doDownload() {
 	var selected = w2ui['config_opStemcellsGrid'].getSelection();
-/* 	if (selected == null || selected == '') {
-		alert("다운로드받을 스템셀을 선택하세요.");
-	}
- */	
+
 	var record = w2ui['config_opStemcellsGrid'].get(selected);
 
 	var requestParameter = {
@@ -150,7 +145,7 @@ function doDelete() {
 	
 	var requestParameter = { stemcellFileName: record.stemcellFileName };
 	
-	w2confirm( { msg : '선택된 스템셀을 삭제하시겠습니까?'
+	w2confirm( { msg : '선택된 스템셀 ' + record.stemcellFileName + '을 삭제하시겠습니까?'
 		, title : '스템셀 삭제'
 		, yes_text:'확인'
 		, no_text:'취소'
@@ -170,7 +165,6 @@ function doDelete() {
 					w2alert("삭제 처리가 완료되었습니다.", "스템셀  삭제");
 				},
 				error : function(e) {
-					console.log(e);
 					w2alert("오류가 발생하였습니다.");
 				}
 			});
@@ -197,23 +191,29 @@ $(window).resize(function() {
 	<!-- OpenPaaS 스템셀 목록-->
 	<div class="title">스템셀 목록</div>
 	
- 	<div class="search_box" style align="center">
+ 	<div class="search_box" align="center">
 		<span class="search_li">OS</span>&nbsp;&nbsp;&nbsp;
+		<!-- OS구분 -->
 		<select name="select" id="os" class="select" style="width:120px">
 		</select>
 		<span class="search_li">OS버전</span>&nbsp;&nbsp;&nbsp;
+		<!-- OS버전구분 -->
 		<select name="select" id="osVersion" class="select" style="width:120px">
 		</select>
 		<span class="search_li">IaaS</span>&nbsp;&nbsp;&nbsp;
+		<!-- IaaS구분 -->
 		<select name="select" id="iaas" class="select" style="width:120px">
 		</select>
 		&nbsp;&nbsp;&nbsp;
-		<button type="button" class="btn btn-info" style="width:100px" id="doSearch">조회</button>
+		
+		<button type="button" class="btn btn-info !important" style="width:100px" id="doSearch">조회</button>
+		
 		<button type="button" class="btn btn-primary" style="width:100px" id="doDownload">다운로드</button>
 		<button type="button" class="btn btn-danger" style="width:100px" id="doDelete">삭제</button>
+
 	</div>
 	
 	<!-- 그리드 영역 -->
-	<div id="config_opStemcellsGrid" style="width:100%; height:500px"/>	
+	<div id="config_opStemcellsGrid" style="width:100%; height:500px"></div>	
 	
 </div>

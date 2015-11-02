@@ -9,6 +9,8 @@ function getDefaultDirector(url) {
 			ajaxErrorMsg(xhr);
 		},
 		success: function(data) {
+			if ( data == null || data == "" ) return;
+			
 			$('#directorName').text(data.directorName);
 			$('#userId').text(data.userId);
 			
