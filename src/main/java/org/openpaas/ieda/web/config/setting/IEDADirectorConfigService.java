@@ -185,7 +185,7 @@ public class IEDADirectorConfigService {
 	public void deleteDirectorConfig(int seq) {
 		IEDADirectorConfig directorConfig = directorConfigRepository
 				.findByIedaDirectorConfigSeq(seq);
-
+		log.info("========== : " + seq);
 		if (directorConfig == null) {
 			throw new IEDACommonException("illigalArgument.director.exception",
 					"해당하는 디렉터가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
@@ -202,13 +202,15 @@ public class IEDADirectorConfigService {
 			throw new IEDACommonException("illigalArgument.director.exception",
 					"해당하는 디렉터가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
-		directorConfig.setDefaultYn("Y");
-		directorConfigRepository.save(directorConfig);
 		
 		IEDADirectorConfig oldDefaultDiretor = directorConfigRepository.findOneByDefaultYn("Y");
 		if (oldDefaultDiretor != null) {
 			oldDefaultDiretor.setDefaultYn("N");
 			directorConfigRepository.save(oldDefaultDiretor);
 		}
+
+		directorConfig.setDefaultYn("Y");
+		directorConfigRepository.save(directorConfig);
+		
 	}
 }

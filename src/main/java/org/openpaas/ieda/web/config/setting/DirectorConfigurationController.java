@@ -5,6 +5,7 @@ package org.openpaas.ieda.web.config.setting;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import lombok.extern.slf4j.Slf4j;
@@ -170,9 +172,10 @@ public class DirectorConfigurationController {
 	@RequestMapping(value="/director/{seq}", method=RequestMethod.DELETE)
 	public ResponseEntity deleteDirector(@PathVariable int seq) {
 		service.deleteDirectorConfig(seq);
-		
+		log.info("########### : " + seq);
 		return new ResponseEntity<> (HttpStatus.NO_CONTENT); 
 	}
+	
 	
 	@ExceptionHandler(IEDACommonException.class)
 	public ResponseEntity handleIEDACommonException(IEDACommonException e) {
@@ -185,11 +188,11 @@ public class DirectorConfigurationController {
 		
 	}
 	
-	@RequestMapping(value="/director/setDefault", method=RequestMethod.PUT)
-	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value="/director/default/{seq}", method=RequestMethod.PUT)
 	public ResponseEntity setDefaultDirector(@PathVariable int seq) {
+//		log.info( "########## : " + map.get("seq").toString());
 		service.setDefaultDirector(seq);
-		
+//		service.setDefaultDirector(seq);
 		return new ResponseEntity<> (HttpStatus.NO_CONTENT); 
 	}
 }

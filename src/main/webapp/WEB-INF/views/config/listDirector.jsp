@@ -31,6 +31,10 @@ $(function() {
 			gridErrorMsg(event);
 		}
 	});
+  	
+	//  기본 설치관리자 정보 조회
+	getDefaultDirector();
+  	
  	doSearch();
 });
 
@@ -51,24 +55,33 @@ function setDefaultDirector() {
 		return;
 	}
 	else{
-		w2alert(selected.tostring);
-		//w2confirm(selected[0].get+"기본관리자로 설정하시겠습니까?", "기본관리자 설정", w2alert(selected.length) );
+		var record = w2ui['config_directorGrid'].get(selected);
+		//w2alert(selected.tostring);
+		w2confirm(record.directorName + "를 " + "기본관리자로 설정하시겠습니까?","기본관리자 설정")
+		.yes(function(){
+			//w2alert(
+			registDefault(record.iedaDirectorConfigSeq);
+		})
+		.no(function () { 
+	        console.log("user clicked NO")
+	    });;
 	}
 }
 
-function registDefaultDirector(item){
-	w2alert(selected.length)
-}
-
-//설정 삭제 버튼
-function deleteSetting() {
-	var selected = w2ui['config_directorGrid'].getSelection();
-	
-	if( selected.length == 0 ){
-		w2alert("선택된 정보가 없습니다.", "관리자 삭제");
-		return;
-	}
-	var result = w2confirm("선택한 정보를 삭제하시겠습니까?", "관리자 삭제", w2alert("set"));
+function registDefault(seq){
+	$.ajax({
+		type : "PUT",
+		url : "/director/default/"+seq,
+		contentType : "application/json",
+		success : function(data, status) {
+			w2popup.unlock();
+			w2popup.close();
+			doSearch();
+		},
+		error : function(e ) {
+			w2alert("기본관리자 등록에 실패 하였습니다.", "기본관리자 등록");
+		}
+	});
 }
 
 //설정 추가 버튼
@@ -80,16 +93,6 @@ function addSetting(){
 		body	: $("#regPopupDiv").html(),
 		buttons : $("#regPopupBtnDiv").html()
 	});
-}
-
-//다른페이지 이동시 호출
-function clearMainPage() {
-	$().w2destroy('config_directorGrid');
-}
-
-function lock (msg) {
-    w2popup.lock(msg, true);
-    registSetting();
 }
 
 //등록처리
@@ -120,6 +123,62 @@ function registSetting(){
 		}
 	});
 }
+
+//관리자 삭제 버튼
+function deleteSetting() {
+	var selected = w2ui['config_directorGrid'].getSelection();
+	
+	if( selected.length == 0 ){
+		w2alert("선택된 정보가 없습니다.", "설치 관리자 삭제");
+		return;
+	}
+	else{
+		var record = w2ui['config_directorGrid'].get(selected);
+		//w2alert(selected.tostring);
+		w2confirm("설치 관리자(" + record.directorName + ")를 삭제하시겠습니까?","설치 관리자 삭제")
+		.yes(function(){
+			//w2alert(
+			deleteDirector(record.iedaDirectorConfigSeq);
+		})
+		.no(function () { 
+	        console.log("user clicked NO")
+	    });;
+	}
+}
+
+function deleteDirector(seq){
+	$.ajax({
+		type : "DELETE",
+		url : "/director/"+ seq,
+		contentType : "application/json",
+		//async : true,
+		//data : JSON.stringify({seq: seq}),
+		success : function(data, status) {
+			// ajax가 성공할때 처리...
+			w2popup.unlock();
+			w2popup.close();
+			doSearch();
+		},
+		error : function(e ) {
+			// ajax가 실패할때 처리...
+			w2alert("설치 관리자 삭제에 실패 하였습니다.", "설치 관리자 삭제");
+			//alert("등록 중 오류가 발생하였습니다." );
+			//w2popup.unlock();
+		}
+	});
+}
+
+//다른페이지 이동시 호출
+function clearMainPage() {
+	$().w2destroy('config_directorGrid');
+}
+
+function lock (msg) {
+    w2popup.lock(msg, true);
+    registSetting();
+}
+
+
 </script>
 
 <div id="main">
