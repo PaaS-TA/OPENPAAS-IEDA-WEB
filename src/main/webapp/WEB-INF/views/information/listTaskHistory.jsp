@@ -11,16 +11,33 @@ $(function() {
 	$('#sq_taskHistoryGrid').w2grid({
 		name: 'sq_taskHistoryGrid',
 		style: 'text-align:center',
+		method: 'GET',
+		show: {	
+			lineNumbers: true,
+			selectColumn: true,
+			footer: true},
 		columns:[
-			 {field: 'TASK_ID', caption: '번호', size: '10%'}
-			,{field: 'TASK_STATUS', caption: '상태', size: '10%'}
-			,{field: 'TASK_DATETIME', caption: '시간', size: '20%'}
-			,{field: 'TASK_USER', caption: '사용자', size: '20%'}
-			,{field: 'TASK_COMMENT', caption: '설명', size: '40%'}
-		]
+			 {field: 'recid', 	caption: 'recid', 			hidden: true}
+			,{field: 'id', caption: '번호', size: '10%'}
+			,{field: 'state', caption: '상태', size: '10%'}
+			,{field: 'runTime', caption: '시간', size: '15%'}
+			,{field: 'user', caption: '사용자', size: '15%'}
+			,{field: 'description', caption: '설명', size: '30%', align:'left'}
+			,{field: 'result', caption: '결과', size: '30%', align:'left'}
+		],
+		onError: function(event) {
+			this.unlock();
+			gridErrorMsg(event);
+		}
 	});
 
+	doSearch();
 });
+
+//조회기능
+function doSearch() {
+	w2ui['sq_taskHistoryGrid'].load("<c:url value='/tasks'/>");
+}
 
 //다른페이지 이동시 호출
 function clearMainPage() {

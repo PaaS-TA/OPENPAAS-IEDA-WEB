@@ -3,8 +3,6 @@
 <script type="text/javascript">
 
 $(function() {
-	// 기본 설치 관리자 정보 조회
- 	getDefaultDirector("<c:url value='/directors/default'/>");
 	
   	$('#config_directorGrid').w2grid({
 		name: 'config_directorGrid',
@@ -95,6 +93,9 @@ $(function() {
 
 //조회기능
 function doSearch() {
+	// 기본 설치 관리자 정보 조회
+ 	getDefaultDirector("<c:url value='/directors/default'/>");
+ 	w2ui['config_directorGrid'].reload();
 	w2ui['config_directorGrid'].load("<c:url value='/directors'/>");
 }
 
@@ -251,13 +252,13 @@ function lock (msg) {
 			<div class="w2ui-field">
 				<label style="width:30%;text-align: left;padding-left: 20px;">관리자 계정명</label>
 				<div style="width: 70%">
-					<input name="userId" type="text" maxlength="100" style="width: 250px" required="required" value="test_id"/>
+					<input name="userId" type="text" maxlength="100" style="width: 250px" required="required" value="admin"/>
 				</div>
 			</div>
 			<div class="w2ui-field">
 				<label style="width:30%;text-align: left;padding-left: 20px;">관리자 계정 비밀번호</label>
 				<div style="width: 70%;">
-					<input name="userPassword" type="password" maxlength="100" style="width: 250px" required="required" value="testPass"/>
+					<input name="userPassword" type="password" maxlength="100" style="width: 250px" required="required" value="admin"/>
 				</div>
 			</div>
 			<div class="w2ui-field">
