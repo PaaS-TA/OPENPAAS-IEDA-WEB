@@ -14,16 +14,16 @@ $(function() {
 		method: 'GET',
 		show: {	
 			lineNumbers: true,
-			selectColumn: true,
+			selectColumn: false	,
 			footer: true},
 		columns:[
 			 {field: 'recid', 	caption: 'recid', 			hidden: true}
-			,{field: 'id', caption: '번호', size: '10%'}
-			,{field: 'state', caption: '상태', size: '10%'}
-			,{field: 'runTime', caption: '시간', size: '15%'}
-			,{field: 'user', caption: '사용자', size: '15%'}
-			,{field: 'description', caption: '설명', size: '30%', align:'left'}
-			,{field: 'result', caption: '결과', size: '30%', align:'left'}
+			,{field: 'id', caption: 'Task ID', size: '7%'}
+			,{field: 'state', caption: '상태', size: '8%'}
+			,{field: 'runTime', caption: '시간', size: '20%'}
+			,{field: 'user', caption: '사용자', size: '10%'}
+			,{field: 'description', caption: '설명', size: '25%', style:"text-align:left"}
+			,{field: 'result', caption: '결과', size: '35%', style:"text-align:left"}
 		],
 		onError: function(event) {
 			this.unlock();
@@ -55,7 +55,7 @@ $( window ).resize(function() {
 	<div class="page_site">서비스 정보조회 > <strong>Task 실행 이력</strong></div>
 
 	<!-- 설치 관리자 -->
-	<div class="title">설치 관리자</div>
+	<div class="title">Task 실행 이력</div>
 	
 	<table class="tbl1" border="1" cellspacing="0">
 	<tr>
@@ -68,11 +68,15 @@ $( window ).resize(function() {
 	</tr>
 	</table>
 	
-	<div id="hMargin"/>
-
 	<!-- Task실행 이력 -->
-	<div class="title">Task 실행 이력</div>
-	<div id="sq_taskHistoryGrid" style="width:100%; height:500px"/>	
-	
-	
+	<div class="pdt20">
+		<div class="title fl">Task 실행 이력</div>
+		<div class="fr"> 
+			<!-- Btn -->
+			<span class="boardBtn" id="detailTaskBtn" ><a href="#" class="btn btn-primary" style="width:150px"><span>Task 상세</span></a></span>
+			<!-- //Btn -->
+		</div>
+	</div>	
+	<div id="hMargin"></div>
+	<div id="sq_taskHistoryGrid" style="width:100%; height:500px"></div>
 </div>
