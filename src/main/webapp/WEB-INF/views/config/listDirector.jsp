@@ -3,6 +3,9 @@
 <script type="text/javascript">
 
 $(function() {
+	// 기본 설치 관리자 정보 조회
+ 	getDefaultDirector("<c:url value='/directors/default'/>");
+	
   	$('#config_directorGrid').w2grid({
 		name: 'config_directorGrid',
 		header: '<b>설치관리자 목록</b>',
@@ -26,46 +29,73 @@ $(function() {
 		         },
 		         {field: 'directorUUID', caption: '관리자 UUID', size: '35%'}
 		         ],
+		
+		onSelect:function (event){
+			var grid = this;
+			event.onComplete = function() {
+				var sel = grid.getSelection();
+				if ( sel == null || sel == "") {
+					$('#setDefaultDirector a').attr('disabled', true);
+					$('#deleteSetting a').attr('disabled', true);
+					return;
+				}
+				
+				var record = grid.get(sel);
+				if ( record.defaultYn == 'Y' ) {
+					$('#setDefaultDirector a').attr('disabled', true);// 기본관리자 설정 Disable
+				}
+				else {
+					$('#setDefaultDirector a').attr('disabled', false);// 기본관리자 설정 Enable
+				}
+			}
+			
+		},
 		onError: function(event) {
 			this.unlock();
 			gridErrorMsg(event);
 		}
 	});
   	
-	//  기본 설치관리자 정보 조회
-	getDefaultDirector();
-  	
  	doSearch();
+ 	
+ 	$("#setDefaultDirector").click(function(){
+ 		if($("#setDefaultDirector a").attr('disabled') != "disabled"){
+	 		var selected = w2ui['config_directorGrid'].getSelection();
+	 		if( selected.length == 0 ){
+	 			w2alert("선택된 정보가 없습니다.", "기본관리자 설정");
+	 			return;
+	 		}
+	 		else  if ( selected.length > 1 ){
+	 			w2alert("기본관리자 설정은 하나만 선택 가능합니다.", "기본관리자 설정");
+	 			return;
+	 		}
+	 		else{
+	 			var record = w2ui['config_directorGrid'].get(selected);
+	 			//w2alert(selected.tostring);
+	 			if( record.defaultYn == "Y" ){
+	 				//w2alert("")
+	 				//클릭시 버튼  Disable] 
+	 				w2alert("선택한 설정관리자는 이미 기본관리자로 설정되어 있습니다.","기본관리자 설정");
+	 				return;
+	 			}
+	 			else{
+		 			w2confirm(record.directorName + "를 " + "기본관리자로 설정하시겠습니까?","기본관리자 설정")
+		 			.yes(function(){
+		 				//w2alert(
+		 				registDefault(record.iedaDirectorConfigSeq);
+		 			})
+		 			.no(function () { 
+		 		        console.log("user clicked NO")
+		 		    });;
+	 			}
+	 		}
+	 	}
+	})
 });
 
 //조회기능
 function doSearch() {
 	w2ui['config_directorGrid'].load("<c:url value='/directors'/>");
-}
-
-//기본관리자 설정 버튼
-function setDefaultDirector() {
-	var selected = w2ui['config_directorGrid'].getSelection();
-	if( selected.length == 0 ){
-		w2alert("선택된 정보가 없습니다.", "기본관리자 설정");
-		return;
-	}
-	else if ( selected.length > 1 ){
-		w2alert("기본관리자 설정은 하나만 선택 가능합니다.", "기본관리자 설정");
-		return;
-	}
-	else{
-		var record = w2ui['config_directorGrid'].get(selected);
-		//w2alert(selected.tostring);
-		w2confirm(record.directorName + "를 " + "기본관리자로 설정하시겠습니까?","기본관리자 설정")
-		.yes(function(){
-			//w2alert(
-			registDefault(record.iedaDirectorConfigSeq);
-		})
-		.no(function () { 
-	        console.log("user clicked NO")
-	    });;
-	}
 }
 
 function registDefault(seq){
@@ -203,7 +233,7 @@ function lock (msg) {
 		<div class="title fl">설치관리자 목록</div>
 		<div class="fr"> 
 		<!-- Btn -->
-		<span class="boardBtn" id="setDefaultDirector" onclick="setDefaultDirector();"><a href="#" class="btn btn-primary" style="width:150px"><span>기본관리자로 설정</span></a></span>
+		<span class="boardBtn" id="setDefaultDirector" ><a href="#" class="btn btn-primary" style="width:150px"><span>기본관리자로 설정</span></a></span>
 		<span class="boardBtn" id="addSetting" onclick="addSetting();"><a href="#" class="btn btn-primary" style="width:130px"><span>설정 추가</span></a></span>
 		<span class="boardBtn" id="deleteSetting" onclick="deleteSetting();"><a href="#" class="btn btn-danger" style="width:130px"><span>설정 삭제</span></a></span>
 		<!-- //Btn -->

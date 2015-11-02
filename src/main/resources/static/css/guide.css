@@ -182,9 +182,6 @@ a:active {
 .brd1 a{}
 .brd1 a:hover{color:#2a76c0;text-decoration:underline;}
 
-/* boardBtn */
-.boardBtn{text-align:right}
-
 /* btnType */
 .btnType1{display:inline-block;background:url(../images/btn_type1_r.gif) no-repeat right 0 #f9f9f9;color:#fff !important;text-decoration:none; font-size:12px; !important;cursor:pointer}
 .btnType1 span{display:inline-block;background:url(../images/btn_type1_l.gif) no-repeat left 0;text-align:center;font-weight:bold;font-size:11px;min-width:28px;line-height:19px;height:27px;padding:5px 10px 1px 10px}
@@ -192,7 +189,6 @@ a:active {
 .btnType2 span{display:inline-block;background:url(../images/btn_type2_l.gif) no-repeat left 0;text-align:center;font-weight:bold;min-width:28px;line-height:19px;height:27px;padding:3px 10px 1px 10px}
 .btnType3{display:inline-block;background:url(../images/btn_type3_r.gif) no-repeat right 0 #f9f9f9;color:#fff !important;text-decoration:none  !important;cursor:pointer}
 .btnType3 span{display:inline-block;background:url(../images/btn_type3_l.gif) no-repeat left 0;text-align:center;font-weight:bold;min-width:28px;line-height:19px;height:27px;padding:3px 10px 1px 10px}
-
 
 /* ie9 default size */
 .ie9fix .btnType1 span{line-height:20px;height:20px;padding:0 10px 0 10px}
