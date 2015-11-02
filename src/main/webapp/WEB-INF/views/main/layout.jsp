@@ -20,8 +20,8 @@ response.setDateHeader("Expires",0);
 <title>Open PaaS 플랫폼 설치 자동화</title>
 
 <!-- CSS  -->
-<link rel="stylesheet" type="text/css" href="<c:url value='/webjars/w2ui/1.4.2/w2ui.min.css'/>"/>
 <link rel="stylesheet" type="text/css" href="<c:url value='/webjars/bootstrap/3.3.5/css/bootstrap.min.css'/>"/>
+<link rel="stylesheet" type="text/css" href="<c:url value='/webjars/w2ui/1.4.2/w2ui.min.css'/>"/>
 <link rel="stylesheet" type="text/css" href="<c:url value='/css/default.css'/>"/>
 <link rel="stylesheet" type="text/css" href="<c:url value='/css/guide.css'/>"/>
 
