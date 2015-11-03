@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class TaskConfigService  {
+public class IEDATaskConfigService  {
 	
 	@Autowired
 	private IEDADirectorConfigRepository directorConfigRepository;
@@ -52,6 +52,8 @@ public class TaskConfigService  {
 
 		} catch (ResourceAccessException e) {
 			e.printStackTrace();
+			log.info("getMessage : " + e.getMessage());
+			log.info("getLocalizedMessage : " + e.getLocalizedMessage());
 			throw new IEDACommonException("notfound.tasks.exception", " Task정보 조회중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			throw new IEDACommonException("notfound.tasks.exception",

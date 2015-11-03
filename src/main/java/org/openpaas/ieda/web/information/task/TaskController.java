@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TaskController {
 	
 	@Autowired
-	private TaskConfigService service;
+	private IEDATaskConfigService service;
 
 	@RequestMapping(value="/information/listTaskHistory", method=RequestMethod.GET)
 	public String List() {
@@ -44,11 +44,11 @@ public class TaskController {
 			task.setRunTime(format.format(runTime));
 		}
 		
-		HashMap<String, Object> d = new HashMap<String, Object>();
-		d.put("total", contents.size());
-		d.put("records", contents);
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		result.put("total", contents.size());
+		result.put("records", contents);
 		
-		return new ResponseEntity(d, HttpStatus.OK);
+		return new ResponseEntity(result, HttpStatus.OK);
 	}
 
 /*	@RequestMapping( value="/tasks/{taskId}", method =RequestMethod.GET)

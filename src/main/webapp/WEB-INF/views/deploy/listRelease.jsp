@@ -8,17 +8,38 @@ $(function() {
  	getDefaultDirector("<c:url value='/directors/default'/>");
  	
  	$('#ru_uploadedReleasesGrid').w2grid({
-		name: 'ru_uploadedReleasesGrid',
-		style: 'text-align:center',
-		columns:[
-			 {field: 'name', caption: '이름', size: '20%'}
-			,{field: 'version', caption: '버전', size: '40%'}
-			,{field: 'commit_hash', caption: 'Commit Hash', size: '40%'}
-		]
+		name	: 'ru_uploadedReleasesGrid',
+		method 	: "GET",
+		style	: 'text-align:center',
+		show	: {	
+					lineNumbers: true,
+					selectColumn: false	,
+					footer: true},
+		columns	:[
+		         {field: 'recid', caption: 'recid', hidden: true}
+		       , {field: 'version', caption: 'version', size: '20%'}
+		       , {field: 'name', caption: '이름', size: '30%'}
+		       , {field: 'currentlyDeployed', caption: 'currently_deployed', size: '15%'}
+		       , {field: 'uncommittedChanges', caption: 'uncommitted_changes ', size: '15%'}
+		       , {field: 'commitHash', caption: 'commitHash', size: '20%'}
+		       //, {field: 'commit_hash', caption: 'Commit Hash', size: '40%'}
+		       ],
+       onError: function(event) {
+			this.unlock();
+			gridErrorMsg(event);
+		}
 	});
  	
-
+ 	doSearch();
 });
+
+
+//조회기능
+function doSearch() {
+	w2ui['ru_uploadedReleasesGrid'].load("<c:url value='/releases'/>");
+}
+
+
 
 //다른페이지 이동시 호출
 function clearMainPage() {
