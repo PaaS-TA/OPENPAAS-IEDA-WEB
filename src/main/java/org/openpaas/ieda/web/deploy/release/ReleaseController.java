@@ -38,8 +38,10 @@ public class ReleaseController {
 		List<ReleaseConfig> contents = service.listRelease();
 		
 		int recid = 0;
-		for( ReleaseConfig config : contents ){
-			config.setRecid(recid++);
+		if(contents != null){
+			for( ReleaseConfig config : contents ){
+				config.setRecid(recid++);
+			}
 		}
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		result.put("total", contents.size());

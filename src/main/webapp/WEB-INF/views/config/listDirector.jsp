@@ -3,6 +3,8 @@
 <script type="text/javascript">
 
 $(function() {
+	// 기본 설치 관리자 정보 조회
+ 	getDefaultDirector("<c:url value='/directors/default'/>");
 	
   	$('#config_directorGrid').w2grid({
 		name: 'config_directorGrid',
@@ -46,7 +48,6 @@ $(function() {
 					$('#setDefaultDirector a').attr('disabled', false);// 기본관리자 설정 Enable
 				}
 			}
-			
 		},
 		onError: function(event) {
 			this.unlock();
@@ -56,6 +57,7 @@ $(function() {
   	
  	doSearch();
  	
+ 	//기본관리자 설정
  	$("#setDefaultDirector").click(function(){
  		if($("#setDefaultDirector a").attr('disabled') != "disabled"){
 	 		var selected = w2ui['config_directorGrid'].getSelection();
@@ -88,23 +90,70 @@ $(function() {
 	 			}
 	 		}
 	 	}
-	})
+	});
+		 			
+	//설정 관리자 추가 버튼
+	$("#addSetting").click(function(){
+		w2popup.open({
+			title 	: "<b>설치관리자 설정추가</b>",
+			width 	: 600,
+			height	: 250,
+			body	: $("#regPopupDiv").html(),
+			buttons : $("#regPopupBtnDiv").html()
+		});
+	});
+	
+	//설정관리자 삭제 버튼
+	$("#deleteSetting").click(function(){
+		var girdTotal = w2ui['config_directorGrid'].records.length;
+		if(girdTotal > 1 ){
+			var selected = w2ui['config_directorGrid'].getSelection();
+			
+			if( selected.length == 0 ){
+				w2alert("선택된 정보가 없습니다.", "설치 관리자 삭제");
+				return;
+			}
+			else{
+				var record = w2ui['config_directorGrid'].get(selected);
+				//w2alert(selected.tostring);
+				w2confirm("설치 관리자(" + record.directorName + ")를 삭제하시겠습니까?","설치 관리자 삭제")
+					.yes(function(){
+						//w2alert(
+						deleteDirector(record.iedaDirectorConfigSeq);
+					})
+					.no(function () { 
+				        console.log("user clicked NO")
+				    });;
+			}
+		}
+	});//설정관리자 삭제 버튼 END
+		 			
+	
 });
 
 //조회기능
 function doSearch() {
-	// 기본 설치 관리자 정보 조회
- 	getDefaultDirector("<c:url value='/directors/default'/>");
- 	w2ui['config_directorGrid'].reload();
-	w2ui['config_directorGrid'].load("<c:url value='/directors'/>");
+	w2ui['config_directorGrid'].load("<c:url value='/directors'/>", doButtonStyle);
 }
 
+function doButtonStyle(){
+	var girdTotal = w2ui['config_directorGrid'].records.length;
+	if(girdTotal==1 || girdTotal==0){
+		//기본관리자 버튼 Hide
+		$('#setDefaultDirector a').attr('disabled', true);// 기본관리자 설정 Disable
+		//삭제 버튼 hide
+		$('#deleteSetting a').attr('disabled', true);// 기본관리자 설정 Disable
+	} 
+}
+
+//기본관리자 등록
 function registDefault(seq){
 	$.ajax({
 		type : "PUT",
 		url : "/director/default/"+seq,
 		contentType : "application/json",
 		success : function(data, status) {
+			w2ui['config_directorGrid'].reload();
 			w2popup.unlock();
 			w2popup.close();
 			doSearch();
@@ -115,18 +164,7 @@ function registDefault(seq){
 	});
 }
 
-//설정 추가 버튼
-function addSetting(){
-	w2popup.open({
-		title 	: "<b>설치관리자 설정추가</b>",
-		width 	: 600,
-		height	: 250,
-		body	: $("#regPopupDiv").html(),
-		buttons : $("#regPopupBtnDiv").html()
-	});
-}
-
-//등록처리
+//설정관리자 등록
 function registSetting(){
 	$.ajax({
 		type : "POST",
@@ -155,35 +193,12 @@ function registSetting(){
 	});
 }
 
-//관리자 삭제 버튼
-function deleteSetting() {
-	var selected = w2ui['config_directorGrid'].getSelection();
-	
-	if( selected.length == 0 ){
-		w2alert("선택된 정보가 없습니다.", "설치 관리자 삭제");
-		return;
-	}
-	else{
-		var record = w2ui['config_directorGrid'].get(selected);
-		//w2alert(selected.tostring);
-		w2confirm("설치 관리자(" + record.directorName + ")를 삭제하시겠습니까?","설치 관리자 삭제")
-		.yes(function(){
-			//w2alert(
-			deleteDirector(record.iedaDirectorConfigSeq);
-		})
-		.no(function () { 
-	        console.log("user clicked NO")
-	    });;
-	}
-}
-
+//설정관리자 삭제
 function deleteDirector(seq){
 	$.ajax({
 		type : "DELETE",
 		url : "/director/"+ seq,
 		contentType : "application/json",
-		//async : true,
-		//data : JSON.stringify({seq: seq}),
 		success : function(data, status) {
 			// ajax가 성공할때 처리...
 			w2popup.unlock();
@@ -203,13 +218,6 @@ function deleteDirector(seq){
 function clearMainPage() {
 	$().w2destroy('config_directorGrid');
 }
-
-function lock (msg) {
-    w2popup.lock(msg, true);
-    registSetting();
-}
-
-
 </script>
 
 <div id="main">
@@ -236,7 +244,7 @@ function lock (msg) {
 		<!-- Btn -->
 		<span class="boardBtn" id="setDefaultDirector" ><a href="#" class="btn btn-primary" style="width:150px"><span>기본관리자로 설정</span></a></span>
 		<span class="boardBtn" id="addSetting" onclick="addSetting();"><a href="#" class="btn btn-primary" style="width:130px"><span>설정 추가</span></a></span>
-		<span class="boardBtn" id="deleteSetting" onclick="deleteSetting();"><a href="#" class="btn btn-danger" style="width:130px"><span>설정 삭제</span></a></span>
+		<span class="boardBtn" id="deleteSetting"><a href="#" class="btn btn-danger" style="width:130px"><span>설정 삭제</span></a></span>
 		<!-- //Btn -->
 	    </div>
 	</div>
