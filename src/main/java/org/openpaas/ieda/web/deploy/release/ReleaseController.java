@@ -6,7 +6,6 @@ package org.openpaas.ieda.web.deploy.release;
 import java.util.HashMap;
 import java.util.List;
 
-import org.openpaas.ieda.api.Release;
 import org.openpaas.ieda.api.ReleaseConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ReleaseController {
 
 	@Autowired
-	private ReleaseService service;
+	private IEDAReleaseService service;
 	
 	@RequestMapping(value="/deploy/listRelease", method=RequestMethod.GET)
 	public String List() {
@@ -38,9 +37,6 @@ public class ReleaseController {
 	public ResponseEntity listRelease(){
 		List<ReleaseConfig> contents = service.listRelease();
 		
-		log.info("#####listRelease#####");
-		log.info("contents.size  : "+ contents.size());
-		log.info("#####################");
 		int recid = 0;
 		for( ReleaseConfig config : contents ){
 			config.setRecid(recid++);

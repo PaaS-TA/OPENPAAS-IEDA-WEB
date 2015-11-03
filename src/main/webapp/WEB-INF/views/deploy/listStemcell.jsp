@@ -9,24 +9,34 @@ $(function() {
  	getDefaultDirector("<c:url value='/directors/default'/>");
  	
  	$('#us_uploadStemcellsGrid').w2grid({
-		name: 'us_uploadStemcellsGrid',
-		show: {selectColumn: true, footer: true},
-//		multiSelect: false,
-		style: 'text-align:center',
-		columns:[
-			 {field: 'os', caption: '운영체계', size: '10%'}
-			,{field: 'os_version', caption: '버전', size: '10%'}
-			,{field: 'iaas', caption: 'IaaS', size: '10%'}
-			,{field: 'stemcell_version', caption: '스템셀버전', size: '10%'}
-			,{field: 'stemcell_filename', caption: '파일명', size: '40%'}
-			,{field: 'download', caption: '다운로드', size: '10%'}
-			,{field: 'upload', caption: '업로드', size: '10%'}
-		]
+		name	: 'us_uploadStemcellsGrid',
+		method 	: "GET",
+		style	: 'text-align:center',
+		show	: {		
+					lineNumbers: true,
+					selectColumn: false	,
+					footer: true},
+		columns	:[
+		           {field: 'recid', caption: 'recid', hidden: true}
+		         , {field: 'name', caption: '이름', size: '30%'}
+		         , {field: 'operating_system', caption: 'OS', size: '20%'}
+		         , {field: 'version', caption: '버전', size: '10%'}
+		         , {field: 'cid', caption: 'CID', size: '30%'}
+		         ],
+		onError: function(event) {
+			this.unlock();
+			gridErrorMsg(event);
+		}
 	});
 	
-
+ 	doSearch();
 
 });
+
+//조회기능
+function doSearch() {
+	w2ui['us_uploadStemcellsGrid'].load("<c:url value='/stemcells'/>");
+}
 
 //다른페이지 이동시 호출
 function clearMainPage() {
@@ -63,23 +73,12 @@ $( window ).resize(function() {
 	<div class="pdt20">
 		<div class="title fl">스템셀 목록</div>
 		<div class="fr"> 
+			<span class="boardBtn"><a href="#" class="btn btn-primary" style="width:100px"><span>업로드</span></a></span>
+			<span class="boardBtn"><a href="#" class="btn btn-danger" style="width:100px"><span>삭제</span></a></span>
 	    </div>
-	</div>
-	
- 	<div class="search_box" style align="center">
-		<span class="search_li">OS</span>&nbsp;&nbsp;&nbsp;
-		<select name="select" class="select" style="width:120px"><option>Ubuntu</option></select>
-		<span class="search_li">OS버전</span>&nbsp;&nbsp;&nbsp;
-		<select name="select" class="select" style="width:120px"><option>Trusty</option></select>
-		<span class="search_li">IaaS</span>&nbsp;&nbsp;&nbsp;
-		<select name="select" class="select" style="width:120px"><option>Openstack</option></select>
-		<span class="boardBtn">&nbsp;&nbsp;&nbsp;<a href="#" class="btn btn-info" style="width:100px"><span>조회</span></a></span>
-		<span class="boardBtn"><a href="#" class="btn btn-primary" style="width:100px"><span>업로드</span></a></span>
-		<span class="boardBtn"><a href="#" class="btn btn-danger" style="width:100px"><span>삭제</span></a></span>
-	</div> 
 		
-	<div id="hMargin"/>
-	
-	<div id="us_uploadStemcellsGrid" style="width:100%; height:500px"/>	
+	<!-- <div id="hMargin"></div> -->
+	</div>
+	<div id="us_uploadStemcellsGrid" style="width:100%; height:500px">	
 	
 </div>

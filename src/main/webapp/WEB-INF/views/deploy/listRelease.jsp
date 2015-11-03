@@ -21,7 +21,7 @@ $(function() {
 		       , {field: 'name', caption: '이름', size: '30%'}
 		       , {field: 'currentlyDeployed', caption: 'currently_deployed', size: '15%'}
 		       , {field: 'uncommittedChanges', caption: 'uncommitted_changes ', size: '15%'}
-		       , {field: 'commitHash', caption: 'commitHash', size: '20%'}
+		       , {field: 'commitHash', caption: 'CommitHash', size: '20%'}
 		       //, {field: 'commit_hash', caption: 'Commit Hash', size: '40%'}
 		       ],
        onError: function(event) {
@@ -38,8 +38,6 @@ $(function() {
 function doSearch() {
 	w2ui['ru_uploadedReleasesGrid'].load("<c:url value='/releases'/>");
 }
-
-
 
 //다른페이지 이동시 호출
 function clearMainPage() {

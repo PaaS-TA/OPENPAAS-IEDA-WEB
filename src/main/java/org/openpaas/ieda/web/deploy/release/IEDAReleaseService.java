@@ -2,16 +2,13 @@ package org.openpaas.ieda.web.deploy.release;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.neo4j.cypher.internal.compiler.v2_1.ast.IsNotNull;
 import org.openpaas.ieda.api.DirectorClient;
 import org.openpaas.ieda.api.DirectorClientBuilder;
 import org.openpaas.ieda.api.Release;
 import org.openpaas.ieda.api.ReleaseConfig;
 import org.openpaas.ieda.api.ReleaseVersion;
-import org.openpaas.ieda.api.Task;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigRepository;
@@ -25,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class ReleaseService {
+public class IEDAReleaseService {
 
 	@Autowired
 	private IEDADirectorConfigRepository directorConfigRepository;
@@ -44,7 +41,6 @@ public class ReleaseService {
 					.pathSegment("releases").build().toUri();
 			
 			releases = client.getRestTemplate().getForObject(releasesUri, Release[].class);
-			log.info("############");
 			if(  releases != null ){
 				for (Release release : releases) {
 					ReleaseConfig config = new ReleaseConfig();
@@ -64,9 +60,9 @@ public class ReleaseService {
 			e.printStackTrace();
 			log.info("getMessage : " + e.getMessage());
 			log.info("getLocalizedMessage : " + e.getLocalizedMessage());
-			throw new IEDACommonException("notfound.tasks.exception", " Release정보 조회중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
+			throw new IEDACommonException("notfound.releases.exception", " Release정보 조회중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			throw new IEDACommonException("notfound.tasks.exception",
+			throw new IEDACommonException("notfound.releases.exception",
 					"요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
 		}
 		
