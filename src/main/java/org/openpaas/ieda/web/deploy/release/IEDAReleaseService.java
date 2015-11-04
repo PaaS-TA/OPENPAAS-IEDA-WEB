@@ -7,7 +7,6 @@ import java.util.List;
 import org.openpaas.ieda.api.DirectorClient;
 import org.openpaas.ieda.api.DirectorClientBuilder;
 import org.openpaas.ieda.api.Release;
-import org.openpaas.ieda.api.ReleaseConfig;
 import org.openpaas.ieda.api.ReleaseVersion;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;

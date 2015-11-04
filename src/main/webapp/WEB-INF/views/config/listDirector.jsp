@@ -71,17 +71,14 @@ $(function() {
 	 		}
 	 		else{
 	 			var record = w2ui['config_directorGrid'].get(selected);
-	 			//w2alert(selected.tostring);
 	 			if( record.defaultYn == "Y" ){
-	 				//w2alert("")
-	 				//클릭시 버튼  Disable] 
+	 				//클릭시 버튼  Disable 
 	 				w2alert("선택한 설정관리자는 이미 기본관리자로 설정되어 있습니다.","기본관리자 설정");
 	 				return;
 	 			}
 	 			else{
 		 			w2confirm(record.directorName + "를 " + "기본관리자로 설정하시겠습니까?","기본관리자 설정")
 		 			.yes(function(){
-		 				//w2alert(
 		 				registDefault(record.iedaDirectorConfigSeq);
 		 			})
 		 			.no(function () { 
@@ -115,10 +112,8 @@ $(function() {
 			}
 			else{
 				var record = w2ui['config_directorGrid'].get(selected);
-				//w2alert(selected.tostring);
 				w2confirm("설치 관리자(" + record.directorName + ")를 삭제하시겠습니까?","설치 관리자 삭제")
 					.yes(function(){
-						//w2alert(
 						deleteDirector(record.iedaDirectorConfigSeq);
 					})
 					.no(function () { 
@@ -127,8 +122,6 @@ $(function() {
 			}
 		}
 	});//설정관리자 삭제 버튼 END
-		 			
-	
 });
 
 //조회기능
@@ -186,8 +179,7 @@ function registSetting(){
 		},
 		error : function(e ) {
 			// ajax가 실패할때 처리...
-			alert(e);
-			//alert("등록 중 오류가 발생하였습니다." );
+			w2alert(e);
 			w2popup.unlock();
 		}
 	});
@@ -208,8 +200,6 @@ function deleteDirector(seq){
 		error : function(e ) {
 			// ajax가 실패할때 처리...
 			w2alert("설치 관리자 삭제에 실패 하였습니다.", "설치 관리자 삭제");
-			//alert("등록 중 오류가 발생하였습니다." );
-			//w2popup.unlock();
 		}
 	});
 }
@@ -217,6 +207,10 @@ function deleteDirector(seq){
 //다른페이지 이동시 호출
 function clearMainPage() {
 	$().w2destroy('config_directorGrid');
+}
+
+function lock (msg) {
+    w2popup.lock(msg, true);
 }
 </script>
 
@@ -243,7 +237,7 @@ function clearMainPage() {
 		<div class="fr"> 
 		<!-- Btn -->
 		<span class="boardBtn" id="setDefaultDirector" ><a href="#" class="btn btn-primary" style="width:150px"><span>기본관리자로 설정</span></a></span>
-		<span class="boardBtn" id="addSetting" onclick="addSetting();"><a href="#" class="btn btn-primary" style="width:130px"><span>설정 추가</span></a></span>
+		<span class="boardBtn" id="addSetting" ><a href="#" class="btn btn-primary" style="width:130px"><span>설정 추가</span></a></span>
 		<span class="boardBtn" id="deleteSetting"><a href="#" class="btn btn-danger" style="width:130px"><span>설정 삭제</span></a></span>
 		<!-- //Btn -->
 	    </div>

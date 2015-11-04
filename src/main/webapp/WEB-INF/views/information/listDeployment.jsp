@@ -9,18 +9,34 @@ $(function() {
  	getDefaultDirector("<c:url value='/directors/default'/>");
  	
 	$('#sq_deploymentsGrid').w2grid({
-		name: 'sq_deploymentsGrid',
-		style: 'text-align:center',
-		columns:[
-			 {field: 'DEPLOYMENT_NAME', caption: '배포 이름', size: '20%'}
-			,{field: 'DEPLOYMENT_URL', caption: '릴리즈 목록', size: '40%'}
-			,{field: 'DEPLOYMENT_UUID', caption: '스템셀 목록', size: '40%'}
-		]
+		name	: 'sq_deploymentsGrid',
+		style	: 'text-align:center',
+		method	: 'GET',
+		show	: {
+					lineNumbers: true,
+					selectColumn: true,
+					footer: true},
+		columns	: [
+					 {field: 'recid', 	caption: 'recid', hidden: true}
+		       	   , {field: 'deployName', caption: '배포 이름', size: '20%'}
+		       	   , {field: 'release', caption: '릴리즈 목록', size: '40%'}
+		       	   , {field: 'stemcellName', caption: '스템셀 목록', size: '40%'}
+		       	],
+		onError: function(event) {
+			w2alert("ERROR");
+			//this.unlock();
+			//gridErrorMsg(event);
+		}
 	});
 	
-
+	doSearch();
 
 });
+
+//조회기능
+function doSearch() {
+	w2ui['sq_deploymentsGrid'].load("<c:url value='/listDeployment'/>");
+}
 
 //다른페이지 이동시 호출
 function clearMainPage() {

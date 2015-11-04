@@ -1,4 +1,4 @@
-package org.openpaas.ieda.api;
+package org.openpaas.ieda.web.deploy.release;
 
 import lombok.Data;
 
