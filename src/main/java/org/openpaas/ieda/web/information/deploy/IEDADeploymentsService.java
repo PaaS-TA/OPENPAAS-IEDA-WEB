@@ -34,20 +34,15 @@ public class IEDADeploymentsService {
 		Deployment[] deployments = null;
 		List<DeploymentsConfig> deploymentConfigs = new ArrayList<DeploymentsConfig>();
 		try {
-			log.info("@@@@@ URI : " + defaultDirector.getDirectorUrl());
+			
 			DirectorClient client = new DirectorClientBuilder()
 					.withHost(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort())
 					.withCredentials(defaultDirector.getUserId(), defaultDirector.getUserPassword()).build();
 			
 			URI deploymentsUri = UriComponentsBuilder.fromUri(client.getRoot())
 					.pathSegment("deployments").build().toUri();
-			log.info("### DeploymentsUri :  " + deploymentsUri);
 			
-//			deploymentsUri = new URI.create('https://52.21.37.184:25555/deployments');
-						
-			deployments = client.getRestTemplate().getForObject(deploymentsUri , Deployment[].class);
-			
-			log.info("### deployments Length :  " + deployments.length );
+			deployments = client.getRestTemplate().getForObject(deploymentsUri, Deployment[].class);
 			
 			if(deployments != null && deployments.length > 0){
 				for( Deployment deployment : deployments){
@@ -58,12 +53,9 @@ public class IEDADeploymentsService {
 							&& deployment.getStemcells() != null && deployment.getStemcells().size() > 0){
 						for(ReleaseConfig releaseConfig : deployment.getReleases()){
 							config.setRelease(releaseConfig.getName() + "/" + releaseConfig.getVersion());
-							log.info("###############################");
 							for(Stemcell stemcell : deployment.getStemcells()){
 								config.setStemcellName(stemcell.getName());
-								log.info(config.toString());
 								deploymentConfigs.add(config);
-								log.info("###############################");
 							}
 						}
 					}
