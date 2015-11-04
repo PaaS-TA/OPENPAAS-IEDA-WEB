@@ -14,7 +14,7 @@ $(function() {
 		style	: 'text-align:center',
 		show	: {		
 					lineNumbers: true,
-					selectColumn: false	,
+					selectColumn: true	,
 					footer: true},
 		columns	:[
 		           {field: 'recid', caption: 'recid', hidden: true}
