@@ -35,7 +35,7 @@ $(function() {
 
 //조회기능
 function doSearch() {
-	w2ui['sq_deploymentsGrid'].load("<c:url value='/listDeployment'/>");
+	w2ui['sq_deploymentsGrid'].load("<c:url value='/deployments'/>");
 }
 
 //다른페이지 이동시 호출

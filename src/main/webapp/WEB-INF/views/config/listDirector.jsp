@@ -266,7 +266,7 @@ function lock (msg) {
 			<div class="w2ui-field">
 				<label style="width:30%;text-align: left;padding-left: 20px;">디텍터 Url</label>
 				<div style="width: 70%;">
-					<input name="directorUrl" type="text" maxlength="100" style="width: 250px" required="required" value="52.21.37.184"/>
+					<input name="directorUrl" type="url" maxlength="100" style="width: 250px" required="required" value="52.21.37.184"/>
 				</div>
 			</div>
 			<div class="w2ui-field">

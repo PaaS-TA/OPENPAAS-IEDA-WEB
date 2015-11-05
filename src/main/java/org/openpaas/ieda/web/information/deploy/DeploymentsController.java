@@ -36,7 +36,7 @@ public class DeploymentsController {
 		return "/information/listDeployment";
 	}
 	
-	@RequestMapping(value="/listDeployment", method=RequestMethod.GET)
+	@RequestMapping(value="/deployments", method=RequestMethod.GET)
 	public ResponseEntity listDeployment(){
 		
 		List<DeploymentsConfig> contents = service.listDeployment();

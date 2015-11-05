@@ -36,7 +36,7 @@ public class IEDADeploymentsService {
 		try {
 			
 			DirectorClient client = new DirectorClientBuilder()
-					.withHost(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort())
+					.withHost("52.23.2.85"/*defaultDirector.getDirectorUrl()*/, defaultDirector.getDirectorPort())
 					.withCredentials(defaultDirector.getUserId(), defaultDirector.getUserPassword()).build();
 			
 			URI deploymentsUri = UriComponentsBuilder.fromUri(client.getRoot())

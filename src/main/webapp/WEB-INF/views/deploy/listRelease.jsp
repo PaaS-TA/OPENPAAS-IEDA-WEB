@@ -17,11 +17,11 @@ $(function() {
 					footer: true},
 		columns	:[
 		         {field: 'recid', caption: 'recid', hidden: true}
-		       , {field: 'version', caption: 'version', size: '20%'}
 		       , {field: 'name', caption: '이름', size: '30%'}
+		       , {field: 'version', caption: 'version', size: '20%'}
+		       , {field: 'commitHash', caption: 'CommitHash', size: '20%'}
 		       , {field: 'currentlyDeployed', caption: 'currently_deployed', size: '15%'}
 		       , {field: 'uncommittedChanges', caption: 'uncommitted_changes ', size: '15%'}
-		       , {field: 'commitHash', caption: 'CommitHash', size: '20%'}
 		       //, {field: 'commit_hash', caption: 'Commit Hash', size: '40%'}
 		       ],
        onError: function(event) {
