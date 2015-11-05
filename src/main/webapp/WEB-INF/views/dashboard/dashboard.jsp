@@ -5,40 +5,56 @@
 <script type="text/javascript">
 
 $(function() {
+	// 기본 설치 관리자 정보 조회
+ 	getDefaultDirector("<c:url value='/directors/default'/>");
 	
 	$('#main_deploymentsGrid').w2grid({
 		name: 'main_deploymentsGrid',
-		style: 'text-align:center',
-		columns:[
-			 {field: 'DEPLOYMENT_NAME', caption: '배포 이름', size: '20%'}
-			,{field: 'DEPLOYMENT_URL', caption: '릴리즈 목록', size: '40%'}
-			,{field: 'DEPLOYMENT_UUID', caption: '스템셀 목록', size: '40%'}
-		]
+		style	: 'text-align:center',
+		method	: 'GET',
+		columns	: [
+					 {field: 'recid', 	caption: 'recid', hidden: true}
+		       	   , {field: 'deployName', caption: '배포 이름', size: '20%'}
+		       	   , {field: 'release', caption: '릴리즈 목록', size: '40%'}
+		       	   , {field: 'stemcellName', caption: '스템셀 목록', size: '40%'}
+		       	],
+		onError: function(event) {
+			w2alert("ERROR");
+		}
 	});
 	
 	$('#main_releasesGrid').w2grid({
 		name: 'main_releasesGrid',
+		method 	: "GET",
 		style: 'text-align:center',
 		columns:[
-			 {field: 'RELEASE_NAME', caption: '릴리즈 이름', size: '50%'}
-			,{field: 'RELEASE_VERSION', caption: '버전', size: '25%'}
-			,{field: 'RELEASE_USE_YN', caption: '배포여부', size: '25%'}
+			 {field: 'name', caption: '릴리즈 이름', size: '50%'}
+			,{field: 'version', caption: '버전', size: '25%'}
+			,{field: 'commitHash', caption: '배포여부', size: '25%'}
 		]
 	});
 	
 	$('#main_stemcellsGrid').w2grid({
 		name: 'main_stemcellsGrid',
+		method 	: "GET",
 		style: 'text-align:center',
 		columns:[
-			 {field: 'STEMCELL_NAME', caption: '스템셀 이름', size: '40%'}
-			,{field: 'STEMCELL_OS', caption: '운영체계', size: '10%'}
-			,{field: 'STEMCELL_VERSION', caption: '버전', size: '10%'}
-			,{field: 'STEMCELL_CID', caption: 'CID', size: '40%'}
+			 {field: 'name', caption: '스템셀 이름', size: '40%'}
+			,{field: 'operating_system', caption: '운영체계', size: '10%'}
+			,{field: 'version', caption: '버전', size: '10%'}
+			,{field: 'cid', caption: 'CID', size: '40%'}
 		]
 	});	
 	
+	doSearch();
 });
 
+//조회기능
+function doSearch() {
+	w2ui['main_deploymentsGrid'].load("<c:url value='/dashboard/deployments'/>");
+	w2ui['main_releasesGrid'].load("<c:url value='/dashboard/releases'/>");
+	w2ui['main_stemcellsGrid'].load("<c:url value='/dashboard/stemcells'/>");	
+}
 
 //다른페이지 이동시 호출
 function clearMainPage() {
@@ -59,33 +75,33 @@ $( window ).resize(function() {
 	<!-- 설치 관리자 -->
 	<div class="title">설치 관리자</div>
 	
-	<table class="tbl1" border="1" cellspacing="0">
+	<table class="tbl1" border="1" >
 	<tr>
-		<th width="18%" class="th_fb">관리자 이름</th><td class="td_fb">0000</td>
-		<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb">0000</td>
+		<th width="18%" class="th_fb">관리자 이름</th><td class="td_fb"><b id="directorName"></b></td>
+		<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb"><b id="userId"></b></td>
 	</tr>
 	<tr>
-		<th width="18%" >관리자 URL</th><td>0000</td>
-		<th width="18%" >관리자 UUID</th><td >0000</td>
+		<th width="18%" >관리자 URL</th><td><b id="directorUrl"></b></td>
+		<th width="18%" >관리자 UUID</th><td ><b id="directorUuid"></b></td>
 	</tr>
 	</table>
 	
-	<div id="hMargin"/>
+	<div id="hMargin"></div>
 	
 	<!-- 설치 목록 -->
 	<div class="title">설치 목록</div>
-	<div id="main_deploymentsGrid" style="width:100%; height:150px"/>
+	<div id="main_deploymentsGrid" style="width:100%; height:150px"></div>
 	
-	<div id="hMargin"/>
+	<div id="hMargin"></div>
 	
 	<!-- 릴리즈 목록 -->
 	<div class="title">릴리즈 목록</div>
-	<div id="main_releasesGrid" style="width:100%; height:150px"/>
+	<div id="main_releasesGrid" style="width:100%; height:150px"></div>
 	
-	<div id="hMargin"/>
+	<div id="hMargin"></div>
 	
 	<!-- 스템셀 목록-->
 	<div class="title">스템셀 목록</div>
-	<div id="main_stemcellsGrid" style="width:100%; height:150px"/>
+	<div id="main_stemcellsGrid" style="width:100%; height:150px"></div>
           
 </div>
