@@ -71,6 +71,12 @@ $(function() {
  	$("#doDelete").click(function(){
  		doDelete();
     });
+ 	
+ 	// OS구분 코드 변경 시  OS버전 구분코드 조회
+ 	$("#os").change(function() {
+ 		// OS버전 코드  (OS구분과 연관된 하위코드로 선택된 OS구분 코드의 값)
+ 		setCommonCode('<c:url value="/codes/child/"/>' + $("#os option:selected").val(), 'osVersion');
+ 	});
 
 });
 
