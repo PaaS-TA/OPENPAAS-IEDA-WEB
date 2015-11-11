@@ -43,6 +43,9 @@ public class StemcellManagementService {
 
 	@Autowired
 	private IEDADirectorConfigService directorConfigService;
+	
+	@Autowired
+	private IEDAStemcellContentRepository repository;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -52,7 +55,7 @@ public class StemcellManagementService {
 
 	private String key;
 	
-	private List<String> getLocalStemcellList() {
+	public List<String> getLocalStemcellList() {
 		
 		File dir = new File(iedaConfiguration.getStemcellDir());
 		File[] localFiles = dir.listFiles();
@@ -134,11 +137,14 @@ public class StemcellManagementService {
 		return publicStemcells;
 	}
 
-	public List<StemcellContent> getPublicStemcell() {
+	/*
+	 * # Public Stemcell 목록 동기화
+	 * . IEDA_PUBLIC_STEMCELL 전체 데이터 삭제 
+	 * . Make PUBLIC STEMCELL LIST
+	 * . IEDA_PUBLIC_STEMCELL 저장
+	 */
+	public void syncPublicStemcell() {
 
-		// 다운로드 받은 스템셀
-		List<String> localStemcells = getLocalStemcellList();
-		
 		// AWS S3로부터 스템셀 목록 조회
 		List<StemcellContent> publicStemcells = getAllPublicStemcell();
 
@@ -190,27 +196,41 @@ public class StemcellManagementService {
 
 			// IaaS 구분
 			if (replaceStemcellName.contains("aws"))
-				stemcell.setIaas("aws");
+				stemcell.setIaas("AWS");
 			if (replaceStemcellName.contains("openstack"))
 				stemcell.setIaas("openstack");
 			if (replaceStemcellName.contains("vsphere"))
-				stemcell.setIaas("vsphere");
-			
-			if ( existStemcells(localStemcells, (t) -> t.equals(stemcellName)) ) {
-				log.info("==> existed " + stemcellName);
-			}
-			
-			//  로컬(웹서버)내에 스템셀 파일 존재 여부 설정
-			stemcell.setIsExisted((existStemcells(localStemcells, (t) -> t.equals(stemcellName))) ? "Y" : "N");
+				stemcell.setIaas("vSphere");
 		}
 
-		Comparator<StemcellContent> byLastModified = Collections
-				.reverseOrder(Comparator.comparing(StemcellContent::getLastModified));
+		repository.save(publicStemcells);
+		
+		
 
-		return publicStemcells.stream().filter(t -> t.getOs() != null && t.getOs().length() > 0)
+/*		return publicStemcells.stream().filter(t -> t.getOs() != null && t.getOs().length() > 0)
 				.filter(t -> t.getOsVersion() != null && t.getOsVersion().length() > 0)
 				.filter(t -> t.getIaas() != null && t.getIaas().length() > 0).sorted(byLastModified)
-				.collect(Collectors.toList());
+				.collect(Collectors.toList());*/
+	}
+	
+	public List<StemcellContent> getStemcellList(String os, String osVersion, String iaas) {
+		if ( repository.count() == 0 ) {
+			syncPublicStemcell();
+		}
+		
+		List<StemcellContent> stemcellList = repository.findByOsAndOsVersionAndIaasAllIgnoreCaseOrderByOsVersionDesc(os, osVersion, iaas);
+		
+		// 다운로드 받은 스템셀
+		List<String> localStemcells = getLocalStemcellList();
+
+		// 로컬에 스템셀 파일이 존재하는 여부 표시
+		for (StemcellContent stemcell : stemcellList) {
+			stemcell.setIsExisted((existStemcells(localStemcells, (t) -> t.equals(stemcell.getStemcellFileName()))) ? "Y" : "N");
+		}
+		
+		// 스템셀 버전 역순으로 정렬
+		Comparator<StemcellContent> byStemcellVersion = Collections.reverseOrder(Comparator.comparing(StemcellContent::getStemcellVersion));
+		return stemcellList.stream().sorted(byStemcellVersion).collect(Collectors.toList());
 	}
 	
 	//  로컬(웹서버)내에 스템셀 파일 존재 여부 판단

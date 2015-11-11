@@ -46,19 +46,10 @@ public class StemcellManagementController {
 	@RequestMapping(value="/publicStemcells", method=RequestMethod.GET)
 	public ResponseEntity getPublicStemcells(@RequestParam  HashMap<String, String> requestMap) {
 		
-		List<StemcellContent> stemcellList = service.getPublicStemcell();
-
-		stemcellList = stemcellList.stream()
-				.filter(t ->  t.getOs().toUpperCase().equals(requestMap.get("os").toUpperCase()))
-				.filter(t ->  t.getOsVersion().toUpperCase().equals(requestMap.get("osVersion").toUpperCase()))
-				.filter(t ->  t.getIaas().toUpperCase().equals(requestMap.get("iaas").toUpperCase()))
-				.collect(Collectors.toList());
+		List<StemcellContent> stemcellList = service.getStemcellList(requestMap.get("os").toUpperCase(),
+				requestMap.get("osVersion").toUpperCase(),
+				requestMap.get("iaas").toUpperCase());
 		
-		int recid = 0;
-		for (StemcellContent stemcell : stemcellList) {
-			stemcell.setRecid(recid++);
-		}
-	
 		HashMap<String, Object> d = new HashMap<String, Object>();
 		d.put("total", stemcellList.size());
 		d.put("records", stemcellList);

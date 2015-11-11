@@ -10,6 +10,9 @@ import org.openpaas.ieda.api.Stemcell;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigRepository;
+import org.openpaas.ieda.web.config.stemcell.IEDAStemcellContentRepository;
+import org.openpaas.ieda.web.config.stemcell.StemcellContent;
+import org.openpaas.ieda.web.config.stemcell.StemcellManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,12 @@ public class IEDAStemcellService {
 
 	@Autowired
 	private IEDADirectorConfigRepository directorConfigRepository;
+	
+	@Autowired
+	private IEDAStemcellContentRepository stemcellContentRepository;
+	
+	@Autowired
+	private StemcellManagementService stemcellManagementService;
 	
 	public List<Stemcell> listStemcell(){
 		
@@ -53,5 +62,12 @@ public class IEDAStemcellService {
 					"요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
 		}
 		return Arrays.asList(stemcells);
+	}
+	
+	public List<StemcellContent> listLocalStemcells(){
+		
+		List<String> localStemcellList = stemcellManagementService.getLocalStemcellList();
+		List<StemcellContent> stemcellList = stemcellContentRepository.findByStemcellFileNameInOrderByOsVersionDesc(localStemcellList);
+		return stemcellList;
 	}
 }

@@ -4,12 +4,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Entity(name="IEDA_COMMON_CODE")
-@Getter
-@Setter
+@Data
 public class IEDACommonCode {
 	
 	@Id @GeneratedValue

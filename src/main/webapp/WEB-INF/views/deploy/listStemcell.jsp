@@ -10,17 +10,15 @@ $(function() {
  	
  	$('#us_uploadStemcellsGrid').w2grid({
 		name	: 'us_uploadStemcellsGrid',
-		method 	: "GET",
-		style	: 'text-align:center',
-		show	: {		
-					lineNumbers: true,
-					selectColumn: true	,
-					footer: true},
+		show: {selectColumn: true, footer: true},
+		multiSelect: false,
+		method: 'GET',
+		style: 'text-align:center',
 		columns	:[
 		           {field: 'recid', caption: 'recid', hidden: true}
-		         , {field: 'name', caption: '이름', size: '30%'}
 		         , {field: 'operating_system', caption: 'OS', size: '20%'}
-		         , {field: 'version', caption: '버전', size: '10%'}
+		         , {field: 'name', caption: '스템셀명', size: '30%'}		         
+		         , {field: 'version', caption: '스템셀버전', size: '10%'}
 		         , {field: 'cid', caption: 'CID', size: '30%'}
 		         ],
 		onError: function(event) {
@@ -29,18 +27,75 @@ $(function() {
 		}
 	});
 	
- 	doSearch();
+ 	$('#us_localStemcellsGrid').w2grid({
+		name: 'us_localStemcellsGrid',
+		show: {selectColumn: true, footer: true},
+		multiSelect: false,
+		method: 'GET',
+		style: 'text-align:center',
+		columns:[
+			 {field: 'recid', caption: '운영체계', hidden: true}
+			,{field: 'os', caption: '운영체계', size: '10%'}
+			,{field: 'osVersion', caption: '버전', size: '10%'}
+			,{field: 'iaas', caption: 'IaaS', size: '10%', sortable: true}
+			,{field: 'stemcellVersion', caption: '스템셀버전', size: '10%'}
+			,{field: 'stemcellFileName', caption: '파일명', size: '60%', style: 'text-align:left'}
+		],
+		onClick: function(event) {
+			var grid = this;
+			event.onComplete = function() {
+/* 				var sel = grid.getSelection();
+				if ( sel == null || sel == "") {
+					$('#doDownload').attr('disabled', true);
+					$('#doDelete').attr('disabled', true);
+					return;
+				}
+				
+				var record = grid.get(sel);
+				if ( record.isExisted == 'Y' ) {
+					// 다운로드 버튼 Disable
+					$('#doDownload').attr('disabled', true);
+					// 삭제 버튼 Enable
+					$('#doDelete').attr('disabled', false);
+				}
+				else {
+					// 다운로드 버튼 Enable
+					$('#doDownload').attr('disabled', false);
+					// 삭제 버튼 Disable
+					$('#doDelete').attr('disabled', true);
+				} */
+			}
+		}
+		
+	});
+ 	
+ 	initView();
+ 	
 
 });
 
-//조회기능
-function doSearch() {
+function initView() {
+	// 업로드된 스템셀 조회
+ 	doSearchUploadedStemcells();
+	
+	// 로컬에 다운로드된 스템셀 조회
+	doSearchLocalStemcells();
+}
+
+//업로드된 스템셀 조회
+function doSearchUploadedStemcells() {
 	w2ui['us_uploadStemcellsGrid'].load("<c:url value='/stemcells'/>");
+}
+
+//로컬에 다운로드된 스템셀 조회
+function doSearchLocalStemcells() {
+	w2ui['us_localStemcellsGrid'].load("<c:url value='/localStemcells'/>");
 }
 
 //다른페이지 이동시 호출
 function clearMainPage() {
 	$().w2destroy('us_uploadStemcellsGrid');
+	$().w2destroy('us_localStemcellsGrid');
 }
 
 //화면 리사이즈시 호출
@@ -67,18 +122,23 @@ $( window ).resize(function() {
 	</tr>
 	</table>
 	
-<!-- 	<div id="hMargin"/> -->
-	
-	<!-- 스템셀 목록-->
+	<!-- 업로드된 스템셀 목록-->
 	<div class="pdt20">
-		<div class="title fl">스템셀 목록</div>
+		<div class="title fl">디렉터에 업로드된 스템셀 목록</div>
 		<div class="fr"> 
-			<span class="boardBtn"><a href="#" class="btn btn-primary" style="width:100px"><span>업로드</span></a></span>
-			<span class="boardBtn"><a href="#" class="btn btn-danger" style="width:100px"><span>삭제</span></a></span>
+			<span class="boardBtn"><a href="#" class="btn btn-danger" style="width:120px"><span>스템셀 삭제</span></a></span>
 	    </div>
-		
-	<!-- <div id="hMargin"></div> -->
 	</div>
-	<div id="us_uploadStemcellsGrid" style="width:100%; height:500px">	
+	<div id="us_uploadStemcellsGrid" style="width:100%; height:200px"/>
+	
+	<!-- 로컬 스템셀 목록-->
+	<div class="pdt20">
+		<div class="title fl">다운로드된 스템셀 목록</div>
+		<div class="fr"> 
+			<span class="boardBtn"><a href="#" class="btn btn-primary" style="width:120px"><span>스템셀 업로드</span></a></span>
+	    </div>
+	</div>
+		
+	<div id="us_localStemcellsGrid" style="width:100%; height:200px"/>
 	
 </div>

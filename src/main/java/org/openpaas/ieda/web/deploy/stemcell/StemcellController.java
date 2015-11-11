@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openpaas.ieda.api.Stemcell;
+import org.openpaas.ieda.web.config.stemcell.StemcellContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,18 @@ public class StemcellController {
 		result.put("total", contents.size());
 		result.put("records", contents);
 		return new ResponseEntity( result, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/localStemcells", method=RequestMethod.GET)
+	public ResponseEntity listLocalStemcells(){
+		List<StemcellContent> contents = sevice.listLocalStemcells();
+		
+		HashMap<String, Object> d = new HashMap<String, Object>();
+		d.put("total", contents.size());
+		d.put("records", contents);
+		
+		return new ResponseEntity<>(d, HttpStatus.OK);
+		
 	}
 }
 
