@@ -27,11 +27,19 @@ public class IEDAReleaseService {
 	private IEDADirectorConfigRepository directorConfigRepository;
 
 	public List<ReleaseConfig> listRelease(){
-		IEDADirectorConfig defaultDirector = directorConfigRepository.findOneByDefaultYn("Y");
+		IEDADirectorConfig defaultDirector = new IEDADirectorConfig();
 		
 		Release[] releases = null;
-		List<ReleaseConfig> releaseConfigs = new ArrayList<ReleaseConfig>(); 
+		List<ReleaseConfig> releaseConfigs = new ArrayList<ReleaseConfig>();
 		try{
+			defaultDirector = directorConfigRepository.findOneByDefaultYn("Y");
+			if( defaultDirector  == null){
+				
+				throw new IEDACommonException("notfound.releases.exception", " 기본관리자 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+			}
+			log.info("DirectorUrl : " + defaultDirector.getDirectorUrl() +"/", defaultDirector.getDirectorPort());
+			log.info("UserId      : " + defaultDirector.getUserId() +"/"+ defaultDirector.getUserPassword());
+			
 			DirectorClient client = new DirectorClientBuilder()
 					.withHost(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort())
 					.withCredentials(defaultDirector.getUserId(), defaultDirector.getUserPassword()).build();
@@ -42,17 +50,18 @@ public class IEDAReleaseService {
 			releases = client.getRestTemplate().getForObject(releasesUri, Release[].class);
 			if(  releases != null ){
 				for (Release release : releases) {
-					ReleaseConfig config = new ReleaseConfig();
-					config.setName(release.getName());
 					if(release.getReleaseVersions().size() > 0){
+						log.info("### ReleaseVersions :::" + release.getReleaseVersions().size() );
 						for(ReleaseVersion version :  release.getReleaseVersions()){
+							ReleaseConfig config = new ReleaseConfig();
+							config.setName(release.getName());
 							config.setVersion(version.getVersion());
 							config.setCommitHash(version.getCommitHash());
 							config.setCurrentlyDeployed(version.getCurrentlyDeployed() ? "Y" :"N");
 							config.setUncommittedChanges(version.getUncommittedChanges() ? "Y" :"N");
+							releaseConfigs.add(config);
 						}					
 					}
-					releaseConfigs.add(config);
 				}
 			}
 		} catch (ResourceAccessException e) {

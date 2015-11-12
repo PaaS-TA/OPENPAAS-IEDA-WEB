@@ -159,6 +159,7 @@ function registDefault(seq){
 
 //설정관리자 등록
 function registSetting(){
+	lock( '등록 중입니다.', true);
 	$.ajax({
 		type : "POST",
 		url : "/directors",
@@ -176,11 +177,13 @@ function registSetting(){
 			w2popup.unlock();
 			w2popup.close();
 			doSearch();
+			// 기본 설치 관리자 정보 조회
+		 	getDefaultDirector("<c:url value='/directors/default'/>");
 		},
 		error : function(e ) {
 			// ajax가 실패할때 처리...
-			w2alert(e);
 			w2popup.unlock();
+			w2alert("ERROR");
 		}
 	});
 }
@@ -279,6 +282,6 @@ function lock (msg) {
 	</form>	
 </div>
 <div id="regPopupBtnDiv" hidden="true">
-	<button class="btn" onclick="lock( '등록 중입니다.', true);">설정</button>
-	<button class="btn" onclick="w2popup.close();">취소</button>
+	<button class="btn" id="registBtn"onclick="registSetting();">설정</button>
+	<button class="btn" id="popClose" onclick="w2popup.close();">취소</button>
 </div>
