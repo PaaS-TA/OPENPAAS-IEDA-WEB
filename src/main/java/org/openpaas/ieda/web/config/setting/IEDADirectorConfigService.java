@@ -69,13 +69,12 @@ public class IEDADirectorConfigService {
 		return directorConfigList;
 	}
 
-	public IEDADirectorConfig createDirector(
-			IEDADirectorConfigDto.Create createDto) {
+	public IEDADirectorConfig createDirector(IEDADirectorConfigDto.Create createDto) {
 
 		// 추가할 디렉터가 이미 존재하는지 여부 확인
 		List<IEDADirectorConfig> directorConfigList = directorConfigRepository
 				.findByDirectorUrl(createDto.getDirectorUrl());
-
+		log.info("##### Director Service ::: " + directorConfigList.size() );
 		if (directorConfigList.size() > 0) {
 			throw new IEDACommonException("duplicated.director.exception", "["
 					+ createDto.getDirectorUrl() + "] 데이터가 이미 존재합니다.", HttpStatus.BAD_REQUEST);
