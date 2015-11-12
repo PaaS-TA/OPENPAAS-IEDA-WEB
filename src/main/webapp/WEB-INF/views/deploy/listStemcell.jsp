@@ -21,6 +21,18 @@ $(function() {
 		         , {field: 'version', caption: '스템셀버전', size: '10%'}
 		         , {field: 'cid', caption: 'CID', size: '30%'}
 		         ],
+ 		onClick: function(event) {
+			var grid = this;
+			event.onComplete = function() {
+ 				var sel = grid.getSelection();
+				if ( sel == null || sel == "") {
+					setDisable($('#doDeleteStemcell'), true);
+					return;
+				}
+				
+				setDisable($('#doDeleteStemcell'), false);
+			}
+		},
 		onError: function(event) {
 			this.unlock();
 			gridErrorMsg(event);
@@ -44,26 +56,13 @@ $(function() {
 		onClick: function(event) {
 			var grid = this;
 			event.onComplete = function() {
-/* 				var sel = grid.getSelection();
+ 				var sel = grid.getSelection();
 				if ( sel == null || sel == "") {
-					$('#doDownload').attr('disabled', true);
-					$('#doDelete').attr('disabled', true);
+					setDisable($('#doUploadStemcell'), true);
 					return;
 				}
 				
-				var record = grid.get(sel);
-				if ( record.isExisted == 'Y' ) {
-					// 다운로드 버튼 Disable
-					$('#doDownload').attr('disabled', true);
-					// 삭제 버튼 Enable
-					$('#doDelete').attr('disabled', false);
-				}
-				else {
-					// 다운로드 버튼 Enable
-					$('#doDownload').attr('disabled', false);
-					// 삭제 버튼 Disable
-					$('#doDelete').attr('disabled', true);
-				} */
+				setDisable($('#doUploadStemcell'), false);
 			}
 		}
 		
@@ -71,6 +70,17 @@ $(function() {
  	
  	initView();
  	
+ 	// 스템셀 삭제
+ 	$("#doDeleteStemcell").click(function(){
+ 		doDeleteStemcell();
+    });
+ 	
+ 	// 스템셀 업로드
+ 	$("#doUploadStemcell").click(function(){
+ 		doUploadStemcell();
+    });
+
+
 
 });
 
@@ -80,6 +90,14 @@ function initView() {
 	
 	// 로컬에 다운로드된 스템셀 조회
 	doSearchLocalStemcells();
+
+	// 컨트롤 
+	setDisable($('#doDeleteStemcell'), true);
+	setDisable($('#doUploadStemcell'), true);
+}
+
+function setDisable(object, flag) {
+	object.attr('disabled', flag);
 }
 
 //업로드된 스템셀 조회
@@ -96,6 +114,44 @@ function doSearchLocalStemcells() {
 function clearMainPage() {
 	$().w2destroy('us_uploadStemcellsGrid');
 	$().w2destroy('us_localStemcellsGrid');
+}
+
+// 스템셀 삭제
+function doDeleteStemcell() {
+	var selected = w2ui['us_uploadStemcellsGrid'].getSelection();
+	if ( selected == "" || selected == null) return;
+	
+	var record = w2ui['us_uploadStemcellsGrid'].get(selected);
+	if ( record == "" || record == null) return;
+	
+}
+
+//스템셀 업로드
+function doUploadStemcell() {
+	var selected = w2ui['us_localStemcellsGrid'].getSelection();
+	if ( selected == "" || selected == null) return;
+	
+	var record = w2ui['us_localStemcellsGrid'].get(selected);
+	if ( record == "" || record == null) return;
+	
+	var requestParameter = {
+			subLink : record.key,
+			fileName : record.stemcellFileName
+		};
+	
+	$.ajax({
+		method : 'post',
+		type : "json",
+		url : "/uploadStemcell",
+		contentType : "application/json",
+		data : JSON.stringify(requestParameter),
+		success : function(data, status) {
+			alert(status);
+		},
+		error : function(e) {
+			alert("오류가 발생하였습니다.");
+		}
+	});
 }
 
 //화면 리사이즈시 호출
@@ -126,7 +182,7 @@ $( window ).resize(function() {
 	<div class="pdt20">
 		<div class="title fl">디렉터에 업로드된 스템셀 목록</div>
 		<div class="fr"> 
-			<span class="boardBtn"><a href="#" class="btn btn-danger" style="width:120px"><span>스템셀 삭제</span></a></span>
+			<span class="btn btn-danger" style="width:120px" id="doDeleteStemcell">스템셀 삭제</span>
 	    </div>
 	</div>
 	<div id="us_uploadStemcellsGrid" style="width:100%; height:200px"/>
@@ -135,7 +191,7 @@ $( window ).resize(function() {
 	<div class="pdt20">
 		<div class="title fl">다운로드된 스템셀 목록</div>
 		<div class="fr"> 
-			<span class="boardBtn"><a href="#" class="btn btn-primary" style="width:120px"><span>스템셀 업로드</span></a></span>
+			<span class="btn btn-primary" style="width:120px" id="doUploadStemcell">스템셀 업로드</span>
 	    </div>
 	</div>
 		

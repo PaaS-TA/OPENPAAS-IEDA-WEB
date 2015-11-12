@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.openpaas.ieda.api.Stemcell;
+import org.openpaas.ieda.common.IEDAConfiguration;
 import org.openpaas.ieda.web.config.stemcell.StemcellContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -29,6 +31,10 @@ public class StemcellController {
 	
 	@Autowired
 	private IEDAStemcellService sevice;
+	
+	@Autowired
+	private IEDAConfiguration iedaConfiguration;
+	
 	
 	@RequestMapping(value="/deploy/listStemcell", method=RequestMethod.GET)
 	public String List() {
@@ -60,7 +66,18 @@ public class StemcellController {
 		d.put("records", contents);
 		
 		return new ResponseEntity<>(d, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/uploadStemcell", method=RequestMethod.POST)
+	public ResponseEntity doUploadStemcell(@RequestBody HashMap<String, String> requestMap) {
 		
+		log.info("### Upload Stemcell");
+		log.info("Stemcell Directory : " + iedaConfiguration.getStemcellDir());
+		log.info("Sub Link           : " + requestMap.get("subLink"));
+		log.info("Stemcell FileName  : " + requestMap.get("fileName"));
+		
+		
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
 
