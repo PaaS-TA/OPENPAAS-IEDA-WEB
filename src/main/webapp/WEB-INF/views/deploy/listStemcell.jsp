@@ -80,8 +80,6 @@ $(function() {
  		doUploadStemcell();
     });
 
-
-
 });
 
 function initView() {
@@ -123,7 +121,38 @@ function doDeleteStemcell() {
 	
 	var record = w2ui['us_uploadStemcellsGrid'].get(selected);
 	if ( record == "" || record == null) return;
+
+	var requestParameter = {
+			fileName : record.name,
+			version  : record.version
+		};
 	
+	w2confirm( { msg : '설치관리자에 업로드된 스템셀 <br>' + record.name + '<br>을 삭제하시겠습니까?'
+		, title : '스템셀 삭제'
+		, yes_text:'확인'
+		, no_text:'취소'
+		})
+		.yes(function() {
+			$.ajax({
+				method : 'post',
+				type : "json",
+				url : "/deleteStemcell",
+				contentType : "application/json",
+				data : JSON.stringify(requestParameter),
+				success : function(data, status) {
+					w2alert("웹소켓 연결 + 팝업창 띄워서 로그 보여주기");
+				},
+				error : function(request, status, error) {
+                    //w2alert("code:"+request.status+ ", message: "+request.responseText+", error:"+error);
+                    //w2alert(request.responseText);
+					w2alert("오류가 발생하였습니다");
+                }
+			});
+
+		})
+		.no(function() {
+			// do nothing
+		});	
 }
 
 //스템셀 업로드
@@ -135,23 +164,35 @@ function doUploadStemcell() {
 	if ( record == "" || record == null) return;
 	
 	var requestParameter = {
-			subLink : record.key,
 			fileName : record.stemcellFileName
 		};
 	
-	$.ajax({
-		method : 'post',
-		type : "json",
-		url : "/uploadStemcell",
-		contentType : "application/json",
-		data : JSON.stringify(requestParameter),
-		success : function(data, status) {
-			alert(status);
-		},
-		error : function(e) {
-			alert("오류가 발생하였습니다.");
-		}
-	});
+	w2confirm( { msg : '선택된 스템셀  <br>' + record.stemcellFileName + ' <br>을 설치관리자에 업로드하시겠습니까?'
+		, title : '스템셀 업로드'
+		, yes_text:'확인'
+		, no_text:'취소'
+		})
+		.yes(function() {
+			$.ajax({
+				method : 'post',
+				type : "json",
+				url : "/uploadStemcell",
+				contentType : "application/json",
+				data : JSON.stringify(requestParameter),
+				success : function(data, status) {
+					w2alert("웹소켓 연결 + 팝업창 띄워서 로그 보여주기");
+				},
+				error : function(request, status, error) {
+                    //w2alert("code:"+request.status+ ", message: "+request.responseText+", error:"+error);
+                    //w2alert(request.responseText);
+					w2alert("오류가 발생하였습니다");
+                }
+			});
+
+		})
+		.no(function() {
+			// do nothing
+		});	
 }
 
 //화면 리사이즈시 호출

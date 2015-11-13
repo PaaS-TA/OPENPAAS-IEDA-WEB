@@ -67,7 +67,7 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
-		
+
 		<!-- httpclient -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -151,12 +151,21 @@
 			<artifactId>jquery-validation</artifactId>
 			<version>1.14.0-1</version>
 		</dependency>
+
 		<!-- jQuery UI -->
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>jquery-ui</artifactId>
 			<version>1.11.4</version>
 		</dependency>
+
+		<!-- Jsoup -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+
 
 	</dependencies>
 

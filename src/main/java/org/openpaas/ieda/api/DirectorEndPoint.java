@@ -9,21 +9,22 @@ import lombok.Data;
 
 @Data
 public class DirectorEndPoint {
-    private String host;
-    private int    port;
-    private String username;
-    private String password;
-    
-    private static DirectorEndPoint director;
-    
-    public static DirectorEndPoint getInstance() {
-    	if (director != null)
-    		return director;
-    	else
-    		return new DirectorEndPoint();
-    }
-    
-	public DirectorEndPoint() {	}
+	private String host;
+	private int port;
+	private String username;
+	private String password;
+
+	private static DirectorEndPoint director;
+
+	public static DirectorEndPoint getInstance() {
+		if (director != null)
+			return director;
+		else
+			return new DirectorEndPoint();
+	}
+
+	public DirectorEndPoint() {
+	}
 
 	public DirectorEndPoint(String host, int port, String username, String password) {
 		this.host = host;
@@ -31,6 +32,5 @@ public class DirectorEndPoint {
 		this.username = username;
 		this.password = password;
 	}
-    
-    
+
 }

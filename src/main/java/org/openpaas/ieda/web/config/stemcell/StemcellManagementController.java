@@ -6,7 +6,6 @@ package org.openpaas.ieda.web.config.stemcell;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.openpaas.ieda.common.IEDAConfiguration;
 import org.openpaas.ieda.common.IEDAErrorResponse;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -60,7 +60,6 @@ public class StemcellManagementController {
 	//  스템셀 다운로드
 	@RequestMapping(value="/downloadPublicStemcell", method=RequestMethod.POST)
 	public ResponseEntity doDownloadStemcell(@RequestBody HashMap<String, String> requestMap ) {
-		
 		log.info("stemcell dir : " + iedaConfiguration.getStemcellDir());
 		log.info("doDownload key      : " + requestMap.get("key"));
 		log.info("doDownload fileName : " + requestMap.get("fileName"));
@@ -75,7 +74,10 @@ public class StemcellManagementController {
 	}
 	
 	@RequestMapping(value="/deletePublicStemcell", method=RequestMethod.DELETE)
-	public ResponseEntity doDeleteStemcell(@RequestBody HashMap<String, String> requestMap ) {
+	public ResponseEntity doDeleteStemcell(@RequestBody HashMap<String, String> requestMap, BindingResult result) {
+		if ( result.hasErrors() ) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		
 		log.info("doDelete stemecllFileName : " + requestMap.get("stemcellFileName"));
 		

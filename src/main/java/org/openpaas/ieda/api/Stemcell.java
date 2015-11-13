@@ -11,11 +11,11 @@ public class Stemcell {
 
 	private Integer recid;
 	private String name;
-	
+
 	@JsonProperty("operating_system")
 	private String operatingSystem;
-	
-	private String version;	
+
+	private String version;
 	private String cid;
-	private List<String> deployments; 
+	private List<String> deployments;
 }

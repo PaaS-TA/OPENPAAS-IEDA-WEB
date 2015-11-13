@@ -1,6 +1,5 @@
 package org.openpaas.ieda.api;
 
-
 import java.net.URI;
 
 import lombok.Data;
@@ -16,9 +15,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Data
 public class DirectorClient {
 
-	private URI			root;
+	private URI root;
 	private RestTemplate restTemplate;
-	
+
 	DirectorClient(URI root, RestTemplate restTemplate) {
 		this.root = root;
 		this.restTemplate = restTemplate;

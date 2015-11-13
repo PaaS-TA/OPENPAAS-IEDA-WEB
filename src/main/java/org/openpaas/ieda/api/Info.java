@@ -14,6 +14,3 @@ public class Info {
 	private Map<String, Object> features;
 	private Map<String, Object> user_authenticate;
 }
-
-
-

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class BootstrapController {
 
-	@RequestMapping(value="/config/bootstrap", method=RequestMethod.GET)
+	@RequestMapping(value = "/config/bootstrap", method = RequestMethod.GET)
 	public String main() {
 		return "/config/bootstrap";
 	}

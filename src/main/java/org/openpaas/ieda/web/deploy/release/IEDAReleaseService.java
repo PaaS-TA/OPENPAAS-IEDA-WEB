@@ -26,41 +26,41 @@ public class IEDAReleaseService {
 	@Autowired
 	private IEDADirectorConfigRepository directorConfigRepository;
 
-	public List<ReleaseConfig> listRelease(){
+	public List<ReleaseConfig> listRelease() {
 		IEDADirectorConfig defaultDirector = new IEDADirectorConfig();
-		
+
 		Release[] releases = null;
 		List<ReleaseConfig> releaseConfigs = new ArrayList<ReleaseConfig>();
-		try{
+		try {
 			defaultDirector = directorConfigRepository.findOneByDefaultYn("Y");
-			if( defaultDirector  == null){
-				
-				throw new IEDACommonException("notfound.releases.exception", " 기본관리자 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+			if (defaultDirector == null) {
+
+				throw new IEDACommonException("notfound.releases.exception", " 기본관리자 정보가 존재하지 않습니다.",
+						HttpStatus.NOT_FOUND);
 			}
-			log.info("DirectorUrl : " + defaultDirector.getDirectorUrl() +"/", defaultDirector.getDirectorPort());
-			log.info("UserId      : " + defaultDirector.getUserId() +"/"+ defaultDirector.getUserPassword());
-			
+			log.info("DirectorUrl : " + defaultDirector.getDirectorUrl() + "/", defaultDirector.getDirectorPort());
+			log.info("UserId      : " + defaultDirector.getUserId() + "/" + defaultDirector.getUserPassword());
+
 			DirectorClient client = new DirectorClientBuilder()
 					.withHost(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort())
 					.withCredentials(defaultDirector.getUserId(), defaultDirector.getUserPassword()).build();
-			
-			URI releasesUri = UriComponentsBuilder.fromUri(client.getRoot())
-					.pathSegment("releases").build().toUri();
-			
+
+			URI releasesUri = UriComponentsBuilder.fromUri(client.getRoot()).pathSegment("releases").build().toUri();
+
 			releases = client.getRestTemplate().getForObject(releasesUri, Release[].class);
-			if(  releases != null ){
+			if (releases != null) {
 				for (Release release : releases) {
-					if(release.getReleaseVersions().size() > 0){
-						log.info("### ReleaseVersions :::" + release.getReleaseVersions().size() );
-						for(ReleaseVersion version :  release.getReleaseVersions()){
+					if (release.getReleaseVersions().size() > 0) {
+						log.info("### ReleaseVersions :::" + release.getReleaseVersions().size());
+						for (ReleaseVersion version : release.getReleaseVersions()) {
 							ReleaseConfig config = new ReleaseConfig();
 							config.setName(release.getName());
 							config.setVersion(version.getVersion());
 							config.setCommitHash(version.getCommitHash());
-							config.setCurrentlyDeployed(version.getCurrentlyDeployed() ? "Y" :"N");
-							config.setUncommittedChanges(version.getUncommittedChanges() ? "Y" :"N");
+							config.setCurrentlyDeployed(version.getCurrentlyDeployed() ? "Y" : "N");
+							config.setUncommittedChanges(version.getUncommittedChanges() ? "Y" : "N");
 							releaseConfigs.add(config);
-						}					
+						}
 					}
 				}
 			}
@@ -68,12 +68,12 @@ public class IEDAReleaseService {
 			e.printStackTrace();
 			log.info("getMessage : " + e.getMessage());
 			log.info("getLocalizedMessage : " + e.getLocalizedMessage());
-			throw new IEDACommonException("notfound.releases.exception", " Release정보 조회중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
+			throw new IEDACommonException("notfound.releases.exception", " Release정보 조회중 오류가 발생하였습니다.",
+					HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			throw new IEDACommonException("notfound.releases.exception",
-					"요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
+			throw new IEDACommonException("notfound.releases.exception", "요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
 		}
-		
+
 		return releaseConfigs;
 	}
 }
