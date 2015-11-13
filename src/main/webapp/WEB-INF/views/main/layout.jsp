@@ -68,14 +68,9 @@ function setLayoutContainerHeight()
 {
     var layoutHeight = $(window).height();
     var layoutWidth = $(window).width();
-
-    if (layoutHeight > 800) {
-	    $('#wrap1').height(layoutHeight);
-	    if (layoutWidth > 1280)
-	    {
-	    	w2ui['layout'].resize();
-	    }
-    }
+    
+    $('#wrap1').height(layoutHeight);
+    w2ui['layout'].resize();
 }
 
 </script>
