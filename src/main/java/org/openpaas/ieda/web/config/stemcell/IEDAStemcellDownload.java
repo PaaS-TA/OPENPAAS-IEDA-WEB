@@ -50,9 +50,6 @@ public class IEDAStemcellDownload {
 			throw new IEDACommonException("failedDownloadStemcell.publicStemcell.exception",
 					"다운로드 중인 스템셀이 존재합니다.", HttpStatus.LOCKED);
 		}
-//		if(this.getPercentage() != 0 )
-//			throw new IEDACommonException("failedDownloadStemcell.publicStemcell.exception",
-//					"다운로드 중인 스템셀이 존재합니다.", HttpStatus.LOCKED);
 		
 		setDownloadStatus(DownloadStatus.DOWNLOADING);
 		
