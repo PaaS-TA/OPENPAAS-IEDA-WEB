@@ -36,6 +36,9 @@ public class StemcellManagementController {
 	@Autowired
 	private IEDAConfiguration iedaConfiguration;
 
+	@Autowired
+	private IEDAStemcellDownload stemcellDownloadService;
+	
 	@RequestMapping(value="/config/listPublicStemcell", method=RequestMethod.GET)
 	public String List() {
 		
@@ -65,10 +68,10 @@ public class StemcellManagementController {
 		log.info("doDownload fileName : " + requestMap.get("fileName"));
 		log.info("doDownload fileSize : " + requestMap.get("fileSize"));
 		
-		List<String> directoryList = service.doDownloadStemcell(
+		stemcellDownloadService.doDownload(
 				requestMap.get("key"),
 				requestMap.get("fileName"),
-				new BigDecimal(requestMap.get("fileSize")));
+				new BigDecimal(requestMap.get("fileSize")).doubleValue());
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -93,5 +96,14 @@ public class StemcellManagementController {
 		service.doDeleteStemcell(stemcellFileName);
 		
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+	
+	@RequestMapping(value="/stemcellDownloadStatus" )
+	public ResponseEntity downloadStatus (@RequestBody HashMap<String, String> requestMap ) throws Exception {
+		int downloadStatus = stemcellDownloadService.getPercentage();
+		
+		log.info("################# ::::  "+ downloadStatus );
+		requestMap.put("status", String.valueOf(downloadStatus));
+		return new ResponseEntity<>(requestMap, HttpStatus.OK);
 	}
 }

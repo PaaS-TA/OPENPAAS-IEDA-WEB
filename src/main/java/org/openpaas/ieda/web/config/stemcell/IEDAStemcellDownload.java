@@ -7,48 +7,52 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Data
 @Slf4j
+@Service
 public class IEDAStemcellDownload {
 	
 	@Autowired
 	private IEDAConfiguration iedaConfiguration;
 
-	private static IEDAStemcellDownload instance;
 	private boolean isAvailable;
 	private String PUBLIC_STEMCELLS_BASE_URL = "https://bosh-jenkins-artifacts.s3.amazonaws.com";
 
 	private String subLink;
 	private String stemcellFileName;
-	private double stemcellTotalSize;
 	private int percentage;
 	
 	private DownloadStatus status;
 	
-	public enum DownloadStatus {AVAILABLE, DOWNLOADING, DOWNLOADED, CANCELING, CANCELED};
+	public enum DownloadStatus {AVAILABLE, DOWNLOADING};
 
-	public static IEDAStemcellDownload getIntance() {
-		if (instance != null)
-			return instance;
-		else
-			return new IEDAStemcellDownload();
-	}
-
-	public void setConfigure(String subLink, String stemcellFileName, double stemcellSize) {
+/*	public void setConfigure(String subLink, String stemcellFileName, double stemcellSize) {
 		this.subLink = subLink;
 		this.stemcellFileName = stemcellFileName;
 		this.stemcellTotalSize = stemcellSize;
-	}
+	}*/
 
 	@Async
-	public void setDownload(String subLink, String stemcellFileName, double stemcellSize) {
+	public void doDownload(String subLink, String stemcellFileName, double stemcellSize) {
+		
+		log.info("@@ status :: "  + status + " percentage :: " + this.getPercentage() );
+		if( status != null && status.equals(DownloadStatus.DOWNLOADING) ){
+			throw new IEDACommonException("failedDownloadStemcell.publicStemcell.exception",
+					"다운로드 중인 스템셀이 존재합니다.", HttpStatus.LOCKED);
+		}
+//		if(this.getPercentage() != 0 )
+//			throw new IEDACommonException("failedDownloadStemcell.publicStemcell.exception",
+//					"다운로드 중인 스템셀이 존재합니다.", HttpStatus.LOCKED);
 		
 		setDownloadStatus(DownloadStatus.DOWNLOADING);
 		
@@ -58,6 +62,7 @@ public class IEDAStemcellDownload {
 	    BufferedInputStream in = null;
 	    FileOutputStream fout = null;
 	    
+	    percentage = 0;
 	    double received = 0;
 	    try {
 	        in = new BufferedInputStream(new URL(downloadLink).openStream());
@@ -68,7 +73,8 @@ public class IEDAStemcellDownload {
 	        while ((count = in.read(data, 0, 4096)) != -1) {
 	            fout.write(data, 0, count);
 	            received += count;
-	            log.info("progress : " + (int)((received/stemcellTotalSize) *100));
+	            percentage = (int)((received/stemcellSize) *100);
+	            log.info("received:" + received + ", stemcellTotalSize: " + stemcellSize + " = " + percentage);
 	        }
 	    } catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -93,8 +99,6 @@ public class IEDAStemcellDownload {
 	        }
 	    }
 	    
-	    resetConfigure();
-	    
 	    setDownloadStatus(DownloadStatus.AVAILABLE);
 	}
 
@@ -111,6 +115,7 @@ public class IEDAStemcellDownload {
 	}
 	
 	public boolean isDownloaded() {
+		
 		
 		return true;
 	}

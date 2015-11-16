@@ -22,11 +22,13 @@ response.setDateHeader("Expires",0);
 <!-- CSS  -->
 <link rel="stylesheet" type="text/css" href="<c:url value='/webjars/bootstrap/3.3.5/css/bootstrap.min.css'/>"/>
 <link rel="stylesheet" type="text/css" href="<c:url value='/webjars/w2ui/1.4.2/w2ui.min.css'/>"/>
+<link rel="stylesheet" type="text/css" href="<c:url value='/webjars/jquery-ui/1.11.4/jquery-ui.css'/>"/>
 <link rel="stylesheet" type="text/css" href="<c:url value='/css/default.css'/>"/>
 <link rel="stylesheet" type="text/css" href="<c:url value='/css/guide.css'/>"/>
 
 <!-- JQuery -->
 <script type="text/javascript" src="<c:url value='/webjars/jquery/2.1.1/jquery.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/webjars/jquery-ui/1.11.4/jquery-ui.js'/>"></script>
 
 <!-- JQuery Form -->
 <script type="text/javascript" src="<c:url value='/webjars/jquery-form/3.51/jquery.form.js'/>"></script>

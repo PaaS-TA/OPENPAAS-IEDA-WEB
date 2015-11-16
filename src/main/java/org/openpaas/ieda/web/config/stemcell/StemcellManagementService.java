@@ -26,6 +26,8 @@ import org.openpaas.ieda.common.IEDAConfiguration;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.core.MessageSendingOperations;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -52,7 +54,7 @@ public class StemcellManagementService {
 
 	@Autowired
 	private IEDAConfiguration iedaConfiguration;
-
+	
 	private String key;
 	
 	public List<String> getLocalStemcellList() {
@@ -245,8 +247,7 @@ public class StemcellManagementService {
 	}
 
 	// 다운로드 스템셀
-	public List<String> doDownloadStemcell(String subLink, String stemcellFile, BigDecimal fileSize) {
-		log.info("stemcell Dir     : " + iedaConfiguration.getStemcellDir());
+/*	public List<String> doDownloadStemcell(String subLink, String stemcellFile, BigDecimal fileSize) {
 		log.info("Stemcell Name    : " + PUBLIC_STEMCELLS_BASE_URL + "/" + stemcellFile);
 		log.info("Stemcell Size    : " + fileSize);
 		log.info("downloaded  file : " + iedaConfiguration.getStemcellDir()+"/"+stemcellFile);
@@ -258,9 +259,7 @@ public class StemcellManagementService {
 	    double received = 0;
 	    try {
 	        in = new BufferedInputStream(new URL(downloadLink).openStream());
-	        log.info("111");
 	        fout = new FileOutputStream(iedaConfiguration.getStemcellDir()+"/"+stemcellFile);
-	        log.info("222");
 
 	        final byte data[] = new byte[4096];
 	        int count;
@@ -271,20 +270,16 @@ public class StemcellManagementService {
 	            log.info("progress : " + (int)((received/total) *100));
 	        }
 	    } catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 	        if (in != null) {
 	            try {
 					in.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 	        }
@@ -292,74 +287,13 @@ public class StemcellManagementService {
 	            try {
 					fout.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 	        }
 	    }		
 
-/*		Runtime r = Runtime.getRuntime();
-
-		InputStream inputStream = null;
-		BufferedReader bufferedReader = null;
-		String command = "D:/ieda_workspace/stemcell/bosh_status.bat ";
-		command += iedaConfiguration.getStemcellDir() + " ";
-		command += stemcell;
-		
-		try {
-			log.info("1");
-			Process process = r.exec(command);
-			process.getInputStream();
-			log.info("2");
-			inputStream = process.getInputStream();
-			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-			log.info("3");
-			String info = null;
-			while ((info = bufferedReader.readLine()) != null) {
-				//String ;
-				//log.info("info:" + info);
-				//if (info == null || info.equals("")) {
-//				if (info == null ) {
-//					break;
-//				}
-				log.info(info);
-			}
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inputStream != null)
-					inputStream.close();
-			} catch (Exception e) {
-			}
-			try {
-				if (bufferedReader != null)
-					bufferedReader.close();
-			} catch (Exception e) {
-			}
-		}	
-*/
-		/*
-		 * try { // 디렉토리 변경 log.info("다운로드 받을 스템셀 : " +
-		 * PUBLIC_STEMCELLS_BASE_URL + "/" + stemcell);
-		 * 
-		 * // 스템셀 다운로드 //Runtime.getRuntime().exec(
-		 * "bosh download public stemcells"); } catch (IOException e) { // TODO
-		 * Auto-generated catch block e.printStackTrace(); }
-		 */
-
-		/*
-		 * 디렉토리 뷰어 File dir = new File(iedaConfiguration.getStemcellDir());
-		 * File[] files = dir.listFiles();
-		 * 
-		 * ArrayList filPaths = new ArrayList(); for (File file : files) {
-		 * log.info("내부 디렉토리 : " + file.getAbsolutePath() );
-		 * filPaths.add(file.getAbsolutePath()); }
-		 */
-		return null;
-	}
+	    return null;
+	}*/
 	
 	// 스템셀 삭제
 	public void doDeleteStemcell(String stemcellFile) {
@@ -382,4 +316,14 @@ public class StemcellManagementService {
 		}
 		
 	}
+	
+/*	public int downloadingStemcell(String subLink, String stemcellFile, BigDecimal fileSize) throws Exception {
+		log.info("downloaded file : " + iedaConfiguration.getStemcellDir()+"/"+stemcellFile);
+		log.info("Stemcell Size    : " + fileSize);
+		log.info("Percentage       : " + stemcellDownloader.getPercentage());
+		
+		//		int fileSize = fileSize;
+	
+		return (int)(getFileSize / fileSize.longValue() * 100) ;
+	}*/
 }
