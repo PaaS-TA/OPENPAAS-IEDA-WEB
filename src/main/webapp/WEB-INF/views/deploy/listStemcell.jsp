@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<script type="text/javascript" src="/js/sockjs-0.3.4.js"></script>
+<script type="text/javascript" src="/js/stomp.js"></script>
 <script type="text/javascript">
-
 $(function() {
 	
  	// 기본 설치 관리자 정보 조회
@@ -68,6 +68,12 @@ $(function() {
 		
 	});
  	
+ 	//팝업 닫기 버튼
+ 	$(".closeBtn").on("click", function(){
+ 		console.log( "aaaaa" );
+ 		w2popup.close();
+ 	});
+ 	
  	initView();
  	
  	// 스템셀 삭제
@@ -80,7 +86,9 @@ $(function() {
  		doUploadStemcell();
     });
 
+ 	
 });
+
 
 function initView() {
 	// 업로드된 스템셀 조회
@@ -173,32 +181,65 @@ function doUploadStemcell() {
 		, no_text:'취소'
 		})
 		.yes(function() {
-			$.ajax({
-				method : 'post',
-				type : "json",
-				url : "/uploadStemcell",
-				contentType : "application/json",
-				data : JSON.stringify(requestParameter),
-				success : function(data, status) {
-					w2alert("웹소켓 연결 + 팝업창 띄워서 로그 보여주기");
-				},
-				error : function(request, status, error) {
-                    //w2alert("code:"+request.status+ ", message: "+request.responseText+", error:"+error);
-                    //w2alert(request.responseText);
-					w2alert("오류가 발생하였습니다");
-                }
-			});
-
+			appendLogPopup("up",requestParameter);
 		})
 		.no(function() {
 			// do nothing
 		});	
 }
 
+function appendLogPopup(type, requestParameter){
+	$("#uploadPopLayer").w2popup({
+		width 	: 800,
+		height	: 500,
+		modal	: true,
+		onOpen  : function(){
+			console.log("=============");
+			if(type =="up") doUploadConnect(requestParameter);
+			else doUploadConnect(requestParameter);
+		}
+	});
+}
+
 //화면 리사이즈시 호출
 $( window ).resize(function() {
 	setLayoutContainerHeight();
 });
+
+function doUploadConnect(requestParameter){
+	console.log("2.=====doUploadConnect=====");
+	var socket = new SockJS('/stemcellUploading');
+	stompClient = Stomp.over(socket); 
+	stompClient.connect({}, function(frame) {
+        console.log('Connected: ' + frame);
+        stompClient.subscribe('/socket/uploadStemcell', function(data){
+        	//appendLog += data.body;
+        	$("textarea[name='uploadStemcellLogs']").append(data.body + "\n");
+        	      		
+        });
+        socketSendUploadData(requestParameter);
+    });
+}
+
+function appendLog(param){
+	var logArea = $("#uploadStemcellLogs");
+	logArea.append(param + "\n");
+}
+
+function socketSendUploadData(requestParameter){
+	console.log("3.=====socketSendUploadData=====");
+	stompClient.send("/app/stemcellUploading", {}, JSON.stringify(requestParameter));
+}
+
+function popupClose() {
+	if (stompClient != null) {
+		stompClient.disconnect();
+		$("textarea[name='uploadStemcellLogs']").text("");
+	}
+	w2popup.close();
+	console.log("Disconnected");
+}
+
 
 </script>
 
@@ -210,12 +251,12 @@ $( window ).resize(function() {
 	
 	<table class="tbl1" border="1" cellspacing="0">
 	<tr>
-		<th width="18%" class="th_fb">관리자 이름</th><td class="td_fb"><b id="directorName"/></td>
-		<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb"><b id="userId"/></td>
+		<th width="18%" class="th_fb">관리자 이름</th><td class="td_fb"><b id="directorName"></b></td>
+		<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb"><b id="userId"></b></td>
 	</tr>
 	<tr>
-		<th width="18%" >관리자 URL</th><td><b id="directorUrl"/></td>
-		<th width="18%" >관리자 UUID</th><td ><b id="directorUuid"/></td>
+		<th width="18%" >관리자 URL</th><td><b id="directorUrl"></b></td>
+		<th width="18%" >관리자 UUID</th><td ><b id="directorUuid"></b></td>
 	</tr>
 	</table>
 	
@@ -226,7 +267,7 @@ $( window ).resize(function() {
 			<span class="btn btn-danger" style="width:120px" id="doDeleteStemcell">스템셀 삭제</span>
 	    </div>
 	</div>
-	<div id="us_uploadStemcellsGrid" style="width:100%; height:200px"/>
+	<div id="us_uploadStemcellsGrid" style="width:100%; height:200px"></div>
 	
 	<!-- 로컬 스템셀 목록-->
 	<div class="pdt20">
@@ -236,6 +277,19 @@ $( window ).resize(function() {
 	    </div>
 	</div>
 		
-	<div id="us_localStemcellsGrid" style="width:100%; height:200px"/>
+	<div id="us_localStemcellsGrid" style="width:100%; height:200px"></div>
 	
+</div>
+
+<div id="uploadPopLayer" class=" popuplayer" hidden="true">
+ 	<div rel="title">
+        <b>Stemcell Upload Log</b>
+    </div>
+    <div rel="body" style="padding: 10px; line-height: 150%">
+	<!-- <div class="pdt10" id="uploadStemcellLogsDiv" style="width: 100%; height:100%; background-color: #F7F7F7;overflow: hidden;"> -->
+		<textarea name="uploadStemcellLogs" readonly="readonly" style="width:100%;height:100%;overflow-y:auto;resize:none;background-color: #FFF;"></textarea>
+	</div>
+	<div rel="buttons">
+		<button class="btn closeBtn" onclick="popupClose();"   >닫기</button>
+    </div>
 </div>

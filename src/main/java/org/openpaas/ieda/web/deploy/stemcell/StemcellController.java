@@ -14,6 +14,9 @@ import org.openpaas.ieda.web.config.stemcell.StemcellContentDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,6 +45,9 @@ public class StemcellController {
 
 	@Autowired
 	private DeleteStemcellAsyncByScriptService deleteStemcellService;
+	
+	@Autowired
+	private SimpMessagingTemplate messagingTemplate;
 
 	@RequestMapping(value = "/deploy/listStemcell", method = RequestMethod.GET)
 	public String List() {
@@ -76,15 +82,18 @@ public class StemcellController {
 	}
 
 	// 스템셀 업로드
-	@RequestMapping(value = "/uploadStemcell", method = RequestMethod.POST)
-	public ResponseEntity doUploadStemcell(@RequestBody @Valid StemcellContentDto.Upload dto, BindingResult result) {
-		if (result.hasErrors()) {
-			IEDAErrorResponse errorResponse = new IEDAErrorResponse();
-			errorResponse.setMessage("잘못된 요청입니다.");
-			errorResponse.setCode("bad.request");
-
-			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-		}
+	//@RequestMapping(value = "/uploadStemcell", method = RequestMethod.POST)
+	@MessageMapping("/stemcellUploading")
+    @SendTo("/socket/uploadStemcell")
+	public ResponseEntity doUploadStemcell(@Valid StemcellContentDto.Upload dto) {
+		log.info("##### Upload ::: " + dto.toString());
+//		if (result.hasErrors()) {
+//			IEDAErrorResponse errorResponse = new IEDAErrorResponse();
+//			errorResponse.setMessage("잘못된 요청입니다.");
+//			errorResponse.setCode("bad.request");
+//			messagingTemplate.convertAndSend("/socket/stemcellUpload", errorResponse);
+//			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+//		}
 
 		log.info("### Upload Stemcell : " + dto.getFileName());
 
@@ -111,4 +120,32 @@ public class StemcellController {
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+	
+	@RequestMapping(value="/testing", method=RequestMethod.GET)
+	public String testing(){
+		return "/test";
+	}
+	
+//	@MessageMapping("/stemcellDownload")
+//    @SendTo("/stemcell/download")
+//	public ResponseEntity stemcellDown(){
+//		log.info("DownName : ");
+//		Map<String, Object>  result = new HashMap<>();
+//		result.put("name", "stemcellDDD");
+//		return  new ResponseEntity<>(result, HttpStatus.OK);
+//	}
+	/*
+	@MessageMapping("/stemcellUploading")
+    @SendTo("/socket/stemcellUpload")
+	public String stemcellUp(String name) throws Exception{
+		log.info("#####UpName : " + name);
+		Thread.sleep(3000); // simulated delay
+		for (int i=0;i<10;i++){
+        	this.messagingTemplate.convertAndSend("/socket/stemcellUpload", "No : " + i);
+        	log.info("stemcellUpload : " + i);
+        }
+		Map<String, Object>  result = new HashMap<>();
+		result.put("name", "stemcellUUU");
+		return  "ni~~~na~~~~no";
+	}*/
 }

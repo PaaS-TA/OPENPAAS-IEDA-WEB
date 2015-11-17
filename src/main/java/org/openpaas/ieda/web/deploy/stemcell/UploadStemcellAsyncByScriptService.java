@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class UploadStemcellAsyncByScriptService {
+	
 	private String uploadStemcellLog;
 
+	@Autowired
+	private SimpMessagingTemplate messagingTemplate;
+	
+	
 	public Boolean uploadStemcell(String stemcellDir, String stemcellFileName) {
 		Boolean success = Boolean.FALSE;
 
@@ -37,7 +44,8 @@ public class UploadStemcellAsyncByScriptService {
 			String info = null;
 			while ((info = bufferedReader.readLine()) != null) {
 				uploadStemcellLog += info;
-				log.info(info);
+				log.info("##### uploadStemcell ::: " + info);
+				messagingTemplate.convertAndSend("/socket/uploadStemcell", info.toString());
 			}
 
 		} catch (IOException e) {

@@ -43,8 +43,11 @@ $(function() {
 			,{field: 'stemcellFileName', caption: '파일명', size: '40%', style: 'text-align:left'}
 			,{field: 'isExisted', caption: '다운로드 여부', size: '10%',
 				render: function(record) {
-					if ( record.isExisted == 'Y'){
+					if ( record.isExisted == 'Y' && record.downloadStatus == 'AVAILABLE'){
 						return '<div class="btn btn-success btn-xs" style="width:70px;">' + '완료 ' + '</div>';
+					}
+					else if ( record.isExisted == 'Y' && record.downloadStatus == 'DOWNLOADING'){
+						return '<div class="btn btn-info btn-xs" style="width:70px;">' + '다운 중' + '</div>';
 					}
 					else{
 						return '<div id="isExisted_'+record.recid+'"><div class="progress-label"></div></div>';

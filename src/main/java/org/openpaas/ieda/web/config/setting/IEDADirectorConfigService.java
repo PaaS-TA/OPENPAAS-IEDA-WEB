@@ -74,28 +74,19 @@ public class IEDADirectorConfigService {
 		// 추가할 디렉터가 이미 존재하는지 여부 확인
 		List<IEDADirectorConfig> directorConfigList = directorConfigRepository
 				.findByDirectorUrl(createDto.getDirectorUrl());
-		log.info("##### Director Service ::: " + directorConfigList.size() );
-		if (directorConfigList.size() > 0) {
-			throw new IEDACommonException("duplicated.director.exception", "["
-					+ createDto.getDirectorUrl() + "] 데이터가 이미 존재합니다.", HttpStatus.BAD_REQUEST);
-		}
-
+		
 		Info info = null;
-
+		
 		try {
 			DirectorClient client = new DirectorClientBuilder()
 					.withHost(createDto.getDirectorUrl(), createDto.getDirectorPort())
 					.withCredentials(createDto.getUserId(), createDto.getUserPassword()).build();
-
 			URI infoUri = UriComponentsBuilder.fromUri(client.getRoot())
 					.pathSegment("info").build().toUri();
 			ResponseEntity<Info> response = client.getRestTemplate()
 					.getForEntity(infoUri, Info.class);
-
 			info = response.getBody();
-
-			log.info(info.toString());
-
+			
 		} catch (ResourceAccessException e) {
 			throw new IEDACommonException("notfound.director.exception", "["
 					+ createDto.getDirectorUrl() + "] 디렉터를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
@@ -117,7 +108,9 @@ public class IEDADirectorConfigService {
 		director.setDirectorCpi(info.getCpi());
 		director.setDirectorVersion(info.getVersion());
 		
-		director.setDefaultYn((directorConfigList.size() ==0 ) ? "Y":"N");
+		IEDADirectorConfig directorConfig = directorConfigRepository.findOneByDefaultYn("Y");
+		
+		director.setDefaultYn((directorConfig == null ) ? "Y":"N");
 		director.setUpdatedDate(now);
 		director.setCreatedDate(now);
 
