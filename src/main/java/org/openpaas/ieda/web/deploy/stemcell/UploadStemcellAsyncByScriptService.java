@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class UploadStemcellAsyncByScriptService {
 	
-	private String uploadStemcellLog;
 
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
@@ -36,20 +35,19 @@ public class UploadStemcellAsyncByScriptService {
 		log.info("## Command : " + command);
 
 		try {
-			uploadStemcellLog = "";
 			Process process = r.exec(command);
 			process.getInputStream();
 			inputStream = process.getInputStream();
 			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 			String info = null;
 			while ((info = bufferedReader.readLine()) != null) {
-				uploadStemcellLog += info;
 				log.info("##### uploadStemcell ::: " + info);
 				messagingTemplate.convertAndSend("/socket/uploadStemcell", info.toString());
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			messagingTemplate.convertAndSend("/socket/uploadStemcell", e.getMessage());
 		} finally {
 			try {
 				if (inputStream != null)

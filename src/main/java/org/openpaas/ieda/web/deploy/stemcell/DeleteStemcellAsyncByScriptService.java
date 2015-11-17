@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,9 @@ public class DeleteStemcellAsyncByScriptService {
 
 	private String stemcellFileName;
 	private String stemcellVersion;
+	
+	@Autowired
+	private SimpMessagingTemplate messagingTemplate;
 
 	public Boolean deleteStemcell(String stemcellDir, String stemcellFileName, String stemcellVersion) {
 		Boolean success = Boolean.FALSE;
@@ -45,10 +50,13 @@ public class DeleteStemcellAsyncByScriptService {
 			while ((info = bufferedReader.readLine()) != null) {
 				deleteStemcellLog += info;
 				log.info(info);
+				log.info("##### DeleteStemcell ::: " + info);
+				messagingTemplate.convertAndSend("/socket/deleteStemcell", info.toString());
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			messagingTemplate.convertAndSend("/socket/deleteStemcell", e.getMessage());
 		} finally {
 			try {
 				if (inputStream != null)

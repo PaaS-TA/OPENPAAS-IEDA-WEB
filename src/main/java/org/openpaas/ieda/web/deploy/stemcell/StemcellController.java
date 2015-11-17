@@ -85,33 +85,24 @@ public class StemcellController {
 	//@RequestMapping(value = "/uploadStemcell", method = RequestMethod.POST)
 	@MessageMapping("/stemcellUploading")
     @SendTo("/socket/uploadStemcell")
-	public ResponseEntity doUploadStemcell(@Valid StemcellContentDto.Upload dto) {
+	public ResponseEntity doUploadStemcell(@RequestBody @Valid StemcellContentDto.Upload dto) {
 		log.info("##### Upload ::: " + dto.toString());
-//		if (result.hasErrors()) {
-//			IEDAErrorResponse errorResponse = new IEDAErrorResponse();
-//			errorResponse.setMessage("잘못된 요청입니다.");
-//			errorResponse.setCode("bad.request");
-//			messagingTemplate.convertAndSend("/socket/stemcellUpload", errorResponse);
-//			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-//		}
-
-		log.info("### Upload Stemcell : " + dto.getFileName());
 
 		uploadStemcellService.uploadStemcellAsync(iedaConfiguration.getStemcellDir(), dto.getFileName());
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	// 스템셀 삭제
+	/**
+	 * 스템셀 삭제
+	 * @param StemcellContentDto.Delete
+	 * @param result
+	 * @return
+	 */
 	@RequestMapping(value = "/deleteStemcell", method = RequestMethod.POST)
-	public ResponseEntity doDeleteStemcell(@RequestBody @Valid StemcellContentDto.Delete dto, BindingResult result) {
-		if (result.hasErrors()) {
-			IEDAErrorResponse errorResponse = new IEDAErrorResponse();
-			errorResponse.setMessage("잘못된 요청입니다.");
-			errorResponse.setCode("bad.request");
-
-			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-		}
+	@MessageMapping("/stemcellDelete")
+    @SendTo("/socket/deleteStemcell")
+	public ResponseEntity doDeleteStemcell(@RequestBody @Valid StemcellContentDto.Delete dto) {
 
 		log.info("### Delete Stemcell : " + dto.getFileName() + ", version : " + dto.getVersion());
 

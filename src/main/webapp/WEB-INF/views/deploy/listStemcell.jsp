@@ -3,6 +3,9 @@
 <script type="text/javascript" src="/js/sockjs-0.3.4.js"></script>
 <script type="text/javascript" src="/js/stomp.js"></script>
 <script type="text/javascript">
+var uploadClient = null;
+var deleteClient = null;
+
 $(function() {
 	
  	// 기본 설치 관리자 정보 조회
@@ -29,8 +32,9 @@ $(function() {
 					setDisable($('#doDeleteStemcell'), true);
 					return;
 				}
-				
-				setDisable($('#doDeleteStemcell'), false);
+				else{
+					setDisable($('#doDeleteStemcell'), false);
+				}
 			}
 		},
 		onError: function(event) {
@@ -141,21 +145,7 @@ function doDeleteStemcell() {
 		, no_text:'취소'
 		})
 		.yes(function() {
-			$.ajax({
-				method : 'post',
-				type : "json",
-				url : "/deleteStemcell",
-				contentType : "application/json",
-				data : JSON.stringify(requestParameter),
-				success : function(data, status) {
-					w2alert("웹소켓 연결 + 팝업창 띄워서 로그 보여주기");
-				},
-				error : function(request, status, error) {
-                    //w2alert("code:"+request.status+ ", message: "+request.responseText+", error:"+error);
-                    //w2alert(request.responseText);
-					w2alert("오류가 발생하였습니다");
-                }
-			});
+			appendLogPopup("delete",requestParameter);
 
 		})
 		.no(function() {
@@ -196,7 +186,7 @@ function appendLogPopup(type, requestParameter){
 		onOpen  : function(){
 			console.log("=============");
 			if(type =="up") doUploadConnect(requestParameter);
-			else doUploadConnect(requestParameter);
+			else doDeleteConnect(requestParameter);
 		}
 	});
 }
@@ -206,40 +196,67 @@ $( window ).resize(function() {
 	setLayoutContainerHeight();
 });
 
+//Stemcell Upload connect
 function doUploadConnect(requestParameter){
 	console.log("2.=====doUploadConnect=====");
 	var socket = new SockJS('/stemcellUploading');
-	stompClient = Stomp.over(socket); 
-	stompClient.connect({}, function(frame) {
+	uploadClient = Stomp.over(socket); 
+	uploadClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/socket/uploadStemcell', function(data){
+        uploadClient.subscribe('/socket/uploadStemcell', function(data){
         	//appendLog += data.body;
-        	$("textarea[name='uploadStemcellLogs']").append(data.body + "\n");
+        	$("textarea[name='logAppendArea']").append(data.body + "\n");
         	      		
         });
         socketSendUploadData(requestParameter);
     });
 }
 
+//Stemcell Delete connect
+function doDeleteConnect(requestParameter){
+	console.log("2.=====doDeleteConnect=====");
+	var socket = new SockJS('/stemcellDelete');
+	deleteClient = Stomp.over(socket); 
+	deleteClient.connect({}, function(frame) {
+        console.log('Connected: ' + frame);
+        deleteClient.subscribe('/socket/deleteStemcell', function(data){
+        	//appendLog += data.body;
+        	$("textarea[name='logAppendArea']").append(data.body + "\n");
+        	      		
+        });
+        socketSendDeleteData(requestParameter);
+    });
+}
+
 function appendLog(param){
-	var logArea = $("#uploadStemcellLogs");
+	var logArea = $("#logAppendArea");
 	logArea.append(param + "\n");
 }
 
 function socketSendUploadData(requestParameter){
 	console.log("3.=====socketSendUploadData=====");
-	stompClient.send("/app/stemcellUploading", {}, JSON.stringify(requestParameter));
+	uploadClient.send("/app/stemcellUploading", {}, JSON.stringify(requestParameter));
 }
 
+function socketSendDeleteData(requestParameter){
+	console.log("3.=====socketSendDeleteData=====");
+	deleteClient.send("/app/stemcellDelete", {}, JSON.stringify(requestParameter));
+}
+
+//팝업 닫을 경우 Socket Connection 종료 및 log 영역 초기화
 function popupClose() {
-	if (stompClient != null) {
-		stompClient.disconnect();
-		$("textarea[name='uploadStemcellLogs']").text("");
+	if (uploadClient != null) {
+		uploadClient.disconnect();
+		$("textarea[name='logAppendArea']").text("");
 	}
-	w2popup.close();
+	else if (deleteClient != null) {
+		deleteClient.disconnect();
+		$("textarea[name='logAppendArea']").text("");
+	}
+	
 	console.log("Disconnected");
+	w2popup.close();
 }
-
 
 </script>
 
@@ -286,8 +303,7 @@ function popupClose() {
         <b>Stemcell Upload Log</b>
     </div>
     <div rel="body" style="padding: 10px; line-height: 150%">
-	<!-- <div class="pdt10" id="uploadStemcellLogsDiv" style="width: 100%; height:100%; background-color: #F7F7F7;overflow: hidden;"> -->
-		<textarea name="uploadStemcellLogs" readonly="readonly" style="width:100%;height:100%;overflow-y:auto;resize:none;background-color: #FFF;"></textarea>
+		<textarea name="logAppendArea" readonly="readonly" style="width:100%;height:100%;overflow-y:auto;resize:none;background-color: #FFF;"></textarea>
 	</div>
 	<div rel="buttons">
 		<button class="btn closeBtn" onclick="popupClose();"   >닫기</button>
