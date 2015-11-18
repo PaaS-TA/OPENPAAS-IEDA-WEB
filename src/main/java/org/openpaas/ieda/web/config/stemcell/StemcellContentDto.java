@@ -20,4 +20,16 @@ public class StemcellContentDto {
 		@NotBlank
 		private String version;
 	}
+	
+	@Data
+	public static class Download {
+		@NotBlank
+		private String key;
+		
+		@NotBlank
+		private String fileName;
+		
+		@NotBlank
+		private String fileSize;
+	}
 }

@@ -11,6 +11,7 @@ import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,9 @@ public class IEDAStemcellDownload {
 	private int percentage;
 	
 	private DownloadStatus status;
+	
+	@Autowired
+	private SimpMessagingTemplate messagingTemplate;
 	
 	public enum DownloadStatus {AVAILABLE, DOWNLOADING};
 
@@ -70,15 +74,21 @@ public class IEDAStemcellDownload {
 	        while ((count = in.read(data, 0, 4096)) != -1) {
 	            fout.write(data, 0, count);
 	            received += count;
-	            percentage = (int)((received/stemcellSize) *100);
-	            log.info("received:" + received + ", stemcellTotalSize: " + stemcellSize + " = " + percentage);
+	            if(percentage != (int)((received/stemcellSize) *100)){ 
+	            	percentage = (int)((received/stemcellSize) *100);
+	            	log.info("received:" + received + ", stemcellTotalSize: " + stemcellSize + " = " + percentage);
+					messagingTemplate.convertAndSend("/socket/downloadStemcell", percentage);
+	            }
 	        }
 	    } catch (FileNotFoundException e) {
 			e.printStackTrace();
+			messagingTemplate.convertAndSend("/socket/uploadStemcell", e.getMessage());
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
+			messagingTemplate.convertAndSend("/socket/uploadStemcell", e.getMessage());
 		} catch (IOException e) {
 			e.printStackTrace();
+			messagingTemplate.convertAndSend("/socket/uploadStemcell", e.getMessage());
 		} finally {
 	        if (in != null) {
 	            try {

@@ -18,11 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class DeleteStemcellAsyncByScriptService {
 
-	private String deleteStemcellLog;
-
-	private String stemcellFileName;
-	private String stemcellVersion;
-	
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 
@@ -41,15 +36,15 @@ public class DeleteStemcellAsyncByScriptService {
 		log.info("## Command : " + command);
 
 		try {
-			deleteStemcellLog = "";
 			Process process = r.exec(command);
 			process.getInputStream();
 			inputStream = process.getInputStream();
 			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 			String info = null;
+			String streamLogs = "";
+			
 			while ((info = bufferedReader.readLine()) != null) {
-				deleteStemcellLog += info;
-				log.info(info);
+				streamLogs += info;
 				log.info("##### DeleteStemcell ::: " + info);
 				messagingTemplate.convertAndSend("/socket/deleteStemcell", info.toString());
 			}

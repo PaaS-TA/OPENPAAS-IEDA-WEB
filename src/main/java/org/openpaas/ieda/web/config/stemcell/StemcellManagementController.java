@@ -7,11 +7,15 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.openpaas.ieda.common.IEDAConfiguration;
 import org.openpaas.ieda.common.IEDAErrorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,17 +65,19 @@ public class StemcellManagementController {
 	}
 	
 	//  스템셀 다운로드
-	@RequestMapping(value="/downloadPublicStemcell", method=RequestMethod.POST)
-	public ResponseEntity doDownloadStemcell(@RequestBody HashMap<String, String> requestMap ) {
+	//@RequestMapping(value="/downloadPublicStemcell", method=RequestMethod.POST)
+	@MessageMapping("/stemcellDownloading")
+	@SendTo("/socket/downloadStemcell")
+	public ResponseEntity doDownloadStemcell(@RequestBody @Valid StemcellContentDto.Download dto) {
 		log.info("stemcell dir : " + iedaConfiguration.getStemcellDir());
-		log.info("doDownload key      : " + requestMap.get("key"));
-		log.info("doDownload fileName : " + requestMap.get("fileName"));
-		log.info("doDownload fileSize : " + requestMap.get("fileSize"));
+		log.info("doDownload key      : " + dto.getKey());
+		log.info("doDownload fileName : " + dto.getFileName());
+		log.info("doDownload fileSize : " + dto.getFileSize());
 		
 		stemcellDownloadService.doDownload(
-				requestMap.get("key"),
-				requestMap.get("fileName"),
-				new BigDecimal(requestMap.get("fileSize")).doubleValue());
+				dto.getKey(),
+				dto.getFileName(),
+				new BigDecimal(dto.getFileSize()).doubleValue());
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
