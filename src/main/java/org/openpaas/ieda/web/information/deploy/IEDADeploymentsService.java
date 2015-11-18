@@ -38,17 +38,14 @@ public class IEDADeploymentsService {
 			DirectorClient client = new DirectorClientBuilder()
 					.withHost(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort())
 					.withCredentials(defaultDirector.getUserId(), defaultDirector.getUserPassword()).build();
-			
 			URI deploymentsUri = UriComponentsBuilder.fromUri(client.getRoot())
 					.pathSegment("deployments").build().toUri();
-			
 			deployments = client.getRestTemplate().getForObject(deploymentsUri, Deployment[].class);
-			
-			if(deployments != null && deployments.length > 0){
+			if(deployments != null ){
+				log.info("##### Deployments Size ::: " + deployments.length);
 				for( Deployment deployment : deployments){
 					DeploymentsConfig config = new DeploymentsConfig();
 					config.setDeployName(deployment.getName());
-					
 					if(deployment.getReleases() != null && deployment.getReleases().size() > 0
 							&& deployment.getStemcells() != null && deployment.getStemcells().size() > 0){
 						for(ReleaseConfig releaseConfig : deployment.getReleases()){

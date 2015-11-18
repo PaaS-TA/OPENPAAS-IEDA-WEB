@@ -18,7 +18,13 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/stemcellUploading", "/stemcellDownloading", "/stemcellDelete").withSockJS();
+		registry.addEndpoint( "/stemcellUploading"
+							, "/stemcellDownloading"
+							, "/stemcellDelete"
+							, "/releaseUploading"
+							, "/releaseDownloading"
+							, "/releaseDelete"
+							).withSockJS();
 	}
 
 }

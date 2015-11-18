@@ -72,12 +72,6 @@ $(function() {
 		
 	});
  	
- 	//팝업 닫기 버튼
- 	$(".closeBtn").on("click", function(){
- 		console.log( "aaaaa" );
- 		w2popup.close();
- 	});
- 	
  	initView();
  	
  	// 스템셀 삭제
@@ -143,14 +137,14 @@ function doDeleteStemcell() {
 		, title : '스템셀 삭제'
 		, yes_text:'확인'
 		, no_text:'취소'
-		})
-		.yes(function() {
-			appendLogPopup("delete",requestParameter);
+	})
+	.yes(function() {
+		appendLogPopup("delete",requestParameter);
 
-		})
-		.no(function() {
-			// do nothing
-		});	
+	})
+	.no(function() {
+		// do nothing
+	});
 }
 
 //스템셀 업로드
@@ -178,8 +172,9 @@ function doUploadStemcell() {
 		});	
 }
 
+//Log Popup Create
 function appendLogPopup(type, requestParameter){
-	$("#uploadPopLayer").w2popup({
+	$("#appendLogPopupLayer").w2popup({
 		width 	: 800,
 		height	: 500,
 		modal	: true,
@@ -191,10 +186,6 @@ function appendLogPopup(type, requestParameter){
 	});
 }
 
-//화면 리사이즈시 호출
-$( window ).resize(function() {
-	setLayoutContainerHeight();
-});
 
 //Stemcell Upload connect
 function doUploadConnect(requestParameter){
@@ -208,7 +199,7 @@ function doUploadConnect(requestParameter){
         	$("textarea[name='logAppendArea']").append(data.body + "\n");
         	      		
         });
-        socketSendUploadData(requestParameter);
+        socketSendUploadData( requestParameter);
     });
 }
 
@@ -228,19 +219,13 @@ function doDeleteConnect(requestParameter){
     });
 }
 
-function appendLog(param){
-	var logArea = $("#logAppendArea");
-	logArea.append(param + "\n");
-}
-
+//socket으로 데이터 전송
 function socketSendUploadData(requestParameter){
-	console.log("3.=====socketSendUploadData=====");
-	uploadClient.send("/app/stemcellUploading", {}, JSON.stringify(requestParameter));
+	uploadClient.send('/app/stemcellUploading', {}, JSON.stringify(requestParameter));
 }
 
 function socketSendDeleteData(requestParameter){
-	console.log("3.=====socketSendDeleteData=====");
-	deleteClient.send("/app/stemcellDelete", {}, JSON.stringify(requestParameter));
+	deleteClient.send('/app/stemcellDelete', {}, JSON.stringify(requestParameter));
 }
 
 //팝업 닫을 경우 Socket Connection 종료 및 log 영역 초기화
@@ -258,6 +243,10 @@ function popupClose() {
 	w2popup.close();
 }
 
+//화면 리사이즈시 호출
+$( window ).resize(function() {
+	setLayoutContainerHeight();
+});
 </script>
 
 <div id="main">
@@ -297,10 +286,10 @@ function popupClose() {
 	<div id="us_localStemcellsGrid" style="width:100%; height:200px"></div>
 	
 </div>
-
-<div id="uploadPopLayer" class=" popuplayer" hidden="true">
+<!-- Popup Layer -->
+<div id="appendLogPopupLayer" class=" popuplayer" hidden="true">
  	<div rel="title">
-        <b>Stemcell Upload Log</b>
+        <b>Stemcell Process Log</b>
     </div>
     <div rel="body" style="padding: 10px; line-height: 150%">
 		<textarea name="logAppendArea" readonly="readonly" style="width:100%;height:100%;overflow-y:auto;resize:none;background-color: #FFF;"></textarea>

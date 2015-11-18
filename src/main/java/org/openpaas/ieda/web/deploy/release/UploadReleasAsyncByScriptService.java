@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.deploy.stemcell;
+package org.openpaas.ieda.web.deploy.release;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,22 +14,23 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class DeleteStemcellAsyncByScriptService {
+public class UploadReleasAsyncByScriptService {
 
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 
-	public Boolean deleteStemcell(String stemcellDir, String stemcellFileName, String stemcellVersion) {
+	public Boolean uploadRelease(String dir, String fileName) {
 		Boolean success = Boolean.FALSE;
 
 		Runtime r = Runtime.getRuntime();
 
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
-		String command = "D:/ieda_workspace/stemcell/bosh_delete_stemcell.bat ";
-		command += stemcellDir + " ";
-		command += stemcellFileName + " ";
-		command += stemcellVersion;
+		String command = "D:/ieda_workspace/release/bosh_upload_release.bat ";
+		command += dir + " ";
+		command += fileName;
+		
+		String streamLogs = "";
 
 		log.info("## Command : " + command);
 
@@ -39,17 +40,16 @@ public class DeleteStemcellAsyncByScriptService {
 			inputStream = process.getInputStream();
 			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 			String info = null;
-			String streamLogs = "";
-			
 			while ((info = bufferedReader.readLine()) != null) {
 				streamLogs += info;
-				log.info("##### DeleteStemcell ::: " + info);
-				messagingTemplate.convertAndSend("/socket/deleteStemcell", info.toString());
+
+				log.info("##### uploadRelease ::: " + info);
+				messagingTemplate.convertAndSend("/socket/uploadRelease", info.toString());
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			messagingTemplate.convertAndSend("/socket/deleteStemcell", e.getMessage());
+			messagingTemplate.convertAndSend("/socket/uploadRelease", e.getMessage());
 		} finally {
 			try {
 				if (inputStream != null)
@@ -69,12 +69,11 @@ public class DeleteStemcellAsyncByScriptService {
 	}
 
 	@Async
-	public void deleteStemcellAsync(String stemcellDir, String stemcellFileName, String stemcellVersion) {
+	public void uploadReleaseAsync(String dir, String fileName) {
 		try {
-			deleteStemcell(stemcellDir, stemcellFileName, stemcellVersion);
+			uploadRelease(dir, fileName);
 		} catch (Exception e) {
-			log.info("# Exception caught deleting asynchronous stemcell. " + e);
+			log.info("# Exception caught uploading asynchronous Release. " + e);
 		}
 	}
-
 }

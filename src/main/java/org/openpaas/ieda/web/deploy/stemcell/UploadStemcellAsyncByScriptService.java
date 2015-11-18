@@ -19,7 +19,6 @@ public class UploadStemcellAsyncByScriptService {
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 	
-	
 	public Boolean uploadStemcell(String stemcellDir, String stemcellFileName) {
 		Boolean success = Boolean.FALSE;
 

@@ -1,7 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<script type="text/javascript" src="/js/sockjs-0.3.4.js"></script>
+<script type="text/javascript" src="/js/stomp.js"></script>
 <script type="text/javascript">
+var uploadClient = null;
+var deleteClient = null;
 
 $(function() {
  	// 기본 설치 관리자 정보 조회
@@ -9,12 +12,13 @@ $(function() {
  	
  	$('#ru_uploadedReleasesGrid').w2grid({
 		name	: 'ru_uploadedReleasesGrid',
-		method 	: "GET",
-		style	: 'text-align:center',
 		show	: {	
 					lineNumbers: true,
 					selectColumn: true	,
 					footer: true},
+		multiSelect: false,
+		method	: 'GET',
+		style	: 'text-align:center',
 		columns	:[
 		         {field: 'recid', caption: 'recid', hidden: true}
 		       , {field: 'name', caption: '이름', size: '30%'}
@@ -24,30 +28,237 @@ $(function() {
 		       , {field: 'uncommittedChanges', caption: 'uncommitted_changes ', size: '15%'}
 		       //, {field: 'commit_hash', caption: 'Commit Hash', size: '40%'}
 		       ],
-       onError: function(event) {
+		onClick: function(event) {
+			var grid = this;
+			event.onComplete = function() {
+				var sel = grid.getSelection();
+				if ( sel == null || sel == "") {
+					setDisable($('#doDeleteRelease'), true);
+					return;
+				}
+				else{
+					setDisable($('#doDeleteRelease'), false);
+				}
+			}
+		},
+		onError: function(event) {
 			this.unlock();
 			gridErrorMsg(event);
 		}
 	});
  	
- 	doSearch();
+ 	$('#ru_localReleasesGrid').w2grid({
+		name	: 'ru_localReleasesGrid',
+		show	: {	
+					lineNumbers: true,
+					selectColumn: true	,
+					footer: true},
+		multiSelect: false,
+		method 	: "GET",
+		style	: 'text-align:center',
+		columns	:[
+		         {field: 'recid', caption: 'recid', hidden: true}
+		      /*  , {field: 'name', caption: '이름', size: '10%'}
+		       , {field: 'version', caption: 'version', size: '10%'}
+		       , {field: 'commitHash', caption: 'CommitHash', size: '10%'}
+		       , {field: 'currentlyDeployed', caption: 'Currently_Deployed', size: '15%'}
+		       , {field: 'uncommittedChanges', caption: 'UnCommitted_changes ', size: '15%'} */
+		       //, {field: 'commit_hash', caption: 'Commit Hash', size: '40%'}
+		       , {field: 'fileName', caption: '파일명', size: '80%', style: 'text-align:left'}
+		       ],
+		onClick: function(event) {
+			var grid = this;
+			event.onComplete = function() {
+				var sel = grid.getSelection();
+				if ( sel == null || sel == "") {
+					setDisable($('#doUploadRelease'), true);
+					return;
+				}
+				else{
+					setDisable($('#doUploadRelease'), false);
+				}
+			}
+		},
+		onError: function(event) {
+			this.unlock();
+			gridErrorMsg(event);
+		}
+	});
+ 	
+ 	
+ 	initView();
+ 	
+ 	//릴리즈 삭제
+ 	$("#doDeleteRelease").click(function(){
+ 		doDeleteRelease();
+    });
+ 	
+ 	//릴리즈 업로드
+ 	$("#doUploadRelease").click(function(){
+ 		doUploadRelease();
+    });
+ 	
 });
 
 
-//조회기능
-function doSearch() {
+function initView() {
+	// 업로드된 릴리즈 조회
+ 	doSearchUploadedReleases();
+	
+	// 로컬에 다운로드된 릴리즈 조회
+	doSearchLocalReleases();
+
+	// 컨트롤 
+	setDisable($('#doDeleteRelease'), true);
+	setDisable($('#doUploadRelease'), true);
+}
+
+function setDisable(object, flag) {
+	object.attr('disabled', flag);
+}
+
+//업로드된 릴리즈 조회
+function doSearchUploadedReleases() {
 	w2ui['ru_uploadedReleasesGrid'].load("<c:url value='/releases'/>");
+}
+
+//로컬에 다운로드된 릴리즈 조회
+function doSearchLocalReleases() {
+	w2ui['ru_localReleasesGrid'].load("<c:url value='/localReleases'/>");
 }
 
 //다른페이지 이동시 호출
 function clearMainPage() {
 	$().w2destroy('ru_uploadedReleasesGrid');
+	$().w2destroy('ru_localReleasesGrid');
 }
 
 //화면 리사이즈시 호출
 $( window ).resize(function() {
 	setLayoutContainerHeight();
 });
+
+//릴리즈 삭제
+function doDeleteRelease() {
+	var selected = w2ui['ru_uploadedReleasesGrid'].getSelection();
+	if ( selected == "" || selected == null) return;
+	
+	var record = w2ui['ru_uploadedReleasesGrid'].get(selected);
+	if ( record == "" || record == null) return;
+
+	var requestParameter = {
+			fileName : record.name,
+			version  : record.version
+		};
+	
+	w2confirm( { msg : '설치관리자에 업로드된 릴리즈 <br/>' + record.name + '<br/>을 삭제하시겠습니까?'
+		, title : '릴리즈 삭제'
+		, yes_text:'확인'
+		, no_text:'취소'
+	})
+	.yes(function() {
+		appendLogPopup("delete",requestParameter);
+
+	})
+	.no(function() {
+		// do nothing
+	});	
+}
+
+//릴리즈 업로드
+function doUploadRelease() {
+	var selected = w2ui['ru_localReleasesGrid'].getSelection();
+	if ( selected == "" || selected == null) return;
+	
+	var record = w2ui['ru_localReleasesGrid'].get(selected);
+	if ( record == "" || record == null) return;
+	
+	var requestParameter = {
+			fileName : record.fileName
+		};
+	
+	w2confirm( { msg : '선택된 릴리즈 <br>' + record.fileName + ' <br>을 설치관리자에 업로드하시겠습니까?'
+		, title : '릴리즈 업로드'
+		, yes_text:'확인'
+		, no_text:'취소'
+		})
+		.yes(function() {
+			appendLogPopup("upload",requestParameter);
+		})
+		.no(function() {
+			// do nothing
+		});	
+}
+
+//Log Popup Create
+function appendLogPopup(type, requestParameter){
+	$("#appendLogPopupLayer").w2popup({
+		width 	: 800,
+		height	: 500,
+		modal	: true,
+		onOpen  : function(){
+			console.log("=============");
+			if(type =="upload") doUploadConnect(requestParameter);
+			else doDeleteConnect(requestParameter);
+		}
+	});
+}
+
+//Release Upload connect
+function doUploadConnect(requestParameter){
+	console.log("2.=====Release doUploadConnect=====");
+	var socket = new SockJS('/releaseUploading');
+	uploadClient = Stomp.over(socket); 
+	uploadClient.connect({}, function(frame) {
+        console.log('Connected: ' + frame);
+        uploadClient.subscribe('/socket/uploadRelease', function(data){
+        	$("textarea[name='logAppendArea']").append(data.body + "\n");
+        });
+        socketSendUploadData(requestParameter);
+    });
+}
+
+//Release Delete connect
+function doDeleteConnect(requestParameter){
+	console.log("2.=====Release doDeleteConnect=====" + requestParameter.fileName);
+	var socket = new SockJS('/releaseDelete');
+	deleteClient = Stomp.over(socket); 
+	deleteClient.connect({}, function(frame) {
+        console.log('Connected: ' + frame);
+        deleteClient.subscribe('/socket/deleteRelease', function(data){
+        	$("textarea[name='logAppendArea']").append(data.body + "\n");
+        });
+        socketSendDeleteData(requestParameter);
+        
+    });
+}
+function socketSendUploadData(requestParameter){
+	uploadClient.send('/app/releaseUploading', {}, JSON.stringify(requestParameter));
+}
+function socketSendDeleteData(requestParameter){
+	deleteClient.send('/app/releaseDelete', {}, JSON.stringify(requestParameter));
+}
+
+//팝업 닫을 경우 Socket Connection 종료 및 log 영역 초기화
+function popupClose() {
+	if (uploadClient != null) {
+		uploadClient.disconnect();
+		$("textarea[name='logAppendArea']").text("");
+	}
+	else if (deleteClient != null) {
+		deleteClient.disconnect();
+		$("textarea[name='logAppendArea']").text("");
+	}
+	
+	console.log("Disconnected");
+	w2popup.close();
+}
+
+//화면 리사이즈시 호출
+$( window ).resize(function() {
+	setLayoutContainerHeight();
+});
+
 
 </script>
 
@@ -59,12 +270,12 @@ $( window ).resize(function() {
 	
 	<table class="tbl1" border="1" cellspacing="0">
 	<tr>
-		<th width="18%" class="th_fb">관리자 이름</th><td class="td_fb"><b id="directorName"/></td>
-		<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb"><b id="userId"/></td>
+		<th width="18%" class="th_fb">관리자 이름</th><td class="td_fb"><b id="directorName"></b></td>
+		<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb"><b id="userId"></b></td>
 	</tr>
 	<tr>
-		<th width="18%" >관리자 URL</th><td><b id="directorUrl"/></td>
-		<th width="18%" >관리자 UUID</th><td ><b id="directorUuid"/></td>
+		<th width="18%" >관리자 URL</th><td><b id="directorUrl"></b></td>
+		<th width="18%" >관리자 UUID</th><td ><b id="directorUuid"></b></td>
 	</tr>
 	</table>
 	
@@ -72,14 +283,30 @@ $( window ).resize(function() {
 	
 	<!-- 릴리즈 목록-->
 	<div class="pdt20"> 
-		<div class="title fl">릴리즈 목록</div>
-		<div class="fr"> 
-		<!-- Btn -->
-		<span class="boardBtn"><a href="#" class="btn btn-primary" style="width:130px"><span>릴리즈 업로드</span></a></span>
-		<span class="boardBtn"><a href="#" class="btn btn-danger" style="width:130px"><span>릴리즈 삭제</span></a></span>
-		<!-- //Btn -->
+		<div class="title fl">디렉터에 업로드된 릴리즈 목록</div>
+		<div class="fr">
+			<span class="btn btn-danger" style="width:120px" id="doDeleteRelease">릴리즈 삭제</span>
 	    </div>
 	</div>
-	<div id="ru_uploadedReleasesGrid" style="width:100%; height:500px"/>	
-	
+	<div id="ru_uploadedReleasesGrid" style="width:100%; height:200px"></div>	
+	<div class="pdt20"> 
+		<div class="title fl">다운로드된 릴리즈 목록</div>
+		<div class="fr"> 
+			<span class="btn btn-primary" style="width:120px" id="doUploadRelease">릴리즈 업로드</span>
+		</div>
+	</div>
+	<div id="ru_localReleasesGrid" style="width:100%; height:200px"></div>
+</div>
+
+<!-- Popup Layer -->
+<div id="appendLogPopupLayer" class=" popuplayer" hidden="true">
+ 	<div rel="title">
+        <b>Release Process Log</b>
+    </div>
+    <div rel="body" style="padding: 10px; line-height: 150%">
+		<textarea name="logAppendArea" readonly="readonly" style="width:100%;height:100%;overflow-y:auto;resize:none;background-color: #FFF;"></textarea>
+	</div>
+	<div rel="buttons">
+		<button class="btn closeBtn" onclick="popupClose();"   >닫기</button>
+    </div>
 </div>

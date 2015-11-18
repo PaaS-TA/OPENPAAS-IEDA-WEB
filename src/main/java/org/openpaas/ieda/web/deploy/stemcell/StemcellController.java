@@ -8,7 +8,6 @@ import javax.validation.Valid;
 
 import org.openpaas.ieda.api.Stemcell;
 import org.openpaas.ieda.common.IEDAConfiguration;
-import org.openpaas.ieda.common.IEDAErrorResponse;
 import org.openpaas.ieda.web.config.stemcell.StemcellContent;
 import org.openpaas.ieda.web.config.stemcell.StemcellContentDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,9 +43,6 @@ public class StemcellController {
 	@Autowired
 	private DeleteStemcellAsyncByScriptService deleteStemcellService;
 	
-	@Autowired
-	private SimpMessagingTemplate messagingTemplate;
-
 	@RequestMapping(value = "/deploy/listStemcell", method = RequestMethod.GET)
 	public String List() {
 		return "/deploy/listStemcell";
@@ -58,7 +52,7 @@ public class StemcellController {
 	public ResponseEntity listStemcell() {
 		List<Stemcell> contents = service.listStemcell();
 		int recid = 0;
-		if (contents.size() > 0) {
+		if (contents != null) {
 			for (Stemcell stemcell : contents) {
 				stemcell.setRecid(recid++);
 				log.info("### OS : " + stemcell.getOperatingSystem());
@@ -82,7 +76,6 @@ public class StemcellController {
 	}
 
 	// 스템셀 업로드
-	//@RequestMapping(value = "/uploadStemcell", method = RequestMethod.POST)
 	@MessageMapping("/stemcellUploading")
     @SendTo("/socket/uploadStemcell")
 	public ResponseEntity doUploadStemcell(@RequestBody @Valid StemcellContentDto.Upload dto) {
@@ -99,7 +92,6 @@ public class StemcellController {
 	 * @param result
 	 * @return
 	 */
-	@RequestMapping(value = "/deleteStemcell", method = RequestMethod.POST)
 	@MessageMapping("/stemcellDelete")
     @SendTo("/socket/deleteStemcell")
 	public ResponseEntity doDeleteStemcell(@RequestBody @Valid StemcellContentDto.Delete dto) {
@@ -112,31 +104,4 @@ public class StemcellController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/testing", method=RequestMethod.GET)
-	public String testing(){
-		return "/test";
-	}
-	
-//	@MessageMapping("/stemcellDownload")
-//    @SendTo("/stemcell/download")
-//	public ResponseEntity stemcellDown(){
-//		log.info("DownName : ");
-//		Map<String, Object>  result = new HashMap<>();
-//		result.put("name", "stemcellDDD");
-//		return  new ResponseEntity<>(result, HttpStatus.OK);
-//	}
-	/*
-	@MessageMapping("/stemcellUploading")
-    @SendTo("/socket/stemcellUpload")
-	public String stemcellUp(String name) throws Exception{
-		log.info("#####UpName : " + name);
-		Thread.sleep(3000); // simulated delay
-		for (int i=0;i<10;i++){
-        	this.messagingTemplate.convertAndSend("/socket/stemcellUpload", "No : " + i);
-        	log.info("stemcellUpload : " + i);
-        }
-		Map<String, Object>  result = new HashMap<>();
-		result.put("name", "stemcellUUU");
-		return  "ni~~~na~~~~no";
-	}*/
 }

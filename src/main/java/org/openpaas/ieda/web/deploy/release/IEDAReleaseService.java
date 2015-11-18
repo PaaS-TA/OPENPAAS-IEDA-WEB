@@ -1,5 +1,6 @@
 package org.openpaas.ieda.web.deploy.release;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.openpaas.ieda.api.DirectorClientBuilder;
 import org.openpaas.ieda.api.Release;
 import org.openpaas.ieda.api.ReleaseVersion;
 import org.openpaas.ieda.common.IEDACommonException;
+import org.openpaas.ieda.common.IEDAConfiguration;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +26,11 @@ import lombok.extern.slf4j.Slf4j;
 public class IEDAReleaseService {
 
 	@Autowired
+	private IEDAConfiguration iedaConfiguration;
+	
+	@Autowired
 	private IEDADirectorConfigRepository directorConfigRepository;
-
+	
 	public List<ReleaseConfig> listRelease() {
 		IEDADirectorConfig defaultDirector = new IEDADirectorConfig();
 
@@ -76,4 +81,29 @@ public class IEDAReleaseService {
 
 		return releaseConfigs;
 	}
+	
+	/**
+	 * Get Local Release File List 
+	 * @return List<ReleaseConfig>
+	 */
+	public List<ReleaseConfig> listLocalRelease() {
+		File file = new File(iedaConfiguration.getReleaseDir());
+		File[] localFiles = file.listFiles();
+		
+		List<ReleaseConfig> returnReleases = new ArrayList<>();
+		
+		for (File fileInfo : localFiles) {
+			ReleaseConfig config = new ReleaseConfig();
+			if(fileInfo.getName().endsWith(".tgz")){
+				config.setFileName(fileInfo.getName());
+				returnReleases.add(config);
+			}
+		}
+		return returnReleases;
+	}
+
+	
+
+	
+	
 }
