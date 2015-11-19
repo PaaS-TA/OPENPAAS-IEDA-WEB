@@ -28,7 +28,9 @@ public class DeleteReleaseAsyncByScriptService {
 		BufferedReader bufferedReader = null;
 		String command = "D:/ieda_workspace/release/bosh_delete_release.bat ";
 		command += dir + " ";
-		command += fileName + " ";
+//		command += fileName + " ";
+		dir = dir.replace("/", "\\") + " ";
+		command += dir + "\\" + fileName;
 		command += version;
 
 		log.info("## Command : " + command);

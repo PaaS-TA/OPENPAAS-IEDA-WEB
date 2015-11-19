@@ -5,6 +5,8 @@
 <script type="text/javascript">
 var uploadClient = null;
 var deleteClient = null;
+var appendLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:430px;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
+var appendLogPopupButton = '<button class="btn closeBtn" onclick="popupClose();">닫기</button>'
 
 $(function() {
 	
@@ -84,7 +86,6 @@ $(function() {
  		doUploadStemcell();
     });
 
- 	
 });
 
 
@@ -174,10 +175,13 @@ function doUploadStemcell() {
 
 //Log Popup Create
 function appendLogPopup(type, requestParameter){
-	$("#appendLogPopupLayer").w2popup({
+	w2popup.open({
+		title	: '<b>Stemcell Process Log</b>',
+		body	: appendLogPopupBody,
+		buttons : appendLogPopupButton,
 		width 	: 800,
-		height	: 500,
-		modal	: true,
+		height	: 550,		
+		modal	: true,		
 		onOpen  : function(){
 			console.log("=============");
 			if(type =="up") doUploadConnect(requestParameter);
@@ -195,9 +199,8 @@ function doUploadConnect(requestParameter){
 	uploadClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
         uploadClient.subscribe('/socket/uploadStemcell', function(data){
-        	//appendLog += data.body;
-        	$("textarea[name='logAppendArea']").append(data.body + "\n");
-        	      		
+        	
+        	$("textarea[name='logAppendArea']").append(data.body + "\n").animate({scrollTop:$("textarea[name='logAppendArea']")[0].scrollHeight});
         });
         socketSendUploadData( requestParameter);
     });
@@ -211,9 +214,7 @@ function doDeleteConnect(requestParameter){
 	deleteClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
         deleteClient.subscribe('/socket/deleteStemcell', function(data){
-        	//appendLog += data.body;
-        	$("textarea[name='logAppendArea']").append(data.body + "\n");
-        	      		
+        	$("textarea[name='logAppendArea']").append(data.body + "\n").animate({scrollTop:$("textarea[name='logAppendArea']")[0].scrollHeight});
         });
         socketSendDeleteData(requestParameter);
     });
@@ -284,17 +285,4 @@ $( window ).resize(function() {
 	</div>
 		
 	<div id="us_localStemcellsGrid" style="width:100%; height:200px"></div>
-	
-</div>
-<!-- Popup Layer -->
-<div id="appendLogPopupLayer" class=" popuplayer" hidden="true">
- 	<div rel="title">
-        <b>Stemcell Process Log</b>
-    </div>
-    <div rel="body" style="padding: 10px; line-height: 150%">
-		<textarea name="logAppendArea" readonly="readonly" style="width:100%;height:100%;overflow-y:auto;resize:none;background-color: #FFF;"></textarea>
-	</div>
-	<div rel="buttons">
-		<button class="btn closeBtn" onclick="popupClose();"   >닫기</button>
-    </div>
 </div>

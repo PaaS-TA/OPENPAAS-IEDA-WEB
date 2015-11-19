@@ -28,7 +28,10 @@ public class UploadStemcellAsyncByScriptService {
 		BufferedReader bufferedReader = null;
 		String command = "D:/ieda_workspace/stemcell/bosh_upload_stemcell.bat ";
 		command += stemcellDir + " ";
-		command += stemcellFileName;
+//		command += stemcellFileName;
+		
+		String dir = stemcellDir.replace("/", "\\");
+		command += dir + "\\" + stemcellFileName;
 		
 		String streamLogs = "";
 

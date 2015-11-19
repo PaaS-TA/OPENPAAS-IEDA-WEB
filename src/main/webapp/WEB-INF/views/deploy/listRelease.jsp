@@ -3,8 +3,11 @@
 <script type="text/javascript" src="/js/sockjs-0.3.4.js"></script>
 <script type="text/javascript" src="/js/stomp.js"></script>
 <script type="text/javascript">
+
 var uploadClient = null;
 var deleteClient = null;
+var appendLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:430px;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
+var appendLogPopupButton = '<button class="btn closeBtn" onclick="popupClose();">닫기</button>'
 
 $(function() {
  	// 기본 설치 관리자 정보 조회
@@ -192,9 +195,12 @@ function doUploadRelease() {
 
 //Log Popup Create
 function appendLogPopup(type, requestParameter){
-	$("#appendLogPopupLayer").w2popup({
+	w2popup.open({
+		title	: '<b>Release Process Log</b>',
+		body	: appendLogPopupBody,
+		buttons : appendLogPopupButton,
 		width 	: 800,
-		height	: 500,
+		height	: 550,
 		modal	: true,
 		onOpen  : function(){
 			console.log("=============");
@@ -212,7 +218,7 @@ function doUploadConnect(requestParameter){
 	uploadClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
         uploadClient.subscribe('/socket/uploadRelease', function(data){
-        	$("textarea[name='logAppendArea']").append(data.body + "\n");
+        	$("textarea[name='logAppendArea']").append(data.body + "\n").animate({scrollTop:$("textarea[name='logAppendArea']")[0].scrollHeight});
         });
         socketSendUploadData(requestParameter);
     });
@@ -226,7 +232,7 @@ function doDeleteConnect(requestParameter){
 	deleteClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
         deleteClient.subscribe('/socket/deleteRelease', function(data){
-        	$("textarea[name='logAppendArea']").append(data.body + "\n");
+        	$("textarea[name='logAppendArea']").append(data.body + "\n").animate({scrollTop:$("textarea[name='logAppendArea']")[0].scrollHeight});
         });
         socketSendDeleteData(requestParameter);
         
@@ -296,17 +302,4 @@ $( window ).resize(function() {
 		</div>
 	</div>
 	<div id="ru_localReleasesGrid" style="width:100%; height:200px"></div>
-</div>
-
-<!-- Popup Layer -->
-<div id="appendLogPopupLayer" class=" popuplayer" hidden="true">
- 	<div rel="title">
-        <b>Release Process Log</b>
-    </div>
-    <div rel="body" style="padding: 10px; line-height: 150%">
-		<textarea name="logAppendArea" readonly="readonly" style="width:100%;height:100%;overflow-y:auto;resize:none;background-color: #FFF;"></textarea>
-	</div>
-	<div rel="buttons">
-		<button class="btn closeBtn" onclick="popupClose();"   >닫기</button>
-    </div>
 </div>

@@ -28,7 +28,9 @@ public class UploadReleasAsyncByScriptService {
 		BufferedReader bufferedReader = null;
 		String command = "D:/ieda_workspace/release/bosh_upload_release.bat ";
 		command += dir + " ";
-		command += fileName;
+//		command += fileName;
+
+		command += dir.replace("/", "\\") + "\\" + fileName;
 		
 		String streamLogs = "";
 
