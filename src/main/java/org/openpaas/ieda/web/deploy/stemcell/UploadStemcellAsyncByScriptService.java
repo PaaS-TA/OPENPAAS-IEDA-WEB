@@ -28,13 +28,10 @@ public class UploadStemcellAsyncByScriptService {
 		BufferedReader bufferedReader = null;
 		String command = "D:/ieda_workspace/stemcell/bosh_upload_stemcell.bat ";
 		command += stemcellDir + " ";
-//		command += stemcellFileName;
 		
 		String dir = stemcellDir.replace("/", "\\");
 		command += dir + "\\" + stemcellFileName;
 		
-		String streamLogs = "";
-
 		log.info("## Command : " + command);
 
 		try {
@@ -43,9 +40,10 @@ public class UploadStemcellAsyncByScriptService {
 			inputStream = process.getInputStream();
 			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 			String info = null;
+			String streamLogs = "";
+			
 			while ((info = bufferedReader.readLine()) != null) {
 				streamLogs += info;
-
 				log.info("##### uploadStemcell ::: " + info);
 				messagingTemplate.convertAndSend("/socket/uploadStemcell", info.toString());
 			}

@@ -166,7 +166,7 @@ function doUploadStemcell() {
 		, no_text:'취소'
 		})
 		.yes(function() {
-			appendLogPopup("up",requestParameter);
+			appendLogPopup("upload",requestParameter);
 		})
 		.no(function() {
 			// do nothing
@@ -175,16 +175,16 @@ function doUploadStemcell() {
 
 //Log Popup Create
 function appendLogPopup(type, requestParameter){
+	console.log("============================================================================");
 	w2popup.open({
-		title	: '<b>Stemcell Process Log</b>',
+		title	: (type =="upload") ? '<b>스템셀 업로드 로그</b>': '<b>스템셀 삭제 로그</b>',
 		body	: appendLogPopupBody,
 		buttons : appendLogPopupButton,
 		width 	: 800,
 		height	: 550,		
 		modal	: true,		
 		onOpen  : function(){
-			console.log("=============");
-			if(type =="up") doUploadConnect(requestParameter);
+			if(type =="upload") doUploadConnect(requestParameter);
 			else doDeleteConnect(requestParameter);
 		}
 	});
@@ -199,8 +199,7 @@ function doUploadConnect(requestParameter){
 	uploadClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
         uploadClient.subscribe('/socket/uploadStemcell', function(data){
-        	
-        	$("textarea[name='logAppendArea']").append(data.body + "\n").animate({scrollTop:$("textarea[name='logAppendArea']")[0].scrollHeight});
+        	$("textarea[name='logAppendArea']").append(data.body + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
         });
         socketSendUploadData( requestParameter);
     });
@@ -214,7 +213,7 @@ function doDeleteConnect(requestParameter){
 	deleteClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
         deleteClient.subscribe('/socket/deleteStemcell', function(data){
-        	$("textarea[name='logAppendArea']").append(data.body + "\n").animate({scrollTop:$("textarea[name='logAppendArea']")[0].scrollHeight});
+        	$("textarea[name='logAppendArea']").append(data.body + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
         });
         socketSendDeleteData(requestParameter);
     });
@@ -242,6 +241,11 @@ function popupClose() {
 	
 	console.log("Disconnected");
 	w2popup.close();
+	
+	// 업로드된 스템셀 조회
+ 	doSearchUploadedStemcells();
+ 	setDisable($('#doUploadStemcell'), true);
+	
 }
 
 //화면 리사이즈시 호출

@@ -11,7 +11,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -34,6 +36,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import lombok.extern.slf4j.Slf4j;
+import scala.annotation.meta.getter;
 
 @Slf4j
 @Service
@@ -60,7 +63,7 @@ public class StemcellManagementService {
 		File dir = new File(iedaConfiguration.getStemcellDir());
 		File[] localFiles = dir.listFiles();
 		 
-		List<String> localStemcells = new ArrayList();
+		List<String> localStemcells = new ArrayList<>();
 		for (File file : localFiles) {
 			localStemcells.add(file.getName());
 		}
@@ -222,10 +225,12 @@ public class StemcellManagementService {
 		
 		// 다운로드 받은 스템셀
 		List<String> localStemcells = getLocalStemcellList();
+		List<Map<String, String>> localStemcellFileInfos = getLocalStemcellFileList();
 
 		// 로컬에 스템셀 파일이 존재하는 여부 표시
 		for (StemcellContent stemcell : stemcellList) {
 			stemcell.setIsExisted((existStemcells(localStemcells, (t) -> t.equals(stemcell.getStemcellFileName()))) ? "Y" : "N");
+			stemcell.setIsDose((doseStemcells(localStemcellFileInfos, (t) -> t.equals(stemcell.getStemcellFileName()), (x) -> x.equals(stemcell.getSize()) )) ? "Y" : "N");
 		}
 		
 		// 스템셀 버전 역순으로 정렬
@@ -243,6 +248,16 @@ public class StemcellManagementService {
 		
 		return false;
 	}
+	
+	public boolean doseStemcells(List<Map<String, String>> localStemcellFileInfos, Predicate<String> fileName,Predicate<String> fileSize){
+		for ( Map<String, String> localStemcell : localStemcellFileInfos) {
+			if ( fileName.test(localStemcell.get("fileName")) && fileSize.test(localStemcell.get("fileSize"))) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 
 	// 다운로드 스템셀
 	public List<String> doDownloadStemcell(String subLink, String stemcellFile, BigDecimal fileSize) {
@@ -258,9 +273,7 @@ public class StemcellManagementService {
 	    double received = 0;
 	    try {
 	        in = new BufferedInputStream(new URL(downloadLink).openStream());
-	        log.info("111");
 	        fout = new FileOutputStream(iedaConfiguration.getStemcellDir()+"/"+stemcellFile);
-	        log.info("222");
 
 	        final byte data[] = new byte[4096];
 	        int count;
@@ -381,5 +394,20 @@ public class StemcellManagementService {
 					"스템셀 삭제 중에 오류가 발생하였습니다.", HttpStatus.NO_CONTENT);
 		}
 		
+	}
+	
+	public List<Map<String, String>> getLocalStemcellFileList(){
+		List<Map<String, String>> fileInfos = new ArrayList<>();
+		
+		File dir = new File(iedaConfiguration.getStemcellDir());
+		File[] localFiles = dir.listFiles();
+		 
+		for (File file : localFiles) {
+			Map<String, String> fileInfo = new HashMap<>();
+			fileInfo.put("fileName", file.getName());
+			fileInfo.put("fileSize", String.valueOf(file.length()));
+			fileInfos.add(fileInfo);
+		}
+		return fileInfos;
 	}
 }

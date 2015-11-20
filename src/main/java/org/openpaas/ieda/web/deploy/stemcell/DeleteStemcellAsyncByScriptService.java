@@ -28,10 +28,7 @@ public class DeleteStemcellAsyncByScriptService {
 		BufferedReader bufferedReader = null;
 		String command = "D:/ieda_workspace/stemcell/bosh_delete_stemcell.bat ";
 		command += stemcellDir + " ";
-		//command += stemcellFileName + " ";
-
-		String dir = stemcellDir.replace("/", "\\");
-		command += dir + "\\" + stemcellFileName + " ";
+		command += stemcellFileName + " ";
 		command += stemcellVersion;
 		
 		log.info("## Command : " + command);

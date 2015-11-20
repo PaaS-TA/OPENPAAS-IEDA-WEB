@@ -196,7 +196,7 @@ function doUploadRelease() {
 //Log Popup Create
 function appendLogPopup(type, requestParameter){
 	w2popup.open({
-		title	: '<b>Release Process Log</b>',
+		title	: (type == "upload") ? '<b>릴리즈 업로드 로그</b>':'<b>릴리즈 삭제 로그</b>',
 		body	: appendLogPopupBody,
 		buttons : appendLogPopupButton,
 		width 	: 800,
@@ -218,7 +218,7 @@ function doUploadConnect(requestParameter){
 	uploadClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
         uploadClient.subscribe('/socket/uploadRelease', function(data){
-        	$("textarea[name='logAppendArea']").append(data.body + "\n").animate({scrollTop:$("textarea[name='logAppendArea']")[0].scrollHeight});
+        	$("textarea[name='logAppendArea']").append(data.body + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
         });
         socketSendUploadData(requestParameter);
     });
@@ -232,7 +232,7 @@ function doDeleteConnect(requestParameter){
 	deleteClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
         deleteClient.subscribe('/socket/deleteRelease', function(data){
-        	$("textarea[name='logAppendArea']").append(data.body + "\n").animate({scrollTop:$("textarea[name='logAppendArea']")[0].scrollHeight});
+        	$("textarea[name='logAppendArea']").append(data.body + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
         });
         socketSendDeleteData(requestParameter);
         
@@ -258,6 +258,10 @@ function popupClose() {
 	
 	console.log("Disconnected");
 	w2popup.close();
+	
+	// 업로드된 릴리즈 조회
+ 	doSearchUploadedReleases();
+ 	setDisable($('#doUploadRelease'), true);
 }
 
 //화면 리사이즈시 호출

@@ -28,12 +28,9 @@ public class UploadReleasAsyncByScriptService {
 		BufferedReader bufferedReader = null;
 		String command = "D:/ieda_workspace/release/bosh_upload_release.bat ";
 		command += dir + " ";
-//		command += fileName;
+		//		command += fileName;
 
 		command += dir.replace("/", "\\") + "\\" + fileName;
-		
-		String streamLogs = "";
-
 		log.info("## Command : " + command);
 
 		try {
@@ -42,13 +39,13 @@ public class UploadReleasAsyncByScriptService {
 			inputStream = process.getInputStream();
 			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 			String info = null;
+			String streamLogs = "";
+
 			while ((info = bufferedReader.readLine()) != null) {
 				streamLogs += info;
-
 				log.info("##### uploadRelease ::: " + info);
 				messagingTemplate.convertAndSend("/socket/uploadRelease", info.toString());
 			}
-
 		} catch (IOException e) {
 			e.printStackTrace();
 			messagingTemplate.convertAndSend("/socket/uploadRelease", e.getMessage());

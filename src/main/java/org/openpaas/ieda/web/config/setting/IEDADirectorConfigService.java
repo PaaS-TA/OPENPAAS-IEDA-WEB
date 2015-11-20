@@ -1,5 +1,8 @@
 package org.openpaas.ieda.web.config.setting;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -113,6 +116,11 @@ public class IEDADirectorConfigService {
 		director.setDefaultYn((directorConfig == null ) ? "Y":"N");
 		director.setUpdatedDate(now);
 		director.setCreatedDate(now);
+		
+		//Target 설정
+		if(directorConfig == null ) {
+			setTarget(createDto.getDirectorUrl(), createDto.getDirectorPort());
+		}	
 
 		return directorConfigRepository.save(director);
 
@@ -183,6 +191,32 @@ public class IEDADirectorConfigService {
 		}
 
 		directorConfigRepository.delete(seq);
+		
+		//관리자가 0인경우 .bosh_config  삭제
+		if( directorConfigRepository.count() == 0 ){
+			//command
+			Runtime r = Runtime.getRuntime();
+			InputStream inputStream = null;
+			BufferedReader bufferedReader = null;
+			String command = "D:/ieda_workspace/director/bosh_config_delete.bat ";
+			log.info("## Command : " + command);
+			
+			try {
+				Process process = r.exec(command);
+				process.getInputStream();
+				inputStream = process.getInputStream();
+				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+				
+				String info = null;
+				String bufferlog = "";
+				while ((info = bufferedReader.readLine()) != null) {
+					bufferlog += info+"\n";
+				}
+				log.info("### deleteDirectorConfig bosh config delete ### \n" + bufferlog + "\n ### END ::: deleteDirectorConfig bosh config delete ###");
+			} catch (Exception e) {
+				e.getMessage();
+			}	
+		}
 	}
 
 	public void setDefaultDirector(int seq) {
@@ -194,14 +228,49 @@ public class IEDADirectorConfigService {
 					"해당하는 디렉터가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 		
+		//Database
 		IEDADirectorConfig oldDefaultDiretor = directorConfigRepository.findOneByDefaultYn("Y");
 		if (oldDefaultDiretor != null) {
 			oldDefaultDiretor.setDefaultYn("N");
 			directorConfigRepository.save(oldDefaultDiretor);
 		}
-
 		directorConfig.setDefaultYn("Y");
 		directorConfigRepository.save(directorConfig);
+		
+		//보쉬 타겟설정
+		setTarget(directorConfig.getDirectorUrl(), directorConfig.getDirectorPort());
+	}
+
+	/**
+	 * Bosh 타겟 설정
+	 * @param url
+	 * @param port
+	 */
+	public void setTarget(String url, Integer port){
+		Runtime r = Runtime.getRuntime();
+		InputStream inputStream = null;
+		BufferedReader bufferedReader = null;
+		String command = "D:/ieda_workspace/director/bosh_director_change.bat ";
+		command += "https://" + url + " ";
+		command += port;
+		log.info("## Command : " + command);
+		
+		try {
+			Process process = r.exec(command);
+			process.getInputStream();
+			inputStream = process.getInputStream();
+			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+			
+			String info = null;
+			String bufferlog = "";
+			while ((info = bufferedReader.readLine()) != null) {
+				bufferlog += info+"\n";
+				//System.out.println("##### DeleteStemcell ::: " + info);
+			}
+			log.info("### setDefaultDirector Director change ### \n" + bufferlog + "\n ### END ::: setDefaultDirector Director change ###");
+		} catch (Exception e) {
+			e.getMessage();
+		}
 		
 	}
 }

@@ -79,7 +79,8 @@ $(function() {
 	 			else{
 		 			w2confirm(record.directorName + "를 " + "기본관리자로 설정하시겠습니까?","기본관리자 설정")
 		 			.yes(function(){
-		 				registDefault(record.iedaDirectorConfigSeq);
+		 				w2ui['config_directorGrid'].reload();
+		 				registDefault(record.iedaDirectorConfigSeq, record.directorName);
 		 			})
 		 			.no(function () { 
 		 		        console.log("user clicked NO")
@@ -103,7 +104,7 @@ $(function() {
 	//설정관리자 삭제 버튼
 	$("#deleteSetting").click(function(){
 		var girdTotal = w2ui['config_directorGrid'].records.length;
-		if(girdTotal > 1 ){
+		if(girdTotal > 0 ){
 			var selected = w2ui['config_directorGrid'].getSelection();
 			
 			if( selected.length == 0 ){
@@ -131,7 +132,7 @@ function doSearch() {
 
 function doButtonStyle(){
 	var girdTotal = w2ui['config_directorGrid'].records.length;
-	if(girdTotal==1 || girdTotal==0){
+	if( girdTotal==0){
 		//기본관리자 버튼 Hide
 		$('#setDefaultDirector a').attr('disabled', true);// 기본관리자 설정 Disable
 		//삭제 버튼 hide
@@ -140,16 +141,15 @@ function doButtonStyle(){
 }
 
 //기본관리자 등록
-function registDefault(seq){
+function registDefault(seq, target){
 	$.ajax({
 		type : "PUT",
 		url : "/director/default/"+seq,
 		contentType : "application/json",
 		success : function(data, status) {
-			w2ui['config_directorGrid'].reload();
-			w2popup.unlock();
-			w2popup.close();
-			doSearch();
+			/* w2popup.unlock();
+			w2popup.close(); */
+			w2alert("기본관리자를 \n" + target +"로 변경하였습니다.",  "기본관리자 설정", doSearch);
 		},
 		error : function(e ) {
 			w2alert("기본관리자 등록에 실패 하였습니다.", "기본관리자 등록");
@@ -269,7 +269,7 @@ function lock (msg) {
 			<div class="w2ui-field">
 				<label style="width:30%;text-align: left;padding-left: 20px;">디텍터 Url</label>
 				<div style="width: 70%;">
-					<input name="directorUrl" type="url" maxlength="100" style="width: 250px" required="required" value="52.21.37.184"/>
+					<input name="directorUrl" type="url" maxlength="100" style="width: 250px" required="required" value="52.23.2.85"/>
 				</div>
 			</div>
 			<div class="w2ui-field">

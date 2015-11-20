@@ -49,6 +49,9 @@ public class StemcellContent {
 	@Transient
 	private String isExisted;
 	
+	@Transient
+	private String isDose;
+	
 	@Column(name="DOWNLOAD_STATUS")  // NULL, DOWNLOADING, DOWNLOADED
 	private String downloadStatus; 
 }

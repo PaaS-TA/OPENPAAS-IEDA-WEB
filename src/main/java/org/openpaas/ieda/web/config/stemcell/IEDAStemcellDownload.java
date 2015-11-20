@@ -1,6 +1,7 @@
 package org.openpaas.ieda.web.config.stemcell;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -65,6 +66,7 @@ public class IEDAStemcellDownload {
 	    
 	    percentage = 0;
 	    double received = 0;
+	    Boolean isError = Boolean.FALSE;
 	    try {
 	        in = new BufferedInputStream(new URL(downloadLink).openStream());
 	        fout = new FileOutputStream(iedaConfiguration.getStemcellDir()+"/" + stemcellFileName);
@@ -81,12 +83,15 @@ public class IEDAStemcellDownload {
 	            }
 	        }
 	    } catch (FileNotFoundException e) {
+	    	isError = Boolean.TRUE;
 			e.printStackTrace();
 			messagingTemplate.convertAndSend("/socket/uploadStemcell", e.getMessage());
 		} catch (MalformedURLException e) {
+			isError = Boolean.TRUE;
 			e.printStackTrace();
 			messagingTemplate.convertAndSend("/socket/uploadStemcell", e.getMessage());
 		} catch (IOException e) {
+			isError = Boolean.TRUE;
 			e.printStackTrace();
 			messagingTemplate.convertAndSend("/socket/uploadStemcell", e.getMessage());
 		} finally {
@@ -100,6 +105,10 @@ public class IEDAStemcellDownload {
 	        if (fout != null) {
 	            try {
 					fout.close();
+					if(isError){//에러발생시 파일 삭제
+						File targetFile = new File(iedaConfiguration.getStemcellDir()+"/" + stemcellFileName);
+						targetFile.delete();
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -109,22 +118,17 @@ public class IEDAStemcellDownload {
 	    setDownloadStatus(DownloadStatus.AVAILABLE);
 	}
 
-	private void resetConfigure() {
+	/* 미사용중
+	 * private void resetConfigure() {
 		this.subLink = null;
 		this.stemcellFileName = null;
 		this.stemcellFileName = null;
 		isAvailable = true;
-	}
+	}*/
 	
 	private DownloadStatus setDownloadStatus(DownloadStatus status) {
 		this.status = status;
 		return this.status;
-	}
-	
-	public boolean isDownloaded() {
-		
-		
-		return true;
 	}
 	
 }
