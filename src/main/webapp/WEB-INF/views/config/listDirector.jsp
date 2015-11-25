@@ -29,17 +29,16 @@ $(function() {
 		         },
 		         {field: 'directorUUID', caption: '관리자 UUID', size: '35%'}
 		         ],
-		
-		onSelect:function (event){
+		onClick:function(event) {
 			var grid = this;
 			event.onComplete = function() {
 				var sel = grid.getSelection();
 				if ( sel == null || sel == "") {
+					console.log("lala1");
 					$('#setDefaultDirector a').attr('disabled', true);
 					$('#deleteSetting a').attr('disabled', true);
 					return;
 				}
-				
 				var record = grid.get(sel);
 				if ( record.defaultYn == 'Y' ) {
 					$('#setDefaultDirector a').attr('disabled', true);// 기본관리자 설정 Disable
@@ -151,8 +150,9 @@ function registDefault(seq, target){
 			w2popup.close(); */
 			w2alert("기본관리자를 \n" + target +"로 변경하였습니다.",  "기본관리자 설정", doSearch);
 		},
-		error : function(e ) {
-			w2alert("기본관리자 등록에 실패 하였습니다.", "기본관리자 등록");
+		error : function(request, status, error) {
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message, "기본관리자 등록");
 		}
 	});
 }
@@ -160,6 +160,7 @@ function registDefault(seq, target){
 //설정관리자 등록
 function registSetting(){
 	lock( '등록 중입니다.', true);
+
 	$.ajax({
 		type : "POST",
 		url : "/directors",
@@ -167,10 +168,10 @@ function registSetting(){
 		//dataType: "json",
 		async : true,
 		data : JSON.stringify({
-			userId : $("[name='userId']").val(),
-			userPassword : $("[name='userPassword']").val(),
-			directorUrl : $("[name='directorUrl']").val(),
-			directorPort : parseInt($("[name='directorPort']").val())
+			userId : $(".w2ui-msg-body input[name='userId']").val(),
+			userPassword : $(".w2ui-msg-body input[name='userPassword']").val(),
+			directorUrl : $(".w2ui-msg-body input[name='directorUrl']").val(),
+			directorPort : parseInt($(".w2ui-msg-body input[name='directorPort']").val())
 		}),
 		success : function(data, status) {
 			// ajax가 성공할때 처리...
@@ -180,10 +181,11 @@ function registSetting(){
 			// 기본 설치 관리자 정보 조회
 		 	getDefaultDirector("<c:url value='/directors/default'/>");
 		},
-		error : function(e ) {
+		error : function(request, status, error) {
 			// ajax가 실패할때 처리...
 			w2popup.unlock();
-			w2alert("ERROR");
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message);
 		}
 	});
 }
@@ -200,9 +202,9 @@ function deleteDirector(seq){
 			w2popup.close();
 			doSearch();
 		},
-		error : function(e ) {
-			// ajax가 실패할때 처리...
-			w2alert("설치 관리자 삭제에 실패 하였습니다.", "설치 관리자 삭제");
+		error : function(request, status, error) {
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message, "설치 관리자 삭제");
 		}
 	});
 }

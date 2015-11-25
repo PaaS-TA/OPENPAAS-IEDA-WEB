@@ -1,12 +1,19 @@
 package org.openpaas.ieda.web.config.setting;
 
-import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.modelmapper.ModelMapper;
 import org.openpaas.ieda.api.DirectorClient;
 import org.openpaas.ieda.api.DirectorClientBuilder;
@@ -15,12 +22,16 @@ import org.openpaas.ieda.api.Info;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.yaml.snakeyaml.Yaml;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,6 +82,33 @@ public class IEDADirectorConfigService {
 		
 		return directorConfigList;
 	}
+	
+	//  map to api --> /info
+	public Info getDirectorInfo(String directorUrl, int port, String userId, String password) {
+		Info info = null;
+		
+		try {
+			DirectorClient client = new DirectorClientBuilder()
+					.withHost(directorUrl, port)
+					.withCredentials(userId, password).build();
+			URI infoUri = UriComponentsBuilder.fromUri(client.getRoot())
+					.pathSegment("info").build().toUri();
+			
+      		ResponseEntity<Info> response = client.getRestTemplate().getForEntity(infoUri, Info.class);
+			info = response.getBody();
+			
+		} catch (ResourceAccessException e) {
+			e.printStackTrace();
+			throw new IEDACommonException("notfound.director.exception", "["
+					+ directorUrl + "] 디렉터를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new IEDACommonException("notfound.director.exception",
+					"요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+	
+		return info;
+	}
 
 	public IEDADirectorConfig createDirector(IEDADirectorConfigDto.Create createDto) {
 
@@ -78,26 +116,23 @@ public class IEDADirectorConfigService {
 		List<IEDADirectorConfig> directorConfigList = directorConfigRepository
 				.findByDirectorUrl(createDto.getDirectorUrl());
 		
-		Info info = null;
-		
-		try {
-			DirectorClient client = new DirectorClientBuilder()
-					.withHost(createDto.getDirectorUrl(), createDto.getDirectorPort())
-					.withCredentials(createDto.getUserId(), createDto.getUserPassword()).build();
-			URI infoUri = UriComponentsBuilder.fromUri(client.getRoot())
-					.pathSegment("info").build().toUri();
-			ResponseEntity<Info> response = client.getRestTemplate()
-					.getForEntity(infoUri, Info.class);
-			info = response.getBody();
-			
-		} catch (ResourceAccessException e) {
-			throw new IEDACommonException("notfound.director.exception", "["
-					+ createDto.getDirectorUrl() + "] 디렉터를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			throw new IEDACommonException("notfound.director.exception",
-					"요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
+		if ( directorConfigList.size() > 0 ) {
+			throw new IEDACommonException("duplicated.director.exception",
+					"이미 등록되어 있는 디렉터 URL입니다.", HttpStatus.BAD_REQUEST);
 		}
-
+		
+		Info info = getDirectorInfo(createDto.getDirectorUrl()
+								, createDto.getDirectorPort()
+								, createDto.getUserId()
+								, createDto.getUserPassword());
+		
+		log.info(info.toString());
+		
+		if ( info == null || info.getUser() == null || info.getUser().equals("") ) {
+			throw new IEDACommonException("unauthenticated.director.exception",
+					"로그인 실패하였습니다.", HttpStatus.BAD_REQUEST);
+		}
+		
 		Date now = new Date();
 
 		IEDADirectorConfig director = new IEDADirectorConfig();
@@ -117,15 +152,14 @@ public class IEDADirectorConfigService {
 		director.setUpdatedDate(now);
 		director.setCreatedDate(now);
 		
-		//Target 설정
-		if(directorConfig == null ) {
-			setTarget(createDto.getDirectorUrl(), createDto.getDirectorPort());
+		// Target 설정
+		if( director.getDefaultYn().equals("Y") ) {
+			setTarget(director);
 		}	
 
 		return directorConfigRepository.save(director);
-
 	}
-
+	
 	public IEDADirectorConfig getDirectorConfig(int seq) {
 		IEDADirectorConfig directorConfig = directorConfigRepository
 				.findByIedaDirectorConfigSeq(seq);
@@ -192,7 +226,7 @@ public class IEDADirectorConfigService {
 
 		directorConfigRepository.delete(seq);
 		
-		//관리자가 0인경우 .bosh_config  삭제
+/*		//관리자가 0인경우 .bosh_config  삭제
 		if( directorConfigRepository.count() == 0 ){
 			//command
 			Runtime r = Runtime.getRuntime();
@@ -216,7 +250,7 @@ public class IEDADirectorConfigService {
 			} catch (Exception e) {
 				e.getMessage();
 			}	
-		}
+		}*/
 	}
 
 	public void setDefaultDirector(int seq) {
@@ -238,7 +272,7 @@ public class IEDADirectorConfigService {
 		directorConfigRepository.save(directorConfig);
 		
 		//보쉬 타겟설정
-		setTarget(directorConfig.getDirectorUrl(), directorConfig.getDirectorPort());
+		//setTarget(directorConfig.getDirectorUrl(), directorConfig.getDirectorPort());
 	}
 
 	/**
@@ -246,7 +280,74 @@ public class IEDADirectorConfigService {
 	 * @param url
 	 * @param port
 	 */
-	public void setTarget(String url, Integer port){
+	public void setTarget(IEDADirectorConfig directorConfig) {
+		
+		String boshConfigFile = getBoshConfigFile();
+
+		// Config File이 존재하느냐?
+		if ( boshConfigFile != null ) {
+			// 읽어서 수정
+			try {
+				InputStream input = new FileInputStream(new File(boshConfigFile));
+				Yaml yaml = new Yaml();
+				Map<String, Object> object = (Map<String, Object>)yaml.load(input);
+				
+				// set target
+				String directorLink = "https://" + directorConfig.getDirectorUrl() + ":" + directorConfig.getDirectorPort();
+				object.put("target", directorLink);
+				object.put("target_name", directorConfig.getDirectorName());
+				object.put("target_version", directorConfig.getDirectorVersion());
+				object.put("target_uuid", directorConfig.getDirectorUuid());
+				
+				// set ca_cert
+				Map<String, String> certMap = (Map<String,String>)object.get("ca_cert");
+				certMap.put(directorLink, null);
+				
+				// aliases
+				Map<String, Object> aliasMap = (Map<String,Object>)object.get("aliases");
+				Map<String, Object> targetMap = (Map<String,Object>)aliasMap.get("target");
+				targetMap.put(directorConfig.getDirectorUuid(), directorLink);
+				
+				// auth
+				Map<String, String> accountMap = new HashMap<String, String>();
+				accountMap.put("username", directorConfig.getUserId());
+				accountMap.put("password", directorConfig.getUserPassword());
+				
+				Map<String, Object> authMap = (Map<String,Object>)object.get("auth");
+				authMap.put(directorLink, accountMap);
+				
+				// write file
+				FileWriter fileWriter = new FileWriter(boshConfigFile);
+				StringWriter stringWriter = new StringWriter();
+				yaml.dump(object, stringWriter);
+				log.info(stringWriter.toString());
+				fileWriter.write(stringWriter.toString());
+				fileWriter.close();
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+			
+		}
+		else {
+			// 생성
+			
+		}
+	}
+	
+	public String getBoshConfigFile() {
+		String homeDir = System.getProperty("user.home");
+		String boshConfigFile = homeDir + "\\.bosh_config";
+		System.out.println("BOSH Config File Location : " + homeDir);
+		
+		File f = new File(boshConfigFile);
+		return f.exists() ? boshConfigFile : null;
+	}
+	
+/*	public void setTarget(String url, Integer port){
 		Runtime r = Runtime.getRuntime();
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
@@ -272,5 +373,5 @@ public class IEDADirectorConfigService {
 			e.getMessage();
 		}
 		
-	}
+	}*/
 }
