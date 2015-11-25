@@ -5,10 +5,12 @@ package org.openpaas.ieda.web.deploy.release;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.web.config.stemcell.StemcellManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +44,9 @@ public class ReleaseController {
 	
 	@Autowired
 	private DeleteReleaseAsyncByScriptService deleteService;
+	
+	@Autowired
+	private StemcellManagementService stemcellService;
 	
 	@RequestMapping(value="/deploy/listRelease", method=RequestMethod.GET)
 	public String List() {
@@ -96,7 +101,7 @@ public class ReleaseController {
 				, dto.getFileName());
 		
 		
-		return null;
+		return new ResponseEntity(HttpStatus.OK);
 	}
 	
 	/**
@@ -111,8 +116,55 @@ public class ReleaseController {
 		deleteService.deleteReleaseAsync(iedaConfiguration.getReleaseDir()
 				, dto.getFileName()
 				, dto.getVersion());
-		return null;
+		return new ResponseEntity(HttpStatus.OK);
 	}
 	
+	
+	@RequestMapping(value="/test")
+	public String popupTest1(){
+		return "/test";
+	}
+	
+	@RequestMapping(value="/test2")
+	public String popupTest2(){
+		return "/test2";
+	}
+	
+	@RequestMapping(value="/test3")
+	public String popupTest3(){
+		return "/test3";
+	}
+	
+	@RequestMapping(value="/release/bootSetAwsSave", method = RequestMethod.POST)
+	public ResponseEntity doBootSetAwsSave(@RequestBody  BootStrapSettingData.Aws data){
+		log.info("### AwsData : " + data.toString());
+		
+		return new ResponseEntity(HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/release/bootSetNetworkSave", method = RequestMethod.POST)
+	public ResponseEntity doBootSetNetworkSave(@RequestBody  BootStrapSettingData.Network data){
+		log.info("### NetworkData : " + data.toString());
+		
+		return new ResponseEntity(HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/release/bootSetResourcesSave", method = RequestMethod.POST)
+	public ResponseEntity doBootSetResourcesSave(@RequestBody  BootStrapSettingData.Resources data){
+		log.info("### ResourcesSave : " + data.toString());
+		return new ResponseEntity(HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/release/getLocalStemcellList", method = RequestMethod.GET)
+	public ResponseEntity doBootSetStemcellList(){
+		log.info("### doBootSetStemcellList : ");
+		List<Map<String, String>> contents = stemcellService.getLocalStemcellFileList();
+		log.info("@@@@@@ : " + contents.size());
+		Map<String, Object> result = new HashMap<>();
+		result.put("total", contents.size());
+		result.put("records", contents);
+		
+		return new ResponseEntity(result, HttpStatus.OK);
+	}
 }
 

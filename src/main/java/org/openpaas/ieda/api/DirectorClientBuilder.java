@@ -13,8 +13,6 @@ import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
-import lombok.Data;
-
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -25,7 +23,9 @@ import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.openpaas.ieda.web.config.setting.DirectorException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -38,11 +38,15 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
  *
  */
 
+@Slf4j
 @Data
 public class DirectorClientBuilder {
     private String   host;
@@ -75,7 +79,11 @@ public class DirectorClientBuilder {
         
 		RestTemplate restTemplate = new RestTemplate(requestFactory);
         
-        restTemplate.getInterceptors().add(new ContentTypeClientHttpRequestInterceptor());
+		ContentTypeClientHttpRequestInterceptor interceptor = new ContentTypeClientHttpRequestInterceptor();
+		interceptor.setAuthInfo(username, password);
+		
+        //restTemplate.getInterceptors().add(new ContentTypeClientHttpRequestInterceptor());
+		restTemplate.getInterceptors().add(interceptor);
         handleTextHtmlResponses(restTemplate);
         
         return new DirectorClient(root, restTemplate);
@@ -97,7 +105,7 @@ public class DirectorClientBuilder {
 
         SSLConnectionSocketFactory connectionFactory = new SSLConnectionSocketFactory(sslContext,
                 new AllowAllHostnameVerifier());
-
+        
         HttpClient httpClient = HttpClientBuilder.create().disableRedirectHandling()
                 .setDefaultCredentialsProvider(credentialsProvider)
                 .setSSLSocketFactory(connectionFactory).build();
@@ -118,13 +126,25 @@ public class DirectorClientBuilder {
     }
     
     private static class ContentTypeClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
-
+    	private String userId;
+    	private String password;
+    	
+    	public void setAuthInfo(String userId, String password) {
+    		this.userId = userId;
+    		this.password = password;
+    	}
+    	
         @Override
         public ClientHttpResponse intercept(HttpRequest request, byte[] body,
                 ClientHttpRequestExecution execution) throws IOException {
+        	
+	        String auth = userId + ":" + password;
+	        byte[] encodedAuth = Base64.encodeBase64(auth.getBytes());
+	        String authHeader = "Basic " + new String(encodedAuth);
+       
+	        request.getHeaders().set("Authorization", authHeader);
             ClientHttpResponse response = execution.execute(request, body);
-            // some BOSH resources return text/plain and this modifies this response
-            // so we can use Jackson
+
             response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             return response;
         }
