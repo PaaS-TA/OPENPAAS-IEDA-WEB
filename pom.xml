@@ -158,6 +158,13 @@
 			<artifactId>jquery-ui</artifactId>
 			<version>1.11.4</version>
 		</dependency>
+		
+		<!-- SnakeYAML -->
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.16</version>
+		</dependency>
 
 		<!-- Jsoup -->
 		<dependency>
