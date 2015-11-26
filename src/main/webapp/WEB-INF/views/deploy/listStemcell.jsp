@@ -11,7 +11,7 @@ var appendLogPopupButton = '<button class="btn closeBtn" onclick="popupClose();"
 $(function() {
 	
  	// 기본 설치 관리자 정보 조회
- 	getDefaultDirector("<c:url value='/directors/default'/>");
+ 	var bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");
  	
  	$('#us_uploadStemcellsGrid').w2grid({
 		name	: 'us_uploadStemcellsGrid',
@@ -74,7 +74,7 @@ $(function() {
 		
 	});
  	
- 	initView();
+ 	initView(bDefaultDirector);
  	
  	// 스템셀 삭제
  	$("#doDeleteStemcell").click(function(){
@@ -89,12 +89,14 @@ $(function() {
 });
 
 
-function initView() {
-	// 업로드된 스템셀 조회
- 	doSearchUploadedStemcells();
-	
-	// 로컬에 다운로드된 스템셀 조회
-	doSearchLocalStemcells();
+function initView(bDefaultDirector) {
+	if ( bDefaultDirector ) {
+		// 업로드된 스템셀 조회
+	 	doSearchUploadedStemcells();
+		
+		// 로컬에 다운로드된 스템셀 조회
+		doSearchLocalStemcells();
+	}
 
 	// 컨트롤 
 	setDisable($('#doDeleteStemcell'), true);

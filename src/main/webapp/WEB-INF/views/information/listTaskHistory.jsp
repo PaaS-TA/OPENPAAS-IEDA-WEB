@@ -6,7 +6,7 @@
 $(function() {
 	
  	// 기본 설치 관리자 정보 조회
- 	getDefaultDirector("<c:url value='/directors/default'/>");
+ 	var bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");
  	
 	$('#sq_taskHistoryGrid').w2grid({
 		name: 'sq_taskHistoryGrid',
@@ -30,9 +30,16 @@ $(function() {
 			gridErrorMsg(event);
 		}
 	});
+	
+	initView(bDefaultDirector)
 
-	doSearch();
 });
+
+function initView(bDefaultDirector) {
+	if ( bDefaultDirector ) {
+		doSearch();
+	}
+}
 
 //조회기능
 function doSearch() {
@@ -55,7 +62,7 @@ $( window ).resize(function() {
 	<div class="page_site">서비스 정보조회 > <strong>Task 실행 이력</strong></div>
 
 	<!-- 설치 관리자 -->
-	<div class="title">Task 실행 이력</div>
+	<div class="title">설치 관리자</div>
 	
 	<table class="tbl1" border="1" cellspacing="0">
 	<tr>

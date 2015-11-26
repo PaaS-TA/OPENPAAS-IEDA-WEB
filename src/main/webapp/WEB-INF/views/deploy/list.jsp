@@ -6,7 +6,7 @@
 $(function() {
 	
  	// 기본 설치 관리자 정보 조회
- 	getDefaultDirector("<c:url value='/directors/default'/>");	
+ 	var bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");	
 	
 	$('#deploy_deploymentsGrid').w2grid({
 		name: 'deploy_deploymentsGrid',
@@ -39,9 +39,16 @@ $(function() {
                   { recid: 8, name: 'Thomas', releases: 'Bahh', stemcells: 'jdoe@gmail.com'}
               ]		
 	});
-
+	
+	if ( bDefaultDirector ) {
+		doSearch();
+	}
 
 });
+
+function doSearch() {
+	
+}
 
 // 서비스 설치 팝업
 function deployPopup() {

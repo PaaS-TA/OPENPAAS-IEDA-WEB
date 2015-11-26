@@ -1,26 +1,33 @@
 
 function getDefaultDirector(url) {
+	var isOk = true;
 	
 	jQuery.ajax({
 		type: "get",
 		url: url,
 		async : false,
-		error: function(xhr, status) {
-			ajaxErrorMsg(xhr);
+		error: function(request, status, error) {
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message);
+			isOk = false;
 		},
 		success: function(data) {
-			if ( data == null || data == "" ) return;
-			
-			$('#directorName').text(data.directorName);
-			$('#userId').text(data.userId);
-			
-			diretorUrl = "https://" + data.directorUrl + ":" + data.directorPort;
-			
-			$('#directorUrl').text(diretorUrl);
-			$('#directorUuid').text(data.directorUuid);
+			if ( data == null || data == "" )
+				isOk = false;
+			else {
+				$('#directorName').text(data.directorName);
+				$('#userId').text(data.userId);
+				
+				diretorUrl = "https://" + data.directorUrl + ":" + data.directorPort;
+				
+				$('#directorUrl').text(diretorUrl);
+				$('#directorUuid').text(data.directorUuid);
+			}
 		}
 
 	});
+	
+	return isOk;
 }
 
 function setCommonCode(url, id) {

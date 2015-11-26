@@ -4,7 +4,7 @@
 
 $(function() {
 	// 기본 설치 관리자 정보 조회
- 	getDefaultDirector("<c:url value='/directors/default'/>");
+ 	var bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");
 	
   	$('#config_directorGrid').w2grid({
 		name: 'config_directorGrid',
@@ -34,11 +34,11 @@ $(function() {
 			event.onComplete = function() {
 				var sel = grid.getSelection();
 				if ( sel == null || sel == "") {
-					console.log("lala1");
 					$('#setDefaultDirector a').attr('disabled', true);
 					$('#deleteSetting a').attr('disabled', true);
 					return;
 				}
+				
 				var record = grid.get(sel);
 				if ( record.defaultYn == 'Y' ) {
 					$('#setDefaultDirector a').attr('disabled', true);// 기본관리자 설정 Disable
@@ -46,6 +46,8 @@ $(function() {
 				else {
 					$('#setDefaultDirector a').attr('disabled', false);// 기본관리자 설정 Enable
 				}
+				
+				$('#deleteSetting a').attr('disabled', false);
 			}
 		},
 		onError: function(event) {
@@ -102,24 +104,32 @@ $(function() {
 	
 	//설정관리자 삭제 버튼
 	$("#deleteSetting").click(function(){
-		var girdTotal = w2ui['config_directorGrid'].records.length;
-		if(girdTotal > 0 ){
-			var selected = w2ui['config_directorGrid'].getSelection();
+		var selected = w2ui['config_directorGrid'].getSelection();
+		
+		if( selected.length == 0 ){
+			w2alert("선택된 정보가 없습니다.", "설치 관리자 삭제");
+			return;
+		}
+		else{
+			var record = w2ui['config_directorGrid'].get(selected);
+
+			w2confirm("설치 관리자(" + record.directorName + ")를 삭제하시겠습니까?","설치 관리자 삭제")
+				.yes(function(){
+					// 디렉터 삭제
+					deleteDirector(record.iedaDirectorConfigSeq);
+					
+					// 기본 관리자일 경우 
+					if ( record.defaultYn == "Y" ) {
+						console.log('aaa');
+						// 기본 설치 관리자 정보 조회
+						$('.defaultDirector').text('');
+					}
+					w2ui['config_directorGrid'].delete(record);
+				})
+				.no(function () { 
+			        console.log("user clicked NO")
+			    });
 			
-			if( selected.length == 0 ){
-				w2alert("선택된 정보가 없습니다.", "설치 관리자 삭제");
-				return;
-			}
-			else{
-				var record = w2ui['config_directorGrid'].get(selected);
-				w2confirm("설치 관리자(" + record.directorName + ")를 삭제하시겠습니까?","설치 관리자 삭제")
-					.yes(function(){
-						deleteDirector(record.iedaDirectorConfigSeq);
-					})
-					.no(function () { 
-				        console.log("user clicked NO")
-				    });;
-			}
 		}
 	});//설정관리자 삭제 버튼 END
 });
@@ -178,6 +188,7 @@ function registSetting(){
 			w2popup.unlock();
 			w2popup.close();
 			doSearch();
+			
 			// 기본 설치 관리자 정보 조회
 		 	getDefaultDirector("<c:url value='/directors/default'/>");
 		},
@@ -200,7 +211,6 @@ function deleteDirector(seq){
 			// ajax가 성공할때 처리...
 			w2popup.unlock();
 			w2popup.close();
-			doSearch();
 		},
 		error : function(request, status, error) {
 			var errorResult = JSON.parse(request.responseText);
@@ -227,12 +237,12 @@ function lock (msg) {
 	
 	<table class="tbl1" border="1" cellspacing="0">
 	<tr>
-		<th width="18%" class="th_fb">관리자 이름</th><td class="td_fb"><b id="directorName"></b></td>
-		<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb"><b id="userId"></b></td>
+		<th width="18%" class="th_fb">관리자 이름</th><td class="td_fb"><b class='defaultDirector' id="directorName"></b></td>
+		<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb"><b class='defaultDirector' id="userId"></b></td>
 	</tr>
 	<tr>
-		<th width="18%" >관리자 URL</th><td><b id="directorUrl"></b></td>
-		<th width="18%" >관리자 UUID</th><td ><b id="directorUuid"></b></td>
+		<th width="18%" >관리자 URL</th><td><b class='defaultDirector' id="directorUrl"></b></td>
+		<th width="18%" >관리자 UUID</th><td ><b class='defaultDirector' id="directorUuid"></b></td>
 	</tr>
 	</table>
 	
