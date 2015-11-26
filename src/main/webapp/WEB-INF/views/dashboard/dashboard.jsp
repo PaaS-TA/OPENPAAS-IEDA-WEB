@@ -6,7 +6,7 @@
 
 $(function() {
 	// 기본 설치 관리자 정보 조회
- 	getDefaultDirector("<c:url value='/directors/default'/>");
+ 	var isOk = getDefaultDirector("<c:url value='/directors/default'/>");
 	
 	$('#main_deploymentsGrid').w2grid({
 		name: 'main_deploymentsGrid',
@@ -46,7 +46,7 @@ $(function() {
 		]
 	});	
 	
-	doSearch();
+	if ( isOk ) doSearch();
 });
 
 //조회기능

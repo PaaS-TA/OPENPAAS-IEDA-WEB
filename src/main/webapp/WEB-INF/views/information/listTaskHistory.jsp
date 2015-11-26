@@ -6,7 +6,7 @@
 $(function() {
 	
  	// 기본 설치 관리자 정보 조회
- 	getDefaultDirector("<c:url value='/directors/default'/>");
+ 	var bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");
  	
 	$('#sq_taskHistoryGrid').w2grid({
 		name: 'sq_taskHistoryGrid',
@@ -30,9 +30,16 @@ $(function() {
 			gridErrorMsg(event);
 		}
 	});
+	
+	initView(bDefaultDirector)
 
-	doSearch();
 });
+
+function initView(bDefaultDirector) {
+	if ( bDefaultDirector ) {
+		doSearch();
+	}
+}
 
 //조회기능
 function doSearch() {

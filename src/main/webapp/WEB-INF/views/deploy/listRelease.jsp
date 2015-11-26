@@ -11,7 +11,7 @@ var appendLogPopupButton = '<button class="btn closeBtn" onclick="popupClose();"
 
 $(function() {
  	// 기본 설치 관리자 정보 조회
- 	getDefaultDirector("<c:url value='/directors/default'/>");
+ 	var bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");
  	
  	$('#ru_uploadedReleasesGrid').w2grid({
 		name	: 'ru_uploadedReleasesGrid',
@@ -89,7 +89,7 @@ $(function() {
 	});
  	
  	
- 	initView();
+ 	initView(bDefaultDirector);
  	
  	//릴리즈 삭제
  	$("#doDeleteRelease").click(function(){
@@ -104,12 +104,15 @@ $(function() {
 });
 
 
-function initView() {
-	// 업로드된 릴리즈 조회
- 	doSearchUploadedReleases();
+function initView(bDefaultDirector) {
 	
-	// 로컬에 다운로드된 릴리즈 조회
-	doSearchLocalReleases();
+	if ( bDefaultDirector ) { 
+		// 업로드된 릴리즈 조회
+	 	doSearchUploadedReleases();
+		
+		// 로컬에 다운로드된 릴리즈 조회
+		doSearchLocalReleases();
+	}
 
 	// 컨트롤 
 	setDisable($('#doDeleteRelease'), true);
@@ -264,10 +267,6 @@ function popupClose() {
  	setDisable($('#doUploadRelease'), true);
 }
 
-//화면 리사이즈시 호출
-$( window ).resize(function() {
-	setLayoutContainerHeight();
-});
 
 
 </script>

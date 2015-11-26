@@ -130,7 +130,7 @@ public class IEDADirectorConfigService {
 		
 		if ( info == null || info.getUser() == null || info.getUser().equals("") ) {
 			throw new IEDACommonException("unauthenticated.director.exception",
-					"로그인 실패하였습니다.", HttpStatus.BAD_REQUEST);
+					"해당 디렉터에 로그인 실패하였습니다.", HttpStatus.BAD_REQUEST);
 		}
 		
 		Date now = new Date();
@@ -223,34 +223,35 @@ public class IEDADirectorConfigService {
 			throw new IEDACommonException("illigalArgument.director.exception",
 					"해당하는 디렉터가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
-
-		directorConfigRepository.delete(seq);
 		
-/*		//관리자가 0인경우 .bosh_config  삭제
-		if( directorConfigRepository.count() == 0 ){
-			//command
-			Runtime r = Runtime.getRuntime();
-			InputStream inputStream = null;
-			BufferedReader bufferedReader = null;
-			String command = "D:/ieda_workspace/director/bosh_config_delete.bat ";
-			log.info("## Command : " + command);
+		try {
+			// bosh_config의 인증정보 초기화
+			// set target
+			String directorLink = "https://" + directorConfig.getDirectorUrl() + ":" + directorConfig.getDirectorPort();
 			
-			try {
-				Process process = r.exec(command);
-				process.getInputStream();
-				inputStream = process.getInputStream();
-				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-				
-				String info = null;
-				String bufferlog = "";
-				while ((info = bufferedReader.readLine()) != null) {
-					bufferlog += info+"\n";
-				}
-				log.info("### deleteDirectorConfig bosh config delete ### \n" + bufferlog + "\n ### END ::: deleteDirectorConfig bosh config delete ###");
-			} catch (Exception e) {
-				e.getMessage();
-			}	
-		}*/
+			InputStream input = new FileInputStream(new File(getBoshConfigLocation()));
+			Yaml yaml = new Yaml();
+			Map<String, Object> object = (Map<String, Object>)yaml.load(input);
+
+			// set auth
+			Map<String, Object> authMap = (Map<String,Object>)object.get("auth");
+			authMap.put(directorLink, null);
+			
+			// write file
+			FileWriter fileWriter = new FileWriter(getBoshConfigLocation());
+			StringWriter stringWriter = new StringWriter();
+			yaml.dump(object, stringWriter);
+			log.info(stringWriter.toString());
+			fileWriter.write(stringWriter.toString());
+			fileWriter.close();
+			
+			// 모델 데이터 삭제
+			directorConfigRepository.delete(seq);
+			
+		} catch (Exception e) {
+			throw new IEDACommonException("illigalArgument.director.exception",
+					"설치관리자 삭제 중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
+		}
 	}
 
 	public void setDefaultDirector(int seq) {
@@ -259,7 +260,7 @@ public class IEDADirectorConfigService {
 
 		if (directorConfig == null) {
 			throw new IEDACommonException("illigalArgument.director.exception",
-					"해당하는 디렉터가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+					"해당하는 설치관리자 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 		
 		//Database
@@ -282,18 +283,18 @@ public class IEDADirectorConfigService {
 	 */
 	public void setTarget(IEDADirectorConfig directorConfig) {
 		
-		String boshConfigFile = getBoshConfigFile();
+		// set target
+		String directorLink = "https://" + directorConfig.getDirectorUrl() + ":" + directorConfig.getDirectorPort();
 
 		// Config File이 존재하느냐?
-		if ( boshConfigFile != null ) {
+		if ( isExistBoshConfigFile() ) {
 			// 읽어서 수정
 			try {
-				InputStream input = new FileInputStream(new File(boshConfigFile));
+				InputStream input = new FileInputStream(new File(getBoshConfigLocation()));
 				Yaml yaml = new Yaml();
 				Map<String, Object> object = (Map<String, Object>)yaml.load(input);
 				
 				// set target
-				String directorLink = "https://" + directorConfig.getDirectorUrl() + ":" + directorConfig.getDirectorPort();
 				object.put("target", directorLink);
 				object.put("target_name", directorConfig.getDirectorName());
 				object.put("target_version", directorConfig.getDirectorVersion());
@@ -303,12 +304,12 @@ public class IEDADirectorConfigService {
 				Map<String, String> certMap = (Map<String,String>)object.get("ca_cert");
 				certMap.put(directorLink, null);
 				
-				// aliases
+				// set aliases
 				Map<String, Object> aliasMap = (Map<String,Object>)object.get("aliases");
 				Map<String, Object> targetMap = (Map<String,Object>)aliasMap.get("target");
 				targetMap.put(directorConfig.getDirectorUuid(), directorLink);
 				
-				// auth
+				// set auth
 				Map<String, String> accountMap = new HashMap<String, String>();
 				accountMap.put("username", directorConfig.getUserId());
 				accountMap.put("password", directorConfig.getUserPassword());
@@ -317,34 +318,81 @@ public class IEDADirectorConfigService {
 				authMap.put(directorLink, accountMap);
 				
 				// write file
-				FileWriter fileWriter = new FileWriter(boshConfigFile);
+				FileWriter fileWriter = new FileWriter(getBoshConfigLocation());
 				StringWriter stringWriter = new StringWriter();
 				yaml.dump(object, stringWriter);
 				log.info(stringWriter.toString());
 				fileWriter.write(stringWriter.toString());
 				fileWriter.close();
 				
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
 			} catch (IOException e) {
-				
-				e.printStackTrace();
+				throw new IEDACommonException("taretDirector.director.exception",
+						"설치관리자 타겟 설정 중 오류 발생하였습니다.", HttpStatus.NOT_FOUND);
 			}
 			
 		}
 		else {
-			// 생성
+			try {
+				// 생성
+				log.info("# create .bosh_config file");
+				Map<String, Object> newConfig = new HashMap<String, Object>();
+				
+				// set target
+				newConfig.put("target", directorLink);
+				newConfig.put("target_name", directorConfig.getDirectorName());
+				newConfig.put("target_version", directorConfig.getDirectorVersion());
+				newConfig.put("target_uuid", directorConfig.getDirectorUuid());
+				
+				// set ca_cert
+				Map<String, Object> certMap = new HashMap<String, Object>();
+				certMap.put(directorLink, null);
+				newConfig.put("ca_cert", certMap);
+				
+				// set aliases
+				Map<String, Object> aliasesMap = new HashMap<String, Object>();
+				aliasesMap.put(directorConfig.getDirectorUuid(), directorLink);
+	
+				Map<String, Object> targetMap = new HashMap<String, Object>();
+				targetMap.put("target", aliasesMap);
+				
+				newConfig.put("aliases", targetMap);
+				
+				// set auth
+				Map<String, String> accountInfo = new HashMap<String, String>();
+				accountInfo.put("username", directorConfig.getUserId());
+				accountInfo.put("password", directorConfig.getUserPassword());
+				
+				Map<String, Object> authMap = new HashMap<String, Object>();
+				authMap.put(directorLink, accountInfo);
+				newConfig.put("auth", authMap);
+				
+				Yaml yaml = new Yaml();
+				
+				// write file
+				FileWriter fileWriter = new FileWriter(getBoshConfigLocation());
+				StringWriter stringWriter = new StringWriter();
+				yaml.dump(newConfig, stringWriter);
+				log.info(stringWriter.toString());
+				fileWriter.write(stringWriter.toString());
+				fileWriter.close();
+			} catch (IOException e) {
+				throw new IEDACommonException("taretDirector.director.exception",
+						"설치관리자 설정 파일 생성 중 오류 발생하였습니다.", HttpStatus.NOT_FOUND);
+			}
 			
 		}
 	}
 	
-	public String getBoshConfigFile() {
+	public String getBoshConfigLocation() {
 		String homeDir = System.getProperty("user.home");
 		String boshConfigFile = homeDir + "\\.bosh_config";
 		System.out.println("BOSH Config File Location : " + homeDir);
-		
-		File f = new File(boshConfigFile);
-		return f.exists() ? boshConfigFile : null;
+		return boshConfigFile;
+	}
+	
+	public boolean isExistBoshConfigFile() {
+		File f = new File(getBoshConfigLocation());
+		return f.exists();
 	}
 	
 /*	public void setTarget(String url, Integer port){
