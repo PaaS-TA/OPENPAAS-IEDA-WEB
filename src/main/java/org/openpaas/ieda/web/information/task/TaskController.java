@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -51,11 +52,10 @@ public class TaskController {
 		return new ResponseEntity(result, HttpStatus.OK);
 	}
 
-/*	@RequestMapping( value="/tasks/{taskId}", method =RequestMethod.GET)
+	@RequestMapping( value="/tasks/{taskId}", method =RequestMethod.GET)
 	public ResponseEntity listTaskHistory(@PathVariable String taskId){
-//		List<Task> taskList = "";
-		List<Task> contents = service.listTask();
+		service.listTask();
 		return new ResponseEntity(HttpStatus.OK);
-	}*/
+	}
 
 }

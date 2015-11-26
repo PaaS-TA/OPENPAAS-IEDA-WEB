@@ -95,11 +95,13 @@ $(function() {
  	
  	//  스템셀 다운로드
  	$("#doDownload").click(function(){
+ 		if($("#doDownload").attr('disabled') == "disabled") return;
     	doDownload();
     });
  	
  	//	스템셀 삭제
  	$("#doDelete").click(function(){
+ 		if($("#doDelete").attr('disabled') == "disabled") return;
  		doDelete();
     });
  	
@@ -316,10 +318,11 @@ $(window).resize(function() {
 		</select>
 		&nbsp;&nbsp;&nbsp;
 		
-		<button type="button" class="btn btn-info !important" style="width:100px" id="doSearch">조회</button>
-		
-		<button type="button" class="btn btn-primary" style="width:100px" id="doDownload">다운로드</button>
-		<button type="button" class="btn btn-danger" style="width:100px" id="doDelete">삭제</button>
+		<!-- Btn -->
+		<span id="doSearch" class="btn btn-info" style="width:100px" >조회</span>
+		<span id="doDownload" class="btn btn-primary" style="width:100px" >다운로드</span>
+		<span id="doDelete" class="btn btn-danger" style="width:100px" >삭제</span>
+		<!-- //Btn -->
 
 	</div>
 	

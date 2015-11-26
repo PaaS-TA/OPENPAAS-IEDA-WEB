@@ -12,12 +12,9 @@ $(function() {
 		name: 'sq_taskHistoryGrid',
 		style: 'text-align:center',
 		method: 'GET',
-		show: {	
-			lineNumbers: true,
-			selectColumn: true	,
-			footer: true},
+		show: {selectColumn: true, footer: true},
 		columns:[
-			 {field: 'recid', 	caption: 'recid', 			hidden: true}
+			 {field: 'recid', 	caption: 'recid', hidden: true}
 			,{field: 'id', caption: 'Task ID', size: '7%'}
 			,{field: 'state', caption: '상태', size: '8%'}
 			,{field: 'runTime', caption: '시간', size: '20%'}
