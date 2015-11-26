@@ -43,10 +43,10 @@ public class StemcellManagementController {
 	@Autowired
 	private IEDAStemcellDownload stemcellDownloadService;
 	
-	@RequestMapping(value="/config/listPublicStemcell", method=RequestMethod.GET)
+	@RequestMapping(value="/config/stemcellManagement", method=RequestMethod.GET)
 	public String List() {
 		
-		return "/config/listPublicStemcell";
+		return "/config/stemcellManagement";
 	}
 	
 	// 스템셀 목록조회

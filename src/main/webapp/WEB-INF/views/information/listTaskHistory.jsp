@@ -62,7 +62,7 @@ $( window ).resize(function() {
 	<div class="page_site">서비스 정보조회 > <strong>Task 실행 이력</strong></div>
 
 	<!-- 설치 관리자 -->
-	<div class="title">Task 실행 이력</div>
+	<div class="title">설치 관리자</div>
 	
 	<table class="tbl1" border="1" cellspacing="0">
 	<tr>
