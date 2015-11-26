@@ -3,6 +3,7 @@
  */
 package org.openpaas.ieda.web.deploy.release;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,24 +148,35 @@ public class ReleaseController {
 		log.info("### NetworkData : " + data.toString());
 		
 		return new ResponseEntity(HttpStatus.OK);
-	}
+	}	
+	/*
+	@RequestMapping(value="/release/bootSetStemcellSave", method = RequestMethod.POST)
+	public ResponseEntity doBootSetStemcellSave(@RequestBody  BootStrapSettingData.Stemcell data){
+		log.info("### ResourcesSave : " + data.toString());
+		return new ResponseEntity(HttpStatus.OK);
+	}*/
 	
 	@RequestMapping(value="/release/bootSetResourcesSave", method = RequestMethod.POST)
 	public ResponseEntity doBootSetResourcesSave(@RequestBody  BootStrapSettingData.Resources data){
 		log.info("### ResourcesSave : " + data.toString());
+		//service.downloadSettingFile(data);
 		return new ResponseEntity(HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/release/getLocalStemcellList", method = RequestMethod.GET)
 	public ResponseEntity doBootSetStemcellList(){
 		log.info("### doBootSetStemcellList : ");
-		List<Map<String, String>> contents = stemcellService.getLocalStemcellFileList();
-		log.info("@@@@@@ : " + contents.size());
-		Map<String, Object> result = new HashMap<>();
-		result.put("total", contents.size());
-		result.put("records", contents);
+		List<String> contents = stemcellService.getLocalStemcellList();
 		
-		return new ResponseEntity(result, HttpStatus.OK);
+		return new ResponseEntity(contents, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/release/test3", method = RequestMethod.POST)
+	public ResponseEntity test3(@RequestBody Map<String, String> fileInfo){
+		log.info("### doBootSetStemcellList : " + fileInfo.get("filePath") );
+		//List<String> contents = stemcellService.getLocalStemcellList();
+		service.downloadSettingFile(fileInfo.get("filePath"));
+		return new ResponseEntity(HttpStatus.OK);
 	}
 }
 

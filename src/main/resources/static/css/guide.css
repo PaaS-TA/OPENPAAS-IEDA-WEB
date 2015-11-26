@@ -325,11 +325,11 @@ a:active {
 /* processBar_1008 */
 /* Progress 5 Step Start*/
 .processbar li{display:inline-block;position:relative;}
-.process_s01{width:572px;height:45px;background:url(../images/process_s01.png);}
-.process_s02{width:572px;height:45px;background:url(../images/process_s02.png);}
-.process_s03{width:572px;height:45px;background:url(../images/process_s03.png);}
-.process_s04{width:572px;height:45px;background:url(../images/process_s04.png);}
-.process_s05{width:572px;height:45px;background:url(../images/process_s05.png);}
+.process_s01{width:572px;height:45px;background:url(../images/process_s01n.png);}
+.process_s02{width:572px;height:45px;background:url(../images/process_s02n.png);}
+.process_s03{width:572px;height:45px;background:url(../images/process_s03n.png);}
+.process_s04{width:572px;height:45px;background:url(../images/process_s04n.png);}
+.process_s05{width:572px;height:45px;background:url(../images/process_s05n.png);}
 /* Progress Step 1*/
 .process_s01 .process_sti1{left:15px; padding:12px 14px 0 14px;text-align:center;font-weight:bold;font-size:11px;color:#fff;}
 .process_s01 .process_sti2{left:38px; padding:12px 14px 0 14px;text-align:center;font-weight:bold;font-size:11px;color:#333;}
