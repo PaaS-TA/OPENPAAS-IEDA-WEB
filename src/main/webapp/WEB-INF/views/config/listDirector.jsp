@@ -4,7 +4,7 @@
 
 $(function() {
 	// 기본 설치 관리자 정보 조회
- 	var bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");
+ 	getDefaultDirector("<c:url value='/directors/default'/>");
 	
   	$('#config_directorGrid').w2grid({
 		name: 'config_directorGrid',
@@ -17,11 +17,11 @@ $(function() {
 				footer: true},
 		style: 'text-align: center',
 		columns:[
-				 {field: 'recid', 					caption: 'recid', 			hidden: true},
+				 {field: 'recid', 					caption: 'recid', 		hidden: true},
 		         {field: 'iedaDirectorConfigSeq', 	caption: '레코드키', 		hidden: true},
-		         {field: 'defaultYn', 				caption: '기본관리자 여부', size: '15%'},
-		         {field: 'directorName', 			caption: '관리자 이름', 	size: '10%'},
-		         {field: 'userId', 					caption: '관리자 계정', 	size: '15%'},
+		         {field: 'defaultYn', 				caption: '기본관리자 여부',	size: '15%'},
+		         {field: 'directorName', 			caption: '관리자 이름',		size: '10%'},
+		         {field: 'userId', 					caption: '관리자 계정',		size: '15%'},
 		         {field: 'directorUrl', 			caption: '관리자 URL', 		size: '30%',
 		        	 render: function(record) {
 		        		 return 'https://' + record.directorUrl + ':' + record.directorPort;
@@ -34,20 +34,20 @@ $(function() {
 			event.onComplete = function() {
 				var sel = grid.getSelection();
 				if ( sel == null || sel == "") {
-					$('#setDefaultDirector a').attr('disabled', true);
-					$('#deleteSetting a').attr('disabled', true);
+					$('#setDefaultDirector').attr('disabled', true);
+					$('#deleteSetting').attr('disabled', true);
 					return;
 				}
 				
 				var record = grid.get(sel);
 				if ( record.defaultYn == 'Y' ) {
-					$('#setDefaultDirector a').attr('disabled', true);// 기본관리자 설정 Disable
+					$('#setDefaultDirector').attr('disabled', true);// 기본관리자 설정 Disable
 				}
 				else {
-					$('#setDefaultDirector a').attr('disabled', false);// 기본관리자 설정 Enable
+					$('#setDefaultDirector').attr('disabled', false);// 기본관리자 설정 Enable
 				}
 				
-				$('#deleteSetting a').attr('disabled', false);
+				$('#deleteSetting').attr('disabled', false);
 			}
 		},
 		onError: function(event) {
@@ -56,39 +56,39 @@ $(function() {
 		}
 	});
   	
- 	doSearch();
+ 	initView();
  	
  	//기본관리자 설정
  	$("#setDefaultDirector").click(function(){
- 		if($("#setDefaultDirector a").attr('disabled') != "disabled"){
-	 		var selected = w2ui['config_directorGrid'].getSelection();
-	 		if( selected.length == 0 ){
-	 			w2alert("선택된 정보가 없습니다.", "기본관리자 설정");
-	 			return;
-	 		}
-	 		else  if ( selected.length > 1 ){
-	 			w2alert("기본관리자 설정은 하나만 선택 가능합니다.", "기본관리자 설정");
-	 			return;
-	 		}
-	 		else{
-	 			var record = w2ui['config_directorGrid'].get(selected);
-	 			if( record.defaultYn == "Y" ){
-	 				//클릭시 버튼  Disable 
-	 				w2alert("선택한 설정관리자는 이미 기본관리자로 설정되어 있습니다.","기본관리자 설정");
-	 				return;
-	 			}
-	 			else{
-		 			w2confirm(record.directorName + "를 " + "기본관리자로 설정하시겠습니까?","기본관리자 설정")
-		 			.yes(function(){
-		 				w2ui['config_directorGrid'].reload();
-		 				registDefault(record.iedaDirectorConfigSeq, record.directorName);
-		 			})
-		 			.no(function () { 
-		 		        console.log("user clicked NO")
-		 		    });;
-	 			}
-	 		}
-	 	}
+ 		if($("#setDefaultDirector").attr('disabled') == "disabled") return;
+ 		
+ 		var selected = w2ui['config_directorGrid'].getSelection();
+ 		if( selected.length == 0 ){
+ 			w2alert("선택된 정보가 없습니다.", "기본관리자 설정");
+ 			return;
+ 		}
+ 		else  if ( selected.length > 1 ){
+ 			w2alert("기본관리자 설정은 하나만 선택 가능합니다.", "기본관리자 설정");
+ 			return;
+ 		}
+ 		else{
+ 			var record = w2ui['config_directorGrid'].get(selected);
+ 			if( record.defaultYn == "Y" ){
+ 				//클릭시 버튼  Disable 
+ 				w2alert("선택한 설정관리자는 이미 기본관리자로 설정되어 있습니다.","기본관리자 설정");
+ 				return;
+ 			}
+ 			else{
+	 			w2confirm(record.directorName + "를 " + "기본관리자로 설정하시겠습니까?","기본관리자 설정")
+	 			.yes(function(){
+	 				w2ui['config_directorGrid'].reload();
+	 				registDefault(record.iedaDirectorConfigSeq, record.directorName);
+	 			})
+	 			.no(function () { 
+	 		        console.log("user clicked NO")
+	 		    });;
+ 			}
+ 		}
 	});
 		 			
 	//설정 관리자 추가 버튼
@@ -104,6 +104,8 @@ $(function() {
 	
 	//설정관리자 삭제 버튼
 	$("#deleteSetting").click(function(){
+		if($("#setDefaultDirector").attr('disabled') == "disabled") return;
+
 		var selected = w2ui['config_directorGrid'].getSelection();
 		
 		if( selected.length == 0 ){
@@ -134,6 +136,11 @@ $(function() {
 	});//설정관리자 삭제 버튼 END
 });
 
+function initView() {
+	doSearch();
+	//doButtonStyle();
+}
+
 //조회기능
 function doSearch() {
 	w2ui['config_directorGrid'].load("<c:url value='/directors'/>", doButtonStyle);
@@ -141,12 +148,11 @@ function doSearch() {
 
 function doButtonStyle(){
 	var girdTotal = w2ui['config_directorGrid'].records.length;
-	if( girdTotal==0){
-		//기본관리자 버튼 Hide
-		$('#setDefaultDirector a').attr('disabled', true);// 기본관리자 설정 Disable
-		//삭제 버튼 hide
-		$('#deleteSetting a').attr('disabled', true);// 기본관리자 설정 Disable
-	} 
+	
+	//기본관리자 버튼 Hide
+	$('#setDefaultDirector').attr('disabled', true);// 기본관리자 설정 Disable
+	//삭제 버튼 hide
+	$('#deleteSetting').attr('disabled', true);// 기본관리자 설정 Disable
 }
 
 //기본관리자 등록
@@ -251,9 +257,9 @@ function lock (msg) {
 		<div class="title fl">설치관리자 목록</div>
 		<div class="fr"> 
 		<!-- Btn -->
-		<span class="boardBtn" id="setDefaultDirector" ><a href="#" class="btn btn-primary" style="width:150px"><span>기본관리자로 설정</span></a></span>
-		<span class="boardBtn" id="addSetting" ><a href="#" class="btn btn-primary" style="width:130px"><span>설정 추가</span></a></span>
-		<span class="boardBtn" id="deleteSetting"><a href="#" class="btn btn-danger" style="width:130px"><span>설정 삭제</span></a></span>
+		<span id="setDefaultDirector" class="btn btn-primary" style="width:150px" >기본관리자로 설정</span>
+		<span id="addSetting" class="btn btn-primary" style="width:130px" >설정 추가</span>
+		<span id="deleteSetting" class="btn btn-danger" style="width:130px" >설정 삭제</span>
 		<!-- //Btn -->
 	    </div>
 	</div>

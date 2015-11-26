@@ -270,7 +270,10 @@ public class IEDADirectorConfigService {
 			directorConfigRepository.save(oldDefaultDiretor);
 		}
 		directorConfig.setDefaultYn("Y");
-		directorConfigRepository.save(directorConfig);
+		directorConfig= directorConfigRepository.save(directorConfig);
+		
+		// target 설정
+		setTarget(directorConfig);
 		
 		//보쉬 타겟설정
 		//setTarget(directorConfig.getDirectorUrl(), directorConfig.getDirectorPort());
@@ -334,7 +337,6 @@ public class IEDADirectorConfigService {
 		else {
 			try {
 				// 생성
-				log.info("# create .bosh_config file");
 				Map<String, Object> newConfig = new HashMap<String, Object>();
 				
 				// set target
@@ -394,32 +396,4 @@ public class IEDADirectorConfigService {
 		File f = new File(getBoshConfigLocation());
 		return f.exists();
 	}
-	
-/*	public void setTarget(String url, Integer port){
-		Runtime r = Runtime.getRuntime();
-		InputStream inputStream = null;
-		BufferedReader bufferedReader = null;
-		String command = "D:/ieda_workspace/director/bosh_director_change.bat ";
-		command += "https://" + url + " ";
-		command += port;
-		log.info("## Command : " + command);
-		
-		try {
-			Process process = r.exec(command);
-			process.getInputStream();
-			inputStream = process.getInputStream();
-			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-			
-			String info = null;
-			String bufferlog = "";
-			while ((info = bufferedReader.readLine()) != null) {
-				bufferlog += info+"\n";
-				//System.out.println("##### DeleteStemcell ::: " + info);
-			}
-			log.info("### setDefaultDirector Director change ### \n" + bufferlog + "\n ### END ::: setDefaultDirector Director change ###");
-		} catch (Exception e) {
-			e.getMessage();
-		}
-		
-	}*/
 }

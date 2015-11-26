@@ -5,21 +5,18 @@
 <script type="text/javascript">
 
 $(function() {
- 	$('#config_opBoshReleaseGrid').w2grid({
-		name: 'config_opBoshReleaseGrid',
+ 	$('#config_opReleaseGrid').w2grid({
+		name: 'config_opReleaseGrid',
 		show: {selectColumn: true, footer: true},
-
 		multiSelect: false,
 		method: 'GET',
 		style: 'text-align:center',
 		columns:[
-			 {field: 'recid', caption: '운영체계', hidden: true}
-			,{field: 'os', caption: '운영체계', size: '10%'}
-			,{field: 'osVersion', caption: '버전', size: '10%'}
-			,{field: 'iaas', caption: 'IaaS', size: '10%', sortable: true}
-			,{field: 'stemcellVersion', caption: '스템셀버전', size: '10%'}
-			,{field: 'stemcellFileName', caption: '파일명', size: '40%', style: 'text-align:left'}
-			,{field: 'isExisted', caption: '다운로드 여부', size: '10%',
+			 {field: 'recid', caption: 'recid', hidden: true}
+			,{field: 'isMandatory', caption: 'mandatory', hidden: true}
+			,{field: 'releaseName', caption: '릴리즈 명', size: '60%'}
+			,{field: 'releaseVersion', caption: '릴리즈 버전', size: '20%'}
+			,{field: 'isExisted', caption: '다운로드 여부', size: '20%',
 				render: function(record) {
 					if ( record.isExisted == 'Y')
 						return '<div class="btn btn-success btn-xs" style="width:70px;">' + '완료 ' + '</div>';
@@ -76,89 +73,26 @@ $(function() {
 
 function initView() {
 
-	//	doSearch();
-	
-	// 다운로드 & 삭제버튼 Disable
-//	$('#doDownload').attr('disabled', true);
-//	$('#doDelete').attr('disabled', true);
 }
 
 //스템셀 목록 조회
 function doSearch() {
-/* 	var requestParam = "?os=" + $("#os option:selected").text();
-	requestParam += "&osVersion=" + $("#osVersion option:selected").text();
-	requestParam += "&iaas=" + $("#iaas option:selected").text();
 
-	w2ui['config_opBoshReleaseGrid'].load("<c:url value='/publicStemcells'/>"
-			+ requestParam); */
 }
 
 // 스템셀 다운로드
 function doDownload() {
-/* 	var selected = w2ui['config_opBoshReleaseGrid'].getSelection();
 
-	var record = w2ui['config_opBoshReleaseGrid'].get(selected);
-
-	var requestParameter = {
-			key : record.key,
-			fileName : record.stemcellFileName,
-			fileSize : record.size
-		};
-
-	$.ajax({
-		method : 'post',
-		type : "json",
-		url : "/downloadPublicStemcell",
-		contentType : "application/json",
-		data : JSON.stringify(requestParameter),
-		success : function(data, status) {
-			alert(status);
-		},
-		error : function(e) {
-			alert("오류가 발생하였습니다.");
-		}
-	}); */
 }
 
 // 스템셀 삭제
 function doDelete() {
-/* 	var selected = w2ui['config_opBoshReleaseGrid'].getSelection();
-	var record = w2ui['config_opBoshReleaseGrid'].get(selected);
-	
-	var requestParameter = { stemcellFileName: record.stemcellFileName };
-	
-	w2confirm( { msg : '선택된 스템셀 ' + record.stemcellFileName + '을 삭제하시겠습니까?'
-		, title : '스템셀 삭제'
-		, yes_text:'확인'
-		, no_text:'취소'
-		})
-		.yes(function() {
-			$.ajax({
-				method : 'delete',
-				type : "json",
-				url : "/deletePublicStemcell",
-				contentType : "application/json",
-				data : JSON.stringify(requestParameter),
-				success : function(data, status) {
-					record.isExisted = 'N';
-					w2ui['config_opBoshReleaseGrid'].reload();
-					$('#doDelete').attr('disabled', true);
-					w2ui['config_opBoshReleaseGrid'].selectNone();
-					w2alert("삭제 처리가 완료되었습니다.", "스템셀  삭제");
-				},
-				error : function(e) {
-					w2alert("오류가 발생하였습니다.");
-				}
-			});
-		})
-		.no(function() {
-			// do nothing
-		}); */
+
 }
 
 //다른페이지 이동시 호출
 function clearMainPage() {
-	$().w2destroy('config_opBoshReleaseGrid');
+	$().w2destroy('config_opReleaseGrid');
 }
 
 //화면 리사이즈시 호출
@@ -174,18 +108,21 @@ $(window).resize(function() {
 	<div class="title">릴리즈 목록</div>
 	
  	<div class="search_box" align="center">
-		<span class="search_li">릴리즈 버전</span>&nbsp;&nbsp;&nbsp;
+		<span class="search_li">릴리즈 선택</span>&nbsp;&nbsp;&nbsp;
 		<!-- OS구분 -->
 		<select name="select" id="os" class="select" style="width:120px">
 		</select>
 		&nbsp;&nbsp;&nbsp;
 		
-		<button type="button" class="btn btn-primary" style="width:100px" id="doDownload">다운로드</button>
-		<button type="button" class="btn btn-danger" style="width:100px" id="doDelete">삭제</button>
+		<!-- Btn -->
+		<span id="doSearch" class="btn btn-info" style="width:100px" >조회</span>
+		<span id="doDownload" class="btn btn-primary" style="width:100px" >다운로드</span>
+		<span id="doDelete" class="btn btn-danger" style="width:100px" >삭제</span>
+		<!-- Btn -->
 
 	</div>
 	
 	<!-- 그리드 영역 -->
-	<div id="config_opBoshReleaseGrid" style="width:100%; height:500px"></div>	
+	<div id="config_opReleaseGrid" style="width:100%; height:500px"></div>	
 	
 </div>
