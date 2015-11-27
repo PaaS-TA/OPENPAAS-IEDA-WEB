@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -48,7 +49,7 @@ public class IEDAStemcellDownload {
 	}*/
 
 	@Async
-	public void doDownload(String subLink, String stemcellFileName, double stemcellSize) {
+	public void doDownload(StemcellContentDto.Download dto) {
 		
 		log.info("@@ status :: "  + status + " percentage :: " + this.getPercentage() );
 		if( status != null && status.equals(DownloadStatus.DOWNLOADING) ){
@@ -59,17 +60,18 @@ public class IEDAStemcellDownload {
 		setDownloadStatus(DownloadStatus.DOWNLOADING);
 		
 		
-		String downloadLink = PUBLIC_STEMCELLS_BASE_URL + "/" + subLink;
+		String downloadLink = PUBLIC_STEMCELLS_BASE_URL + "/" + dto.getKey();
 		
 	    BufferedInputStream in = null;
 	    FileOutputStream fout = null;
 	    
 	    percentage = 0;
 	    double received = 0;
+	    double stemcellSize = Double.parseDouble(dto.getFileSize());
 	    Boolean isError = Boolean.FALSE;
 	    try {
 	        in = new BufferedInputStream(new URL(downloadLink).openStream());
-	        fout = new FileOutputStream(iedaConfiguration.getStemcellDir()+"/" + stemcellFileName);
+	        fout = new FileOutputStream(iedaConfiguration.getStemcellDir()+"/" + dto.getFileName());
 
 	        final byte data[] = new byte[4096];
 	        int count;
@@ -79,7 +81,7 @@ public class IEDAStemcellDownload {
 	            if(percentage != (int)((received/stemcellSize) *100)){ 
 	            	percentage = (int)((received/stemcellSize) *100);
 	            	log.info("received:" + received + ", stemcellTotalSize: " + stemcellSize + " = " + percentage);
-					messagingTemplate.convertAndSend("/socket/downloadStemcell", percentage);
+					messagingTemplate.convertAndSend("/socket/downloadStemcell", dto.getRecid()+"/"+percentage);
 	            }
 	        }
 	    } catch (FileNotFoundException e) {
@@ -106,7 +108,7 @@ public class IEDAStemcellDownload {
 	            try {
 					fout.close();
 					if(isError){//에러발생시 파일 삭제
-						File targetFile = new File(iedaConfiguration.getStemcellDir()+"/" + stemcellFileName);
+						File targetFile = new File(iedaConfiguration.getStemcellDir()+"/" + dto.getFileName());
 						targetFile.delete();
 					}
 				} catch (IOException e) {

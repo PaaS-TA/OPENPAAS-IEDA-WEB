@@ -67,17 +67,14 @@ public class StemcellManagementController {
 	//  스템셀 다운로드
 	//@RequestMapping(value="/downloadPublicStemcell", method=RequestMethod.POST)
 	@MessageMapping("/stemcellDownloading")
-	@SendTo("/socket/downloadStemcell")
+	@SendTo("/stemcell/downloadStemcell")
 	public ResponseEntity doDownloadStemcell(@RequestBody @Valid StemcellContentDto.Download dto) {
 		log.info("stemcell dir : " + iedaConfiguration.getStemcellDir());
 		log.info("doDownload key      : " + dto.getKey());
 		log.info("doDownload fileName : " + dto.getFileName());
-		log.info("doDownload fileSize : " + dto.getFileSize());
+		log.info("doDownload fileSize : " + new BigDecimal(dto.getFileSize()));
 		
-		stemcellDownloadService.doDownload(
-				dto.getKey(),
-				dto.getFileName(),
-				new BigDecimal(dto.getFileSize()).doubleValue());
+		stemcellDownloadService.doDownload(dto);
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -104,12 +101,4 @@ public class StemcellManagementController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
-	@RequestMapping(value="/stemcellDownloadStatus" )
-	public ResponseEntity downloadStatus (@RequestBody HashMap<String, String> requestMap ) throws Exception {
-		int downloadStatus = stemcellDownloadService.getPercentage();
-		
-		log.info("################# ::::  "+ downloadStatus );
-		requestMap.put("status", String.valueOf(downloadStatus));
-		return new ResponseEntity<>(requestMap, HttpStatus.OK);
-	}
 }

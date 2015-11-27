@@ -23,6 +23,10 @@ public class StemcellContentDto {
 	
 	@Data
 	public static class Download {
+		
+		@NotBlank
+		private String recid;
+		
 		@NotBlank
 		private String key;
 		

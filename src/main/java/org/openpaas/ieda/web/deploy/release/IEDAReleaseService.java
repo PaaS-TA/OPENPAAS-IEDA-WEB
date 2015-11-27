@@ -1,9 +1,6 @@
 package org.openpaas.ieda.web.deploy.release;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,26 +100,6 @@ public class IEDAReleaseService {
 			}
 		}
 		return returnReleases;
-	}
-	
-	
-	public void downloadSettingFile(String filePath){
-		log.info("### filePath ::: " + filePath);
-		//파일 가져오기
-		File sample = new File(filePath);
-		log.info("isExit : " + sample.exists());
-		log.info(iedaConfiguration.getReleaseDir());
-	    //GET BootStrap Info(DB 정보)
-		//file Set BootStrap Info
-		FileReader fr = null;
-		FileInputStream fis = null;
-		InputStreamReader isr = null;
-		try {
-			isr = new InputStreamReader(System.in);
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
 	}
 	
 }

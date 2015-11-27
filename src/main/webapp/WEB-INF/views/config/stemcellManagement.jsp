@@ -7,17 +7,17 @@
 	}
 	.progress-label {
 	  position: absolute;
-	  left: 50%;
+	  left: 30%;
 	  top: 4px;	  
 	  font-weight: bold;
-	  text-shadow: 1px 1px 0 #58ACFA;
+	  text-shadow: 1px 1px #58ACFA;
 	}
 	.ui-progressbar {
 		width: 70px;
 		height: 20px;
 		text-align: left;
 		overflow: hidden;
-		margin-left: 20px;
+		/* margin-left: 20px; */
 	}
 	.ui-progressbar .ui-progressbar-value {
 		margin: -1px;
@@ -28,6 +28,9 @@
 <script type="text/javascript" src="<c:url value='/js/stomp.js'/>"></script>
 <script type="text/javascript">
 var downloadClient = "";
+
+var completeButton = '<div class="btn btn-success btn-xs" style="width:70px;">완료</div>';
+var downloadingButton = '<div class="btn btn-info btn-xs" style="width:70px;">다운 중</div>';
 $(function() {
  	$('#config_opStemcellsGrid').w2grid({
 		name: 'config_opStemcellsGrid',
@@ -43,17 +46,18 @@ $(function() {
 			,{field: 'iaas', caption: 'IaaS', size: '10%', sortable: true}
 			,{field: 'stemcellVersion', caption: '스템셀버전', size: '10%'}
 			,{field: 'stemcellFileName', caption: '파일명', size: '40%', style: 'text-align:left'}
-			,{field: 'isExisted', caption: '다운로드 여부', size: '10%',
+			,{field: 'isExisted', caption: '다운로드 여부', size: '20%',
 				render: function(record) {
 					if ( record.isExisted == 'Y' && record.isDose == 'Y' ){
-						return '<div class="btn btn-success btn-xs" style="width:70px;">' + '완료 ' + '</div>';
+						return completeButton;
 					}
 					else if ( record.isExisted == 'Y' && record.isDose == 'N' ){
-						return '<div class="btn btn-info btn-xs" style="width:70px;">' + '다운 중' + '</div>';
+						//현재는 다운중 표시만...추후 다운로드 중인 소켓 정보를 가져와서 ProgressBar로 변경
+						return downloadingButton;
 					}
 					else{
-						return '<div id="isExisted_'+record.recid+'"><div class="progress-label"></div></div>';
-					}	
+						return '<div class="btn" id="isExisted_'+record.recid+'" style="position: relative;"><div class="progress-label"></div></div>';
+					}
 				}
 			}
 		],
@@ -140,129 +144,100 @@ function changeOS() {
 	setCommonCode('<c:url value="/codes/child/"/>' + $("#os option:selected").val(), 'osVersion');
 }
 
-//스템셀 목록 조회
-function doSearch() {
-	var requestParam = "?os=" + $("#os option:selected").text();
-	requestParam += "&osVersion=" + $("#osVersion option:selected").text();
-	requestParam += "&iaas=" + $("#iaas option:selected").text();
+	//스템셀 목록 조회
+	function doSearch() {
+		var requestParam = "?os=" + $("#os option:selected").text();
+		requestParam += "&osVersion=" + $("#osVersion option:selected").text();
+		requestParam += "&iaas=" + $("#iaas option:selected").text();
+	
+		w2ui['config_opStemcellsGrid'].load("<c:url value='/publicStemcells'/>" + requestParam);
+	}
 
-	w2ui['config_opStemcellsGrid'].load("<c:url value='/publicStemcells'/>"
-			+ requestParam);
-}
 
-// 스템셀 다운로드
-function doDownload() {
-	var selected = w2ui['config_opStemcellsGrid'].getSelection();
+	// 스템셀 다운로드
+	function doDownload() {
+		var selected = w2ui['config_opStemcellsGrid'].getSelection();
 
-	var record = w2ui['config_opStemcellsGrid'].get(selected);
+		var record = w2ui['config_opStemcellsGrid'].get(selected);
 
-	var requestParameter = {
+		var requestParameter = {
 			recid : record.recid,
 			key : record.key,
 			fileName : record.stemcellFileName,
 			fileSize : record.size
 		};
-	progressGrow(requestParameter);
-}
+		progressGrow(requestParameter);
+	}
 
-//ProgressBar Create
-function progressGrow(requestParameter){
-	var progressbar = $("td #isExisted_" + requestParameter.recid);
-	var progressLabel = $( ".progress-label" );
-	
-	progressbar.progressbar({
-	      value: false,
-	      change: function() {
-	        progressLabel.text( progressbar.progressbar("value") + "%" );
-	      },
-	      complete: function() {
-	        progressLabel.text( "Complete!" );
-	      }
-	});
-	
-	//getDowloadStatus(requestParameter);
-	var socket = new SockJS('/stemcellDownloading');
-	downloadClient = Stomp.over(socket);
-	var status = 0;
-	downloadClient.connect({}, function(frame) {
-        console.log('Connected: ' + frame);
-        downloadClient.subscribe('/socket/downloadStemcell', function(data){
-        	//progressbar status change
-        	status = data.body.trim();
-        	console.log("### Download Status ::: " + status);
-        	 if ( status < 100 ) {
-        		 //progressLabel.text( status+ "%" );
-        		 progressbar.progressbar("value",status);
-		    }
-		    else if(status == 100) {
-		    	progressbar.parent().html('<div class="btn btn-success btn-xs" style="width:70px;">' + '완료 ' + '</div>');
-		    }      		
-        });
-        socketSendDownLoadData(requestParameter);
-    });
-}
+	//PROGRESSBAR 생성
 
-//다운로드 상태 확인
-/* function getDowloadStatus(requestParameter){
-	console.log("2.=====doUploadConnect=====");
+	function progressGrow(requestParameter) {
+		var progressbar = $("td #isExisted_" + requestParameter.recid);
+		var progressLabel = $(".progress-label");
+		var downloadPercentage = 0;
+		progressbar.progressbar({
+			value : false,
+			change : function() {
+				progressLabel.text( progressbar.progressbar("value") + "%" );
+			},
+			complete : function() {
+				//progressLabel.text("Complete!");
+			}
+		});
+		getDownloadStatus(requestParameter);
+	}
 	
-	var progressbar = $("#isExisted_" + requestParameter.recid);
-	var progressLabel = $( ".progress-label" );
-	
-	var socket = new SockJS('/stemcellDownloading');
-	downloadClient = Stomp.over(socket);
-	var status = 0;
-	downloadClient.connect({}, function(frame) {
-        console.log('Connected: ' + frame);
-        downloadClient.subscribe('/socket/downloadStemcell', function(data){
-        	//progressbar status change
-        	status = data.body.trim();
-        	console.log("### Download Status ::: " + status);
-        	 if ( status < 100 ) {
-        		 //progressLabel.text( status+ "%" );
-        		 progressbar.progressbar("value",status);
-		    }
-		    else if(status == 100) {
-		    	progressbar.parent().html('<div class="btn btn-success btn-xs" style="width:70px;">' + '완료 ' + '</div>');
-		    }      		
-        });
-        socketSendDownLoadData(requestParameter);
-    });
-} */
+	function getDownloadStatus(requestParameter){
+		var progressbar = $("td #isExisted_" + requestParameter.recid);
+		var progressLabel = $(".progress-label");
+		//소켓 연결
+		var socket = new SockJS('/stemcellDownloading');
+		downloadClient = Stomp.over(socket);
+		var status = 0;
+		downloadClient.connect({}, function(frame) {
+			console.log('Connected: ' + frame);
+	        downloadClient.subscribe('/socket/downloadStemcell', function(data){
+	        	//데이터에서 타겟을 받아서 지정
+	        	//progressbar status change
+	        	status = data.body.split('/')[1];
+	        	var recid = data.body.split('/')[0];
+	        	console
+	    		var targetProgressbar =  $("td #isExisted_" + recid);
+	    		
+	        	console.log("### Download Status ::: " + status);
+	        	 if ( status < 100 ) {
+	        		 $("td #isExisted_" + recid +" "+ ".progress-label").text( status+ "%" );
+	        		 targetProgressbar.progressbar("value", status);
+			    }
+			    else if(status == 100) {
+			    	progressLabel.text('');
+			    	targetProgressbar.parent().html(completeButton);
+			    }      		
+	        });
+			socketSendDownLoadData(requestParameter);
+		});
+	}
 
-function socketSendDownLoadData(requestParameter){
-	downloadClient.send("/app/stemcellDownloading", {}, JSON.stringify(requestParameter));
-}
-//ProgressBar Status Update
-/* function progressPress(param) {
-	var progressbar = $("#isExisted_" + param.recid);
-	var progressLabel = $( ".progress-label" );
-	console.log("###progress Status ::: " + param.status );
-    var val = param.status;//progressbar.progressbar( "value" ) || 0 ;
+	function socketSendDownLoadData(requestParameter) {
+		downloadClient.send("/send/stemcellDownloading", {}, JSON
+				.stringify(requestParameter));
+	}
 
-    //progressbar.progressbar( "value", val );
-    $("#isExisted_" + param.recid + " .progress-label" ).text(val+"%");
-    if ( val < 100 ) {
-      	setTimeout( getDowloadStatus(param), 4000 );
-    }
-    else if(val == 100) {
-    	progressbar.parent().html('<div class="btn btn-success btn-xs" style="width:70px;">' + '완료 ' + '</div>');
-    }
-} */
+	// 스템셀 삭제
+	function doDelete() {
+		var selected = w2ui['config_opStemcellsGrid'].getSelection();
+		var record = w2ui['config_opStemcellsGrid'].get(selected);
 
-// 스템셀 삭제
-function doDelete() {
-	var selected = w2ui['config_opStemcellsGrid'].getSelection();
-	var record = w2ui['config_opStemcellsGrid'].get(selected);
-	
-	var requestParameter = { stemcellFileName: record.stemcellFileName };
-	
-	w2confirm( { msg : '선택된 스템셀 ' + record.stemcellFileName + '을 삭제하시겠습니까?'
-		, title : '스템셀 삭제'
-		, yes_text:'확인'
-		, no_text:'취소'
-		})
-		.yes(function() {
+		var requestParameter = {
+			stemcellFileName : record.stemcellFileName
+		};
+
+		w2confirm({
+			msg : '선택된 스템셀 ' + record.stemcellFileName + '을 삭제하시겠습니까?',
+			title : '스템셀 삭제',
+			yes_text : '확인',
+			no_text : '취소'
+		}).yes(function() {
 			$.ajax({
 				method : 'delete',
 				type : "json",
@@ -280,21 +255,20 @@ function doDelete() {
 					w2alert("오류가 발생하였습니다.");
 				}
 			});
-		})
-		.no(function() {
+		}).no(function() {
 			// do nothing
 		});
-}
+	}
 
-//다른페이지 이동시 호출
-function clearMainPage() {
-	$().w2destroy('config_opStemcellsGrid');
-}
+	//다른페이지 이동시 호출
+	function clearMainPage() {
+		$().w2destroy('config_opStemcellsGrid');
+	}
 
-//화면 리사이즈시 호출
-$(window).resize(function() {
-	setLayoutContainerHeight();
-});
+	//화면 리사이즈시 호출
+	$(window).resize(function() {
+		setLayoutContainerHeight();
+	});
 </script>
 
 <div id="main">
