@@ -17,13 +17,12 @@
 <!-- CSS  -->
 <link rel="stylesheet" type="text/css" ref="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css" href="/webjars/w2ui/1.4.2/w2ui.min.css" />
-<link rel="stylesheet" type="text/css"
-	href="/webjars/jquery-ui/1.11.4/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" href="/webjars/jquery-ui/1.11.4/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="/css/default.css" />
 <link rel="stylesheet" type="text/css" href="/css/guide.css" />
+<link rel="stylesheet" type="text/css" href="/css/progress-step.css"/>
 <style type="text/css">
-.w2ui-popup .w2ui-msg-body{background-color: #FFF;}
-.processbar ul {margin-left:5px;}
+.w2ui-popup .w2ui-msg-body{background-color: #FFF; }
 </style>
 <!-- JQuery -->
 <script type="text/javascript" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
@@ -100,7 +99,7 @@
 	function awsPopup(){
 		$("#awsSettingInfoDiv").w2popup({
 			width : 610,
-			height : 380,
+			height : 390,
 			onClose : initSetting
 		});
 	}
@@ -318,17 +317,17 @@
 	<!-- AWS  설정 DIV -->
 	<div id="awsSettingInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
-		<div rel="body" style="padding:15px 5px 15px 5px;">
-			<div class="processbar">
-	            <ul class="process_s01">
-		            <li class="process_sti1">AWS 설정</li>
-		            <li class="process_sti2">Network 설정</li>
-		            <li class="process_sti3">리소스 설정</li>
-		            <li class="process_sti4">배포 Manifest</li>
-		            <li class="process_sti5">설치</li>
+		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
+			<div rel="sub-title" >
+	            <ul class="progressStep" >
+		            <li class="active">AWS 설정</li>
+		            <li class="before">Network 설정</li>
+		            <li class="before">리소스 설정</li>
+		            <li class="before">배포 Manifest</li>
+		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" style="margin: 10px 0;">▶ AWS 설정정보</div>
+			<div class="cont_title">▶ AWS 설정정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:200px;font-size:11px;">AWS 키(access-key)</label>
@@ -373,17 +372,17 @@
 	<!-- Network  설정 DIV -->
 	<div id="networkSettingInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
-		<div rel="body" style="padding:15px 5px 15px 5px;">
-			<div class="processbar">
-	            <ul class="process_s02">
-		            <li class="process_sti1">AWS 설정</li>
-		            <li class="process_sti2">Network 설정</li>
-		            <li class="process_sti3">리소스 설정</li>
-		            <li class="process_sti4">배포 Manifest</li>
-		            <li class="process_sti5">설치</li>
+		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
+			<div >
+	            <ul class="progressStep">
+		            <li class="pass">AWS 설정</li>
+		            <li class="active">Network 설정</li>
+		            <li class="before">리소스 설정</li>
+		            <li class="before">배포 Manifest</li>
+		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" style="margin: 10px 0;">▶ Network 설정정보</div>
+			<div rel="sub-title" class="cont_title">▶ Network 설정정보</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Subnet Range</label>
@@ -434,17 +433,17 @@
 	<!-- Resources  설정 DIV -->
 	<div id="resourcesSettingInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
-		<div rel="body" style="padding:15px 5px 15px 5px;">
-			<div class="processbar">
-	            <ul class="process_s03">
-		            <li class="process_sti1">AWS 설정</li>
-		            <li class="process_sti2">Network 설정</li>
-		            <li class="process_sti3">리소스 설정</li>
-		            <li class="process_sti4">배포 Manifest</li>
-		            <li class="process_sti5">설치</li>
+		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
+			<div >
+	            <ul class="progressStep">
+		            <li class="pass">AWS 설정</li>
+		            <li class="pass">Network 설정</li>
+		            <li class="active">리소스 설정</li>
+		            <li class="before">배포 Manifest</li>
+		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" style="margin: 10px 0 ;">▶ 리소스 설정정보</div>
+			<div rel="sub-title" class="cont_title">▶ 리소스 설정정보</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">스템셀 지정</label>
@@ -483,41 +482,41 @@
 	
 	<div id="deployManifestDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
-		<div rel="body" style="padding:15px 5px 15px 5px;">
-			<div class="processbar">
-	            <ul class="process_s04">
-		            <li class="process_sti1">AWS 설정</li>
-		            <li class="process_sti2">Network 설정</li>
-		            <li class="process_sti3">리소스 설정</li>
-		            <li class="process_sti4">배포 Manifest</li>
-		            <li class="process_sti5">설치</li>
+		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
+			<div >
+	            <ul class="progressStep">
+		            <li class="pass">AWS 설정</li>
+		            <li class="pass">Network 설정</li>
+		            <li class="pass">리소스 설정</li>
+		            <li class="active">배포 Manifest</li>
+		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" style="margin:10px 0;">▶ 배포 Manifest 정보</div>
+			<div rel="sub-title" class="cont_title">▶ 배포 Manifest 정보</div>
 			<div>
 				<textarea id="deployInfo" style="width:95%;height:250px;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveDeployInfo('before');">이전</button>
-				<button class="btn" onclick="w2popup.close();">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveDeployInfo('after');">다음>></button>
-			</div>
+			<button class="btn" style="float: left;" onclick="saveDeployInfo('before');">이전</button>
+			<button class="btn" onclick="w2popup.close();">취소</button>
+			<button class="btn" style="float: right; padding-right: 15%" onclick="saveDeployInfo('after');">다음>></button>
+		</div>
 	</div>
 	
 	<div id="installDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
-		<div rel="body" style="padding:15px 5px 15px 5px;">
-			<div class="processbar">
-	            <ul class="process_s05">
-		            <li class="process_sti1">AWS 설정</li>
-		            <li class="process_sti2">Network 설정</li>
-		            <li class="process_sti3">리소스 설정</li>
-		            <li class="process_sti4">배포 Manifest</li>
-		            <li class="process_sti5">설치</li>
+		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
+			<div >
+	            <ul class="progressStep">
+		            <li class="pass">AWS 설정</li>
+		            <li class="pass">Network 설정</li>
+		            <li class="pass">리소스 설정</li>
+		            <li class="pass">배포 Manifest</li>
+		            <li class="active">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" style="margin:10px 0;">▶ 설치 로그</div>
+			<div rel="sub-title" class="cont_title">▶ 설치 로그</div>
 			<div>
 				<textarea id="installLogs" style="width:95%;height:250px;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
