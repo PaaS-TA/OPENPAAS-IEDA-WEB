@@ -1,11 +1,11 @@
-name: [boshName]
+name: microbosh
 releases:
   bosh:
     #bosh release: "file:///" + bosh_file_path + bosh_file_name
-    url: file:///D:/ieda_workspace/release/cpi-release/bosh-219.tgz
+    url: file:///D:/ieda_workspace/release/cpi-release/bosh-230.tgz
   bosh-aws-cpi:
     #cpi release: "file:///" + cpi_file_path + cpi_file_name
-    url: #file:///D:/ieda_workspace/release/cpi-release/bosh-aws-cpi-release-35.tgz
+    url: file:///D:/ieda_workspace/release/cpi-release/bosh-aws-cpi-release-36.tgz
 resource_pools:
   vms:
     stemcell: 
@@ -16,7 +16,7 @@ resource_pools:
         # Change default password:
         # Generate SHA hash using: mkpasswd -m sha-512
         # Sample Password for "admin"
-        password: [microbosh] 
+        password: [microboshPw] 
     cloud_properties:
       instance_type: m3.large
       # availability_zone is part of region

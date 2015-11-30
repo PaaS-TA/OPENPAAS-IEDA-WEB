@@ -43,28 +43,64 @@
 <script type="text/javascript" src="/js/sockjs-0.3.4.js"></script>
 <script type="text/javascript" src="/js/stomp.js"></script>
 <script type="text/javascript">
-	//private var
+	//private variable
 	var structureType = "";
 	var awsInfo = "";
 	var networkInfo = "";
 	var resourcesInfo = "";
 	var deployInfo = "";
-	var stemcells = "";
 	
 	//Title Tag
-	var popTitle1 = '<b>BOOTSTRAP 설치</b>';
-
+	var popupTitle = '<b>BOOTSTRAP 설치</b>';
+	
 	//Body Tag
-	var popBody1 = '<div id="bootSelectBody" style="width:400px;height:80px;">';
-	popBody1 += '<div class="w2ui-lefted" style="text-align:left;">설치할 Infrastructure 을 선택하세요<br/><br/></div>';
-	popBody1 += '<div class="row" ><div class="col-sm-9"><div class="btn-group" data-toggle="buttons"  style="left:20%">';
-	popBody1 += '<label style="width:130px;"><input type="radio" name="structureType" id="type1" value="AWS" checked="checked"/>&nbsp;AWS</label>';
-	popBody1 += '<label style="width:130px;"><input type="radio" name="structureType" id="type2" value="OPENSTACK"/>&nbsp;OPENSTACK</label>';
-	popBody1 += '</div></div></div></div>';
-
+	var instrastructurebody = '<div id="bootSelectBody" style="width: 400px; height: 80px;" hidden="true">';
+	instrastructurebody += '<div class="w2ui-lefted" style="text-align: left;">설치할 Infrastructure 을 선택하세요<br/><br/></div>';
+	instrastructurebody += '<div class="row"><div class="col-sm-9"><div class="btn-group" data-toggle="buttons" style="left: 20%">';
+	instrastructurebody += '<label style="width: 130px;padding-right:20%;"><input type="radio" name="structureType" id="type1" value="AWS" checked="checked"/>';
+	instrastructurebody += '&nbsp;AWS</label><label style="width: 130px;">';
+	instrastructurebody += '<input type="radio" name="structureType" id="type2" value="OPENSTACK" />&nbsp;OPENSTACK</label></div></div></div></div>';
+	
+	var awsSettingBody = '<div rel="sub-title" ><ul class="progressStep" >';
+	awsSettingBody += '<li class="active">AWS 설정</li><li class="before">Network 설정</li>';
+	awsSettingBody += '<li class="before">리소스 설정</li><li class="before">배포 Manifest</li>';
+	awsSettingBody += '<li class="before">설치</li></ul></div>';
+	awsSettingBody += '<div class="cont_title">▶ AWS 설정정보</div><div class="w2ui-page page-0" style="padding-left:5%;">';
+	awsSettingBody += '<div class="w2ui-field"><label style="text-align: left;width:200px;font-size:11px;">AWS 키(access-key)</label>';
+	awsSettingBody += '<div><input name="awsKey" type="text" maxlength="100" size="30" style="float:left;width:330px;"/></div></div>';
+	awsSettingBody += '<div class="w2ui-field"><label style="text-align: left;width:200px;font-size:11px;">AWS 비밀번호(secret-access-key)</label>';
+	awsSettingBody += '<div><input name="awsPw" type="password" maxlength="100" size="30" style="float:left;width:330px;"/></div></div>';
+	awsSettingBody += '<div class="w2ui-field"><label style="text-align: left;width:200px;font-size:11px;">시큐리티 그룹명</label>';
+	awsSettingBody += '<div><input name="securGroupName" type="text" maxlength="100" size="30" style="float:left;width:330px;"/></div></div>';
+	awsSettingBody += '<div class="w2ui-field"><label style="text-align: left;width:200px;font-size:11px;">Private Key 명</label>';
+	awsSettingBody += '<div><input name="privateKeyName" type="text" maxlength="100" size="30" style="float:left;width:330px;"/></div></div>';
+	awsSettingBody += '<div class="w2ui-field"><label style="text-align: left;width:200px;font-size:11px;">Private Key Path</label>';
+	awsSettingBody += '<div><input name="privateKeyPath" type="text" maxlength="100" size="30" style="float:left;width:330px;"/></div></div></div>';
+	
+	var networkSettingBody = '<div rel="body" style="width:100%;padding:15px 5px 15px 5px;"><div ><ul class="progressStep">';
+	networkSettingBody += '<li class="pass">AWS 설정</li><li class="active">Network 설정</li><li class="before">리소스 설정</li>';
+	networkSettingBody += '<li class="before">배포 Manifest</li><li class="before">설치</li></ul></div>';
+	networkSettingBody += '<div rel="sub-title" class="cont_title">▶ Network 설정정보</div><div class="w2ui-page page-0" style="padding-left: 5%;">';
+	networkSettingBody += '<div class="w2ui-field"><label style="text-align: left; width: 200px; font-size: 11px;">Subnet Range</label>';
+	networkSettingBody += '<div><input name="subnetRange" type="text" maxlength="100" size="30" style="float:left;width:330px;"/></div></div>';
+	networkSettingBody += '<div class="w2ui-field"><label style="text-align: left; width: 200px; font-size: 11px;">Gateway</label>';
+	networkSettingBody += '<div><input name="gateway" type="text" maxlength="100" size="30" style="float:left;width:330px;"/></div></div>';
+	networkSettingBody += '<div class="w2ui-field"><label style="text-align: left; width: 200px; font-size: 11px;">DNS</label>';
+	networkSettingBody += '<div><input name="dns" type="text" maxlength="100" size="30" style="float:left;width:330px;"/></div></div>';
+	networkSettingBody += '<div class="w2ui-field"><label style="text-align: left; width: 200px; font-size: 11px;">Subnet ID</label>';
+	networkSettingBody += '<div><input name="subnetId" type="text" maxlength="100" size="30" style="float:left;width:330px;"/></div></div>';
+	networkSettingBody += '<div class="w2ui-field"><label style="text-align: left; width: 200px; font-size: 11px;">Director Private IP</label>';
+	networkSettingBody += '<div><input name="directorPrivateIp" type="text" maxlength="100" size="30" style="float:left;width:330px;"/></div></div>';
+	networkSettingBody += '<div class="w2ui-field"><label style="text-align: left; width: 200px; font-size: 11px;">Director Public IP</label>';
+	networkSettingBody += '<div><input name="directorPublicIp" type="text" maxlength="100" size="30" style="float:left;width:330px;"/></div></div></div>';
+	
 	//Button Tag
-	var popButton1 = '<button id="checkBtn">확인</button><button id="cancleBtn" onlclick="initSetting();">취소</button>';
-
+	var awsSettingButtons = '<button class="btn" style="float: left;" onclick="w2popup.close();">취소</button>';
+	awsSettingButtons 	+= '<button class="btn" style="float: right;padding-right:15%" onclick="saveAwsSettingInfo();">다음>></button>';
+	
+	
+	
+	
 	$(function() {
 
 		$("#bootSetPopup").click(function() {
@@ -78,8 +114,8 @@
 		w2confirm({
 			width 			: 450,
 			height 			: 180,
-			title 			: popTitle1,
-			msg 			: $("#bootSelectBody").html(),//popBody1,
+			title 			: instrastructureTitle,
+			msg 			: $("#bootSelectBody").html(),
 			yes_text 		: "확인",
 			no_text 		: "취소",
 			yes_callBack 	: function(){
@@ -186,10 +222,8 @@
 			type : "GET",
 			url : "/release/getLocalStemcellList",
 			contentType : "application/json",
-			//dataType: "json",
 			async : true,
 			success : function(data, status) {
-				console.log("### Stemcell Size : "+data.length);
 				$('#w2ui-popup input[type=list]').w2field('list', { items: data , maxDropHeight:300, width:500});
 			},
 			error : function( e, status ) {
@@ -247,7 +281,6 @@
 			});
 		}
 		else{
-			console.log("#### 여기오나?");
 			resourcesPopup();
 		}
 	}
@@ -279,7 +312,6 @@
 	}
 	
 	function selectedStemcell(){
-		console.log(" file name :::" + $("input[name='targetStemcellUpload']").val());
 		$("input[name='targetStemcell']").val($("input[name='targetStemcellUpload']").val());		
 	}
 	
@@ -293,29 +325,27 @@
 	</div>
 
 	<!-- Infrastructure  설정 DIV -->
-	<div id="bootSelectBody" style="width: 400px; height: 80px;" hidden="true">
+	<div id="bootSelectBody" style="width:100%; height: 80px;" hidden="true">
 		<div class="w2ui-lefted" style="text-align: left;">
 			설치할 Infrastructure 을 선택하세요<br />
 			<br />
 		</div>
-		<div class="row">
-			<div class="col-sm-9">
-				<div class="btn-group" data-toggle="buttons" style="left: 20%">
-					<label style="width: 130px;padding-right:20%;">
-						<input type="radio" name="structureType" id="type1" value="AWS" checked="checked"/>
-						&nbsp;AWS
-					</label>
-					<label style="width: 130px;">
-						<input type="radio" name="structureType" id="type2" value="OPENSTACK" />
-						&nbsp;OPENSTACK
-					</label>
-				</div>
+		<div class="col-sm-9">
+			<div class="btn-group" data-toggle="buttons" >
+				<label style="width: 100px;margin-left:40px;">
+					<input type="radio" name="structureType" id="type1" value="AWS" checked="checked" />
+					&nbsp;AWS
+				</label>
+				<label style="width: 130px;margin-left:50px;">
+					<input type="radio" name="structureType" id="type2" value="OPENSTACK"  />
+					&nbsp;OPENSTACK
+				</label>
 			</div>
 		</div>
 	</div>
 
 	<!-- AWS  설정 DIV -->
-	<div id="awsSettingInfoDiv" style="width:100%;height:100%;" hidden="true">
+	<!-- <div id="awsSettingInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
 			<div rel="sub-title" >
@@ -366,7 +396,7 @@
 		        <button class="btn" style="float: right;padding-right:15%" onclick="saveAwsSettingInfo();">다음>></button>
 		    </div>
 		</div>
-	</div>
+	</div> -->
 	
 	
 	<!-- Network  설정 DIV -->

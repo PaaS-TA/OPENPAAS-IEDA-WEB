@@ -73,7 +73,7 @@ ul.progressStep li{
 
 ul.progressStep li:before {
     content: '';
-    border-left: 13px solid #fff;
+    border-left: 16px solid #fff;
     border-top: 24px solid transparent;
     border-bottom: 24px solid transparent;
     position: absolute;
