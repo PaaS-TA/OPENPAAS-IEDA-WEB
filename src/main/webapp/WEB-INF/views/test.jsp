@@ -20,7 +20,7 @@
 <link rel="stylesheet" type="text/css" href="/webjars/jquery-ui/1.11.4/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="/css/default.css" />
 <link rel="stylesheet" type="text/css" href="/css/guide.css" />
-<link rel="stylesheet" type="text/css" href="/css/progress-step.css"/>
+<link rel="stylesheet" type="text/css" href="/css/bootstrap-progress-step.css"/>
 <style type="text/css">
 .w2ui-popup .w2ui-msg-body{background-color: #FFF; }
 </style>

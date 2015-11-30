@@ -1,0 +1,132 @@
+/**************************************************************************************
+사용방법 : 
+1)'<ul>' Tag의 Class를 progressStep 으로 
+2)하위 '<li>' Tag 중 지나간 단계 의 경우 Class 명을 'pass'로
+                     현재 단계의의 경우 Class 명을 'active'로
+                     다음 단계의의 경우 Class 명을 'before'로
+  설정한다.
+3)이 ProgessStep의 경우 Width 100% 기준으로 아래 css에서 li의 width의 크기를 조정하면 된다.
+  각 화면별로 다른 경우(공통으로 쓸 수 없는 경우)는 아래 부분의 CSS를 로컬영역의 CSS로 넣고
+  width를 조절해 준다.
+  
+  ul.progressStep li{
+    float: left;
+    padding: 10px 30px 10px 40px;    
+    color: #fff;
+    position: relative;
+    border-top: 1px solid #666;
+    border-bottom: 1px solid #666;
+    width: 15%;				  ------[Step비율] 갯수에 따라 조정 
+    margin: 0 1px;
+  }
+
+4) 단계별 :after 영역의 효과 
+   border-top,border-bottom ->화살표 상하위 효과로 px는 height조절
+   border-left ->화살표 정도 효과로 px는 width(두께) 조절
+
+* CSS Import
+-별도의 페이지
+<link rel="stylesheet" type="text/css" href="<c:url value='/css/progress-step.css'/>"/>
+-Layout 내부의 페이지
+<link rel="stylesheet" type="text/css" href="/css/progress-step.css"/>
+
+* Source
+<ul class="progressStep">
+	<li class="pass">STEP 1</li>			
+	<li class="pass">STEP 2</li>
+	<li class="active">STEP 3</li>
+	<li class="before">STEP 4</li>
+	<li class="before">STEP 5</li>
+</ul>
+
+ul.progressStep * {
+    box-sizing: border-box;
+    
+}
+***************************************************************************************/
+
+@CHARSET "UTF-8";
+
+
+ul.progressStep {
+    list-style-type: none;
+    font-family: arial;
+    font-size: 11px;
+    clear: both;
+    line-height: 1em;
+    margin: 0 -1px;
+    text-align: center;
+    width:100%;
+}
+
+ul.progressStep li{
+    float: left;
+    padding: 18px 10px;    /***  [내부영역 Padding] 내부 글자 크기에 따라 조절**/
+    color: #fff;
+    position: relative;
+    border-top: 1px solid #666;
+    border-bottom: 1px solid #666;
+    width: 19%;				/***  [Step비율] 갯수에 따라 조정 **/
+    height:48px;			/***  [Step 높이] ***/
+    margin: 0 1px;
+}
+
+ul.progressStep li:before {
+    content: '';
+    border-left: 13px solid #fff;
+    border-top: 24px solid transparent;
+    border-bottom: 24px solid transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+}
+ul.progressStep li:after {
+    content: '';
+    border-left: 15px solid #333;
+    border-top: 24px solid transparent;
+    border-bottom: 24px solid transparent;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    z-index: 20;
+}
+
+/* class: pass */
+ul.progressStep li.pass {
+    border-top: 0px;
+    border-bottom: 0px;
+    background: #94d0fb;
+}
+
+ul.progressStep li.pass:after {
+    border-top: 24px solid transparent;
+    border-bottom: 24px solid transparent;
+    border-left-color: #94d0fb;
+}
+/* class: active */
+ul.progressStep li.active {
+    border-top: 0px;
+    border-bottom: 0px;
+    background: #147ad0;
+}
+
+ul.progressStep li.active:after {
+    border-top: 24px solid transparent;
+    border-bottom: 24px solid transparent;
+    border-left-color: #147ad0;
+}
+/* class: before */
+ul.progressStep li.before {
+    border-top: 0px;
+    border-bottom: 0px;
+    color:#333;
+    background: #e2e5e9;
+}
+
+ul.progressStep li.before:after {
+    border-top: 24px solid transparent;
+    border-bottom: 24px solid transparent;
+    color:#333;
+    border-left-color: #e2e5e9;
+}

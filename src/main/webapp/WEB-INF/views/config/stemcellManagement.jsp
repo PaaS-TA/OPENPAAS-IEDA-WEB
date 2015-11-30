@@ -170,7 +170,6 @@ function changeOS() {
 	}
 
 	//PROGRESSBAR 생성
-
 	function progressGrow(requestParameter) {
 		var progressbar = $("td #isExisted_" + requestParameter.recid);
 		var progressLabel = $(".progress-label");
