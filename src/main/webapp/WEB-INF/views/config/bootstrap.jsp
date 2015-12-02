@@ -8,6 +8,7 @@
 
 //private variable
 var structureType = "";
+var bootstrapSeq= "";
 var awsInfo = "";
 var networkInfo = "";
 var resourcesInfo = "";
@@ -58,8 +59,8 @@ $(function() {
 
 //조회기능
 function doSearch() {
-	doButtonStyle();
-	//w2ui['config_bootstrapGrid'].load("<c:url value='/bootstaps'/>", doButtonStyle);
+	//doButtonStyle();
+	w2ui['config_bootstrapGrid'].load("<c:url value='/bootstraps'/>", doButtonStyle);
 }
 
 function doButtonStyle(){
@@ -116,7 +117,7 @@ function setAwsData(){
 	//set Data
 	$(".w2ui-msg-body input[name='awsKey']").val("test-awsKey");
 	$(".w2ui-msg-body input[name='awsPw']").val("test-awsPw");
-	$(".w2ui-msg-body input[name='securGroupName']").val("test-securGroupName");
+	$(".w2ui-msg-body input[name='secretGroupName']").val("test-secretGroupName");
 	$(".w2ui-msg-body input[name='privateKeyName']").val("test-privateKeyName");
 	$(".w2ui-msg-body input[name='privateKeyPath']").val("test-privateKeyPath");
 }
@@ -124,9 +125,10 @@ function setAwsData(){
 //Save AWS Setting Info
 function saveAwsSettingInfo(){
 	awsInfo = {
+			iaas			: structureType,
 			awsKey			: $(".w2ui-msg-body input[name='awsKey']").val(),
 			awsPw			: $(".w2ui-msg-body input[name='awsPw']").val(),
-			securGroupName	: $(".w2ui-msg-body input[name='securGroupName']").val(),
+			secretGroupName	: $(".w2ui-msg-body input[name='secretGroupName']").val(),
 			privateKeyName	: $(".w2ui-msg-body input[name='privateKeyName']").val(),
 			privateKeyPath	: $(".w2ui-msg-body input[name='privateKeyPath']").val()
 	}
@@ -139,6 +141,7 @@ function saveAwsSettingInfo(){
 		async : true,
 		data : JSON.stringify(awsInfo), 
 		success : function(data, status) {
+			bootstrapSeq = data;
 			networkPopup();
 		},
 		error : function( e, status ) {
@@ -170,8 +173,10 @@ function setNetworkData(){
 
 //Save Network Setting Info
 function saveNetworkSettingInfo(param){
+	if(bootstrapSeq == ""){ w2alert("BOOTSTRAP ID가 존재하지 않습니다."); return;}
+	
 	networkInfo = {
-			key					: awsInfo.awsKey,
+			bootstrapId			: bootstrapSeq,
 			subnetRange			: $(".w2ui-msg-body input[name='subnetRange']").val(),
 			gateway				: $(".w2ui-msg-body input[name='gateway']").val(),
 			dns					: $(".w2ui-msg-body input[name='dns']").val(),
@@ -234,8 +239,10 @@ function getStemcellList(){
 }
 
 function saveResourcesSettingInfo(param){
+	if(bootstrapSeq == ""){ w2alert("BOOTSTRAP ID가 존재하지 않습니다."); return;}
+	
 	resourcesInfo = {
-			key				: awsInfo.awsKey,
+			bootstrapId		: bootstrapSeq,
 			targetStemcell	: $(".w2ui-msg-body input[name='targetStemcell']").val(),
 			instanceType	: $(".w2ui-msg-body input[name='instanceType']").val(),
 			availabilityZone: $(".w2ui-msg-body input[name='availabilityZone']").val(),
@@ -326,11 +333,12 @@ function installPopup(){
 
 //팝업창 닫을 경우
 function initSetting(){
-	structureType 	= null;
-	awsInfo			= null;
-	networkInfo 	= null;
-	resourcesInfo 	= null;
-	deployInfo 		= null;
+	structureType 	= "";
+	bootstrapSeq	= "";
+	awsInfo			= "";
+	networkInfo 	= "";
+	resourcesInfo 	= "";
+	deployInfo 		= "";
 }
 
 function uploadStemcell(){
@@ -409,6 +417,12 @@ function uploadStemcell(){
 	        </div>
 			<div class="cont_title">▶ AWS 설정정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
+		    	<div class="w2ui-field" hidden="true">
+		            <label>Iaas</label>
+		            <div>
+		                <input name="iaas" type="text" maxlength="100" />
+		            </div>
+		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">AWS 키(access-key)</label>
 		            <div>
@@ -424,7 +438,7 @@ function uploadStemcell(){
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">시큐리티 그룹명</label>
 		            <div>
-		                <input name="securGroupName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="secretGroupName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">

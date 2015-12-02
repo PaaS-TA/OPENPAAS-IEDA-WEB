@@ -4,12 +4,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.openpaas.ieda.common.IEDACommonException;
+import org.openpaas.ieda.common.IEDAConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,128 +24,139 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class IEDABootstrapService {
+
+	@Autowired
+	private IEDABootstrapRepository bootstrapRepository;
 	
-	private static String stemcell;
-	private static String microboshPw;
-	/*NETWORK*/
-	private static String subnetRange;
-	private static String dns;
-	private static String subnetId;
-	private static String directorPrivateIp;
-	private static String directorPublicIp;
-	/*AWS*/
-	private static String awsKey;
-	private static String secretAccessKey;
-	private static String securGroupName;
-	private static String privateKey;
+	@Autowired
+	private IEDAConfiguration iedaConfiguration;
+
+	@Autowired
+	private IEDABootstrapAwsRepository bootstrapAwsRepository;
 	
-	public void setAwsInfos(BootStrapSettingData.Aws dto){
-		awsKey = dto.getAwsKey();
-		secretAccessKey = dto.getAwsPw();
-		securGroupName = dto.getSecurGroupName();
-		privateKey = dto.getPrivateKeyName();
+	@Autowired
+	private ResourceLoader resourceLoader;
+	
+	public List<IEDABootstrapAwsConfig> listBootstrap() {
+		List<IEDABootstrapAwsConfig> bootstrapAwsConfigsList = bootstrapAwsRepository.findAll();
+		if (bootstrapAwsConfigsList.size() == 0) {
+			throw new IEDACommonException("nocontent.bootstrap.exception", "BOOTSTRAP 정보가 존재하지 않습니다.",
+					HttpStatus.NO_CONTENT);
+		}
+
+		return bootstrapAwsConfigsList;
 	}
-	
-	public void setNetworkInfos(BootStrapSettingData.Network dto){
-		subnetRange = dto.getSubnetRange();
-		dns = dto.getDns();
-		subnetId = dto.getSubnetId();
-		directorPrivateIp = dto.getDirectorPrivateIp();
-		directorPublicIp = dto.getDirectorPublicIp();		
-	}
-	
-	public void setReleaseInfos(BootStrapSettingData.Resources dto){
-		stemcell = dto.getTargetStemcell();
-		microboshPw = dto.getMicroBoshPw();
-		downloadSettingFile();
-	}
-	
-	public void downloadSettingFile(){
+
+	public Integer setAwsInfos(IDEABootStrapInfoDto.Aws dto) {
+		IEDABootstrapConfig config = new IEDABootstrapConfig();
+		config.setIaas(dto.getIaas());
+		Date now = new Date();
+		config.setCreatedDate(now);
+		config.setUpdatedDate(now);
+
+		// IEDABoot
+		config = bootstrapRepository.save(config);
+		int bootstraSeq = config.getId();
+
+		IEDABootstrapAwsConfig awsConfig = new IEDABootstrapAwsConfig();
+		awsConfig.setBootstrapId(bootstraSeq);
+		awsConfig.setAccessKey(dto.getAwsKey());
+		awsConfig.setSecretAccessKey(dto.getAwsPw());
+		awsConfig.setDefaultSecurityGroups(dto.getSecretGroupName());
+		awsConfig.setDefaultKeyName(dto.getPrivateKeyName());
+		awsConfig.setPrivateKeyPath(dto.getPrivateKeyPath());
+		awsConfig.setCreatedDate(now);
+		awsConfig.setUpdatedDate(now);
+		awsConfig = bootstrapAwsRepository.save(awsConfig);
 		
-		//파일 가져오기
-		File sample = new File("src\\main\\resources\\static\\deploy_template\\bosh-init-aws-template.yml"); //src\main\resources\static\deploy_template\bosh-init-aws-template.yml
-		
-	    //GET BootStrap Info(DB 정보)
-		//file Set BootStrap Info
-//		FileReader fr = null;
-//		FileInputStream fis = null;
-//		InputStreamReader isr = null;
-//		Path path = Paths.get(filePath);
-		Charset charset = StandardCharsets.UTF_8;
-//
+		int bootstrapAwsSeq = awsConfig.getId();
+		return bootstrapAwsSeq;
+	}
+
+	public void setNetworkInfos(IDEABootStrapInfoDto.Network dto) {
+		IEDABootstrapAwsConfig awsConfig = bootstrapAwsRepository.findById(Integer.parseInt(dto.getBootstrapId()));
+		awsConfig.setSubnetRange(dto.getSubnetRange());
+		awsConfig.setDns(dto.getDns());
+		awsConfig.setSubnetId(dto.getSubnetId());
+		awsConfig.setDirectorPrivateIp(dto.getDirectorPrivateIp());
+		awsConfig.setDirectorPublicIp(dto.getDirectorPublicIp());
+		Date now = new Date();
+		awsConfig.setUpdatedDate(now);
+		bootstrapAwsRepository.save(awsConfig);
+	}
+ 
+	public void setReleaseInfos(IDEABootStrapInfoDto.Resources dto) {
+		IEDABootstrapAwsConfig awsConfig = bootstrapAwsRepository.findById(Integer.parseInt(dto.getBootstrapId()));
+		awsConfig.setStemcellName(dto.getTargetStemcell());
+		awsConfig.setInstanceType(dto.getInstanceType());
+		awsConfig.setAvailabilityZone(dto.getAvailabilityZone());
+		awsConfig.setMicroBoshPw(dto.getMicroBoshPw());
+		Date now = new Date();
+		awsConfig.setUpdatedDate(now);
+		bootstrapAwsRepository.save(awsConfig);
+		downloadSettingFile(Integer.parseInt(dto.getBootstrapId()));
+	}
+
+	public void downloadSettingFile(Integer bootstrapId) {
+		// 파일 가져오기
+		Resource resource = resourceLoader.getResource("static/deploy_template/bosh-init-aws-template.yml");
+		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/bosh-init-aws-template.yml");
+		File sampleDeploy;
+		//log.info("==== ::: " + classPath.toString());
+		// GET BootStrap Info(DB 정보)
+		IEDABootstrapAwsConfig awsConfig = bootstrapAwsRepository.findById(bootstrapId);
 		String content = "";
-		String value = "";
-		String targetFilePath = "";
 		String targetFileName = "";
 		try {
-			content = IOUtils.toString(new FileInputStream(sample), "UTF-8");
-			/*log.info("######################################################");
-			log.info(content);
-			log.info("######################################################");*/
-			//List<TargetReplace> targetReplaces = getReplaceList();
-			List<BootstrapItem> bootstrapItems  = makeBootstrapItems();
-			for(BootstrapItem item:bootstrapItems){
+			sampleDeploy = new File(classPath.toURI());//resource.getFile();
+			content = IOUtils.toString(new FileInputStream(sampleDeploy), "UTF-8");
+			List<BootstrapItem> bootstrapItems = makeBootstrapItems(awsConfig);
+			log.info(":::SIZE::: "+bootstrapItems.size());
+			for (BootstrapItem item : bootstrapItems) {
 				content = content.replace(item.getTargetItem(), item.getSourceItem());
 			}
-			/*
+
 			log.info("*******************************************************");
-			log.info(content);
+			log.info("\n"+content+"\n");
 			log.info("*******************************************************");
-			*/
-			targetFilePath = "D:/ieda_workspace/temp/";
+
 			targetFileName = "bosh-init-aws-micro-input-tample.yml";
-			
-			IOUtils.write(content, new FileOutputStream(targetFilePath + targetFileName), "UTF-8");
-			
-		} catch (IOException e1) {
+
+			IOUtils.write(content, new FileOutputStream(iedaConfiguration.getTempDir() + targetFileName), "UTF-8");
+		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 	}
-	
-	public List<BootstrapItem> makeBootstrapItems() {
+
+	public List<BootstrapItem> makeBootstrapItems(IEDABootstrapAwsConfig awsConfig) {
 		List<BootstrapItem> items = new ArrayList<BootstrapItem>();
-		/*log.info("## stemcell : " + stemcell);
-		log.info("## microboshPw : " + microboshPw);
-		log.info("## subnetRange : " + subnetRange);
-		log.info("## dns : " + dns);
-		log.info("## subnetId : " + subnetId);
-		log.info("## directorPrivateIp : " + directorPrivateIp);
-		log.info("## directorPublicIp : " + directorPublicIp);
-		log.info("## awsKey : " + awsKey);
-		log.info("## secretAccessKey : " + secretAccessKey);
-		log.info("## securGroupName : " + securGroupName);
-		log.info("## privateKey : " + privateKey);*/
-		
-		
-		items.add(new BootstrapItem("[stemcell]", stemcell));
-		items.add(new BootstrapItem("[microboshPw]", microboshPw));
-		items.add(new BootstrapItem("[subnetRange]", subnetRange));
-		items.add(new BootstrapItem("[dns]", dns));
-		items.add(new BootstrapItem("[subnetId]", subnetId));
-		items.add(new BootstrapItem("[directorPrivateIp]", directorPrivateIp));
-		items.add(new BootstrapItem("[directorPublicIp]", directorPublicIp));
-		items.add(new BootstrapItem("[awsKey]", awsKey));
-		items.add(new BootstrapItem("[secretAccessKey]", secretAccessKey));
-		items.add(new BootstrapItem("[securGroupName]", securGroupName));
-		items.add(new BootstrapItem("[privateKey]", privateKey));
-		/*log.info("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-		log.info(items.toString());
-		log.info("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");*/
-		return items; 
+		items.add(new BootstrapItem("[stemcell]", awsConfig.getStemcellName()));
+		items.add(new BootstrapItem("[microboshPw]", awsConfig.getMicroBoshPw()));
+		items.add(new BootstrapItem("[subnetRange]", awsConfig.getSubnetRange()));
+		items.add(new BootstrapItem("[dns]", awsConfig.getDns()));
+		items.add(new BootstrapItem("[subnetId]", awsConfig.getSubnetId()));
+		items.add(new BootstrapItem("[directorPrivateIp]", awsConfig.getDirectorPrivateIp()));
+		items.add(new BootstrapItem("[directorPublicIp]", awsConfig.getDirectorPublicIp()));
+		items.add(new BootstrapItem("[awsKey]", awsConfig.getAccessKey()));
+		items.add(new BootstrapItem("[secretAccessKey]", awsConfig.getSecretAccessKey()));
+		items.add(new BootstrapItem("[securGroupName]", awsConfig.getDefaultSecurityGroups()));
+		items.add(new BootstrapItem("[privateKey]", awsConfig.getPrivateKeyPath()));
+		return items;
 	}
-	
-	public String getBootStrapSettingInfo(){
+
+	public String getBootStrapSettingInfo() {
 		String contents = "";
 		File settingFile = null;
-		String targetFilePath = "D:/ieda_workspace/temp/";
 		String targetFileName = "bosh-init-aws-micro-input-tample.yml";
 		try {
-			settingFile = new File(targetFilePath+targetFileName);
+			settingFile = new File(iedaConfiguration.getTempDir() + targetFileName);
 			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return contents; 
+		return contents;
 	}
 }

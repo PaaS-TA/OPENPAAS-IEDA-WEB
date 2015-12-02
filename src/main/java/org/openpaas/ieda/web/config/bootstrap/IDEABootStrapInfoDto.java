@@ -9,16 +9,18 @@ import lombok.Data;
  * @author jspark81@cloud4u.co.kr
  *
  */
-public class BootStrapSettingData {
-
+public class IDEABootStrapInfoDto{
+	
 	@Data
 	public static class Aws{
+		@NotNull
+		private String iaas;
 		@NotNull
 		private String awsKey;
 		@NotNull
 		private String awsPw;
 		@NotNull
-		private String securGroupName;
+		private String secretGroupName;
 		@NotNull
 		private String privateKeyName;
 		@NotNull
@@ -28,7 +30,7 @@ public class BootStrapSettingData {
 	@Data
 	public static class Network{
 		@NotNull
-		private String key;
+		private String bootstrapId;
 		@NotNull
 		private String subnetRange;
 		@NotNull
@@ -46,7 +48,7 @@ public class BootStrapSettingData {
 	@Data
 	public static class Resources{
 		@NotNull
-		private String key;
+		private String bootstrapId;
 		@NotNull
 		private String targetStemcell;
 		@NotNull

@@ -58,10 +58,10 @@ public class StemcellManagementService {
 	private String key;
 	
 	public List<String> getLocalStemcellList() {
-		
+		log.info("::: Stemcell Dir ::"+iedaConfiguration.getStemcellDir());
 		File dir = new File(iedaConfiguration.getStemcellDir());
 		File[] localFiles = dir.listFiles();
-		 
+		log.info("::: Local Stemcells ::: "+ localFiles.length);
 		List<String> localStemcells = new ArrayList<>();
 		for (File file : localFiles) {
 			localStemcells.add(file.getName());

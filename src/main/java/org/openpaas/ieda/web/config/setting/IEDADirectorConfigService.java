@@ -126,7 +126,7 @@ public class IEDADirectorConfigService {
 								, createDto.getUserId()
 								, createDto.getUserPassword());
 		
-		log.info(info.toString());
+		log.info("User Info ::: " + info.toString() + "\n isUser ::: " + ( info == null || info.getUser() == null || info.getUser().equals("") ) );
 		
 		if ( info == null || info.getUser() == null || info.getUser().equals("") ) {
 			throw new IEDACommonException("unauthenticated.director.exception",
@@ -387,8 +387,9 @@ public class IEDADirectorConfigService {
 	
 	public String getBoshConfigLocation() {
 		String homeDir = System.getProperty("user.home");
-		String boshConfigFile = homeDir + "\\.bosh_config";
-		System.out.println("BOSH Config File Location : " + homeDir);
+		String fileSeperator = System.getProperty("file.separator");
+		String boshConfigFile = homeDir + fileSeperator + ".bosh_config";
+		System.out.println("BOSH Config File Location : " + boshConfigFile);
 		return boshConfigFile;
 	}
 	

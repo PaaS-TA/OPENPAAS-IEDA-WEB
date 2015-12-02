@@ -3,11 +3,15 @@
  */
 package org.openpaas.ieda.web.config.bootstrap;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
+import org.openpaas.ieda.web.config.setting.IEDADirectorConfigDto;
 import org.openpaas.ieda.web.config.stemcell.StemcellManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -36,22 +40,40 @@ public class BootstrapController {
 		return "/config/bootstrap";
 	}
 	
+	/**
+	 * 관리자 리스트 조회
+	 * @param pageable
+	 * @return
+	 */
+	@RequestMapping(value="/bootstraps", method=RequestMethod.GET)
+	public ResponseEntity listBootstrap(Pageable pageable) {
+		List<IEDABootstrapAwsConfig> content = service.listBootstrap();
+		
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		
+		result.put("total", content.size());
+		result.put("records", content);
+		
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value="/bootstrap/bootSetAwsSave", method = RequestMethod.POST)
-	public ResponseEntity doBootSetAwsSave(@RequestBody  BootStrapSettingData.Aws data){
+	public ResponseEntity doBootSetAwsSave(@RequestBody  IDEABootStrapInfoDto.Aws data){
 		log.info("### AwsData : " + data.toString());
-		service.setAwsInfos(data);
-		return new ResponseEntity(HttpStatus.OK);
+		int seq = service.setAwsInfos(data);
+		
+		return new ResponseEntity(seq, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/bootstrap/bootSetNetworkSave", method = RequestMethod.POST)
-	public ResponseEntity doBootSetNetworkSave(@RequestBody  BootStrapSettingData.Network data){
+	public ResponseEntity doBootSetNetworkSave(@RequestBody  IDEABootStrapInfoDto.Network data){
 		log.info("### NetworkData : " + data.toString());
 		service.setNetworkInfos(data);
 		return new ResponseEntity(HttpStatus.OK);
 	}	
 	
 	@RequestMapping(value="/bootstrap/bootSetResourcesSave", method = RequestMethod.POST)
-	public ResponseEntity doBootSetResourcesSave(@RequestBody  BootStrapSettingData.Resources data){
+	public ResponseEntity doBootSetResourcesSave(@RequestBody  IDEABootStrapInfoDto.Resources data){
 		log.info("### ResourcesSave : " + data.toString());
 		service.setReleaseInfos(data);
 		return new ResponseEntity(HttpStatus.OK);
@@ -68,9 +90,6 @@ public class BootstrapController {
 	@RequestMapping(value="/bootstrap/getBootStrapSettingInfo", method = RequestMethod.POST)
 	public ResponseEntity getBootStrapSettingInfo(){
 		String content = service.getBootStrapSettingInfo();
-		log.info("##################");
-		log.info("\n" +content + "\n");
-		log.info("##################");
 		HttpStatus status = (content != null) ? HttpStatus.OK: HttpStatus.NO_CONTENT;
 		log.info("\n" +status + "\n");
 		return new ResponseEntity(content, status);

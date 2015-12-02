@@ -15,4 +15,6 @@ public class IEDAConfiguration {
 	private String releaseDir;
 
 	private String deploymentDir;
+	
+	private String tempDir;
 }
