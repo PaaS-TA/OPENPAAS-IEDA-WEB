@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -19,6 +20,9 @@ public class UploadStemcellAsyncByScriptService {
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 	
+	@Autowired
+	private IEDAConfiguration iedaConfiguration;
+	
 	public Boolean uploadStemcell(String stemcellDir, String stemcellFileName) {
 		Boolean success = Boolean.FALSE;
 
@@ -26,7 +30,7 @@ public class UploadStemcellAsyncByScriptService {
 
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
-		String command = "D:/ieda_workspace/stemcell/bosh_upload_stemcell.bat ";
+		String command = iedaConfiguration.getScriptDir() + "bosh_upload_stemcell.bat ";
 		command += stemcellDir + " ";
 		
 		String dir = stemcellDir.replace("/", "\\");

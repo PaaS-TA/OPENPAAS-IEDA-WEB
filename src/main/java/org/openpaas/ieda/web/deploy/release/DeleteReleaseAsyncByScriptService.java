@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -18,6 +19,9 @@ public class DeleteReleaseAsyncByScriptService {
 
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
+	
+	@Autowired
+	private IEDAConfiguration iedaConfiguration;
 
 	public Boolean deleteRelease(String dir, String fileName, String version) {
 		Boolean success = Boolean.FALSE;
@@ -26,7 +30,7 @@ public class DeleteReleaseAsyncByScriptService {
 
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
-		String command = "D:/ieda_workspace/release/bosh_delete_release.bat ";
+		String command = iedaConfiguration.getScriptDir()+"bosh_delete_release.bat ";
 		command += dir + " ";
 		command += fileName + " ";
 		command += version;

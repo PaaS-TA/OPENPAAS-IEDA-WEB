@@ -13,6 +13,8 @@ public class IEDAConfiguration {
 	private String stemcellDir;
 	
 	private String releaseDir;
+	
+	private String scriptDir;
 
 	private String deploymentDir;
 	
