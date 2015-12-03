@@ -7,8 +7,8 @@ public class BootstrapItem {
 	String sourceItem;
 	String targetItem;
 	
-	public BootstrapItem(String sourceItem, String targetItem) {
-		this.sourceItem = sourceItem;
+	public BootstrapItem(String targetItem, String sourceItem) {
 		this.targetItem = targetItem;
+		this.sourceItem = sourceItem;
 	}
 }
