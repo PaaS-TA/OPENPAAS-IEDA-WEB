@@ -1,19 +1,19 @@
 name: microbosh
 releases:
   bosh:
-    url: /home/jhkim/openpass/release/bosh-230.tgz
+    url: file:///home/jhkim/openpass/release/bosh-230.tgz
   bosh-aws-cpi:
-    url: /home/jhkim/openpass/release/bosh-aws-cpi-release-36.tgz
+    url: file:///home/jhkim/openpass/release/bosh-aws-cpi-release-36.tgz
 resource_pools:
   vms:
     stemcell: 
-      url: [stemcell]
+      url: file://[stemcell]
     env:
       bosh:
         password: [microboshPw] 
     cloud_properties:
-      instance_type: m3.large
-      availability_zone: us-east-1a
+      instance_type: [flavor]
+      availability_zone: [availabilityZone]
 networks:
   private:
     subnets:
@@ -41,7 +41,7 @@ jobs:
         default_key_name: bosh
         default_security_groups: 
         - [securGroupName]
-        region: us-east-1
+        region: [region]
       ntp: 
       - 1.kr.pool.ntp.org
         0.asia.pool.ntp.org

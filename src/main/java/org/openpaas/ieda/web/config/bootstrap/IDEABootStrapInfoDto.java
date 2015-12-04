@@ -13,6 +13,7 @@ public class IDEABootStrapInfoDto{
 	
 	@Data
 	public static class Aws{
+		private String id;
 		@NotNull
 		private String iaas;
 		@NotNull
@@ -30,7 +31,7 @@ public class IDEABootStrapInfoDto{
 	@Data
 	public static class Network{
 		@NotNull
-		private String bootstrapId;
+		private String id;
 		@NotNull
 		private String subnetRange;
 		@NotNull
@@ -48,11 +49,13 @@ public class IDEABootStrapInfoDto{
 	@Data
 	public static class Resources{
 		@NotNull
-		private String bootstrapId;
+		private String id;
 		@NotNull
 		private String targetStemcell;
 		@NotNull
 		private String instanceType;
+		@NotNull
+		private String region;
 		@NotNull
 		private String availabilityZone;
 		@NotNull

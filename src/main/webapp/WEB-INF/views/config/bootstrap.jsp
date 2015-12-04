@@ -18,18 +18,21 @@ $(function() {
 	
  	$('#config_bootstrapGrid').w2grid({
 		name: 'config_bootstrapGrid',
+		header: '<b>BOOTSTRAP 목록</b>',
 		method: 'GET',
+ 		multiSelect: false,
 		show: {	
-			lineNumbers: true,
-			selectColumn: true,
-			footer: true},
-		multiSelect: false,
-		style: 'text-align:center',
+				lineNumbers: true,
+				selectColumn: true,
+				footer: true},
+		style: 'text-align: center',
 		columns:[
-			 {field: 'status', caption: '상태', size: '20%'}
-			,{field: 'name', caption: '이름', size: '20%'}
-			,{field: 'iaas', caption: 'IaaS', size: '20%'}
-			,{field: 'ip', caption: 'IP', size: '40%'}
+		      {field: 'recid', 	caption: 'recid', hidden: true}
+			, {field: 'id', caption: 'ID', size: '10%'}
+			, {field: 'iaas', caption: 'IaaS', size: '20%'}
+			, {field: 'directorPrivateIp', caption: 'PrivateIp', size: '30%'}
+			, {field: 'directorPublicIp', caption: 'PublicIp', size: '30%'}
+			, {field: 'createdDate', caption: 'created', size: '10%'}
 			],
 		onClick:function(event) {
 			var grid = this;
@@ -37,23 +40,77 @@ $(function() {
 				var sel = grid.getSelection();
 				console.log("##### sel ::: " + sel);
 				if ( sel == null || sel == "") {
-					$('#bootstrapDeleteBtn').attr('disabled', true);
+					$('#modifyBtn').attr('disabled', true);
+					$('#deleteBtn').attr('disabled', true);
 					return;
 				}
+				else{
+					$('#modifyBtn').attr('disabled', false);
+					$('#deleteBtn').attr('disabled', false);
+				}
+				
 			}
 		}
 	});
  	
  	//BootStrap 설치
- 	$("#bootstrapInstallBtn").click(function(){
+ 	$("#installBtn").click(function(){
  		bootSetPopup();
  	});
  	
- 	//BootStrap 삭제
-	$("#bootstrapDeleteBtn").click(function(){
-		if($("#bootstrapDeleteBtn").attr('disabled') == "disabled") return;
+ 	//BootStrap 수정
+	$("#modifyBtn").click(function(){
+		if($("#modifyBtn").attr('disabled') == "disabled") return;
+		w2confirm({
+			title 	: "BOOTSTRAP 수정",
+			msg		: "BOOTSTRAP 정보를 수정하시겠습니까?",
+			yes_text: "확인",
+			yes_callBack : function(envent){
+				//ajax data call
+				var selected = w2ui['config_bootstrapGrid'].getSelection();
+				console.log("modify Click!!!");
+				if( selected.length == 0 ){
+					w2alert("선택된 정보가 없습니다.", "BOOTSTRAP 수정");
+					return;
+				}
+				else{
+					var record = w2ui['config_bootstrapGrid'].get(selected);
+					console.log(record.iaas);
+					if(record.iaas == "AWS") getBootstrapAwsData(record);
+					//else getBootstrapOpenstackData(record);
+				}
+			},
+			no_text : "취소"
+		});
  	});
-
+ 	
+ 	//BootStrap 삭제
+	$("#deleteBtn").click(function(){
+		if($("#deleteBtn").attr('disabled') == "disabled") return;
+		w2confirm({
+			title 	: "BOOTSTRAP 삭제",
+			msg		: "BOOTSTRAP 정보를 삭제하시겠습니까?",
+			yes_text: "확인",
+			yes_callBack : function(event){
+				event.complete= function(){
+					//ajax data call
+					var selected = w2ui['config_bootstrapGrid'].getSelection();
+					console.log("modify Click!!!");
+					if( selected.length == 0 ){
+						w2alert("선택된 정보가 없습니다.", "BOOTSTRAP 삭제");
+						return;
+					}
+					else{
+						var record = w2ui['config_bootstrapGrid'].get(selected);
+						console.log(record.iaas);
+						if(record.iaas == "AWS") deleteBootstrapAwsData(record);
+						//else deleteBootstrapOpenstackData(record);
+					}
+				}
+			},
+			no_text : "취소"
+		});
+ 	});
 	doSearch();
 });
 
@@ -63,9 +120,90 @@ function doSearch() {
 	w2ui['config_bootstrapGrid'].load("<c:url value='/bootstraps'/>", doButtonStyle);
 }
 
+//BOOTSTRAP 수정시 AWS 정보 조회
+function getBootstrapAwsData(record){
+	
+	var url = "/bootstrap/aws/"+record.id;
+	$.ajax({
+		type : "GET",
+		url : url,
+		contentType : "application/json",
+		success : function(data, status) {
+			console.log("== /bootstrap/aws/ RESULT :: ");
+			if ( data == null || data == "" ){
+				//isOk = false;
+			}
+			else {
+				initSetting();
+				//var content = JSON.parse(data.contents);
+				console.log("=== Content ::: " + data.contents);
+				settingAWSData(data.contents);
+			}
+		},
+		error : function(request, status, error) {
+			var errorResult = JSON.parse(request.responseText);
+			console.log("console log ::: " +errorResult.message);
+			w2alert(errorResult.message, "BOOTSTRAP 수정");
+		}
+	});	
+}
+
+function settingAWSData(contents){
+	bootstrapSeq = contents.id;
+	console.log("awsKey		:  "+contents.accessKey+"\n"+
+			"awsPw			:  "+contents.secretAccessKey+"\n"+
+			"secretGroupName	:  "+contents.defaultSecurityGroups+"\n"+
+			"privateKeyName	:  "+contents.defaultKeyName+"\n"+
+			"privateKeyPath	:  "+contents.privateKeyPath);
+	awsInfo = {
+			iaas			: "AWS",
+			awsKey			: contents.accessKey,
+			awsPw			: contents.secretAccessKey,
+			secretGroupName	: contents.defaultSecurityGroups,
+			privateKeyName	: contents.defaultKeyName,
+			privateKeyPath	: contents.privateKeyPath
+	}
+	networkInfo = {
+			id					: contents.id,
+			subnetRange			: contents.subnetRange,
+			gateway				: contents.gateway,
+			dns					: contents.dns,
+			subnetId			: contents.subnetId,
+			directorPrivateIp	: contents.directorPrivateIp,
+			directorPublicIp	: contents.directorPublicIp
+	}
+	resourcesInfo = {
+			id				: contents.id,
+			targetStemcell	: contents.stemcellName,
+			instanceType	: contents.instanceType,
+			region			: contents.region,
+			availabilityZone: contents.availabilityZone,
+			microBoshPw		: contents.microBoshPw
+	}
+	awsPopup();	
+}
+
+//BOOTSTRAP 삭제 실행
+function deleteBootstrapAwsData(record){
+	$.ajax({
+		type : "DELETE",
+		url : "/bootstrap/aws/"+record.id,
+		contentType : "application/json",
+		success : function(status) {
+			console.log("== /bootstrap/aws :: "+status);
+			if(status="success") w2alert("AWS ID :" + record.id +"의 BOOTSTRAP 정보가 삭제 되었습니다.");
+		},
+		error : function(request, status, error) {
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message, "BOOTSTRAP 삭제");
+		}
+	});	
+}
+
 function doButtonStyle(){
-	//삭제 버튼 hide
-	$('#bootstrapDeleteBtn').attr('disabled', true);// 기본관리자 설정 Disable
+	//Button Style init
+	$('#modifyBtn').attr('disabled', true);
+	$('#deleteBtn').attr('disabled', true);
 }
 
 //다른페이지 이동시 호출
@@ -86,6 +224,7 @@ function bootSetPopup() {
 		height 			: 180,
 		title 			: '<b>BOOTSTRAP 설치</b>',
 		msg 			: $("#bootSelectBody").html(),
+		modal	: true,
 		yes_text 		: "확인",
 		no_text 		: "취소",
 		yes_callBack 	: function(){
@@ -107,24 +246,25 @@ function awsPopup(){
 		width : 610,
 		height : 390,
 		onClose : initSetting,
-		onOpen:function(){
-			setAwsData();
+		modal	: true,
+		onOpen:function(event){
+			event.onComplete = function(){				
+				if(awsInfo != ""){
+					$(".w2ui-msg-body input[name='awsKey']").val(awsInfo.awsPw);
+					$(".w2ui-msg-body input[name='awsPw']").val(awsInfo.awsPw);
+					$(".w2ui-msg-body input[name='secretGroupName']").val(awsInfo.secretGroupName);
+					$(".w2ui-msg-body input[name='privateKeyName']").val(awsInfo.privateKeyName);
+					$(".w2ui-msg-body input[name='privateKeyPath']").val(awsInfo.privateKeyPath);
+				}
+			}
 		}
 	});
-}
-
-function setAwsData(){
-	//set Data
-	$(".w2ui-msg-body input[name='awsKey']").val("test-awsKey");
-	$(".w2ui-msg-body input[name='awsPw']").val("test-awsPw");
-	$(".w2ui-msg-body input[name='secretGroupName']").val("test-secretGroupName");
-	$(".w2ui-msg-body input[name='privateKeyName']").val("test-privateKeyName");
-	$(".w2ui-msg-body input[name='privateKeyPath']").val("test-privateKeyPath");
 }
 
 //Save AWS Setting Info
 function saveAwsSettingInfo(){
 	awsInfo = {
+			id				: bootstrapSeq,
 			iaas			: structureType,
 			awsKey			: $(".w2ui-msg-body input[name='awsKey']").val(),
 			awsPw			: $(".w2ui-msg-body input[name='awsPw']").val(),
@@ -134,8 +274,8 @@ function saveAwsSettingInfo(){
 	}
 	
 	$.ajax({
-		type : "POST",
-		url : "/bootstrap/bootSetAwsSave",
+		type : "PUT",
+		url : "/bootstrap/bootstrapSetAws",
 		contentType : "application/json",
 		//dataType: "json",
 		async : true,
@@ -155,20 +295,25 @@ function networkPopup(){
 	$("#networkSettingInfoDiv").w2popup({
 		width : 610,
 		height : 420,
+		modal	: true,
 		onClose : initSetting,
-		onOpen : function(){
-			setNetworkData();	
+		onOpen : function(event){
+			event.onComplete = function(){
+				setNetworkData();	
+			}
 		}
 	});
 }
 
 function setNetworkData(){
-	$(".w2ui-msg-body input[name='subnetRange']").val("52.21.37.180 to 52.21.37.184");
-	$(".w2ui-msg-body input[name='gateway']").val("52.21.37.1");
-	$(".w2ui-msg-body input[name='dns']").val("52.21.37.184");
-	$(".w2ui-msg-body input[name='subnetId']").val("test-subnetId");
-	$(".w2ui-msg-body input[name='directorPrivateIp']").val("127.0.0.1");
-	$(".w2ui-msg-body input[name='directorPublicIp']").val("52.23.2.85");
+	if( networkInfo != ""){
+		$(".w2ui-msg-body input[name='subnetRange']").val(networkInfo.subnetRange);
+		$(".w2ui-msg-body input[name='gateway']").val(networkInfo.gateway);
+		$(".w2ui-msg-body input[name='dns']").val(networkInfo.dns);
+		$(".w2ui-msg-body input[name='subnetId']").val(networkInfo.subnetId);
+		$(".w2ui-msg-body input[name='directorPrivateIp']").val(networkInfo.directorPrivateIp);
+		$(".w2ui-msg-body input[name='directorPublicIp']").val(networkInfo.directorPublicIp);
+	}
 }
 
 //Save Network Setting Info
@@ -176,7 +321,7 @@ function saveNetworkSettingInfo(param){
 	if(bootstrapSeq == ""){ w2alert("BOOTSTRAP ID가 존재하지 않습니다."); return;}
 	
 	networkInfo = {
-			bootstrapId			: bootstrapSeq,
+			id			: bootstrapSeq,
 			subnetRange			: $(".w2ui-msg-body input[name='subnetRange']").val(),
 			gateway				: $(".w2ui-msg-body input[name='gateway']").val(),
 			dns					: $(".w2ui-msg-body input[name='dns']").val(),
@@ -185,21 +330,25 @@ function saveNetworkSettingInfo(param){
 			directorPublicIp	: $(".w2ui-msg-body input[name='directorPublicIp']").val()
 	}
 	
-	$.ajax({
-		type : "POST",
-		url : "/bootstrap/bootSetNetworkSave",
-		contentType : "application/json",
-		//dataType: "json",
-		async : true,
-		data : JSON.stringify(networkInfo), 
-		success : function(data, status) {
-			if(param == 'after') resourcesPopup();
-			else awsPopup();				
-		},
-		error : function( e, status ) {
-			w2alert("네트워크 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
-		}
-	});
+	if(param == 'before'){
+		awsPopup();
+	}
+	else{
+		$.ajax({
+			type : "PUT",
+			url : "/bootstrap/bootstrapSetAwsNetwork",
+			contentType : "application/json",
+			//dataType: "json",
+			async : true,
+			data : JSON.stringify(networkInfo), 
+			success : function(data, status) {
+				 resourcesPopup();
+			},
+			error : function( e, status ) {
+				w2alert("네트워크 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
+			}
+		});
+	}
 }
 
 
@@ -207,19 +356,26 @@ function resourcesPopup(){
 	//getStemcellList();
 	$("#resourcesSettingInfoDiv").w2popup({
 		width : 610,
-		height : 400,
-		onOpen : function(){
-			getStemcellList();//스템셀 리스트 가져오기
-			setReleaseData();
+		height : 430,
+		modal	: true,
+		onOpen : function(event){
+			event.onComplete = function(){	
+				getStemcellList();//스템셀 리스트 가져오기
+			}
 		},
 		onClose : initSetting
 	});
 }
+
 function setReleaseData(){
-	//targetStemcell	: $(".w2ui-msg-body input[name='targetStemcell']").val(),
-	$(".w2ui-msg-body input[name='instanceType']").val("microbosh");
-	$(".w2ui-msg-body input[name='availabilityZone']").val("openstack_01");
-	$(".w2ui-msg-body input[name='microBoshPw']").val("test-microBoshPw");
+	if(resourcesInfo != ""){
+		$(".w2ui-msg-body input[name='targetStemcell']").data('selected', {text:resourcesInfo.targetStemcell});
+		
+		$(".w2ui-msg-body input[name='instanceType']").val(resourcesInfo.instanceType);
+		$(".w2ui-msg-body input[name='region']").val(resourcesInfo.region);
+		$(".w2ui-msg-body input[name='availabilityZone']").val(resourcesInfo.availabilityZone);
+		$(".w2ui-msg-body input[name='microBoshPw']").val(resourcesInfo.microBoshPw);
+	}
 }
 
 function getStemcellList(){
@@ -231,6 +387,7 @@ function getStemcellList(){
 		async : true,
 		success : function(data, status) {
 			$('#w2ui-popup input[type=list]').w2field('list', { items: data , maxDropHeight:300, width:500});
+			setReleaseData();
 		},
 		error : function( e, status ) {
 			w2alert("스템셀 목록을 가져오는데 실패하였습니다.", "BOOTSTRAP 설치");
@@ -242,38 +399,44 @@ function saveResourcesSettingInfo(param){
 	if(bootstrapSeq == ""){ w2alert("BOOTSTRAP ID가 존재하지 않습니다."); return;}
 	
 	resourcesInfo = {
-			bootstrapId		: bootstrapSeq,
+			id				: bootstrapSeq,
 			targetStemcell	: $(".w2ui-msg-body input[name='targetStemcell']").val(),
 			instanceType	: $(".w2ui-msg-body input[name='instanceType']").val(),
+			region			: $(".w2ui-msg-body input[name='region']").val(),
 			availabilityZone: $(".w2ui-msg-body input[name='availabilityZone']").val(),
-			microBoshPw		: $(".w2ui-msg-body input[name='microBoshPw']").val(),
-			nextType		: param
+			microBoshPw		: $(".w2ui-msg-body input[name='microBoshPw']").val()
 	}
 	
-	$.ajax({
-		type : "POST",
-		url : "/bootstrap/bootSetResourcesSave",
-		contentType : "application/json",
-		//dataType: "json",
-		async : true,
-		data : JSON.stringify(resourcesInfo), 
-		success : function(data, status) {
-			if( param == 'after') deployPopup();
-			else networkPopup();
-		},
-		error : function( e, status ) {
-			w2alert("리소스 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
-		}
-	});
+	if( param == 'before') {
+		networkPopup();return;
+	}else {
+		$.ajax({
+			type : "PUT",
+			url : "/bootstrap/bootSetAwsResources",
+			contentType : "application/json",
+			//dataType: "json",
+			async : true,
+			data : JSON.stringify(resourcesInfo), 
+			success : function(data, status) {
+				 deployPopup();				
+			},
+			error : function( e, status ) {
+				w2alert("리소스 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
+			}
+		});
+	}
 }
 
 function deployPopup(){
 	$("#deployManifestDiv").w2popup({
 		width 	: 610,
 		height 	: 470,
+		modal	: true,
 		onClose : initSetting,
-		onOpen :function(){
-			getDeployInfo();
+		onOpen : function(event){
+			event.onComplete = function(){
+				getDeployInfo();
+			}
 		}
 	});
 }
@@ -281,7 +444,7 @@ function deployPopup(){
 function getDeployInfo(){
 	$.ajax({
 		type : "POST",
-		url : "/bootstrap/getBootStrapSettingInfo",
+		url : "/bootstrap/getBootstrapDeployInfo",
 		contentType : "application/json",
 		//dataType: "json",
 		async : true, 
@@ -322,10 +485,13 @@ function installPopup(){
 	$("#installDiv").w2popup({
 		width : 610,
 		height : 470,
-		onOpen : function(){
-			//1.Install
-			//2.소켓연결(설치 로그)
-			w2alert("socket연결");
+		modal	: true,
+		onOpen : function(event){
+			event.onComplete = function(){
+				//1.Install
+				//2.소켓연결(설치 로그)
+				w2alert("socket연결");
+			}
 		},
 		onClose : initSetting
 	});
@@ -350,30 +516,16 @@ function uploadStemcell(){
 <div id="main">
 	<div class="page_site">설치관리자 환경설정 > <strong>BOOTSTRAP 설치</strong></div>
 	
-	<!-- 설치 관리자 -->
-<!-- 	<div class="title">설치 관리자</div>
-	
-	<table class="tbl1" border="1" cellspacing="0">
-	<tr>
-		<th width="18%" class="th_fb">관리자 이름</th><td class="td_fb">0000</td>
-		<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb">0000</td>
-	</tr>
-	<tr>
-		<th width="18%" >관리자 URL</th><td>0000</td>
-		<th width="18%" >관리자 UUID</th><td >0000</td>
-	</tr>
-	</table>
-	
-	<div id="hMargin"/>
- -->
- 
 	<!-- BOOTSTRAP 목록-->
 	<div class="pdt20"> 
 		<div class="title fl">BOOTSTRAP 목록</div>
 		<div class="fr"> 
 			<!-- Btn -->
-			<span id="bootstrapInstallBtn" class="btn btn-primary"  style="width:130px">BOOTSTRAP 설치</span>
-			<span id="bootstrapDeleteBtn" class="btn btn-danger" style="width:130px">BOOTSTRAP 삭제</span>
+			<span id="installBtn" class="btn btn-primary"  style="width:120px">설&nbsp;&nbsp;치</span>
+			&nbsp;
+			<span id="modifyBtn" class="btn btn-info" style="width:120px">수&nbsp;&nbsp;정</span>
+			&nbsp;
+			<span id="deleteBtn" class="btn btn-danger" style="width:120px">삭&nbsp;&nbsp;제</span>
 			<!-- //Btn -->
 	    </div>
 	</div>
@@ -550,6 +702,12 @@ function uploadStemcell(){
 					<label style="text-align: left; width: 200px; font-size: 11px;">인스턴스 유형</label>
 					<div>
 						<input name="instanceType" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align: left; width: 200px; font-size: 11px;">Region</label>
+					<div>
+						<input name="region" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
 					</div>
 				</div>
 				<div class="w2ui-field">

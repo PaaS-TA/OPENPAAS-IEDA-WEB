@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author jspark81@cloud4u.co.kr
  *
  */
-public interface IEDABootstrapOpenstackRepository extends  JpaRepository<IEDABootstrapAwsConfig, Integer>  {
-	public IEDABootstrapAwsConfig findById(Integer id);
-	public IEDABootstrapAwsConfig findOneBybootstrapId(Integer bootstrapId);
+public interface IEDABootstrapOpenstackRepository extends  JpaRepository<IEDABootstrapOpenstackConfig, Integer>  {
+	public IEDABootstrapOpenstackConfig findById(Integer id);
 }

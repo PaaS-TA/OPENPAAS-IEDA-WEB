@@ -18,9 +18,6 @@ public class IEDABootstrapOpenstackConfig {
 	@Id @GeneratedValue
 	private Integer id;
 	
-	//@OneToOne(fetch=FetchType.LAZY)
-	private Integer bootstrapId;
-	
 	@Temporal(TemporalType.DATE)
 	private Date createdDate;
 	
@@ -60,5 +57,9 @@ public class IEDABootstrapOpenstackConfig {
 	private String availabilityZone;
 	
 	private String microBoshPw;
+	
+	private String deploymentFile;
+	
+	private String region;
 
 }

@@ -9,5 +9,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface IEDABootstrapAwsRepository extends  JpaRepository<IEDABootstrapAwsConfig, Integer>  {
 	public IEDABootstrapAwsConfig findById(Integer id);
-	public IEDABootstrapAwsConfig findOneBybootstrapId(Integer bootstrapId);
 }

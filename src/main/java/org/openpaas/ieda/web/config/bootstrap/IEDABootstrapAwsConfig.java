@@ -18,9 +18,6 @@ public class IEDABootstrapAwsConfig {
 	@Id @GeneratedValue
 	private Integer id;
 	
-	//@OneToOne(fetch=FetchType.LAZY)
-	private Integer bootstrapId;
-	
 	@Temporal(TemporalType.DATE)
 	private Date createdDate;
 	
@@ -57,8 +54,12 @@ public class IEDABootstrapAwsConfig {
 	
 	private String instanceType;
 	
+	private String region;
+	
 	private String availabilityZone;
 	
 	private String microBoshPw;
+	
+	private String deploymentFile;
 
 }
