@@ -1,9 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<link rel="stylesheet" type="text/css" href="/css/bootstrap-progress-step.css"/>
+<link rel="stylesheet" type="text/css" href="/css/progress-step.css"/>
 <style type="text/css">
 .w2ui-popup .w2ui-msg-body{background-color: #FFF; }
 </style>
+<script type="text/javascript" src="/js/sockjs-0.3.4.js"></script>
+<script type="text/javascript" src="/js/stomp.js"></script>
 <script type="text/javascript">
 
 //private variable
@@ -13,6 +15,9 @@ var awsInfo = "";
 var networkInfo = "";
 var resourcesInfo = "";
 var deployInfo = "";
+var deployFileName = "";
+var installClient = "";
+var deleteClient = "";
 
 $(function() {
 	
@@ -22,13 +27,12 @@ $(function() {
 		method: 'GET',
  		multiSelect: false,
 		show: {	
-				lineNumbers: true,
 				selectColumn: true,
 				footer: true},
 		style: 'text-align: center',
 		columns:[
 		      {field: 'recid', 	caption: 'recid', hidden: true}
-			, {field: 'id', caption: 'ID', size: '10%'}
+			, {field: 'id', caption: 'ID', hidden: true}
 			, {field: 'iaas', caption: 'IaaS', size: '20%'}
 			, {field: 'directorPrivateIp', caption: 'PrivateIp', size: '30%'}
 			, {field: 'directorPublicIp', caption: 'PublicIp', size: '30%'}
@@ -92,10 +96,10 @@ $(function() {
 			msg		: "BOOTSTRAP 정보를 삭제하시겠습니까?",
 			yes_text: "확인",
 			yes_callBack : function(event){
-				event.complete= function(){
+				//event.onComplete= function(){
 					//ajax data call
 					var selected = w2ui['config_bootstrapGrid'].getSelection();
-					console.log("modify Click!!!");
+					console.log("Delete Click!!!");
 					if( selected.length == 0 ){
 						w2alert("선택된 정보가 없습니다.", "BOOTSTRAP 삭제");
 						return;
@@ -103,21 +107,26 @@ $(function() {
 					else{
 						var record = w2ui['config_bootstrapGrid'].get(selected);
 						console.log(record.iaas);
-						if(record.iaas == "AWS") deleteBootstrapAwsData(record);
+						if(record.iaas == "AWS") deletePop(record);
 						//else deleteBootstrapOpenstackData(record);
 					}
-				}
+			//	}
 			},
 			no_text : "취소"
 		});
  	});
+ 	
+ 	
 	doSearch();
 });
 
 //조회기능
 function doSearch() {
 	//doButtonStyle();
-	w2ui['config_bootstrapGrid'].load("<c:url value='/bootstraps'/>", doButtonStyle);
+	w2ui['config_bootstrapGrid'].load("<c:url value='/bootstraps'/>",
+			function (){
+				doButtonStyle();
+			});
 }
 
 //BOOTSTRAP 수정시 AWS 정보 조회
@@ -132,7 +141,7 @@ function getBootstrapAwsData(record){
 			console.log("== /bootstrap/aws/ RESULT :: ");
 			if ( data == null || data == "" ){
 				//isOk = false;
-			}
+			} 
 			else {
 				initSetting();
 				//var content = JSON.parse(data.contents);
@@ -156,7 +165,7 @@ function settingAWSData(contents){
 			"privateKeyName	:  "+contents.defaultKeyName+"\n"+
 			"privateKeyPath	:  "+contents.privateKeyPath);
 	awsInfo = {
-			iaas			: "AWS",
+			iaas		 	: "AWS",
 			awsKey			: contents.accessKey,
 			awsPw			: contents.secretAccessKey,
 			secretGroupName	: contents.defaultSecurityGroups,
@@ -184,20 +193,61 @@ function settingAWSData(contents){
 }
 
 //BOOTSTRAP 삭제 실행
-function deleteBootstrapAwsData(record){
-	$.ajax({
+function deletePop(record){
+	/* $.ajax({
 		type : "DELETE",
 		url : "/bootstrap/aws/"+record.id,
 		contentType : "application/json",
 		success : function(status) {
-			console.log("== /bootstrap/aws :: "+status);
-			if(status="success") w2alert("AWS ID :" + record.id +"의 BOOTSTRAP 정보가 삭제 되었습니다.");
+				console.log("== /bootstrap/aws :: "+status);
+				if(status="success"){
+					w2alert("BOOTSTRAP 정보가 삭제 되었습니다.");
+					gridReload();
+			}
 		},
 		error : function(request, status, error) {
 			var errorResult = JSON.parse(request.responseText);
 			w2alert(errorResult.message, "BOOTSTRAP 삭제");
 		}
-	});	
+	}); */
+	var body = '<div style="margin:10px 0;"><b>▶ 설치 로그</b></div>';
+	//body += '<div>';
+	body += '<textarea id="deleteLogs" style="width:95%;height:250px;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>';
+	//body += '</div>';
+	
+	w2popup.open({
+		width : 610,
+		height : 400,
+		title : "<b>BOOTSTRAP 삭제</b>",
+		body  : body,
+		buttons : '<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();;">완료</button>',
+		onOpen : function(event){
+			event.onComplete = function(){
+			console.log("Delete Pop");
+				var socket = new SockJS('/bootstrapDelete');
+				deleteClient = Stomp.over(socket); 
+				deleteClient.connect({}, function(frame) {
+					console.log('Connected Frame : ' + frame);
+					deleteClient.subscribe('/bootstrap/bootstrapDelete', function(data){
+				        console.log('Connected: Data : ' + data);
+			        	var deleteLogs = $(".w2ui-msg-body #deleteLogs");
+			        	deleteLogs.append(data.body + "\n").scrollTop( deleteLogs[0].scrollHeight );
+			        	
+			        	if( data == "complete"){
+			        		deleteClient.disconnect();//callback
+			        	}
+			        });
+					deleteClient.send('/send/bootstrapDelete', {}, JSON.stringify({iaas:record.iaas, id:record.id}));
+			    });
+			}
+		}
+	});
+}
+
+function gridReload(){
+	console.log("delete complete!");
+	w2ui['config_bootstrapGrid'].clear();
+	doSearch();
 }
 
 function doButtonStyle(){
@@ -250,7 +300,7 @@ function awsPopup(){
 		onOpen:function(event){
 			event.onComplete = function(){				
 				if(awsInfo != ""){
-					$(".w2ui-msg-body input[name='awsKey']").val(awsInfo.awsPw);
+					$(".w2ui-msg-body input[name='awsKey']").val(awsInfo.awsKey);
 					$(".w2ui-msg-body input[name='awsPw']").val(awsInfo.awsPw);
 					$(".w2ui-msg-body input[name='secretGroupName']").val(awsInfo.secretGroupName);
 					$(".w2ui-msg-body input[name='privateKeyName']").val(awsInfo.privateKeyName);
@@ -418,7 +468,11 @@ function saveResourcesSettingInfo(param){
 			async : true,
 			data : JSON.stringify(resourcesInfo), 
 			success : function(data, status) {
-				 deployPopup();				
+				if( data){
+					console.log("## DeployFileName :: " + data)
+					deployFileName = data;	
+				}
+				deployPopup();				
 			},
 			error : function( e, status ) {
 				w2alert("리소스 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
@@ -488,9 +542,22 @@ function installPopup(){
 		modal	: true,
 		onOpen : function(event){
 			event.onComplete = function(){
-				//1.Install
-				//2.소켓연결(설치 로그)
-				w2alert("socket연결");
+				//deployFileName
+				var socket = new SockJS('/bootstrapInstall');
+				installClient = Stomp.over(socket); 
+				installClient.connect({}, function(frame) {
+					console.log('Connected Frame : ' + frame);
+			        installClient.subscribe('/bootstrap/bootstrapInstall', function(data){
+				        console.log('Connected: Data : ' + data);
+			        	var installLogs = $(".w2ui-msg-body #installLogs");
+			        	installLogs.append(data.body + "\n").scrollTop( installLogs[0].scrollHeight );
+			        	
+			        	if( data == "complete"){
+			        		installClient.disconnect();//callback
+			        	}
+			        });
+			        installClient.send('/send/bootstrapInstall', {}, JSON.stringify({deployFileName:deployFileName}));
+			    });
 			}
 		},
 		onClose : initSetting
@@ -499,16 +566,28 @@ function installPopup(){
 
 //팝업창 닫을 경우
 function initSetting(){
-	structureType 	= "";
-	bootstrapSeq	= "";
-	awsInfo			= "";
-	networkInfo 	= "";
-	resourcesInfo 	= "";
-	deployInfo 		= "";
+	structureType = "";
+	bootstrapSeq= "";
+	awsInfo = "";
+	networkInfo = "";
+	resourcesInfo = "";
+	deployInfo = "";
+	deployFileName = "";
+	installClient = "";
+	deleteClient = "";
 }
 
 function uploadStemcell(){
 	$("#targetStemcellUpload").click();
+}
+
+function popupComplete(){
+	//params init
+	initSetting();
+	//popup.close
+	w2popup.close();
+	//grid Reload
+	gridReload();	
 }
 
 </script>
@@ -559,7 +638,7 @@ function uploadStemcell(){
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
 			<div rel="sub-title" >
-	            <ul class="progressStep" >
+	            <ul class="progressStep_5" >
 		            <li class="active">AWS 설정</li>
 		            <li class="before">Network 설정</li>
 		            <li class="before">리소스 설정</li>
@@ -620,7 +699,7 @@ function uploadStemcell(){
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
 			<div >
-	            <ul class="progressStep">
+	            <ul class="progressStep_5">
 		            <li class="pass">AWS 설정</li>
 		            <li class="active">Network 설정</li>
 		            <li class="before">리소스 설정</li>
@@ -681,7 +760,7 @@ function uploadStemcell(){
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
 			<div >
-	            <ul class="progressStep">
+	            <ul class="progressStep_5">
 		            <li class="pass">AWS 설정</li>
 		            <li class="pass">Network 설정</li>
 		            <li class="active">리소스 설정</li>
@@ -736,7 +815,7 @@ function uploadStemcell(){
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
 			<div >
-	            <ul class="progressStep">
+	            <ul class="progressStep_5">
 		            <li class="pass">AWS 설정</li>
 		            <li class="pass">Network 설정</li>
 		            <li class="pass">리소스 설정</li>
@@ -760,7 +839,7 @@ function uploadStemcell(){
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
 			<div >
-	            <ul class="progressStep">
+	            <ul class="progressStep_5">
 		            <li class="pass">AWS 설정</li>
 		            <li class="pass">Network 설정</li>
 		            <li class="pass">리소스 설정</li>
@@ -777,7 +856,7 @@ function uploadStemcell(){
 				<!-- 설치 실패 시 -->
 				<button class="btn" style="float: left;" onclick="saveDeployInfo('before');">이전</button>
 				<button class="btn" onclick="w2popup.close();">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="w2popup.close();">완료</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
 		</div>		
 	</div>	
 <!-- End Popup Resion -->

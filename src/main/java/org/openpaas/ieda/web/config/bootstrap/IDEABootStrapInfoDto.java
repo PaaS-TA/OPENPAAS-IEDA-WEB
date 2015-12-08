@@ -61,4 +61,18 @@ public class IDEABootStrapInfoDto{
 		@NotNull
 		private String microBoshPw;
 	}
+	
+	@Data
+	public static class Install{
+		@NotNull
+		private String deployFileName;
+	}
+	
+	@Data
+	public static class Delete{
+		@NotNull
+		private String iaas;
+		@NotNull
+		private int id;
+	}
 }

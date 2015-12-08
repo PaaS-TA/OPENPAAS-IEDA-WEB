@@ -7,11 +7,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.modelmapper.ModelMapper;
+import org.openpaas.ieda.web.config.stemcell.StemcellContentDto;
 import org.openpaas.ieda.web.config.stemcell.StemcellManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -78,12 +83,6 @@ public class BootstrapController {
 		//return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/bootstrap/aws/{id}", method=RequestMethod.DELETE)
-	public ResponseEntity deleteAwsInfo(@PathVariable int id){
-		awsService.deleteAwsInfo(id);		
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
-	
 	@RequestMapping(value="/bootstrap/bootstrapSetAws", method = RequestMethod.PUT)
 	public ResponseEntity doBootSetAwsSave(@RequestBody  IDEABootStrapInfoDto.Aws data){
 		log.info("### AwsData : " + data.toString());
@@ -102,8 +101,8 @@ public class BootstrapController {
 	@RequestMapping(value="/bootstrap/bootSetAwsResources", method = RequestMethod.PUT)
 	public ResponseEntity doBootSetResourcesSave(@RequestBody IDEABootStrapInfoDto.Resources data){
 		log.info("### ResourcesSave : " + data.toString());
-		awsService.saveAwsReleaseInfos(data);
-		return new ResponseEntity(HttpStatus.OK);
+		String deployFileName = awsService.saveAwsReleaseInfos(data);
+		return new ResponseEntity(deployFileName, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/bootstrap/getLocalStemcellList", method = RequestMethod.GET)
@@ -120,5 +119,22 @@ public class BootstrapController {
 		HttpStatus status = (content != null) ? HttpStatus.OK: HttpStatus.NO_CONTENT;
 		log.info("\n" +status + "\n");
 		return new ResponseEntity(content, status);
+	}
+
+	@MessageMapping("/bootstrapInstall")
+	@SendTo("/bootstrap/bootstrapInstall")
+	public ResponseEntity doInstallBootstrap(@RequestBody @Valid IDEABootStrapInfoDto.Install dto){
+		log.info("$$$$ SOCKET :  "+ dto.getDeployFileName());
+		bootstrapService.installBootstrap(dto.getDeployFileName());
+		return new ResponseEntity(HttpStatus.OK);
+	}
+	
+	@MessageMapping("/bootstrapDelete")
+	@SendTo("/bootstrap/bootstrapDelete")
+	public ResponseEntity deleteBootstrap(@RequestBody @Valid IDEABootStrapInfoDto.Delete dto){
+		log.info("$$$$ DELETE Connection :: " + dto.toString());
+		if("AWS".equals(dto.getIaas())) awsService.deleteAwsInfo(dto.getId());
+		//else openstackService.deleteOpenstackInfo(dto.getId());
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

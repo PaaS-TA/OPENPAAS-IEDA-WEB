@@ -51,6 +51,7 @@ function goPage(page, title) {
 		<ul>
 		<li><a href="javascript:goPage('<c:url value="/config/listDirector"/>', '설치관리자 설정');">설치관리자 설정</a></li>
 		<li><a href="javascript:goPage('<c:url value="/config/bootstrap"/>', 'BOOTSTRAP 설치');">BOOTSTRAP 설치</a></li>
+		<li><a href="javascript:goPage('<c:url value="/config/bosh"/>', 'BOSH 설치');">BOSH 설치</a></li>
 		<li><a href="javascript:goPage('<c:url value="/config/stemcellManagement"/>', '스템셀 관리');">스템셀 관리</a></li>
 		<li><a href="javascript:goPage('<c:url value="/config/releaseManagement"/>', '릴리즈 관리');">릴리즈 관리</a></li>
 		</ul>

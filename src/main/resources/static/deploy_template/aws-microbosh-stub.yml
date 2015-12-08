@@ -1,0 +1,143 @@
+---
+name: (( merge || "mBosh"  ))
+
+releases:
+- name: bosh
+  url: (( merge ))
+- name: bosh-aws-cpi
+  url: (( merge ))
+
+resource_pools:
+- name: vms
+  network: private
+  stemcell:
+    url: (( merge ))
+  env:
+    bosh:
+      password: (( merge || "c1oudc0w" ))
+  cloud_properties:
+    instance_type: (( merge || "m3.xlarge" ))
+    ephemeral_disk: {size: 25_000, type: gp2}
+    availability_zone: (( merge ))  # <--- Replace with Availability Zone
+
+disk_pools:
+- name: disks
+  disk_size: 20_000
+  cloud_properties: {type: gp2}
+
+networks:
+- name: private
+  type: manual
+  subnets:
+  - range: (( merge ))
+    gateway: (( merge ))
+    dns: [(( merge ))]
+    cloud_properties: {subnet: (( merge ))} # <--- Replace with Subnet ID
+- name: public
+  type: vip
+
+jobs:
+- name: bosh
+  instances: 1
+  
+  templates:
+  - {name: nats, release: bosh}
+  - {name: redis, release: bosh}
+  - {name: postgres, release: bosh}
+  - {name: blobstore, release: bosh}
+  - {name: director, release: bosh}
+  - {name: health_monitor, release: bosh}
+  - {name: registry, release: bosh}
+  - {name: aws_cpi, release: bosh-aws-cpi}
+
+  resource_pool: vms
+  persistent_disk_pool: disks
+
+  networks:
+  - name: private
+    static_ips: (( merge ))
+    default: [dns, gateway]
+  - name: public
+    static_ips: (( merge )) # <--- Replace with Elastic IP
+
+  properties:
+    nats:
+      address: 127.0.0.1
+      user: nats
+      password: nats-password
+
+    redis:
+      listen_address: 127.0.0.1
+      address: 127.0.0.1
+      password: redis-password
+
+    postgres: &db
+      listen_address: 127.0.0.1
+      host: 127.0.0.1
+      user: postgres
+      password: postgres-password
+      database: bosh
+      adapter: postgres
+
+    registry:
+      address: (( jobs.bosh.networks.private.static_ips.[0] ))
+      host: (( jobs.bosh.networks.private.static_ips.[0] ))
+      db: *db
+      http: {user: admin, password: admin, port: 25777}
+      username: admin
+      password: admin
+      port: 25777
+
+    blobstore:
+      address: (( jobs.bosh.networks.private.static_ips.[0] ))
+      port: 25250
+      provider: dav
+      director: {user: director, password: director-password}
+      agent: {user: agent, password: agent-password}
+
+    director:
+      address: 127.0.0.1
+      name: (( merge || "mDirector" ))
+      db: *db
+      cpi_job: aws_cpi
+      max_threads: 10
+      user_management:
+        provider: local
+        local:
+          users:
+          - {name: admin, password: admin}
+          - {name: hm, password: hm-password}
+
+    hm:
+      director_account: {user: hm, password: hm-password}
+      resurrector_enabled: true
+
+    aws: (( merge ))
+
+    agent: 
+      mbus: (( "nats://nats:nats-password@" networks.private.static_ips.[0] ":4222" ))
+
+    ntp: [(( merge ))]
+
+cloud_provider:
+  template: {name: aws_cpi, release: bosh-aws-cpi}
+
+  ssh_tunnel:
+    host: (( jobs.bosh.networks.public.static_ips.[0] )) # <--- Replace with your Elastic IP address
+    port: 22
+    user: vcap
+    private_key: (( merge )) # Path relative to this manifest file
+
+  mbus: (( "https://mbus:mbus-password@" ssh_tunnel.host ":6868" )) # <--- Replace with Elastic IP
+
+  properties:
+    agent: {mbus: "https://mbus:mbus-password@0.0.0.0:6868"}
+    blobstore: {provider: local, path: /var/vcap/micro_bosh/data/cache}
+    aws:
+      access_key_id: (( jobs.bosh.properties.aws.access_key_id ))
+      secret_access_key: (( jobs.bosh.properties.aws.secret_access_key ))
+      default_key_name: (( jobs.bosh.properties.aws.default_key_name ))
+      default_security_groups: (( jobs.bosh.properties.aws.default_security_groups ))
+      region: (( jobs.bosh.properties.aws.region ))
+    ntp: (( jobs.bosh.properties.ntp ))
+

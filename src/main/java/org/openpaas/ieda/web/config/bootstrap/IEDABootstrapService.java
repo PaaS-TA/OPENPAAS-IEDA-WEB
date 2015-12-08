@@ -17,6 +17,8 @@ import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,9 @@ public class IEDABootstrapService {
 	@Autowired
 	private IEDABootstrapOpenstackRepository openstackRepository;
 	
+	@Autowired
+	private SimpMessagingTemplate messagingTemplate;
+	
 	public List<BootstrapListDto> listBootstrap() {
 		List<IEDABootstrapAwsConfig> awsConfigsList = awsRepository.findAll();
 		log.info("### AWS List Size ::: " +  awsConfigsList.size() );
@@ -41,12 +46,11 @@ public class IEDABootstrapService {
 		//log.info("### AWS List Size ::: " +  awsConfigsList.size() );
 		log.info("### AWSLIST :::" + awsConfigsList.toString());
 		List<BootstrapListDto> listDtos = new ArrayList<>();
-		
+		int recid =0;
 		if(awsConfigsList.size() > 0){
-			for(int i=0; i < awsConfigsList.size();i++){
-				IEDABootstrapAwsConfig awsConfig = awsConfigsList.get(i);
+			for(IEDABootstrapAwsConfig awsConfig :awsConfigsList){
 				BootstrapListDto dto = new BootstrapListDto();
-				dto.setRecid(i);
+				dto.setRecid(recid++);
 				dto.setId(awsConfig.getId());
 				dto.setIaas("AWS");
 				dto.setCreatedDate(awsConfig.getCreatedDate());
@@ -71,16 +75,16 @@ public class IEDABootstrapService {
 			}
 		}*/
 		
-		if (listDtos.size() == 0) {
-			throw new IEDACommonException("nocontent.bootstrap.exception", "BOOTSTRAP 정보가 존재하지 않습니다.",
-					HttpStatus.NO_CONTENT);
-		}
+//		if (listDtos.size() == 0) {
+//			throw new IEDACommonException("nocontent.bootstrap.exception", "BOOTSTRAP 정보가 존재하지 않습니다.",
+//					HttpStatus.NO_CONTENT);
+//		}
 
 		return listDtos;
 	}
 	
 
-	public void downloadSettingFile(Integer id, String iaas) {
+	public String downloadSettingFile(Integer id, String iaas) {
 		// 파일 가져오기
 		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-microbosh-setting.yml");
 		URL stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-microbosh-stub.yml");
@@ -89,7 +93,10 @@ public class IEDABootstrapService {
 		
 		String content = "";
 		String stubContent = "";
-		String targetFileName = "aws-microbosh-setting-"+id+".yml";
+		String targetFileName = (iaas == "AWS") ? "aws-microbosh-setting-"+id+".yml" 
+									: "openstack-microbosh-setting-"+id+".yml";
+		String deployFileName = ""; 
+		
 		FileOutputStream fos = null;
 		try {
 			tempDeploy = new File(classPath.toURI());//resource.getFile();
@@ -119,13 +126,15 @@ public class IEDABootstrapService {
 				config.setDeploymentFile("openstack-microbosh-setting-"+id+".yml");
 				openstackRepository.save(config);
 			}
-			setSpiffMerge(stubDeploy.getName(), targetFileName);
+			deployFileName = setSpiffMerge(iaas, id, stubDeploy.getName(), targetFileName);
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		
+		return deployFileName;
 	}
 
 	public List<BootstrapItem> makeBootstrapItems(Integer id, String iaas) {
@@ -145,7 +154,7 @@ public class IEDABootstrapService {
 			items.add(new BootstrapItem("[awsKey]", awsConfig.getAccessKey()));
 			items.add(new BootstrapItem("[secretAccessKey]", awsConfig.getSecretAccessKey()));
 			items.add(new BootstrapItem("[securGroupName]", awsConfig.getDefaultSecurityGroups()));
-			items.add(new BootstrapItem("[privateKey]", awsConfig.getPrivateKeyPath()));
+			items.add(new BootstrapItem("[privateKey]", awsConfig.getPrivateKeyPath() + awsConfig.getDefaultKeyName()));
 			items.add(new BootstrapItem("[region]", awsConfig.getAvailabilityZone()));
 			items.add(new BootstrapItem("[flavor]", awsConfig.getInstanceType()));	
 			
@@ -184,18 +193,21 @@ public class IEDABootstrapService {
 		return contents;
 	}
 	
-	public void setSpiffMerge(String stubFileName, String tempFileName) {
+	public String setSpiffMerge(String iaas, Integer id, String stubFileName, String tempFileName) {
 		File stubFile = null;
 		File tempFile = null;
 		String command = "";
 		Runtime r = Runtime.getRuntime();
-		String deployFileName = "aws-microbosh-merge.yml";
+		String deployFileName = "";
 
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
 		try {
 			stubFile = new File(iedaConfiguration.getTempDir()+ stubFileName);
-			tempFile = new File(iedaConfiguration.getTempDir()+tempFileName);
+			tempFile = new File(iedaConfiguration.getTempDir() + tempFileName);
+			
+			deployFileName =  (iaas == "AWS") ? "aws-microbosh-merge-"+id+".yml"
+					:"openstack-microbosh-merge-"+id+".yml";
 			
 			if(stubFile.exists() && tempFile.exists()){
 				command = iedaConfiguration.getScriptDir() + "merge-deploy.sh ";
@@ -232,10 +244,12 @@ public class IEDABootstrapService {
 			} catch (Exception e) {
 			}
 		}
+		return deployFileName;
 	}
 	
 	//aws-microbosh-delete.sh
 	public void deleteDeploy(String fileName){
+		
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
 		Runtime r = Runtime.getRuntime();
@@ -253,6 +267,7 @@ public class IEDABootstrapService {
 			while ((info = bufferedReader.readLine()) != null){
 				streamLogs += info;
 				log.info("=== Delete Deploy File \n"+ info );
+				messagingTemplate.convertAndSend("/bootstrap/bootstrapDelete", info);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -268,6 +283,51 @@ public class IEDABootstrapService {
 			try {
 				if (bufferedReader != null)
 					bufferedReader.close();
+			} catch (Exception e) {
+			}
+			messagingTemplate.convertAndSend("/bootstrap/bootstrapDelete", "complete");
+		}
+	}
+	
+	@Async
+	public void installBootstrap(String deployFileName){
+		InputStream inputStream = null;
+		BufferedReader bufferedReader = null;
+		Runtime r = Runtime.getRuntime();
+		String command = "";
+		log.info("%%%% Deploy File Name : " + deployFileName);
+		try{
+			command += iedaConfiguration.getScriptDir() + "aws-microbosh-deploy.sh ";
+			command += iedaConfiguration.getDeploymentDir() + deployFileName ;
+					
+			Process process = r.exec(command);
+			log.info("### PROCESS ::: " + process.toString());
+			process.getInputStream();
+			inputStream = process.getInputStream();
+			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+			String info = null;
+			String streamLogs = "";
+			while ((info = bufferedReader.readLine()) != null){
+				streamLogs += info;
+				log.info("=== InstallBootstrap Logs \n"+ info );
+				messagingTemplate.convertAndSend("/bootstrap/bootstrapInstall", info);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		} finally {
+			try {
+				if (inputStream != null)
+					inputStream.close();
+			} catch (Exception e) {
+			}
+			try {
+				if (bufferedReader != null){
+					bufferedReader.close();
+					messagingTemplate.convertAndSend("/bootstrap/bootstrapInstall", "complete");
+				}
 			} catch (Exception e) {
 			}
 		}

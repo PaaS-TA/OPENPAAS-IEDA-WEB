@@ -12,7 +12,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
-		config.enableSimpleBroker("/socket", "/stemcell");
+		config.enableSimpleBroker("/socket", "/stemcell", "/bootstrap");
 		config.setApplicationDestinationPrefixes("/app", "/send");
 	}
 
@@ -24,6 +24,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 							, "/releaseUploading"
 							, "/releaseDownloading"
 							, "/releaseDelete"
+							, "/bootstrapInstall"
+							, "/bootstrapDelete"
 							).withSockJS();
 	}
 

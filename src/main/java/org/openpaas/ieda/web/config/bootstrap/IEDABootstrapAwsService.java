@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.EntityNotFoundException;
 
 import org.openpaas.ieda.common.IEDACommonException;
+import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class IEDABootstrapAwsService {
 	
 	@Autowired
 	private IEDABootstrapService bootstrapService;
+	
+	@Autowired
+	private IEDAConfiguration iedaConfiguration;
 	
 	public IEDABootstrapAwsConfig getAwsInfo(int id){
 		IEDABootstrapAwsConfig config =  null;
@@ -89,17 +93,18 @@ public class IEDABootstrapAwsService {
 		awsRepository.save(config);
 	}
 	
-	public void saveAwsReleaseInfos(IDEABootStrapInfoDto.Resources dto) {
+	public String saveAwsReleaseInfos(IDEABootStrapInfoDto.Resources dto) {
 		IEDABootstrapAwsConfig config = awsRepository.findById(Integer.parseInt(dto.getId()));
 		config.setStemcellName(dto.getTargetStemcell());
 		config.setInstanceType(dto.getInstanceType());
+		config.setRegion(dto.getRegion());
 		config.setAvailabilityZone(dto.getAvailabilityZone());
 		config.setMicroBoshPw(dto.getMicroBoshPw());
 		config.setDeploymentFile("aws-microbosh-setting-"+dto.getId()+".yml");
 		Date now = new Date();
 		config.setUpdatedDate(now);
 		awsRepository.save(config);
-		bootstrapService.downloadSettingFile(Integer.parseInt(dto.getId()), "AWS");
+		return bootstrapService.downloadSettingFile(Integer.parseInt(dto.getId()), "AWS");
 	}
 	
 }

@@ -23,6 +23,7 @@ public class DeleteStemcellAsyncByScriptService {
 	@Autowired
 	private IEDAConfiguration iedaConfiguration;
 
+	@Async
 	public Boolean deleteStemcell(String stemcellDir, String stemcellFileName, String stemcellVersion) {
 		Boolean success = Boolean.FALSE;
 
