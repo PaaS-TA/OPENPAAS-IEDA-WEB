@@ -6,14 +6,11 @@ package org.openpaas.ieda.web.dashboard;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.openpaas.ieda.api.Stemcell;
-import org.openpaas.ieda.web.config.stemcell.StemcellContent;
-import org.openpaas.ieda.web.config.stemcell.StemcellManagementService;
 import org.openpaas.ieda.web.deploy.release.IEDAReleaseService;
 import org.openpaas.ieda.web.deploy.release.ReleaseConfig;
-import org.openpaas.ieda.web.deploy.stemcell.IEDAStemcellService;
+import org.openpaas.ieda.web.deploy.stemcell.StemcellService;
 import org.openpaas.ieda.web.information.deploy.DeploymentsConfig;
 import org.openpaas.ieda.web.information.deploy.IEDADeploymentsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +36,7 @@ public class DashboardController {
 	@Autowired
 	private IEDAReleaseService releaseService;
 	@Autowired
-	private IEDAStemcellService stemcellService;
+	private StemcellService stemcellService;
 
 	@RequestMapping(value="/dashboard", method=RequestMethod.GET)
 	public String main(ModelAndView model) {

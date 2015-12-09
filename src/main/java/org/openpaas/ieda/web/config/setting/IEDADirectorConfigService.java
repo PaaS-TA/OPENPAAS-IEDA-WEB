@@ -2,29 +2,30 @@ package org.openpaas.ieda.web.config.setting;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.modelmapper.ModelMapper;
-import org.openpaas.ieda.api.DirectorClient;
-import org.openpaas.ieda.api.DirectorClientBuilder;
 import org.openpaas.ieda.api.DirectorEndPoint;
 import org.openpaas.ieda.api.Info;
+import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.web.config.stemcell.StemcellContent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -33,20 +34,15 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.yaml.snakeyaml.Yaml;
 
-import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-/**
- * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
- *
- */
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
 @Slf4j
 public class IEDADirectorConfigService {
 	
-	private DirectorEndPoint directorEndPoint = DirectorEndPoint.getInstance();
-
 	@Autowired
 	private IEDADirectorConfigRepository directorConfigRepository;
 
@@ -75,28 +71,37 @@ public class IEDADirectorConfigService {
 	public List<IEDADirectorConfig> listDirector() {
 		
 		List<IEDADirectorConfig> directorConfigList = directorConfigRepository.findAll();
+		
+		// 스템셀 버전 역순으로 정렬
+		Comparator<IEDADirectorConfig> byDefaultYN = Collections.reverseOrder(Comparator.comparing(IEDADirectorConfig::getDefaultYn));
+		//return stemcellList.stream().sorted(byStemcellVersion).collect(Collectors.toList());
+
+		
 		if ( directorConfigList.size() == 0 ) {
 			throw new IEDACommonException("nocontent.director.exception",
 					"디렉터 정보가 존재하지 않습니다.", HttpStatus.NO_CONTENT);
 		}
 		
-		return directorConfigList;
+		return directorConfigList.stream().sorted(byDefaultYN).collect(Collectors.toList());
 	}
 	
 	//  map to api --> /info
 	public Info getDirectorInfo(String directorUrl, int port, String userId, String password) {
 		Info info = null;
 		
+		HttpClient client = DirectorRestHelper.getHttpClient(port);
+		GetMethod get = new GetMethod(DirectorRestHelper.getInfoURI(directorUrl, port));
+		get = (GetMethod)DirectorRestHelper.setAuthorization(userId, password, (HttpMethodBase)get);
+		
 		try {
-			DirectorClient client = new DirectorClientBuilder()
-					.withHost(directorUrl, port)
-					.withCredentials(userId, password).build();
-			URI infoUri = UriComponentsBuilder.fromUri(client.getRoot())
-					.pathSegment("info").build().toUri();
+			int status = client.executeMethod(get);
+			System.out.println("Status Code : " + get.getStatusCode());
+			System.out.println("Response    : " + get.getResponseBodyAsString());
 			
-      		ResponseEntity<Info> response = client.getRestTemplate().getForEntity(infoUri, Info.class);
-			info = response.getBody();
+			ObjectMapper mapper = new ObjectMapper();
+			info = mapper.readValue(get.getResponseBodyAsString(), Info.class);
 			
+			System.out.println("Response    : " + info.toString());
 		} catch (ResourceAccessException e) {
 			e.printStackTrace();
 			throw new IEDACommonException("notfound.director.exception", "["
@@ -106,7 +111,7 @@ public class IEDADirectorConfigService {
 			throw new IEDACommonException("notfound.director.exception",
 					"요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
 		}
-	
+
 		return info;
 	}
 
@@ -175,6 +180,8 @@ public class IEDADirectorConfigService {
 	public IEDADirectorConfig updateDirectorConfig(int seq,
 			IEDADirectorConfigDto.Update updateDto) {
 
+		// TODO : 추후 구현
+		/*
 		IEDADirectorConfig directorConfig = directorConfigRepository
 				.findByIedaDirectorConfigSeq(seq);
 
@@ -183,21 +190,12 @@ public class IEDADirectorConfigService {
 					"해당하는 디렉터가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 
-		Info info = null;
-
 		try {
-			DirectorClient client = new DirectorClientBuilder()
-					.withHost(directorConfig.getDirectorUrl(),
-							directorConfig.getDirectorPort())
-					.withCredentials(updateDto.getUserId(),
-							updateDto.getUserPassword()).build();
-
-			URI infoUri = UriComponentsBuilder.fromUri(client.getRoot())
-					.pathSegment("info").build().toUri();
-			ResponseEntity<Info> response = client.getRestTemplate()
-					.getForEntity(infoUri, Info.class);
-
-			info = response.getBody();
+			
+			Info info = getDirectorInfo(directorConfig.getDirectorUrl()
+					, directorConfig.getDirectorPort()
+					, directorConfig.getUserId()
+					, directorConfig.getUserPassword());
 
 			log.info(info.toString());
 
@@ -213,6 +211,9 @@ public class IEDADirectorConfigService {
 		directorConfig.setUserPassword(updateDto.getUserPassword());
 
 		return directorConfigRepository.save(directorConfig);
+		*/
+		
+		return null;
 	}
 
 	public void deleteDirectorConfig(int seq) {
@@ -254,29 +255,40 @@ public class IEDADirectorConfigService {
 		}
 	}
 
-	public void setDefaultDirector(int seq) {
+	public IEDADirectorConfig setDefaultDirector(int seq) {
 		IEDADirectorConfig directorConfig = directorConfigRepository
 				.findByIedaDirectorConfigSeq(seq);
-
 		if (directorConfig == null) {
 			throw new IEDACommonException("illigalArgument.director.exception",
 					"해당하는 설치관리자 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 		
-		//Database
+		// 디렉터 연결 여부 확인
+		Info info = getDirectorInfo(directorConfig.getDirectorUrl(), directorConfig.getDirectorPort(), directorConfig.getUserId(), directorConfig.getUserPassword());
+		if ( info == null || info.getUser() == null || info.getUser().equals("") ) {
+			throw new IEDACommonException("unauthenticated.director.exception",
+					"해당 디렉터에 로그인 실패하였습니다.", HttpStatus.BAD_REQUEST);
+		}
+		
+		// 이전 디렉터에 대한 기본 디렉터 설정 변경
 		IEDADirectorConfig oldDefaultDiretor = directorConfigRepository.findOneByDefaultYn("Y");
 		if (oldDefaultDiretor != null) {
 			oldDefaultDiretor.setDefaultYn("N");
 			directorConfigRepository.save(oldDefaultDiretor);
 		}
+		
+		// 새로운 디렉터에 대한 기본 디렉터 설정 변경
 		directorConfig.setDefaultYn("Y");
+		directorConfig.setDirectorName(info.getName());
+		directorConfig.setDirectorUuid(info.getUuid());
+		directorConfig.setDirectorCpi(info.getCpi());
+		directorConfig.setDirectorVersion(info.getVersion());
 		directorConfig= directorConfigRepository.save(directorConfig);
 		
-		// target 설정
+		// target 설정 (.bosh_config 설정 변경)
 		setTarget(directorConfig);
 		
-		//보쉬 타겟설정
-		//setTarget(directorConfig.getDirectorUrl(), directorConfig.getDirectorPort());
+		return directorConfig;
 	}
 
 	/**
@@ -332,7 +344,6 @@ public class IEDADirectorConfigService {
 				throw new IEDACommonException("taretDirector.director.exception",
 						"설치관리자 타겟 설정 중 오류 발생하였습니다.", HttpStatus.NOT_FOUND);
 			}
-			
 		}
 		else {
 			try {
@@ -381,7 +392,6 @@ public class IEDADirectorConfigService {
 				throw new IEDACommonException("taretDirector.director.exception",
 						"설치관리자 설정 파일 생성 중 오류 발생하였습니다.", HttpStatus.NOT_FOUND);
 			}
-			
 		}
 	}
 	
@@ -389,7 +399,7 @@ public class IEDADirectorConfigService {
 		String homeDir = System.getProperty("user.home");
 		String fileSeperator = System.getProperty("file.separator");
 		String boshConfigFile = homeDir + fileSeperator + ".bosh_config";
-		System.out.println("BOSH Config File Location : " + boshConfigFile);
+
 		return boshConfigFile;
 	}
 	

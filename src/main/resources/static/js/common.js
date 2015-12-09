@@ -8,7 +8,7 @@ function getDefaultDirector(url) {
 		async : false,
 		error: function(request, status, error) {
 			var errorResult = JSON.parse(request.responseText);
-			w2alert(errorResult.message);
+			w2alert(errorResult.message, "알림");
 			isOk = false;
 		},
 		success: function(data) {
@@ -62,29 +62,3 @@ function setCommonCode(url, id) {
 		}
 	});
 }
-
-/*function setCommonCode(url, id, value) {
-	jQuery.ajax({
-		type: "get",
-		url: url,
-		async : false,
-		error: function(xhr, status) {
-			ajaxErrorMsg(xhr);
-		},
-		success: function(data) {
-			
-			var $object = jQuery("#"+id);
-			
-			var optionString = $object.html() + '\n';
-			for ( i=0; i < data.length; i++ ) {
-				optionString += "<option ";
-				optionString += "value='" + data[i].codeIdx + "'>";
-				optionString += data[i].codeName;
-				optionString += "</option>\n";
-			}
-			alert(optionString);
-			$object.html(optionString);
-		}
-	});
-}
-*/

@@ -135,7 +135,7 @@ public class DirectorConfigurationController {
 	
 
 	/**
-	 * 관리자 기본정보(상단 상세?)
+	 * 관리자 기본정보
 	 * @param seq
 	 * @return
 	 */
@@ -182,14 +182,14 @@ public class DirectorConfigurationController {
 		errorResponse.setMessage(e.getMessage());
 		
 		return new ResponseEntity<>(errorResponse, e.getStatusCode());
-		
 	}
 	
+	// 기본 관리자 로 설정
 	@RequestMapping(value="/director/default/{seq}", method=RequestMethod.PUT)
 	public ResponseEntity setDefaultDirector(@PathVariable int seq) {
-//		log.info( "########## : " + map.get("seq").toString());
-		service.setDefaultDirector(seq);
-//		service.setDefaultDirector(seq);
-		return new ResponseEntity<> (HttpStatus.NO_CONTENT); 
+		IEDADirectorConfig directorConfig = service.setDefaultDirector(seq);
+		
+		IEDADirectorConfigDto.Response response = modelMapper.map(directorConfig, IEDADirectorConfigDto.Response.class);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

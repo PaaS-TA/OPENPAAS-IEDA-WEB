@@ -22,32 +22,28 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
- *
- */
-
 @Slf4j
 @Controller
 public class StemcellController {
 
 	@Autowired
-	private IEDAStemcellService service;
+	private StemcellService service;
 
 	@Autowired
 	private IEDAConfiguration iedaConfiguration;
 
 	@Autowired
-	private UploadStemcellAsyncByScriptService uploadStemcellService;
-
-	@Autowired
-	private DeleteStemcellAsyncByScriptService deleteStemcellService;
+	private DeleteStemcellAsyncService deleteStemcellAsyncService;
 	
+	@Autowired
+	private UploadStemcellAsyncService uploadStemcellAsyncService;
+
 	@RequestMapping(value = "/deploy/listStemcell", method = RequestMethod.GET)
 	public String List() {
 		return "/deploy/listStemcell";
 	}
-
+	
+	// 스템셀 목록 조회
 	@RequestMapping(value = "/stemcells", method = RequestMethod.GET)
 	public ResponseEntity listStemcell() {
 		List<Stemcell> contents = service.listStemcell();
@@ -55,7 +51,6 @@ public class StemcellController {
 		if (contents != null) {
 			for (Stemcell stemcell : contents) {
 				stemcell.setRecid(recid++);
-				log.info("### OS : " + stemcell.getOperatingSystem());
 			}
 		}
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -64,6 +59,7 @@ public class StemcellController {
 		return new ResponseEntity(result, HttpStatus.OK);
 	}
 
+	// 다운로드받은 로컬 스템셀 목록 조회
 	@RequestMapping(value = "/localStemcells", method = RequestMethod.GET)
 	public ResponseEntity listLocalStemcells() {
 		List<StemcellContent> contents = service.listLocalStemcells();
@@ -79,10 +75,7 @@ public class StemcellController {
 	@MessageMapping("/stemcellUploading")
     @SendTo("/socket/uploadStemcell")
 	public ResponseEntity doUploadStemcell(@RequestBody @Valid StemcellContentDto.Upload dto) {
-		log.info("##### Upload ::: " + dto.toString());
-
-		uploadStemcellService.uploadStemcellAsync(iedaConfiguration.getStemcellDir(), dto.getFileName());
-
+		uploadStemcellAsyncService.uploadStemcellAsync(iedaConfiguration.getStemcellDir(), dto.getFileName());
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -95,12 +88,7 @@ public class StemcellController {
 	@MessageMapping("/stemcellDelete")
     @SendTo("/socket/deleteStemcell")
 	public ResponseEntity doDeleteStemcell(@RequestBody @Valid StemcellContentDto.Delete dto) {
-
-		log.info("### Delete Stemcell : " + dto.getFileName() + ", version : " + dto.getVersion());
-
-		deleteStemcellService.deleteStemcellAsync(iedaConfiguration.getStemcellDir(), dto.getFileName(),
-				dto.getVersion());
-
+		deleteStemcellAsyncService.deleteStemcellAsync(dto.getStemcellName(), dto.getVersion());
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	

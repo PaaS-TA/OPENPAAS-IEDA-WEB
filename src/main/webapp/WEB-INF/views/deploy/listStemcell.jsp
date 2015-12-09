@@ -6,7 +6,7 @@
 var uploadClient = null;
 var deleteClient = null;
 var appendLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:430px;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
-var appendLogPopupButton = '<button class="btn closeBtn" onclick="popupClose();">닫기</button>'
+var appendLogPopupButton = '<button id="closeBtn" class="btn closeBtn" onclick="popupClose(); disabled">확인</button>'
 
 $(function() {
 	
@@ -21,10 +21,10 @@ $(function() {
 		style: 'text-align:center',
 		columns	:[
 		           {field: 'recid', caption: 'recid', hidden: true}
-		         , {field: 'operating_system', caption: 'OS', size: '20%'}
-		         , {field: 'name', caption: '스템셀명', size: '30%'}		         
-		         , {field: 'version', caption: '스템셀버전', size: '10%'}
-		         , {field: 'cid', caption: 'CID', size: '30%'}
+		         , {field: 'operating_system', caption: '운영체계', size: '30%'}
+		         , {field: 'name', caption: '스템셀명', size: '40%'}		         
+		         , {field: 'version', caption: '스템셀버전', size: '30%'}
+		         , {field: 'cid', caption: 'CID', size: '30%', hidden: true}
 		         ],
  		onClick: function(event) {
 			var grid = this;
@@ -132,7 +132,7 @@ function doDeleteStemcell() {
 	if ( record == "" || record == null) return;
 
 	var requestParameter = {
-			fileName : record.name,
+			stemcellName : record.name,
 			version  : record.version
 		};
 	
@@ -159,7 +159,8 @@ function doUploadStemcell() {
 	if ( record == "" || record == null) return;
 	
 	var requestParameter = {
-			fileName : record.stemcellFileName
+			fileName : record.stemcellFileName,
+			version: record.stemcellVersion
 		};
 	
 	w2confirm( { msg : '선택된 스템셀  <br>' + record.stemcellFileName + ' <br>을 설치관리자에 업로드하시겠습니까?'
@@ -179,7 +180,7 @@ function doUploadStemcell() {
 function appendLogPopup(type, requestParameter){
 	console.log("============================================================================");
 	w2popup.open({
-		title	: (type =="upload") ? '<b>스템셀 업로드 로그</b>': '<b>스템셀 삭제 로그</b>',
+		title	: (type =="upload") ? '<b>스템셀 업로드</b>': '<b>스템셀 삭제</b>',
 		body	: appendLogPopupBody,
 		buttons : appendLogPopupButton,
 		width 	: 800,
@@ -195,13 +196,31 @@ function appendLogPopup(type, requestParameter){
 
 //Stemcell Upload connect
 function doUploadConnect(requestParameter){
-	console.log("2.=====doUploadConnect=====");
+	
+	var message = requestParameter.version + " 버전의 스템셀(" + requestParameter.fileName + ") ";
+	
 	var socket = new SockJS('/stemcellUploading');
 	uploadClient = Stomp.over(socket); 
 	uploadClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
         uploadClient.subscribe('/socket/uploadStemcell', function(data){
-        	$("textarea[name='logAppendArea']").append(data.body + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
+
+        	var response = JSON.parse(data.body);
+	        
+        	if ( response.messages != null ) {
+		       	for ( var i=0; i < response.messages.length; i++) {
+		       		$("textarea[name='logAppendArea']").append(response.messages[i] + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
+		       	}
+		       	
+		       	if ( response.state.toLowerCase() != "started" ) {
+		            if ( response.state.toLowerCase() == "done" )	message = message + "이 업로드 되었습니다."; 
+		    		if ( response.state.toLowerCase() == "error" ) message = message + " 업로드 중 오류가 발생하였습니다.";
+		    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 업로드 중 취소되었습니다.";
+		    			
+		    		uploadClient.disconnect();
+					w2alert(message, "스템셀 업로드");
+		       	}
+        	}
         });
         socketSendUploadData( requestParameter);
     });
@@ -209,13 +228,30 @@ function doUploadConnect(requestParameter){
 
 //Stemcell Delete connect
 function doDeleteConnect(requestParameter){
-	console.log("2.=====doDeleteConnect=====");
+	
+	var message = requestParameter.version + " 버전의 스템셀(" + requestParameter.stemcellName + ") ";
+	
 	var socket = new SockJS('/stemcellDelete');
 	deleteClient = Stomp.over(socket); 
 	deleteClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
         deleteClient.subscribe('/socket/deleteStemcell', function(data){
-        	$("textarea[name='logAppendArea']").append(data.body + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
+	        var response = JSON.parse(data.body);
+	        
+	        if ( response.messages != null ) {
+		       	for ( var i=0; i < response.messages.length; i++) {
+		       		$("textarea[name='logAppendArea']").append(response.messages[i] + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
+		       	}
+		       	
+		       	if ( response.state.toLowerCase() != "started" ) {
+		            if ( response.state.toLowerCase() == "done" )	message = message + "이 삭제되었습니다."; 
+		    		if ( response.state.toLowerCase() == "error" ) message = message + " 삭제 중 오류가 발생하였습니다.";
+		    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 삭제 중 취소되었습니다.";
+		    			
+		            deleteClient.disconnect();
+					w2alert(message, "스템셀 삭제");
+		       	}
+	        }
         });
         socketSendDeleteData(requestParameter);
     });
@@ -236,12 +272,12 @@ function popupClose() {
 		uploadClient.disconnect();
 		$("textarea[name='logAppendArea']").text("");
 	}
-	else if (deleteClient != null) {
+	
+	if (deleteClient != null) {
 		deleteClient.disconnect();
 		$("textarea[name='logAppendArea']").text("");
 	}
 	
-	console.log("Disconnected");
 	w2popup.close();
 	
 	// 업로드된 스템셀 조회
@@ -275,7 +311,7 @@ $( window ).resize(function() {
 	
 	<!-- 업로드된 스템셀 목록-->
 	<div class="pdt20">
-		<div class="title fl">디렉터에 업로드된 스템셀 목록</div>
+		<div class="title fl">업로드된 스템셀 목록</div>
 		<div class="fr"> 
 			<span class="btn btn-danger" style="width:120px" id="doDeleteStemcell">스템셀 삭제</span>
 	    </div>

@@ -15,7 +15,7 @@ public class StemcellContentDto {
 	@Data
 	public static class Delete {
 		@NotBlank
-		private String fileName;
+		private String stemcellName;
 
 		@NotBlank
 		private String version;

@@ -8,4 +8,5 @@ public interface IEDAStemcellContentRepository extends JpaRepository<StemcellCon
 
 	List<StemcellContent> findByOsAndOsVersionAndIaasAllIgnoreCaseOrderByOsVersionDesc(String os, String osVersion, String iaas);
 	List<StemcellContent> findByStemcellFileNameInOrderByOsVersionDesc(List<String> stemcellFileName);
+	List<StemcellContent> findByStemcellFileNameInOrderByStemcellVersionDesc(List<String> stemcellFileName);
 }
