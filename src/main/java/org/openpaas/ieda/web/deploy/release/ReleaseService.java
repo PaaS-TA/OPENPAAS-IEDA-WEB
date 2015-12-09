@@ -4,7 +4,10 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -13,6 +16,7 @@ import org.openpaas.ieda.api.Release;
 import org.openpaas.ieda.api.ReleaseFile;
 import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.api.ReleaseVersion;
+import org.openpaas.ieda.api.Stemcell;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
@@ -74,7 +78,17 @@ public class ReleaseService {
 					log.info("--> " + releaseInfo.toString());
 				}
 			}
+			
+			if ( releaseInfoList != null ) {
+				// 스템셀 버전 역순으로 정렬
+				//Comparator<ReleaseInfo> byReleaseName = Collections.reverseOrder(Comparator.comparing(ReleaseInfo::getName));
+				Comparator<ReleaseInfo> byReleaseVersion = Collections.reverseOrder(Comparator.comparing(ReleaseInfo::getVersion));
 
+				releaseInfoList = releaseInfoList.stream()
+						//.sorted(byReleaseName)
+						.sorted(byReleaseVersion)
+						.collect(Collectors.toList());
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();

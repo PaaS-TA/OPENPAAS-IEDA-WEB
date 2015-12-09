@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.api.Stemcell;
 import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.openpaas.ieda.web.deploy.stemcell.StemcellService;
@@ -66,28 +67,16 @@ public class DashboardController {
 
 	@RequestMapping( value="/dashboard/releases", method =RequestMethod.GET)
 	public ResponseEntity listRelease(){
-		/*
-		List<ReleaseConfig> contents = releaseService.listRelease();
-
-		int recid = 0;
-		if(contents != null){
-			for( ReleaseConfig config : contents ){
-				config.setRecid(recid++);
-			}
-		}
-
+		List<ReleaseInfo> contents = releaseService.listRelease();
+		
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		if ( contents != null ) {
 			result.put("total", contents.size());
 			result.put("records", contents);
-		}
-		else
+		} else
 			result.put("total", 0);
 		
 		return new ResponseEntity( result, HttpStatus.OK);
-		*/
-		
-		return new ResponseEntity(null, HttpStatus.OK);
 	}
 
 	// 스템셀 목록조회
