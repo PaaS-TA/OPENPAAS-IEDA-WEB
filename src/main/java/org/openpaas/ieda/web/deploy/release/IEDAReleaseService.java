@@ -5,8 +5,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openpaas.ieda.api.DirectorClient;
-import org.openpaas.ieda.api.DirectorClientBuilder;
 import org.openpaas.ieda.api.Release;
 import org.openpaas.ieda.api.ReleaseVersion;
 import org.openpaas.ieda.common.IEDACommonException;
@@ -32,7 +30,8 @@ public class IEDAReleaseService {
 	private IEDADirectorConfigRepository directorConfigRepository;
 	
 	public List<ReleaseConfig> listRelease() {
-		IEDADirectorConfig defaultDirector = new IEDADirectorConfig();
+		return null;
+/*		IEDADirectorConfig defaultDirector = new IEDADirectorConfig();
 
 		Release[] releases = null;
 		List<ReleaseConfig> releaseConfigs = new ArrayList<ReleaseConfig>();
@@ -46,6 +45,7 @@ public class IEDAReleaseService {
 			log.info("DirectorUrl : " + defaultDirector.getDirectorUrl() + "/", defaultDirector.getDirectorPort());
 			log.info("UserId      : " + defaultDirector.getUserId() + "/" + defaultDirector.getUserPassword());
 
+			
 			DirectorClient client = new DirectorClientBuilder()
 					.withHost(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort())
 					.withCredentials(defaultDirector.getUserId(), defaultDirector.getUserPassword()).build();
@@ -79,7 +79,7 @@ public class IEDAReleaseService {
 			throw new IEDACommonException("notfound.releases.exception", "요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
 		}
 
-		return releaseConfigs;
+		return releaseConfigs;*/
 	}
 	
 	/**

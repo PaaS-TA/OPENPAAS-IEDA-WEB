@@ -1,49 +1,45 @@
 package org.openpaas.ieda.web.information.task;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openpaas.ieda.api.DirectorClient;
-import org.openpaas.ieda.api.DirectorClientBuilder;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.openpaas.ieda.api.Task;
+import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigRepository;
+import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.util.UriComponentsBuilder;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 public class IEDATaskConfigService {
 
 	@Autowired
-	private IEDADirectorConfigRepository directorConfigRepository;
-
-	// @Autowired
-	// private RestTemplate restTemplate;
+	private IEDADirectorConfigService directroConfigService;
 
 	public List<Task> listTask() {
-		// get default director
-		// 추가할 디렉터가 이미 존재하는지 여부 확인
-
-		IEDADirectorConfig defaultDirector = directorConfigRepository.findOneByDefaultYn("Y");
+		IEDADirectorConfig defaultDirector = directroConfigService.getDefaultDirector();
 
 		Task[] tasks = null;
+		
 		try {
+			HttpClient client = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
+			GetMethod get = new GetMethod(DirectorRestHelper.getTaskListURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort()));
+			get = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)get);
 
-			DirectorClient client = new DirectorClientBuilder()
-					.withHost(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort())
-					.withCredentials(defaultDirector.getUserId(), defaultDirector.getUserPassword()).build();
-
-			URI tasksUri = UriComponentsBuilder.fromUri(client.getRoot()).pathSegment("tasks").build().toUri();
-
-			tasks = client.getRestTemplate().getForObject(tasksUri, Task[].class);
+			client.executeMethod(get);
+			ObjectMapper mapper = new ObjectMapper();
+			tasks = mapper.readValue(get.getResponseBodyAsString(), Task[].class);
 
 		} catch (ResourceAccessException e) {
 			e.printStackTrace();

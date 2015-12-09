@@ -38,13 +38,10 @@ public class DeploymentsController {
 	@RequestMapping(value="/deployments", method=RequestMethod.GET)
 	public ResponseEntity listDeployment(){
 		
-		List<DeploymentsConfig> contents = service.listDeployment();
-		log.info("*****************");
-		log.info("SIZE : " + contents.size());
-		log.info("*****************");
+		List<Deployment> contents = service.listDeployment();
 		if(contents != null && contents.size() > 0){
 			int recid = 0;
-			for(DeploymentsConfig deploymentConfig : contents){
+			for(Deployment deploymentConfig : contents){
 				deploymentConfig.setRecid(recid++);
 			}
 		}

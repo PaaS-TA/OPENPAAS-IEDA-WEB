@@ -86,13 +86,9 @@ public class IEDADirectorConfigService {
 		
 		try {
 			client.executeMethod(get);
-			System.out.println("Status Code : " + get.getStatusCode());
-			System.out.println("Response    : " + get.getResponseBodyAsString());
 			
 			ObjectMapper mapper = new ObjectMapper();
 			info = mapper.readValue(get.getResponseBodyAsString(), Info.class);
-			
-			System.out.println("Response    : " + info.toString());
 		} catch (ResourceAccessException e) {
 			e.printStackTrace();
 			throw new IEDACommonException("notfound.director.exception", "["

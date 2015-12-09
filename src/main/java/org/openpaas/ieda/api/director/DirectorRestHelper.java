@@ -84,7 +84,14 @@ public class DirectorRestHelper {
 				.toString();
 	}
 	
-	// Task
+	public static String getDeploymentListURI(String host, int port) {
+		return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).path("deployments").build().toString();
+	}
+	
+	public static String getTaskListURI(String host, int port) {
+		return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).path("tasks").build().toString();
+	}
+	
 	public static String getTaskId(String taskUrl) {
 		String taskId = "";
 		try {

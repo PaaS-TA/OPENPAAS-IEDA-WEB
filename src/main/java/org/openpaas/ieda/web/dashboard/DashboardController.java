@@ -11,7 +11,7 @@ import org.openpaas.ieda.api.Stemcell;
 import org.openpaas.ieda.web.deploy.release.IEDAReleaseService;
 import org.openpaas.ieda.web.deploy.release.ReleaseConfig;
 import org.openpaas.ieda.web.deploy.stemcell.StemcellService;
-import org.openpaas.ieda.web.information.deploy.DeploymentsConfig;
+import org.openpaas.ieda.web.information.deploy.Deployment;
 import org.openpaas.ieda.web.information.deploy.IEDADeploymentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,22 +46,21 @@ public class DashboardController {
 	@RequestMapping(value="/dashboard/deployments", method=RequestMethod.GET)
 	public ResponseEntity listDeployment(){
 
-		List<DeploymentsConfig> contents = deploymentsService.listDeployment();
-		log.info("*****************");
-		log.info("SIZE : " + contents.size());
-		log.info("*****************");
+		List<Deployment> contents = deploymentsService.listDeployment();
 		if(contents != null && contents.size() > 0){
 			int recid = 0;
-			for(DeploymentsConfig deploymentConfig : contents){
+			for(Deployment deploymentConfig : contents){
 				deploymentConfig.setRecid(recid++);
 			}
 		}
 
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("total", contents.size());
+		if ( contents != null ) {
+			result.put("total", contents.size());
+			result.put("records", contents);
+		} else
+			result.put("total", 0);
 		
-		if(contents.size() > 5)	contents.subList(0, 4);
-		result.put("records", contents);
 
 		return new ResponseEntity(result, HttpStatus.OK);
 	}
@@ -78,10 +77,13 @@ public class DashboardController {
 		}
 
 		HashMap<String, Object> result = new HashMap<String, Object>();
-		result.put("total", contents.size());
-		
-		if(contents.size() > 5)	contents.subList(0, 4);
-		result.put("records", contents);
+		if ( contents != null ) {
+			result.put("total", contents.size());
+			result.put("records", contents);
+		}
+		else
+			result.put("total", 0);
+
 		return new ResponseEntity( result, HttpStatus.OK);
 	}
 

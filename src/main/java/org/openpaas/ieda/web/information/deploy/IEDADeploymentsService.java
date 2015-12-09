@@ -4,13 +4,18 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openpaas.ieda.api.Deployment;
-import org.openpaas.ieda.api.DirectorClient;
-import org.openpaas.ieda.api.DirectorClientBuilder;
+import org.openpaas.ieda.web.information.deploy.Deployment;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.openpaas.ieda.api.Stemcell;
+import org.openpaas.ieda.api.Task;
+import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigRepository;
+import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.openpaas.ieda.web.deploy.release.ReleaseConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,32 +23,39 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class IEDADeploymentsService {
 
-
-	@Autowired
-	private IEDADirectorConfigRepository directorConfigRepository;
 	
-	public List<DeploymentsConfig> listDeployment(){
-		IEDADirectorConfig defaultDirector = directorConfigRepository.findOneByDefaultYn("Y");
+	@Autowired
+	private IEDADirectorConfigService directroConfigService;
+	
+	public List<Deployment> listDeployment(){
+		return null;
 		
-		Deployment[] deployments = null;
-		List<DeploymentsConfig> deploymentConfigs = new ArrayList<DeploymentsConfig>();
+/*		
+		IEDADirectorConfig defaultDirector = directroConfigService.getDefaultDirector();
+
+		Deployment[] deploymentList = null;
+		
 		try {
 			
-			DirectorClient client = new DirectorClientBuilder()
-					.withHost(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort())
-					.withCredentials(defaultDirector.getUserId(), defaultDirector.getUserPassword()).build();
-			URI deploymentsUri = UriComponentsBuilder.fromUri(client.getRoot())
-					.pathSegment("deployments").build().toUri();
-			deployments = client.getRestTemplate().getForObject(deploymentsUri, Deployment[].class);
-			if(deployments != null ){
-				log.info("##### Deployments Size ::: " + deployments.length);
-				for( Deployment deployment : deployments){
+			HttpClient client = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
+			GetMethod get = new GetMethod(DirectorRestHelper.getDeploymentListURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort()));
+			get = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)get);
+
+			client.executeMethod(get);
+			ObjectMapper mapper = new ObjectMapper();
+			deploymentList = mapper.readValue(get.getResponseBodyAsString(), Deployment[].class);
+			
+			if(deploymentList != null ){
+				log.info("##### Deployments Size ::: " + deploymentList.length);
+				for( Deployment deployment : deploymentList){
 					DeploymentsConfig config = new DeploymentsConfig();
 					config.setDeployName(deployment.getName());
 					if(deployment.getReleases() != null && deployment.getReleases().size() > 0
@@ -70,5 +82,7 @@ public class IEDADeploymentsService {
 					"요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
 		}
 		return deploymentConfigs;
+		
+		return null;*/
 	}
 }
