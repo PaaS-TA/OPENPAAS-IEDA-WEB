@@ -11,12 +11,14 @@ import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.openpaas.ieda.api.Stemcell;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
+import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.openpaas.ieda.web.config.stemcell.IEDAStemcellContentRepository;
 import org.openpaas.ieda.web.config.stemcell.StemcellContent;
 import org.openpaas.ieda.web.config.stemcell.StemcellManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +42,6 @@ public class StemcellService {
 
 	public List<Stemcell> listStemcell() {
 
-		Stemcell[] stemcells = null;
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
 		
 		HttpClient client = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
@@ -48,6 +49,7 @@ public class StemcellService {
 		GetMethod get = new GetMethod(DirectorRestHelper.getStemcellsURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort()));
 		get = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)get);
 
+		Stemcell[] stemcells = null;
 		try {
 			int status = client.executeMethod(get);
 			
@@ -56,6 +58,7 @@ public class StemcellService {
 			log.info("# Stemcell List : " + get.getResponseBodyAsString());
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw new IEDACommonException("notfound.stemcell.exception", " 스템셀 정보 조회중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
 		
 		// 스템셀 버전 역순으로 정렬

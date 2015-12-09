@@ -16,7 +16,6 @@ import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigRepository;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
-import org.openpaas.ieda.web.deploy.release.ReleaseConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

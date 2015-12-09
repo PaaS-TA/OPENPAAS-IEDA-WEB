@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openpaas.ieda.api.Stemcell;
-import org.openpaas.ieda.web.deploy.release.IEDAReleaseService;
-import org.openpaas.ieda.web.deploy.release.ReleaseConfig;
+import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.openpaas.ieda.web.deploy.stemcell.StemcellService;
 import org.openpaas.ieda.web.information.deploy.Deployment;
 import org.openpaas.ieda.web.information.deploy.IEDADeploymentsService;
@@ -34,7 +33,7 @@ public class DashboardController {
 	@Autowired
 	private IEDADeploymentsService deploymentsService;
 	@Autowired
-	private IEDAReleaseService releaseService;
+	private ReleaseService releaseService;
 	@Autowired
 	private StemcellService stemcellService;
 
@@ -67,6 +66,7 @@ public class DashboardController {
 
 	@RequestMapping( value="/dashboard/releases", method =RequestMethod.GET)
 	public ResponseEntity listRelease(){
+		/*
 		List<ReleaseConfig> contents = releaseService.listRelease();
 
 		int recid = 0;
@@ -83,8 +83,11 @@ public class DashboardController {
 		}
 		else
 			result.put("total", 0);
-
+		
 		return new ResponseEntity( result, HttpStatus.OK);
+		*/
+		
+		return new ResponseEntity(null, HttpStatus.OK);
 	}
 
 	// 스템셀 목록조회

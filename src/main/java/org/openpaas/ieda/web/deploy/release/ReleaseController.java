@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.openpaas.ieda.api.ReleaseFile;
+import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,13 +37,13 @@ public class ReleaseController {
 	private IEDAConfiguration iedaConfiguration;
 
 	@Autowired
-	private IEDAReleaseService service;
+	private ReleaseService releaseService;
 	
 	@Autowired
-	private UploadReleasAsyncByScriptService uploadService;
+	private UploadReleaseAsyncService uploadReleaseService;
 	
 	@Autowired
-	private DeleteReleaseAsyncByScriptService deleteService;
+	private DeleteReleaseAsyncService deleteReleaseService;
 	
 	@RequestMapping(value="/deploy/listRelease", method=RequestMethod.GET)
 	public String List() {
@@ -50,35 +52,29 @@ public class ReleaseController {
 	
 	@RequestMapping( value="/releases", method =RequestMethod.GET)
 	public ResponseEntity listRelease(){
-		List<ReleaseConfig> contents = service.listRelease();
+		List<ReleaseInfo> contents = releaseService.listRelease();
 		
-		int recid = 0;
-		if(contents != null){
-			for( ReleaseConfig config : contents ){
-				config.setRecid(recid++);
-			}
-		}
 		HashMap<String, Object> result = new HashMap<String, Object>();
-		result.put("total", contents.size());
-		result.put("records", contents);
+		if ( contents != null ) {
+			result.put("total", contents.size());
+			result.put("records", contents);
+		} else
+			result.put("total", 0);
+		
 		return new ResponseEntity( result, HttpStatus.OK);
 	}
 	
 	@RequestMapping( value="/localReleases", method =RequestMethod.GET)
 	public ResponseEntity listLocalRelease(){
-		List<ReleaseConfig> contents = service.listLocalRelease();
-		
-		int recid = 0;
-		if(contents != null){
-			for( ReleaseConfig config : contents ){
-				config.setRecid(recid++);
-				log.info("#### ::: "+ config.toString());
-			}
-		}
+		List<ReleaseFile> contents = releaseService.listLocalRelease();
 		
 		HashMap<String, Object> result = new HashMap<String, Object>();
-		result.put("total", contents.size());
-		result.put("records", contents);
+		if ( contents != null ) {
+			result.put("total", contents.size());
+			result.put("records", contents);
+		} else
+			result.put("total", 0);
+		
 		return new ResponseEntity( result, HttpStatus.OK);
 	}
 	
@@ -90,12 +86,7 @@ public class ReleaseController {
 	@MessageMapping("/releaseUploading")
 	@SendTo("/socket/uploadRelease")
 	public ResponseEntity doUploadRelease(@RequestBody @Valid ReleaseContentDto.Upload dto) {
-		log.info("### Release Upload Controller ###");
-		
-		uploadService.uploadReleaseAsync(iedaConfiguration.getReleaseDir()
-				, dto.getFileName());
-		
-		
+		uploadReleaseService.uploadReleaseAsync(iedaConfiguration.getReleaseDir(), dto.getFileName());
 		return new ResponseEntity(HttpStatus.OK);
 	}
 	
@@ -107,10 +98,8 @@ public class ReleaseController {
 	@MessageMapping("/releaseDelete")
 	@SendTo("/socket/deleteRelease")
 	public ResponseEntity doDeleteRelease(@RequestBody @Valid ReleaseContentDto.Delete dto) {
-		log.info("### Release Delete Controller ###");
-		deleteService.deleteReleaseAsync(iedaConfiguration.getReleaseDir()
-				, dto.getFileName()
-				, dto.getVersion());
+		
+		deleteReleaseService.deleteReleaseAsync(dto.getFileName(), dto.getVersion());
 		return new ResponseEntity(HttpStatus.OK);
 	}
 	

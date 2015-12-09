@@ -163,7 +163,7 @@ function doUploadStemcell() {
 			version: record.stemcellVersion
 		};
 	
-	w2confirm( { msg : '선택된 스템셀  <br>' + record.stemcellFileName + ' <br>을 설치관리자에 업로드하시겠습니까?'
+	w2confirm( { msg : '스템셀  <br>' + record.stemcellFileName + '을(를)<br> 설치관리자에 업로드하시겠습니까?'
 		, title : '스템셀 업로드'
 		, yes_text:'확인'
 		, no_text:'취소'
@@ -178,7 +178,6 @@ function doUploadStemcell() {
 
 //Log Popup Create
 function appendLogPopup(type, requestParameter){
-	console.log("============================================================================");
 	w2popup.open({
 		title	: (type =="upload") ? '<b>스템셀 업로드</b>': '<b>스템셀 삭제</b>',
 		body	: appendLogPopupBody,
@@ -213,7 +212,7 @@ function doUploadConnect(requestParameter){
 		       	}
 		       	
 		       	if ( response.state.toLowerCase() != "started" ) {
-		            if ( response.state.toLowerCase() == "done" )	message = message + "이 업로드 되었습니다."; 
+		            if ( response.state.toLowerCase() == "done" )	message = message + " 업로드 되었습니다."; 
 		    		if ( response.state.toLowerCase() == "error" ) message = message + " 업로드 중 오류가 발생하였습니다.";
 		    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 업로드 중 취소되었습니다.";
 		    			
@@ -234,7 +233,6 @@ function doDeleteConnect(requestParameter){
 	var socket = new SockJS('/stemcellDelete');
 	deleteClient = Stomp.over(socket); 
 	deleteClient.connect({}, function(frame) {
-        console.log('Connected: ' + frame);
         deleteClient.subscribe('/socket/deleteStemcell', function(data){
 	        var response = JSON.parse(data.body);
 	        
@@ -244,7 +242,7 @@ function doDeleteConnect(requestParameter){
 		       	}
 		       	
 		       	if ( response.state.toLowerCase() != "started" ) {
-		            if ( response.state.toLowerCase() == "done" )	message = message + "이 삭제되었습니다."; 
+		            if ( response.state.toLowerCase() == "done" )	message = message + " 삭제되었습니다."; 
 		    		if ( response.state.toLowerCase() == "error" ) message = message + " 삭제 중 오류가 발생하였습니다.";
 		    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 삭제 중 취소되었습니다.";
 		    			

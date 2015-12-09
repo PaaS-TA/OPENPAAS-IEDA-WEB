@@ -16,20 +16,20 @@ $(function() {
  	$('#ru_uploadedReleasesGrid').w2grid({
 		name	: 'ru_uploadedReleasesGrid',
 		show	: {	
-					lineNumbers: true,
 					selectColumn: true	,
-					footer: true},
+					footer: true
+					},
 		multiSelect: false,
 		method	: 'GET',
 		style	: 'text-align:center',
 		columns	:[
 		         {field: 'recid', caption: 'recid', hidden: true}
-		       , {field: 'name', caption: '이름', size: '30%'}
-		       , {field: 'version', caption: 'version', size: '20%'}
-		       , {field: 'commitHash', caption: 'CommitHash', size: '20%'}
-		       , {field: 'currentlyDeployed', caption: 'currently_deployed', size: '15%'}
-		       , {field: 'uncommittedChanges', caption: 'uncommitted_changes ', size: '15%'}
-		       //, {field: 'commit_hash', caption: 'Commit Hash', size: '40%'}
+		       , {field: 'name', caption: '릴리즈명', size: '20%'}
+		       , {field: 'version', caption: '릴리즈버전', size: '15%'}
+		       , {field: 'currentDeployed', caption: '현재 배포여부', size: '15%'}
+		       , {field: 'jobNames', caption: 'Job템플릿', size: '40%', style: 'text-align:left'}
+
+
 		       ],
 		onClick: function(event) {
 			var grid = this;
@@ -53,21 +53,16 @@ $(function() {
  	$('#ru_localReleasesGrid').w2grid({
 		name	: 'ru_localReleasesGrid',
 		show	: {	
-					lineNumbers: true,
-					selectColumn: true	,
-					footer: true},
+					selectColumn: true,
+					footer: true
+					},
 		multiSelect: false,
 		method 	: "GET",
 		style	: 'text-align:center',
 		columns	:[
 		         {field: 'recid', caption: 'recid', hidden: true}
-		      /*  , {field: 'name', caption: '이름', size: '10%'}
-		       , {field: 'version', caption: 'version', size: '10%'}
-		       , {field: 'commitHash', caption: 'CommitHash', size: '10%'}
-		       , {field: 'currentlyDeployed', caption: 'Currently_Deployed', size: '15%'}
-		       , {field: 'uncommittedChanges', caption: 'UnCommitted_changes ', size: '15%'} */
-		       //, {field: 'commit_hash', caption: 'Commit Hash', size: '40%'}
-		       , {field: 'fileName', caption: '파일명', size: '80%', style: 'text-align:left'}
+		       , {field: 'releaseFile', caption: '릴리즈 파일명', size: '50%', style: 'text-align:left'}
+		       , {field: 'releaseFileSize', caption: '릴리즈 파일크기', size: '50%', style: 'text-align:right'}		       
 		       ],
 		onClick: function(event) {
 			var grid = this;
@@ -180,10 +175,10 @@ function doUploadRelease() {
 	if ( record == "" || record == null) return;
 	
 	var requestParameter = {
-			fileName : record.fileName
+			fileName : record.releaseFile
 		};
 	
-	w2confirm( { msg : '선택된 릴리즈 <br>' + record.fileName + ' <br>을 설치관리자에 업로드하시겠습니까?'
+	w2confirm( { msg : '릴리즈 ' + record.releaseFile + '을(를) <br> 설치관리자에 업로드하시겠습니까?'
 		, title : '릴리즈 업로드'
 		, yes_text:'확인'
 		, no_text:'취소'
@@ -199,14 +194,13 @@ function doUploadRelease() {
 //Log Popup Create
 function appendLogPopup(type, requestParameter){
 	w2popup.open({
-		title	: (type == "upload") ? '<b>릴리즈 업로드 로그</b>':'<b>릴리즈 삭제 로그</b>',
+		title	: (type == "upload") ? '<b>릴리즈 업로드</b>':'<b>릴리즈 삭제</b>',
 		body	: appendLogPopupBody,
 		buttons : appendLogPopupButton,
 		width 	: 800,
 		height	: 550,
 		modal	: true,
 		onOpen  : function(){
-			console.log("=============");
 			if(type =="upload") doUploadConnect(requestParameter);
 			else doDeleteConnect(requestParameter);
 		}
@@ -215,13 +209,30 @@ function appendLogPopup(type, requestParameter){
 
 //Release Upload connect
 function doUploadConnect(requestParameter){
-	console.log("2.=====Release doUploadConnect=====");
+	
+	var message = "릴리즈(" + requestParameter.fileName + ") ";
+	
 	var socket = new SockJS('/releaseUploading');
 	uploadClient = Stomp.over(socket); 
 	uploadClient.connect({}, function(frame) {
         console.log('Connected: ' + frame);
         uploadClient.subscribe('/socket/uploadRelease', function(data){
-        	$("textarea[name='logAppendArea']").append(data.body + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
+        	var response = JSON.parse(data.body);
+	        
+        	if ( response.messages != null ) {
+		       	for ( var i=0; i < response.messages.length; i++) {
+		       		$("textarea[name='logAppendArea']").append(response.messages[i] + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
+		       	}
+		       	
+		       	if ( response.state.toLowerCase() != "started" ) {
+		            if ( response.state.toLowerCase() == "done" )	message = message + " 업로드 되었습니다."; 
+		    		if ( response.state.toLowerCase() == "error" ) message = message + " 업로드 중 오류가 발생하였습니다.";
+		    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 업로드 중 취소되었습니다.";
+		    			
+		    		uploadClient.disconnect();
+					w2alert(message, "릴리즈 업로드");
+		       	}
+        	}
         });
         socketSendUploadData(requestParameter);
     });
@@ -229,13 +240,29 @@ function doUploadConnect(requestParameter){
 
 //Release Delete connect
 function doDeleteConnect(requestParameter){
-	console.log("2.=====Release doDeleteConnect=====" + requestParameter.fileName);
+	
+	var message = requestParameter.version + " 버전의 릴리즈(" + requestParameter.fileName + ") ";
+	
 	var socket = new SockJS('/releaseDelete');
 	deleteClient = Stomp.over(socket); 
-	deleteClient.connect({}, function(frame) {
-        console.log('Connected: ' + frame);
+	deleteClient.connect({}, function() {
         deleteClient.subscribe('/socket/deleteRelease', function(data){
-        	$("textarea[name='logAppendArea']").append(data.body + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
+	        var response = JSON.parse(data.body);
+	        
+	        if ( response.messages != null ) {
+		       	for ( var i=0; i < response.messages.length; i++) {
+		       		$("textarea[name='logAppendArea']").append(response.messages[i] + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
+		       	}
+		       	
+		       	if ( response.state.toLowerCase() != "started" ) {
+		            if ( response.state.toLowerCase() == "done" )	message = message + " 삭제되었습니다."; 
+		    		if ( response.state.toLowerCase() == "error" ) message = message + " 삭제 중 오류가 발생하였습니다.";
+		    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 삭제 중 취소되었습니다.";
+		    			
+		            deleteClient.disconnect();
+					w2alert(message, "릴리즈 삭제");
+		       	}
+	        }
         });
         socketSendDeleteData(requestParameter);
         
@@ -254,12 +281,12 @@ function popupClose() {
 		uploadClient.disconnect();
 		$("textarea[name='logAppendArea']").text("");
 	}
-	else if (deleteClient != null) {
+	
+	if (deleteClient != null) {
 		deleteClient.disconnect();
 		$("textarea[name='logAppendArea']").text("");
 	}
 	
-	console.log("Disconnected");
 	w2popup.close();
 	
 	// 업로드된 릴리즈 조회
@@ -292,7 +319,7 @@ function popupClose() {
 	
 	<!-- 릴리즈 목록-->
 	<div class="pdt20"> 
-		<div class="title fl">디렉터에 업로드된 릴리즈 목록</div>
+		<div class="title fl">업로드된 릴리즈 목록</div>
 		<div class="fr">
 			<span class="btn btn-danger" style="width:120px" id="doDeleteRelease">릴리즈 삭제</span>
 	    </div>
