@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -18,20 +17,15 @@ import java.util.stream.Collectors;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.modelmapper.ModelMapper;
-import org.openpaas.ieda.api.DirectorEndPoint;
 import org.openpaas.ieda.api.Info;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
-import org.openpaas.ieda.web.config.stemcell.StemcellContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,9 +40,6 @@ public class IEDADirectorConfigService {
 	@Autowired
 	private IEDADirectorConfigRepository directorConfigRepository;
 
-	@Autowired
-	private ModelMapper modelMapper;
-	
 	@Autowired
 	private IEDAConfiguration iedaConfiguration;
 	
@@ -94,7 +85,7 @@ public class IEDADirectorConfigService {
 		get = (GetMethod)DirectorRestHelper.setAuthorization(userId, password, (HttpMethodBase)get);
 		
 		try {
-			int status = client.executeMethod(get);
+			client.executeMethod(get);
 			System.out.println("Status Code : " + get.getStatusCode());
 			System.out.println("Response    : " + get.getResponseBodyAsString());
 			
