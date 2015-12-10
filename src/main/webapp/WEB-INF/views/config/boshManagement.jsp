@@ -12,7 +12,7 @@ var boshId = "";
 var awsInfo = "";
 var boshInfo = "";
 var networkInfo = "";
-var recourcesInfo = "";
+var resourcesInfo = "";
 
 $(function(){
 	$('#config_boshGrid').w2grid({
@@ -54,7 +54,144 @@ $(function(){
 	$("#installBtn").click(function(){
 		awsPopup();
 	});
+	
+	//Bosh 수정
+	$("#modifyBtn").click(function(){
+		if($("#modifyBtn").attr('disabled') == "disabled") return;
+		w2confirm({
+			title 	: "BOSH 수정",
+			msg		: "BOSH 를 수정하시겠습니까?",
+			yes_text: "확인",
+			yes_callBack : function(envent){
+				//ajax data call
+				var selected = w2ui['config_boshGrid'].getSelection();
+				console.log("modify Click!!!");
+				if( selected.length == 0 ){
+					w2alert("선택된 정보가 없습니다.", "BOSH 수정");
+					return;
+				}
+				else{
+					var record = w2ui['config_boshGrid'].get(selected);
+					console.log(record.iaas);
+					if(record.iaas == "AWS") getBoshAwsData(record);
+					//else getBootstrapOpenstackData(record);
+				}
+			},
+			no_text : "취소"
+		});
+ 	});
+ 	
+ 	//Bosh 삭제
+	$("#deleteBtn").click(function(){
+		if($("#deleteBtn").attr('disabled') == "disabled") return;
+		w2confirm({
+			title 	: "BOSH 삭제",
+			msg		: "BOSH 를 삭제하시겠습니까?",
+			yes_text: "확인",
+			yes_callBack : function(event){
+				//event.onComplete= function(){
+					//ajax data call
+					var selected = w2ui['config_boshGrid'].getSelection();
+					console.log("Delete Click!!!");
+					if( selected.length == 0 ){
+						w2alert("선택된 정보가 없습니다.", "BOSH 삭제");
+						return;
+					}
+					else{
+						var record = w2ui['config_boshGrid'].get(selected);
+						console.log(record.iaas);
+						if(record.iaas == "AWS") deleteBoshAwsPop(record);
+					}
+			//	}
+			},
+			no_text : "취소"
+		});
+ 	});
+	doSearch();
 });
+//조회기능
+function doSearch() {
+	//doButtonStyle();
+	w2ui['config_boshGrid'].load("<c:url value='/config/boshList'/>",
+			function (){
+				doButtonStyle();
+			});
+}
+//MODIFY
+function getBoshAwsData(record){
+	var url = "/bosh/aws/"+record.id;
+	$.ajax({
+		type : "GET",
+		url : url,
+		contentType : "application/json",
+		success : function(data, status) {
+			console.log("== /bosh/aws/ RESULT :: ");
+			if ( data == null || data == "" ){
+				//isOk = false;
+			} 
+			else {
+				initSetting();
+				//var content = JSON.parse(data.contents);
+				console.log("=== Content ::: " + data.contents);
+				settingAWSData(data.contents);
+			}
+		},
+		error : function(request, status, error) {
+			var errorResult = JSON.parse(request.responseText);
+			console.log("console log ::: " +errorResult.message);
+			w2alert(errorResult.message, "BOOTSTRAP 수정");
+		}
+	});	
+}
+//DELETE
+function deleteBoshAwsPop(record){
+	var body = '<textarea name="deleteLogs" style="width:93%;height:93%;overflow-y:visible;resize:none;background-color: #FFF;margin:2%" readonly="readonly"></textarea>';
+	//body += '</div>';
+	
+	w2popup.open({
+		width : 610,
+		height : 400,
+		title : "<b>Bosh 삭제</b>",
+		body  : body,
+		buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="popupComplete();;">완료</button>',
+		showMax : true,
+		onOpen : function(event){
+			event.onComplete = function(){
+			console.log("Delete Pop");
+				var socket = new SockJS('/boshDelete');
+				deleteClient = Stomp.over(socket); 
+				deleteClient.connect({}, function(frame) {
+					console.log('Connected Frame : ' + frame);
+					deleteClient.subscribe('/bosh/boshDelete', function(data){
+				        console.log('Connected: Data : ' + data);
+				        var deleteLogs = $(".w2ui-msg-body textarea[name=deleteLogs]");
+			        	deleteLogs.append(data.body + "\n").scrollTop( deleteLogs[0].scrollHeight );
+			        	
+			        	if( data == "complete"){
+			        		deleteClient.disconnect(function(){
+			        			console.log("disconnect");
+			        		});//callback
+			        	}
+			        });
+					deleteClient.send('/send/boshDelete', {}, JSON.stringify({iaas:record.iaas, id:record.id}));
+			    });
+			}
+		},
+		onClose : function (event){
+			event.onComplete= function(){
+				/* $("body ").remove("#deleteLogs");
+				deleteLogs.text(""); */
+				$("textarea").text("");
+				w2ui['config_boshGrid'].reset();
+				console.log("close");
+				deleteClient.disconnect();
+				deleteClient.close();
+				deleteClient = "";
+				doSearch();
+			}
+		}
+	});	
+}
 
 function awsPopup(){
 	$("#awsInfoDiv").w2popup({
@@ -64,11 +201,11 @@ function awsPopup(){
 		onOpen:function(event){
 			event.onComplete = function(){				
 				if(awsInfo != ""){
-					$(".w2ui-msg-body input[name='accessKeyId']").val();
-					$(".w2ui-msg-body input[name='secretAccessKey']").val();
-					$(".w2ui-msg-body input[name='defaultKeyName']").val();
-					$(".w2ui-msg-body input[name='defaultSecurityGroups']").val();
-					$(".w2ui-msg-body input[name='region']").val();
+					$(".w2ui-msg-body input[name='accessKeyId']").val(awsInfo.accessKeyId);
+					$(".w2ui-msg-body input[name='secretAccessKey']").val(awsInfo.secretAccessKey);
+					$(".w2ui-msg-body input[name='defaultKeyName']").val(awsInfo.defaultKeyName);
+					$(".w2ui-msg-body input[name='defaultSecurityGroups']").val(awsInfo.defaultSecurityGroups);
+					$(".w2ui-msg-body input[name='region']").val(awsInfo.region);
 				}
 			}
 		},
@@ -80,6 +217,7 @@ function awsPopup(){
 function saveAwsInfo(){
 	//AwsInfo Save
 	awsInfo = {
+			iaas					: "AWS",
 			accessKeyId 			: $(".w2ui-msg-body input[name='accessKeyId']").val(),
 			secretAccessKey			: $(".w2ui-msg-body input[name='secretAccessKey']").val(),
 			defaultKeyName			: $(".w2ui-msg-body input[name='defaultKeyName']").val(),
@@ -87,9 +225,59 @@ function saveAwsInfo(){
 			region					: $(".w2ui-msg-body input[name='region']").val()
 	}
 	//ajax AwsInfo Save
-	
-	boshInfoPopup();
+	$.ajax({
+		type : "PUT",
+		url : "/config/bosh/saveAwsInfo",
+		contentType : "application/json",
+		//dataType: "json",
+		async : true,
+		data : JSON.stringify(awsInfo), 
+		success : function(data, status) {
+			boshId = data;
+			boshInfoPopup();
+		},
+		error : function( e, status ) {
+			w2alert("AWS 설정 등록에 실패 하였습니다.", "Bosh 설치");
+		}
+	});
 }
+
+function settingAWSData(contents){
+	boshId = contents.id;
+	awsInfo = {
+			iaas		 			: "AWS",
+			accessKeyId				: contents.accessKeyId,
+			secretAccessKey			: contents.secretAccessKey,
+			defaultKeyName			: contents.defaultKeyName,
+			defaultSecurityGroups	: contents.defaultSecurityGroups,
+			region					: contents.region
+	}
+	boshInfo = {
+			id				: boshId,
+			boshName 		: contents.boshName,
+			directorUuid	: contents.directorUuid,
+			releaseVersion	: contents.releaseVersion
+	}
+	networkInfo = {
+			id					: boshId,			
+			subnetReserved		: contents.subnetReserved,
+			subnetStatic		: contents.subnetStatic,
+			publicStaticIps		: contents.publicStaticIps,
+			subnetRange			: contents.subnetRange,
+			subnetGateway		: contents.subnetGateway,
+			subnetDns			: contents.subnetDns,
+			cloudSubnet			: contents.cloudSubnet,
+			cloudSecurityGroups	: contents.cloudSecurityGroups
+	}
+	resourcesInfo = {
+			id				: contents.id,
+			stemcellName	: contents.stemcellName,
+			stemcellVersion	: contents.stemcellVersion,
+			boshPassword	: contents.boshPassword
+	}
+	awsPopup();	
+}
+
 
 function  boshInfoPopup(){
 	$("#boshInfoDiv").w2popup({
@@ -99,9 +287,9 @@ function  boshInfoPopup(){
 		onOpen:function(event){
 			event.onComplete = function(){				
 				if(boshInfo != ""){
-					$(".w2ui-msg-body input[name='boshName']").val();
-					$(".w2ui-msg-body input[name='directorUuid']").val();
-					$(".w2ui-msg-body input[name='releaseVersion']").val();
+					$(".w2ui-msg-body input[name='boshName']").val(boshInfo.boshName);
+					$(".w2ui-msg-body input[name='directorUuid']").val(boshInfo.directorUuid);
+					$(".w2ui-msg-body input[name='releaseVersion']").val(boshInfo.releaseVersion);
 				}
 			}
 		},
@@ -112,6 +300,7 @@ function  boshInfoPopup(){
 function saveBoshInfo(param){
 	console.log("### saveBoshInfo :: " + param)
 	boshInfo = {
+			id				: boshId,
 			boshName 		: $(".w2ui-msg-body input[name='boshName']").val(),
 			directorUuid	: $(".w2ui-msg-body input[name='directorUuid']").val(),
 			releaseVersion	: $(".w2ui-msg-body input[name='releaseVersion']").val()
@@ -122,7 +311,20 @@ function saveBoshInfo(param){
 	}
 		
 	//Server send Bosh Info
-	networkPopup();
+	$.ajax({
+		type : "PUT",
+		url : "/config/bosh/saveBoshInfo",
+		contentType : "application/json",
+		//dataType: "json",
+		async : true,
+		data : JSON.stringify(boshInfo), 
+		success : function(data, status) {
+			networkPopup();
+		},
+		error : function( e, status ) {
+			w2alert("Bosh Info 등록에 실패 하였습니다.", "Bosh 설치");
+		}
+	});
 }
 
 function networkPopup(){
@@ -150,6 +352,7 @@ function networkPopup(){
 
 function saveNetworkInfo(param){
 	networkInfo = {
+			id					: boshId,
 			subnetReserved		: $(".w2ui-msg-body input[name='subnetReserved']").val(),
 			subnetStatic		: $(".w2ui-msg-body input[name='subnetStatic']").val(),
 			publicStaticIps		: $(".w2ui-msg-body input[name='publicStaticIps']").val(),
@@ -166,7 +369,21 @@ function saveNetworkInfo(param){
 	}
 		
 	//Server send Bosh Info
-	resourcesPopup();
+	$.ajax({
+		type : "PUT",
+		url : "/config/bosh/saveBoshInfo",
+		contentType : "application/json",
+		//dataType: "json",
+		async : true,
+		data : JSON.stringify(boshInfo), 
+		success : function(data, status) {
+			resourcesPopup();
+		},
+		error : function( e, status ) {
+			w2alert("Bosh Network 등록에 실패 하였습니다.", "Bosh 설치");
+		}
+	});
+	
 }
 
 function resourcesPopup(){
@@ -176,10 +393,11 @@ function resourcesPopup(){
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
-				if(recourcesInfo != ""){
-					$(".w2ui-msg-body input[name='stemcellName']").val(recourcesInfo.stemcellName);
-					$(".w2ui-msg-body input[name='stemcellVersion']").val(recourcesInfo.stemcellVersion);
-					$(".w2ui-msg-body input[name='cloudInstanceType']").val(recourcesInfo.cloudInstanceType);
+				if(resourcesInfo != ""){
+					$(".w2ui-msg-body input[name='stemcellName']").val(resourcesInfo.stemcellName);
+					$(".w2ui-msg-body input[name='stemcellVersion']").val(resourcesInfo.stemcellVersion);
+					//$(".w2ui-msg-body input[name='cloudInstanceType']").val(resourcesInfo.cloudInstanceType);
+					$(".w2ui-msg-body input[name='boshPassword']").val(resourcesInfo.boshPassword);
 				}
 			}
 		},
@@ -188,10 +406,12 @@ function resourcesPopup(){
 }
 
 function saveResourcesInfo(param){
-	recourcesInfo = {
+	resourcesInfo = {
+			id					: boshId,
 			stemcellName		: $(".w2ui-msg-body input[name='stemcellName']").val(),
 			stemcellVersion		: $(".w2ui-msg-body input[name='stemcellVersion']").val(),
-			cloudInstanceType	: $(".w2ui-msg-body input[name='cloudInstanceType']").val()
+			//cloudInstanceType	: $(".w2ui-msg-body input[name='cloudInstanceType']").val(),
+			boshPassword		: $(".w2ui-msg-body input[name='boshPassword']").val()
 	}
 	
 	if(param == 'before'){
@@ -209,6 +429,7 @@ function deployPopup(){
 		width 	: 650,
 		height 	: 470,
 		modal	: true,
+		showMax : true,
 		onClose : initSetting,
 		onOpen : function(event){
 			event.onComplete = function(){
@@ -264,24 +485,27 @@ function installPopup(){
 		width : 650,
 		height : 470,
 		modal	: true,
+		showMax : true,
 		onOpen : function(event){
 			event.onComplete = function(){
 				//deployFileName
-				/* var socket = new SockJS('/bootstrapInstall');
+				var socket = new SockJS('/boshInstall');
 				installClient = Stomp.over(socket); 
 				installClient.connect({}, function(frame) {
 					console.log('Connected Frame : ' + frame);
-			        installClient.subscribe('/bootstrap/bootstrapInstall', function(data){
+			        installClient.subscribe('/bosh/boshInstall', function(data){
 				        console.log('Connected: Data : ' + data);
 			        	var installLogs = $(".w2ui-msg-body #installLogs");
 			        	installLogs.append(data.body + "\n").scrollTop( installLogs[0].scrollHeight );
 			        	
 			        	if( data == "complete"){
+			        		installClient.close();
 			        		installClient.disconnect();//callback
+			        		installClient = "";			        		
 			        	}
 			        });
-			        installClient.send('/send/bootstrapInstall', {}, JSON.stringify({deployFileName:deployFileName}));
-			    }); */
+			        installClient.send('/send/boshInstall', {}, JSON.stringify({deployFileName:deployFileName}));
+			    });
 			}
 		},
 		onClose : initSetting
@@ -289,11 +513,11 @@ function installPopup(){
 }
 
 function initSetting(){
-	var boshId = "";
-	var awsInfo = "";
-	var boshInfo = "";
-	var networkInfo = "";
-	var recourcesInfo = "";
+	boshId = "";
+	awsInfo = "";
+	boshInfo = "";
+	networkInfo = "";
+	resourcesInfo = "";
 }
 
 function popupComplete(){
@@ -402,7 +626,7 @@ $( window ).resize(function() {
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-		        <button class="btn" style="float: left;" onclick="w2popup.close();">취소</button>
+		        <button class="btn" style="float: left;" onclick="popupComplete();">취소</button>
 		        <button class="btn" style="float: right;padding-right:15%" onclick="saveAwsInfo();">다음>></button>
 		    </div>
 		</div>
@@ -452,7 +676,7 @@ $( window ).resize(function() {
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
 				<button class="btn" style="float: left;" onclick="saveBoshInfo('before');">이전</button>
-				<button class="btn" onclick="w2popup.close();">취소</button>
+				<button class="btn" onclick="popupComplete();">취소</button>
 				<button class="btn" style="float: right; padding-right: 15%" onclick="saveBoshInfo('after');">다음>></button>
 			</div>
 		</div>
@@ -526,7 +750,7 @@ $( window ).resize(function() {
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
 				<button class="btn" style="float: left;" onclick="saveNetworkInfo('before');">이전</button>
-				<button class="btn" onclick="w2popup.close();">취소</button>
+				<button class="btn" onclick="popupComplete();">취소</button>
 				<button class="btn" style="float: right; padding-right: 15%" onclick="saveNetworkInfo('after');">다음>></button>
 			</div>
 		</div>
@@ -561,17 +785,23 @@ $( window ).resize(function() {
 						<input name="stemcellVersion" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
 					</div>
 				</div>
-				<div class="w2ui-field">
+				<!-- <div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">인스턴스 유형</label>
 					<div>
 						<input name="cloudInstanceType" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
+					</div>
+				</div> -->
+				<div class="w2ui-field">
+					<label style="text-align: left; width: 200px; font-size: 11px;">Bosh Password</label>
+					<div>
+						<input name="boshPassword" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
 					</div>
 				</div>
 			</div>
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
 				<button class="btn" style="float: left;" onclick="saveResourcesInfo('before');">이전</button>
-				<button class="btn" onclick="w2popup.close();">취소</button>
+				<button class="btn" onclick="popupComplete();">취소</button>
 				<button class="btn" style="float: right; padding-right: 15%" onclick="saveResourcesInfo('after');">다음>></button>
 			</div>
 		</div>
@@ -597,7 +827,7 @@ $( window ).resize(function() {
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 			<button class="btn" style="float: left;" onclick="saveDeployInfo('before');">이전</button>
-			<button class="btn" onclick="w2popup.close();">취소</button>
+			<button class="btn" onclick="popupComplete();">취소</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="saveDeployInfo('after');">다음>></button>
 		</div>
 	</div>
@@ -623,7 +853,7 @@ $( window ).resize(function() {
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 				<!-- 설치 실패 시 -->
 				<button class="btn" style="float: left;" onclick="saveDeployInfo('before');">이전</button>
-				<button class="btn" onclick="w2popup.close();">취소</button>
+				<button class="btn" onclick="popupComplete();">취소</button>
 				<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
 		</div>		
 	</div>	

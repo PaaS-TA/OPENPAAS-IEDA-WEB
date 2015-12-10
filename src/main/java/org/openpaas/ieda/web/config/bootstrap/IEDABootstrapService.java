@@ -12,11 +12,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import org.apache.commons.io.IOUtils;
-import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -97,7 +97,6 @@ public class IEDABootstrapService {
 									: "openstack-microbosh-setting-"+id+".yml";
 		String deployFileName = ""; 
 		
-		FileOutputStream fos = null;
 		try {
 			tempDeploy = new File(classPath.toURI());//resource.getFile();
 			stubDeploy = new File(stubPath.toURI());
@@ -154,7 +153,7 @@ public class IEDABootstrapService {
 			items.add(new BootstrapItem("[awsKey]", awsConfig.getAccessKey()));
 			items.add(new BootstrapItem("[secretAccessKey]", awsConfig.getSecretAccessKey()));
 			items.add(new BootstrapItem("[securGroupName]", awsConfig.getDefaultSecurityGroups()));
-			items.add(new BootstrapItem("[privateKey]", awsConfig.getPrivateKeyPath() + awsConfig.getDefaultKeyName()));
+			items.add(new BootstrapItem("[privateKey]", awsConfig.getPrivateKeyPath() + awsConfig.getPrivateKeyPath()));
 			items.add(new BootstrapItem("[region]", awsConfig.getAvailabilityZone()));
 			items.add(new BootstrapItem("[flavor]", awsConfig.getInstanceType()));	
 			
@@ -173,7 +172,7 @@ public class IEDABootstrapService {
 			items.add(new BootstrapItem("[awsKey]", openstackConfig.getAccessKey()));
 			items.add(new BootstrapItem("[secretAccessKey]", openstackConfig.getSecretAccessKey()));
 			items.add(new BootstrapItem("[securGroupName]", openstackConfig.getDefaultSecurityGroups()));
-			items.add(new BootstrapItem("[privateKey]", openstackConfig.getPrivateKeyPath()));
+			items.add(new BootstrapItem("[privateKey]", iedaConfiguration.getKeyPathDir()+ openstackConfig.getPrivateKeyPath()));
 			items.add(new BootstrapItem("[region]", openstackConfig.getAvailabilityZone()));
 			items.add(new BootstrapItem("[flavor]", openstackConfig.getInstanceType()));
 		}
@@ -331,6 +330,23 @@ public class IEDABootstrapService {
 			} catch (Exception e) {
 			}
 		}
+	}
+
+
+	public List<String> getKeyPathFileList() {
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("KeyFile only","pem");
+		String keyPath = System.getProperty("user.home") + System.getProperty("file.separator") + ".ssh" + System.getProperty("file.separator");
+		log.info("## KeyPath ::: " + keyPath);
+		File dir = new File(keyPath);
+		File[] listFiles = dir.listFiles();
+		log.info("::: Local keyPath ::: "+ listFiles.length);
+		List<String> localFiles = new ArrayList<>();
+		for (File file : listFiles) {
+			if(file.getName().endsWith(".pem") || file.getName().endsWith(".PEM")){
+				localFiles.add(file.getName());
+			}
+		}
+		return localFiles;
 	}
 	
 }

@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.config.bootstrap;
+package org.openpaas.ieda.web.config.bosh;
 
 import java.util.Date;
 
@@ -10,9 +10,10 @@ import javax.persistence.TemporalType;
 
 import lombok.Data;
 
-@Entity(name="IEDA_BOOTSTRAP_AWS")
+@Entity(name="IEDA_BOSH_AWS")
 @Data
-public class IEDABootstrapAwsConfig {
+public class IEDABoshAwsConfig {
+
 	@Id @GeneratedValue
 	private Integer id;
 	
@@ -22,42 +23,25 @@ public class IEDABootstrapAwsConfig {
 	@Temporal(TemporalType.DATE)
 	private Date updatedDate;
 	
-	/** AWS Setting Info **/
-	private String accessKey;
-	
+	private String accessKeyId;
 	private String secretAccessKey;
-	
 	private String defaultKeyName;
-	
 	private String defaultSecurityGroups;
-	
-	private String privateKeyPath;
-	
-	/** Network Info **/
-	private String subnetRange;
-	
-	private String gateway;
-	
-	private String dns;
-	
-	private String subnetId;
-	
-	private String directorPrivateIp;
-	
-	private String directorPublicIp;
-	
-	private String stemcellName;
-	
-	private String stemcellVersion;
-	
-	private String instanceType;
-	
 	private String region;
-	
-	private String availabilityZone;
-	
-	private String microBoshPw;
-	
+	private String boshName;
+	private String directorUuid;
+	private String releaseVersion;
+	private String subnetReserved;
+	private String subnetStatic;
+	private String publicStaticIps;
+	private String subnetRange;
+	private String subnetGateway;
+	private String subnetDns;
+	private String cloudSubnet;
+	private String cloudSecurityGroups;
+	private String stemcellName;
+	private String stemcellVersion;
+	//private String cloudInstanceType;
+	private String boshPassword;
 	private String deploymentFile;
-
 }

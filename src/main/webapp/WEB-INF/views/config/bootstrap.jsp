@@ -18,6 +18,7 @@ var deployInfo = "";
 var deployFileName = "";
 var installClient = "";
 var deleteClient = "";
+var keyPathFileList = "";
 
 $(function() {
 	
@@ -234,11 +235,26 @@ function deletePop(record){
 			        	deleteLogs.append(data.body + "\n").scrollTop( deleteLogs[0].scrollHeight );
 			        	
 			        	if( data == "complete"){
-			        		deleteClient.disconnect();//callback
+			        		deleteClient.disconnect(function(){
+			        			console.log("disconnect");
+			        		});//callback
 			        	}
 			        });
 					deleteClient.send('/send/bootstrapDelete', {}, JSON.stringify({iaas:record.iaas, id:record.id}));
 			    });
+			}
+		},
+		onClose : function (event){
+			event.onComplete= function(){
+				/* $("body ").remove("#deleteLogs");
+				deleteLogs.text(""); */
+				$(".w2ui-msg-body #deleteLogs").text("");
+				w2ui['config_boshGrid'].reset();
+				console.log("close");
+				deleteClient.disconnect();
+				deleteClient.close();
+				deleteClient = "";
+				doSearch();
 			}
 		}
 	});
@@ -246,7 +262,7 @@ function deletePop(record){
 
 function gridReload(){
 	console.log("delete complete!");
-	w2ui['config_bootstrapGrid'].clear();
+	w2ui['config_bootstrapGrid'].reset();
 	doSearch();
 }
 
@@ -294,7 +310,7 @@ function bootSetPopup() {
 function awsPopup(){
 	$("#awsSettingInfoDiv").w2popup({
 		width : 610,
-		height : 390,
+		height : 430,
 		onClose : initSetting,
 		modal	: true,
 		onOpen:function(event){
@@ -306,9 +322,42 @@ function awsPopup(){
 					$(".w2ui-msg-body input[name='privateKeyName']").val(awsInfo.privateKeyName);
 					$(".w2ui-msg-body input[name='privateKeyPath']").val(awsInfo.privateKeyPath);
 				}
+				//keyPathFile list 
+				getKeyPathFileList();				
 			}
 		}
 	});
+}
+
+function getKeyPathFileList(){
+	$.ajax({
+		type : "GET",
+		url : "/bootstrap/getKeyPathFileList",
+		contentType : "application/json",
+		//dataType: "json",
+		async : true,
+		success : function(data, status) {
+			keyPathFileList = data;
+		},
+		error : function( e, status ) {
+			w2alert("KeyPath File 목록을 가져오는데 실패하였습니다.", "BOOTSTRAP 설치");
+		}
+	});
+}
+
+function changeKeyPathType(type){
+	console.log(type);
+	var keyPathDiv = $('.w2ui-msg-body #keyPathDiv');
+	var fileUploadInput = '<input type="file" name="keyPathFile" style="float: left;width:280px;margin-top:1.5px;" onchange="setPrivateKeyPathFileName(this);"> ';
+	var selectInput = '<input type="list" name="keyPathList" style="float: left;width:280px;" onchange="setPrivateKeyPath(this.value);"/>';
+	
+	if(type == "list") {
+		keyPathDiv.html(selectInput);
+		$('#w2ui-popup #keyPathDiv input[type=list]').w2field('list', { items: keyPathFileList , maxDropHeight:200, width:250});
+		
+	}else{
+		keyPathDiv.html(fileUploadInput);
+	}
 }
 
 //Save AWS Setting Info
@@ -320,18 +369,48 @@ function saveAwsSettingInfo(){
 			awsPw			: $(".w2ui-msg-body input[name='awsPw']").val(),
 			secretGroupName	: $(".w2ui-msg-body input[name='secretGroupName']").val(),
 			privateKeyName	: $(".w2ui-msg-body input[name='privateKeyName']").val(),
-			privateKeyPath	: $(".w2ui-msg-body input[name='privateKeyPath']").val()
+			privateKeyPath  : $(".w2ui-msg-body input[name='privateKeyPath']").val()
+	}
+	
+	if( $(".w2ui-msg-body input[name='keyPathFile']").val() != null){
+		var keyPathFile =  $(".w2ui-msg-body input[name='keyPathFile']").val().split('.').pop().toLowerCase();
+		
+		if($.inArray(keyPathFile, ['pem']) == -1) {
+			w2alert("KeyPath File은 .pem 파일만 등록 가능합니다.", "BOOTSTRAP 설치");
+			return;
+		}
 	}
 	
 	$.ajax({
 		type : "PUT",
 		url : "/bootstrap/bootstrapSetAws",
 		contentType : "application/json",
-		//dataType: "json",
 		async : true,
 		data : JSON.stringify(awsInfo), 
 		success : function(data, status) {
 			bootstrapSeq = data;
+			console.log("keypath::"+ bootstrapSeq);
+			keyPathFileUpload();
+		},
+		error : function( e, status ) {
+			w2alert("AWS 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
+		}
+	});
+}
+
+function keyPathFileUpload(){
+	var awsForm = $(".w2ui-msg-body #awsForm")[0];
+	var awsFormData = new FormData(awsForm);
+	$.ajax({
+		type : "POST",
+		url : "/bootstrap/keyPathFileUpload",
+		enctype : 'multipart/form-data',
+		dataType: "text",
+		async : true,
+		processData: false, 
+		contentType:false,
+		data : awsFormData,  
+		success : function(data, status) {
 			networkPopup();
 		},
 		error : function( e, status ) {
@@ -486,6 +565,7 @@ function deployPopup(){
 		width 	: 610,
 		height 	: 470,
 		modal	: true,
+		showMax : true,
 		onClose : initSetting,
 		onOpen : function(event){
 			event.onComplete = function(){
@@ -540,6 +620,7 @@ function installPopup(){
 		width : 610,
 		height : 470,
 		modal	: true,
+		showMax : true,
 		onOpen : function(event){
 			event.onComplete = function(){
 				//deployFileName
@@ -553,7 +634,9 @@ function installPopup(){
 			        	installLogs.append(data.body + "\n").scrollTop( installLogs[0].scrollHeight );
 			        	
 			        	if( data == "complete"){
+			        		installClient.close()
 			        		installClient.disconnect();//callback
+			        		installClient = "";
 			        	}
 			        });
 			        installClient.send('/send/bootstrapInstall', {}, JSON.stringify({deployFileName:deployFileName}));
@@ -589,6 +672,17 @@ function popupComplete(){
 	//grid Reload
 	gridReload();	
 }
+
+function setPrivateKeyPath(value){
+	$(".w2ui-msg-body input[name=privateKeyPath]").val(value);
+}
+
+function setPrivateKeyPathFileName(fileInput){
+	 console.log("@@@@");
+	var file = fileInput.files;
+	$(".w2ui-msg-body input[name=privateKeyPath]").val(file[0].name);
+}
+
 
 </script>
 
@@ -648,42 +742,52 @@ function popupComplete(){
 	        </div>
 			<div class="cont_title">▶ AWS 설정정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<div class="w2ui-field" hidden="true">
-		            <label>Iaas</label>
-		            <div>
-		                <input name="iaas" type="text" maxlength="100" />
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">AWS 키(access-key)</label>
-		            <div>
-		                <input name="awsKey" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">AWS 비밀번호(secret-access-key)</label>
-		            <div>
-		                <input name="awsPw" type="password" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">시큐리티 그룹명</label>
-		            <div>
-		                <input name="secretGroupName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Private Key 명</label>
-		            <div>
-		                <input name="privateKeyName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Private Key Path</label>
-		            <div>
-		                <input name="privateKeyPath" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
+		    	<form id="awsForm" method="POST" enctype="multipart/form-data" action="/bootstrap/keyPathFileUpload">
+			    	<div class="w2ui-field" hidden="true">
+			            <label>Iaas</label>
+			            <div>
+			                <input name="iaas" type="text" maxlength="100" />
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:250px;font-size:11px;">AWS 키(access-key)</label>
+			            <div>
+			                <input name="awsKey" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:250px;font-size:11px;">AWS 비밀번호(secret-access-key)</label>
+			            <div>
+			                <input name="awsPw" type="password" maxlength="100" size="30" style="float:left;width:280px;"/>
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:250px;font-size:11px;">시큐리티 그룹명</label>
+			            <div>
+			                <input name="secretGroupName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:250px;font-size:11px;">Private Key 명</label>
+			            <div>
+			                <input name="privateKeyName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:250px;font-size:11px;">Private Key Path</label>
+		                <input name="privateKeyPath" type="text" maxlength="100" size="30" hidden="true"/>
+		                <div >
+	  						<span onclick="changeKeyPathType('file');" style="width:200px;"><label><input type="radio" name="keyPathType"/>&nbsp;파일업로드</label></span>
+							&nbsp;&nbsp;
+							<span onclick="changeKeyPathType('list');" style="width:200px;"><label><input type="radio" name="keyPathType"/>&nbsp;리스트</label></span>
+						</div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:250px;font-size:11px;"></label>
+		                <input name="privateKeyPath" type="text" maxlength="100" size="30" hidden="true"/>
+						<div id="keyPathDiv" ></div>
+			        </div>
+		        </form>
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -824,8 +928,8 @@ function popupComplete(){
 	            </ul>
 	        </div>
 			<div rel="sub-title" class="cont_title">▶ 배포 Manifest 정보</div>
-			<div>
-				<textarea id="deployInfo" style="width:95%;height:250px;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
+			<div style="height:80%;">
+				<textarea id="deployInfo" style="width:95%;height:85%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -849,7 +953,7 @@ function popupComplete(){
 	        </div>
 			<div rel="sub-title" class="cont_title">▶ 설치 로그</div>
 			<div>
-				<textarea id="installLogs" style="width:95%;height:250px;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
+				<textarea id="installLogs" style="width:95%;height:80%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">

@@ -167,7 +167,7 @@ public class IEDABootstrapOpenstackService {
 		items.add(new BootstrapItem("[awsKey]", config.getAccessKey()));
 		items.add(new BootstrapItem("[secretAccessKey]", config.getSecretAccessKey()));
 		items.add(new BootstrapItem("[securGroupName]", config.getDefaultSecurityGroups()));
-		items.add(new BootstrapItem("[privateKey]", config.getPrivateKeyPath()));
+		items.add(new BootstrapItem("[privateKey]", iedaConfiguration.getKeyPathDir()+config.getPrivateKeyPath()));
 		return items;
 	}
 

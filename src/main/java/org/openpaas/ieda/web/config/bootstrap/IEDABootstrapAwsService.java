@@ -61,11 +61,9 @@ public class IEDABootstrapAwsService {
 		IEDABootstrapAwsConfig config = null;
 		log.info( "====== ID : " + dto.getId() );
 		if(dto.getId() == null || "".equals(dto.getId())){
-			log.info("====NEW=====");;
 			config = new IEDABootstrapAwsConfig();
 		}
 		else {
-			log.info("====UPDATE=====");;
 			config = awsRepository.findOne(Integer.parseInt(dto.getId()));
 		}
 		
@@ -93,7 +91,7 @@ public class IEDABootstrapAwsService {
 		awsRepository.save(config);
 	}
 	
-	public String saveAwsReleaseInfos(IDEABootStrapInfoDto.Resources dto) {
+	public String saveAwsResourcesInfos(IDEABootStrapInfoDto.Resources dto) {
 		IEDABootstrapAwsConfig config = awsRepository.findById(Integer.parseInt(dto.getId()));
 		config.setStemcellName(dto.getTargetStemcell());
 		config.setInstanceType(dto.getInstanceType());

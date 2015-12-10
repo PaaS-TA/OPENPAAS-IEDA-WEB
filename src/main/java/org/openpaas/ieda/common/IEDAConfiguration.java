@@ -19,4 +19,6 @@ public class IEDAConfiguration {
 	private String deploymentDir;
 	
 	private String tempDir;
+	
+	private String keyPathDir;
 }
