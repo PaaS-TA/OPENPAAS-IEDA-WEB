@@ -12,15 +12,13 @@ $(function() {
 		name	: 'sq_deploymentsGrid',
 		style	: 'text-align:center',
 		method	: 'GET',
-		show	: {
-					lineNumbers: true,
-					selectColumn: true,
-					footer: true},
+		multiSelect : false,
 		columns	: [
 					 {field: 'recid', 	caption: 'recid', hidden: true}
-		       	   , {field: 'deployName', caption: '배포 이름', size: '20%'}
-		       	   , {field: 'release', caption: '릴리즈 목록', size: '40%'}
-		       	   , {field: 'stemcellName', caption: '스템셀 목록', size: '40%'}
+		       	   , {field: 'name', caption: '배포 이름', size: '20%', style: 'text-align:left'}
+		       	   , {field: 'releaseInfo', caption: '릴리즈 정보', size: '40%', style: 'text-align:left'}
+		       	   , {field: 'stemcellInfo', caption: '스템셀 정보', size: '40%', style: 'text-align:left'}
+
 		       	],
 		onError: function(event) {
 			w2alert("ERROR");
@@ -29,7 +27,7 @@ $(function() {
 		}
 	});
 	
-	initView();
+	initView(bDefaultDirector);
 
 });
 

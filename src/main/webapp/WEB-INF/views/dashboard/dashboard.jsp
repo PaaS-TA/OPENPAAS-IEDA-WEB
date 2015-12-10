@@ -13,10 +13,10 @@ $(function() {
 		style	: 'text-align:center',
 		method	: 'GET',
 		columns	: [
-					 {field: 'recid', 	caption: 'recid', hidden: true}
-		       	   , {field: 'deployName', caption: '배포 이름', size: '20%'}
-		       	   , {field: 'release', caption: '릴리즈 목록', size: '40%'}
-		       	   , {field: 'stemcellName', caption: '스템셀 목록', size: '40%'}
+		 	 {field: 'recid', 	caption: 'recid', hidden: true}
+       	   , {field: 'name', caption: '배포 이름', size: '20%', style: 'text-align:left'}
+       	   , {field: 'releaseInfo', caption: '릴리즈 정보', size: '40%', style: 'text-align:left'}
+       	   , {field: 'stemcellInfo', caption: '스템셀 정보', size: '40%', style: 'text-align:left'}
 		       	],
 		onError: function(event) {
 			w2alert("ERROR");

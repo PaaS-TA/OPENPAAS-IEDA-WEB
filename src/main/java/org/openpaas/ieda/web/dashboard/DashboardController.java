@@ -7,12 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openpaas.ieda.api.Deployment;
+import org.openpaas.ieda.api.DeploymentInfo;
 import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.api.Stemcell;
 import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.openpaas.ieda.web.deploy.stemcell.StemcellService;
-import org.openpaas.ieda.web.information.deploy.Deployment;
-import org.openpaas.ieda.web.information.deploy.IEDADeploymentsService;
+import org.openpaas.ieda.web.information.deploy.DeploymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DashboardController {
 
 	@Autowired
-	private IEDADeploymentsService deploymentsService;
+	private DeploymentService deploymentService;
 	@Autowired
 	private ReleaseService releaseService;
 	@Autowired
@@ -46,23 +47,16 @@ public class DashboardController {
 	@RequestMapping(value="/dashboard/deployments", method=RequestMethod.GET)
 	public ResponseEntity listDeployment(){
 
-		List<Deployment> contents = deploymentsService.listDeployment();
-		if(contents != null && contents.size() > 0){
-			int recid = 0;
-			for(Deployment deploymentConfig : contents){
-				deploymentConfig.setRecid(recid++);
-			}
-		}
-
-		Map<String, Object> result = new HashMap<String, Object>();
+		List<DeploymentInfo> contents = deploymentService.listDeployment();
+		
+		HashMap<String, Object> result = new HashMap<String, Object>();
 		if ( contents != null ) {
 			result.put("total", contents.size());
 			result.put("records", contents);
 		} else
 			result.put("total", 0);
 		
-
-		return new ResponseEntity(result, HttpStatus.OK);
+		return new ResponseEntity( result, HttpStatus.OK);
 	}
 
 	@RequestMapping( value="/dashboard/releases", method =RequestMethod.GET)

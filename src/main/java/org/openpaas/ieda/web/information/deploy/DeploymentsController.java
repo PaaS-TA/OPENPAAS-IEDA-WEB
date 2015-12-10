@@ -3,11 +3,11 @@
  */
 package org.openpaas.ieda.web.information.deploy;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.openpaas.ieda.api.DeploymentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +17,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import lombok.extern.slf4j.Slf4j;
 
-
-/**
- * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
- *
- */
-
 @Slf4j
 @Controller
 public class DeploymentsController {
 	
 	@Autowired
-	private IEDADeploymentsService service;
+	private DeploymentService deploymentService;
 
 	@RequestMapping(value="/information/listDeployment", method=RequestMethod.GET)
 	public String List() {
@@ -38,18 +32,15 @@ public class DeploymentsController {
 	@RequestMapping(value="/deployments", method=RequestMethod.GET)
 	public ResponseEntity listDeployment(){
 		
-		List<Deployment> contents = service.listDeployment();
-		if(contents != null && contents.size() > 0){
-			int recid = 0;
-			for(Deployment deploymentConfig : contents){
-				deploymentConfig.setRecid(recid++);
-			}
-		}
+		List<DeploymentInfo> contents = deploymentService.listDeployment();
 		
-		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("total", contents.size());
-		result.put("records", contents);
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		if ( contents != null ) {
+			result.put("total", contents.size());
+			result.put("records", contents);
+		} else
+			result.put("total", 0);
 		
-		return new ResponseEntity(result, HttpStatus.OK);
+		return new ResponseEntity( result, HttpStatus.OK);
 	}
 }
