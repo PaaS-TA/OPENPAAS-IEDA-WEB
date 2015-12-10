@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.config.bosh;
+package org.openpaas.ieda.web.deploy.bosh;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,12 +31,12 @@ public class BoshManagementController {
 	@Autowired
 	private IEDABoshService boshService;
 	
-	@RequestMapping(value="/config/bosh")
+	@RequestMapping(value="/deploy/bosh")
 	public String List(){
-		return "/config/boshManagement";
+		return "/deploy/boshManagement";
 	}
 	
-	@RequestMapping(value="/config/boshList", method=RequestMethod.GET)
+	@RequestMapping(value="/deploy/boshList", method=RequestMethod.GET)
 	public ResponseEntity listBootstrap() {
 		List<BoshInfo> content = boshService.getBoshList();
 		
@@ -57,7 +57,7 @@ public class BoshManagementController {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/config/bosh/saveAwsInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/deploy/bosh/saveAwsInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveAwsInfo(@RequestBody @Valid BoshParam.AWS dto){
 		log.info("### saveAwsInfo :: " + dto.toString());
 		IEDABoshAwsConfig awsInfo =  awsService.saveBoshAwsInfo(dto);	
@@ -65,7 +65,7 @@ public class BoshManagementController {
 		return new ResponseEntity<>(awsInfo.getId(), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/config/bosh/saveBoshInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/deploy/bosh/saveBoshInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveBoshInfo(@RequestBody BoshParam.Bosh dto){
 //		Map<String, Object> result = new HashMap<>();
 //		if( "AWS".equals(dto.getIaas())){
@@ -76,7 +76,7 @@ public class BoshManagementController {
 		return new ResponseEntity<>(content, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/config/bosh/saveNetworkInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/deploy/bosh/saveNetworkInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveNetworkInfo(@RequestBody @Valid BoshParam.NetWork dto){
 		HttpStatus status = HttpStatus.OK;
 		Map<String, Object> result = new HashMap<>();
@@ -89,7 +89,7 @@ public class BoshManagementController {
 		return new ResponseEntity<>(result, status);
 	}
 	
-	@RequestMapping(value="/config/bosh/saveResourceInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/deploy/bosh/saveResourceInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveResourceInfo(@RequestBody @Valid BoshParam.Resource dto){
 		HttpStatus status = HttpStatus.OK;
 		Map<String, Object> result = new HashMap<>();
@@ -102,7 +102,7 @@ public class BoshManagementController {
 		return new ResponseEntity<>(result, status);
 	}
 	
-	@RequestMapping(value="/config/bosh/getBoshDeployInfo/{id}", method=RequestMethod.PUT)
+	@RequestMapping(value="/deploy/bosh/getBoshDeployInfo/{id}", method=RequestMethod.PUT)
 	public ResponseEntity getBoshDeployInfo(@PathVariable int id){
 		HttpStatus status = HttpStatus.OK;
 		String content = "";

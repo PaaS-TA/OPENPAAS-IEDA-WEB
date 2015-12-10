@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.config.bosh;
+package org.openpaas.ieda.web.deploy.bosh;
 
 import java.io.BufferedReader;
 import java.io.File;
