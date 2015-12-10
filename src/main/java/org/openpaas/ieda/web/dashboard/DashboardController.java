@@ -11,6 +11,7 @@ import org.openpaas.ieda.api.Deployment;
 import org.openpaas.ieda.api.DeploymentInfo;
 import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.api.Stemcell;
+import org.openpaas.ieda.api.StemcellInfo;
 import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.openpaas.ieda.web.deploy.stemcell.StemcellService;
 import org.openpaas.ieda.web.information.deploy.DeploymentService;
@@ -76,18 +77,16 @@ public class DashboardController {
 	// 스템셀 목록조회
 	@RequestMapping(value="/dashboard/stemcells", method=RequestMethod.GET)
 	public ResponseEntity listStemcell(){
-		List<Stemcell> contents = stemcellService.listStemcell();
-		int recid = 0;
-		if(contents.size() > 0){
-			for( Stemcell stemcell : contents ){
-				stemcell.setRecid(recid++);
-				log.info("### OS : " + stemcell.getOperatingSystem());
-			}
-		}
-		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("total", contents.size());
-		result.put("records", contents);
-		return new ResponseEntity( result, HttpStatus.OK);
+		List<StemcellInfo> contents = stemcellService.listStemcell();
+
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		if ( contents != null ) {
+			result.put("total", contents.size());
+			result.put("records", contents);
+		} else
+			result.put("total", 0);
+		
+		return new ResponseEntity(result, HttpStatus.OK);
 	}
 
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.openpaas.ieda.api.Stemcell;
+import org.openpaas.ieda.api.StemcellInfo;
 import org.openpaas.ieda.common.IEDAConfiguration;
 import org.openpaas.ieda.web.config.stemcell.StemcellContent;
 import org.openpaas.ieda.web.config.stemcell.StemcellContentDto;
@@ -46,16 +47,16 @@ public class StemcellController {
 	// 스템셀 목록 조회
 	@RequestMapping(value = "/stemcells", method = RequestMethod.GET)
 	public ResponseEntity listStemcell() {
-		List<Stemcell> contents = service.listStemcell();
-		int recid = 0;
-		if (contents != null) {
-			for (Stemcell stemcell : contents) {
-				stemcell.setRecid(recid++);
-			}
-		}
-		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("total", contents.size());
-		result.put("records", contents);
+		
+		List<StemcellInfo> contents = service.listStemcell();
+
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		if ( contents != null ) {
+			result.put("total", contents.size());
+			result.put("records", contents);
+		} else
+			result.put("total", 0);
+		
 		return new ResponseEntity(result, HttpStatus.OK);
 	}
 

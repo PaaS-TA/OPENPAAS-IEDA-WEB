@@ -59,18 +59,9 @@ public class DeploymentService {
 					for ( HashMap<String, String> release : deployment.getReleases()) {
 						releaseInfo = releaseInfo + release.get("name") + " (" + release.get("version") + ")<br>";
 					}
-					for ( HashMap<String, String> release : deployment.getReleases()) {
-						releaseInfo = releaseInfo + release.get("name") + " (" + release.get("version") + ")<br>";
-					}
-					for ( HashMap<String, String> release : deployment.getReleases()) {
-						releaseInfo = releaseInfo + release.get("name") + " (" + release.get("version") + ")<br>";
-					}
 					deploymentInfo.setReleaseInfo(releaseInfo);
 					
 					String stemcellInfo = "";
-					for ( HashMap<String, String> stemcell : deployment.getStemcells()) {
-						stemcellInfo = stemcellInfo + stemcell.get("name") + " (" + stemcell.get("version") + ")<br>";
-					}
 					for ( HashMap<String, String> stemcell : deployment.getStemcells()) {
 						stemcellInfo = stemcellInfo + stemcell.get("name") + " (" + stemcell.get("version") + ")<br>";
 					}
@@ -85,53 +76,6 @@ public class DeploymentService {
 			throw new IEDACommonException("notfound.deployment.exception", " 배포정보 조회중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
 		
-		return (deploymentInfoList==null) ? null : deploymentInfoList;
-		
-/*		
-		IEDADirectorConfig defaultDirector = directroConfigService.getDefaultDirector();
-
-		Deployment[] deploymentList = null;
-		
-		try {
-			
-			HttpClient client = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
-			GetMethod get = new GetMethod(DirectorRestHelper.getDeploymentListURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort()));
-			get = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)get);
-
-			client.executeMethod(get);
-			ObjectMapper mapper = new ObjectMapper();
-			deploymentList = mapper.readValue(get.getResponseBodyAsString(), Deployment[].class);
-			
-			if(deploymentList != null ){
-				log.info("##### Deployments Size ::: " + deploymentList.length);
-				for( Deployment deployment : deploymentList){
-					DeploymentsConfig config = new DeploymentsConfig();
-					config.setDeployName(deployment.getName());
-					if(deployment.getReleases() != null && deployment.getReleases().size() > 0
-							&& deployment.getStemcells() != null && deployment.getStemcells().size() > 0){
-						for(ReleaseConfig releaseConfig : deployment.getReleases()){
-							config.setRelease(releaseConfig.getName() + "/" + releaseConfig.getVersion());
-							for(Stemcell stemcell : deployment.getStemcells()){
-								config.setStemcellName(stemcell.getName());
-								deploymentConfigs.add(config);
-							}
-						}
-					}
-				}
-			}else{
-				throw new IEDACommonException("notfound.deploymentConfigs.exception", "Deployment 목록이 존재하지 않습니다.", HttpStatus.NO_CONTENT);
-			}
-		} catch (ResourceAccessException e) {
-			e.printStackTrace();
-			log.info("getMessage : " + e.getMessage());
-			log.info("getLocalizedMessage : " + e.getLocalizedMessage());
-			throw new IEDACommonException("notfound.deploymentConfigs.exception", " DeploymentConfig정보 조회중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			throw new IEDACommonException("notfound.deploymentConfigs.exception",
-					"요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
-		}
-		return deploymentConfigs;
-		
-		return null;*/
+		return deploymentInfoList;
 	}
 }

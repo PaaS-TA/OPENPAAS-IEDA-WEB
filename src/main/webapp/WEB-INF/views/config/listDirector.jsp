@@ -17,7 +17,14 @@ $(function() {
 		columns:[
 				 {field: 'recid', 					caption: 'recid', 		hidden: true},
 		         {field: 'iedaDirectorConfigSeq', 	caption: '레코드키', 		hidden: true},
-		         {field: 'defaultYn', 				caption: '기본관리자 여부',	size: '10%'},
+		         {field: 'defaultYn', 				caption: '기본 관리자',	size: '10%',
+			    	   render: function(record) {
+			    		   if ( record.defaultYn == 'Y' )
+			    			   return '<span class="btn btn-primary" style="width:70px">기본</span>';
+			    		   else
+			    			   return '';
+			    	   }
+		        	 },
 		         {field: 'directorCpi', 			caption: 'CPI',			size: '10%'},
 		         {field: 'directorName', 			caption: '관리자 이름',		size: '10%'},
 		         {field: 'userId', 					caption: '계정',			size: '10%'},

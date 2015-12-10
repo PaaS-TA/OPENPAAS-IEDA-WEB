@@ -1,8 +1,10 @@
 package org.openpaas.ieda.web.deploy.stemcell;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,6 +12,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.openpaas.ieda.api.Stemcell;
+import org.openpaas.ieda.api.StemcellInfo;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
@@ -40,30 +43,59 @@ public class StemcellService {
 	
 	private String filterString = null;
 
-	public List<Stemcell> listStemcell() {
+	public List<StemcellInfo> listStemcell() {
 
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
-		
-		HttpClient client = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
 
-		GetMethod get = new GetMethod(DirectorRestHelper.getStemcellsURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort()));
-		get = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)get);
-
-		Stemcell[] stemcells = null;
+		List<StemcellInfo> stemcellInfoList = null;
 		try {
-			int status = client.executeMethod(get);
+			HttpClient client = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
+
+			GetMethod get = new GetMethod(DirectorRestHelper.getStemcellsURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort()));
+			get = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)get);
+
+			client.executeMethod(get);
+		
+			if ( get.getResponseBodyAsString() != null && !get.getResponseBodyAsString().isEmpty()) {
 			
-			ObjectMapper mapper = new ObjectMapper();
-			stemcells = mapper.readValue(get.getResponseBodyAsString(), Stemcell[].class);
-			log.info("# Stemcell List : " + get.getResponseBodyAsString());
+				ObjectMapper mapper = new ObjectMapper();
+				Stemcell[] stemcells = mapper.readValue(get.getResponseBodyAsString(), Stemcell[].class);
+				
+				int idx = 0;
+				for ( Stemcell stemcell : stemcells ) {
+					if ( stemcellInfoList == null ) 
+						stemcellInfoList = new ArrayList<StemcellInfo>();
+					
+					StemcellInfo stemcellInfo = new StemcellInfo();
+					
+					stemcellInfo.setRecid(idx++);
+					stemcellInfo.setName(stemcell.getName());
+					stemcellInfo.setOperatingSystem(stemcell.getOperatingSystem());
+					stemcellInfo.setVersion(stemcell.getVersion());
+					stemcellInfo.setCid(stemcell.getCid());
+					
+					String deploymentInfo = "";
+					for ( HashMap<String, String> deployment : stemcell.getDeployments() ) {
+						deploymentInfo = deploymentInfo + deployment.get("name") + "<br>";
+					}
+					stemcellInfo.setDeploymentInfo(deploymentInfo);
+					
+					stemcellInfoList.add(stemcellInfo);
+				}
+				
+				// 스템셀 버전 역순으로 정렬
+				Comparator<StemcellInfo> byStemcellVersion = Collections.reverseOrder(Comparator.comparing(StemcellInfo::getVersion));
+				stemcellInfoList = stemcellInfoList.stream()
+						.sorted(byStemcellVersion)
+						.collect(Collectors.toList());
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new IEDACommonException("notfound.stemcell.exception", " 스템셀 정보 조회중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
 		
-		// 스템셀 버전 역순으로 정렬
-		Comparator<Stemcell> byStemcellVersion = Collections.reverseOrder(Comparator.comparing(Stemcell::getVersion));
-		return Arrays.asList(stemcells).stream().sorted(byStemcellVersion).collect(Collectors.toList());
+		return stemcellInfoList;
 	}
 
 	public List<StemcellContent> listLocalStemcells() {

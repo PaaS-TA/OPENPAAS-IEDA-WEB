@@ -25,11 +25,16 @@ $(function() {
 		columns	:[
 		         {field: 'recid', caption: 'recid', hidden: true}
 		       , {field: 'name', caption: '릴리즈명', size: '20%'}
-		       , {field: 'version', caption: '릴리즈버전', size: '15%'}
-		       , {field: 'currentDeployed', caption: '현재 배포여부', size: '15%'}
-		       , {field: 'jobNames', caption: 'Job템플릿', size: '40%', style: 'text-align:left'}
-
-
+		       , {field: 'version', caption: '릴리즈버전', size: '10%'}
+		       , {field: 'currentDeployed', caption: '배포 사용중 여부', size: '15%',
+		    	   render: function(record) {
+		    		   if ( record.currentDeployed == 'true' )
+		    			   return '<span class="btn btn-success" style="width:70px">배포</span>';
+		    		   else
+		    			   return '';
+		    	   }
+		       }
+		       , {field: 'jobNames', caption: 'Job템플릿', size: '55%', style: 'text-align:left'}
 		       ],
 		onClick: function(event) {
 			var grid = this;

@@ -43,7 +43,7 @@ public class ReleaseService {
 		
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
 
-		Release[] releases = null;
+		
 		List<ReleaseInfo> releaseInfoList = null;
 		try {
 			
@@ -52,43 +52,45 @@ public class ReleaseService {
 			get = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)get);
 
 			client.executeMethod(get);
-			ObjectMapper mapper = new ObjectMapper();
-			releases = mapper.readValue(get.getResponseBodyAsString(), Release[].class);
 			
-			int idx = 0;
-			List<Release> releaseList = Arrays.asList(releases);
-			for ( Release release : releaseList ) {
+			if ( get.getResponseBodyAsString() != null && !get.getResponseBodyAsString().isEmpty()) {
 				
-				List<ReleaseVersion> versionList = release.getReleaseVersions();
-				for (ReleaseVersion releaseVersion : versionList) {
+				ObjectMapper mapper = new ObjectMapper();
+				Release[] releases = mapper.readValue(get.getResponseBodyAsString(), Release[].class);
+				
+				int idx = 0;
+				List<Release> releaseList = Arrays.asList(releases);
+				for ( Release release : releaseList ) {
 					
-					ReleaseInfo releaseInfo = new ReleaseInfo();
-					releaseInfo.setRecid(idx++);
-					releaseInfo.setName(release.getName());
-					releaseInfo.setVersion(releaseVersion.getVersion());
-					releaseInfo.setCurrentDeployed(releaseVersion.getCurrentlyDeployed().toString());
-					releaseInfo.setJobNames(releaseVersion.getJobNames().toString());
-					
-					if ( releaseInfoList == null ) 
-						releaseInfoList = new ArrayList<ReleaseInfo>();
-					
-					releaseInfoList.add(releaseInfo);
-					
-					log.info("===============");
-					log.info("--> " + releaseInfo.toString());
+					List<ReleaseVersion> versionList = release.getReleaseVersions();
+					for (ReleaseVersion releaseVersion : versionList) {
+						
+						ReleaseInfo releaseInfo = new ReleaseInfo();
+						releaseInfo.setRecid(idx++);
+						releaseInfo.setName(release.getName());
+						releaseInfo.setVersion(releaseVersion.getVersion());
+						releaseInfo.setCurrentDeployed(releaseVersion.getCurrentlyDeployed().toString());
+						releaseInfo.setJobNames(releaseVersion.getJobNames().toString());
+						
+						if ( releaseInfoList == null ) 
+							releaseInfoList = new ArrayList<ReleaseInfo>();
+						
+						releaseInfoList.add(releaseInfo);
+						
+						log.info("===============");
+						log.info("--> " + releaseInfo.toString());
+					}
+				}
+				
+				if ( releaseInfoList != null ) {
+					// 스템셀 버전 역순으로 정렬
+					Comparator<ReleaseInfo> byReleaseVersion = Collections.reverseOrder(Comparator.comparing(ReleaseInfo::getVersion));
+					releaseInfoList = releaseInfoList.stream()
+							.sorted(byReleaseVersion)
+							.collect(Collectors.toList());
 				}
 			}
 			
-			if ( releaseInfoList != null ) {
-				// 스템셀 버전 역순으로 정렬
-				//Comparator<ReleaseInfo> byReleaseName = Collections.reverseOrder(Comparator.comparing(ReleaseInfo::getName));
-				Comparator<ReleaseInfo> byReleaseVersion = Collections.reverseOrder(Comparator.comparing(ReleaseInfo::getVersion));
-
-				releaseInfoList = releaseInfoList.stream()
-						//.sorted(byReleaseName)
-						.sorted(byReleaseVersion)
-						.collect(Collectors.toList());
-			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
