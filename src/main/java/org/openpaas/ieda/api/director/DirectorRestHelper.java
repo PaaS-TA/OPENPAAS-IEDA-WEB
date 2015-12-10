@@ -27,6 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DirectorRestHelper {
+	
+	final private static int THREAD_SLEEP_TIME = 2 * 1000;
+	
 	public static HttpClient getHttpClient(int port) {
 		Protocol.registerProtocol("https", new Protocol("https", new ExSSLSocketFactory(), port));
 		return new HttpClient();
@@ -128,7 +131,6 @@ public class DirectorRestHelper {
 
 	public static void trackToTask(IEDADirectorConfig defaultDirector, SimpMessagingTemplate messageTemplate,
 			String messageEndpoint, HttpClient client, String taskId) {
-		final int THREAD_SLEEP_TIME = 2 * 1000;
 
 		try {
 			sendTaskOutput(messageTemplate, messageEndpoint, "started", Arrays.asList("Director task " + taskId));
@@ -144,6 +146,7 @@ public class DirectorRestHelper {
 				getTaskStausMethod = (GetMethod) DirectorRestHelper.setAuthorization(defaultDirector.getUserId(),
 						defaultDirector.getUserPassword(), (HttpMethodBase) getTaskStausMethod);
 				int statusCode = client.executeMethod(getTaskStausMethod);
+				System.out.println("#### status code : " + statusCode);
 				if (HttpStatus.valueOf(statusCode) != HttpStatus.OK) {
 					System.out.println("Query Task Status is not ok(" + statusCode + ").");
 					sendTaskOutput(messageTemplate, messageEndpoint, "error",
@@ -266,16 +269,15 @@ public class DirectorRestHelper {
 			sendTaskOutput(messageTemplate, messageEndpoint, "error",
 					Arrays.asList("", "An exception occurred while executing the task " + taskId));
 		}
-
 	}
 
-	// started, done, error, cancelled
-	public static void sendTaskOutput(SimpMessagingTemplate messageTemplate, String messageEndpoint, String status,
-			List<String> messages) {
+	public static void sendTaskOutput(SimpMessagingTemplate messageTemplate, String messageEndpoint, String status, List<String> messages) {
 		ResponseTaskOuput response = new ResponseTaskOuput();
 		response.setState(status);
 		response.setMessages(messages);
 
 		messageTemplate.convertAndSend(messageEndpoint, response);
 	}
+	
+	
 }

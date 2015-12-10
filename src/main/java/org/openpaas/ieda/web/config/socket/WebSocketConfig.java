@@ -26,6 +26,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 							, "/releaseDelete"
 							, "/bootstrapInstall"
 							, "/bootstrapDelete"
+							, "/task"
 							).withSockJS();
 	}
 

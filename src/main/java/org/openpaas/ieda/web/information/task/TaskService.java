@@ -10,7 +10,6 @@ import org.openpaas.ieda.api.Task;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
-import org.openpaas.ieda.web.config.setting.IEDADirectorConfigRepository;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,11 +18,8 @@ import org.springframework.web.client.ResourceAccessException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-public class IEDATaskConfigService {
-
+public class TaskService {
 	@Autowired
 	private IEDADirectorConfigService directroConfigService;
 
@@ -50,5 +46,4 @@ public class IEDATaskConfigService {
 		}
 		return Arrays.asList(tasks);
 	}
-
 }
