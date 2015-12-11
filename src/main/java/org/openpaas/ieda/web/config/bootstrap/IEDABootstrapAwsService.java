@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.persistence.EntityNotFoundException;
 
 import org.openpaas.ieda.common.IEDACommonException;
-import org.openpaas.ieda.common.IEDAConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,19 +21,13 @@ public class IEDABootstrapAwsService {
 	@Autowired
 	private IEDABootstrapService bootstrapService;
 	
-	@Autowired
-	private IEDAConfiguration iedaConfiguration;
-	
 	public IEDABootstrapAwsConfig getAwsInfo(int id){
 		IEDABootstrapAwsConfig config =  null;
 		try{
-			log.info("==="+id);
 			config = awsRepository.findOne(id);
 			
-			log.info("==="+config.toString());
 		}catch(Exception e){
 			e.printStackTrace();
-			log.info("ERROR MESSAGE ::: " + e.getMessage());
 			throw new IEDACommonException("illigalArgument.bootstrap.exception",
 					"해당하는 BOOTSTRAP이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
@@ -59,7 +52,6 @@ public class IEDABootstrapAwsService {
 	public Integer saveAwsInfo(IDEABootStrapInfoDto.Aws dto){
 		Date now = new Date();
 		IEDABootstrapAwsConfig config = null;
-		log.info( "====== ID : " + dto.getId() );
 		if(dto.getId() == null || "".equals(dto.getId())){
 			config = new IEDABootstrapAwsConfig();
 		}

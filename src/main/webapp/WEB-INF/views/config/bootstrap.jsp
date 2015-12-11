@@ -338,6 +338,11 @@ function getKeyPathFileList(){
 		async : true,
 		success : function(data, status) {
 			keyPathFileList = data;
+			if(awsInfo.privateKeyPath){
+				//$(".w2ui-msg-body input[name='keyPathType']").val("list");
+				$('.w2ui-msg-body input:radio[name=keyPathType]:input[value="list"]').attr("checked", true);
+				changeKeyPathType("list");
+			}
 		},
 		error : function( e, status ) {
 			w2alert("KeyPath File 목록을 가져오는데 실패하였습니다.", "BOOTSTRAP 설치");
@@ -348,15 +353,20 @@ function getKeyPathFileList(){
 function changeKeyPathType(type){
 	console.log(type);
 	var keyPathDiv = $('.w2ui-msg-body #keyPathDiv');
-	var fileUploadInput = '<input type="file" name="keyPathFile" style="float: left;width:280px;margin-top:1.5px;" onchange="setPrivateKeyPathFileName(this);"> ';
+	var fileUploadInput = '<input type="file" name="keyPathFile" class="file" style="float: left;width:280px;margin-top:1.5px;" onchange="setPrivateKeyPathFileName(this);">';
 	var selectInput = '<input type="list" name="keyPathList" style="float: left;width:280px;" onchange="setPrivateKeyPath(this.value);"/>';
 	
 	if(type == "list") {
 		keyPathDiv.html(selectInput);
 		$('#w2ui-popup #keyPathDiv input[type=list]').w2field('list', { items: keyPathFileList , maxDropHeight:200, width:250});
-		
+		if(awsInfo.privateKeyPath) $(".w2ui-msg-body input[name='keyPathList']").data('selected', {text:awsInfo.privateKeyPath});
 	}else{
 		keyPathDiv.html(fileUploadInput);
+		/* $(".w2ui-msg-body #keyPathDiv input[name='keyPathFile']").fileinput({
+	        showUpload: false,
+	        maxFileCount: 10,
+	        mainClass: "input-group-lg"
+	    }); */
 	}
 }
 
@@ -730,8 +740,8 @@ function setPrivateKeyPathFileName(fileInput){
 	<!-- AWS  설정 DIV -->
 	<div id="awsSettingInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
-		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
-			<div rel="sub-title" >
+		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
+			<div style="margin-left:3%;">
 	            <ul class="progressStep_5" >
 		            <li class="active">AWS 설정</li>
 		            <li class="before">Network 설정</li>
@@ -740,7 +750,7 @@ function setPrivateKeyPathFileName(fileInput){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div class="cont_title">▶ AWS 설정정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ AWS 설정정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<form id="awsForm" method="POST" enctype="multipart/form-data" action="/bootstrap/keyPathFileUpload">
 			    	<div class="w2ui-field" hidden="true">
@@ -752,7 +762,7 @@ function setPrivateKeyPathFileName(fileInput){
 			        <div class="w2ui-field">
 			            <label style="text-align: left;width:250px;font-size:11px;">AWS 키(access-key)</label>
 			            <div>
-			                <input name="awsKey" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+			                <input name="awsKey" type="text" maxlength="100" size="30" style="float:left;width:280px;" placeholder="pliz input Aws Key"/>
 			            </div>
 			        </div>
 			        <div class="w2ui-field">
@@ -777,14 +787,14 @@ function setPrivateKeyPathFileName(fileInput){
 			            <label style="text-align: left;width:250px;font-size:11px;">Private Key Path</label>
 		                <input name="privateKeyPath" type="text" maxlength="100" size="30" hidden="true"/>
 		                <div >
-	  						<span onclick="changeKeyPathType('file');" style="width:200px;"><label><input type="radio" name="keyPathType"/>&nbsp;파일업로드</label></span>
+	  						<span onclick="changeKeyPathType('file');" style="width:200px;"><label><input type="radio" name="keyPathType" value="file"/>&nbsp;파일업로드</label></span>
 							&nbsp;&nbsp;
-							<span onclick="changeKeyPathType('list');" style="width:200px;"><label><input type="radio" name="keyPathType"/>&nbsp;리스트</label></span>
+							<span onclick="changeKeyPathType('list');" style="width:200px;"><label><input type="radio" name="keyPathType" value="list"/>&nbsp;리스트</label></span>
 						</div>
 			        </div>
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:250px;font-size:11px;"></label>
 		                <input name="privateKeyPath" type="text" maxlength="100" size="30" hidden="true"/>
+			            <label style="text-align: left;width:250px;font-size:11px;" class="control-label"></label>
 						<div id="keyPathDiv" ></div>
 			        </div>
 		        </form>
@@ -801,8 +811,8 @@ function setPrivateKeyPathFileName(fileInput){
 	<!-- Network  설정 DIV -->
 	<div id="networkSettingInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
-		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
-			<div >
+		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
+			<div style="margin-left:3%;">
 	            <ul class="progressStep_5">
 		            <li class="pass">AWS 설정</li>
 		            <li class="active">Network 설정</li>
@@ -811,7 +821,7 @@ function setPrivateKeyPathFileName(fileInput){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title">▶ Network 설정정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ Network 설정정보</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Subnet Range</label>
@@ -862,8 +872,8 @@ function setPrivateKeyPathFileName(fileInput){
 	<!-- Resources  설정 DIV -->
 	<div id="resourcesSettingInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
-		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
-			<div >
+		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
+			<div style="margin-left:3%;">
 	            <ul class="progressStep_5">
 		            <li class="pass">AWS 설정</li>
 		            <li class="pass">Network 설정</li>
@@ -872,7 +882,7 @@ function setPrivateKeyPathFileName(fileInput){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title">▶ 리소스 설정정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 리소스 설정정보</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">스템셀 지정</label>
@@ -917,8 +927,8 @@ function setPrivateKeyPathFileName(fileInput){
 	
 	<div id="deployManifestDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
-		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
-			<div >
+		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
+			<div style="margin-left:3%;">
 	            <ul class="progressStep_5">
 		            <li class="pass">AWS 설정</li>
 		            <li class="pass">Network 설정</li>
@@ -927,9 +937,9 @@ function setPrivateKeyPathFileName(fileInput){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title">▶ 배포 Manifest 정보</div>
-			<div style="height:80%;">
-				<textarea id="deployInfo" style="width:95%;height:85%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 배포 Manifest 정보</div>
+			<div style="width:95%;height:72%;float: left;">
+				<textarea id="deployInfo" style="width:100%;height:100%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -941,8 +951,8 @@ function setPrivateKeyPathFileName(fileInput){
 	
 	<div id="installDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
-		<div rel="body" style="width:100%;padding:15px 5px 15px 5px;">
-			<div >
+		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;">
+			<div style="margin-left:3%;">
 	            <ul class="progressStep_5">
 		            <li class="pass">AWS 설정</li>
 		            <li class="pass">Network 설정</li>
@@ -951,9 +961,9 @@ function setPrivateKeyPathFileName(fileInput){
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title">▶ 설치 로그</div>
-			<div>
-				<textarea id="installLogs" style="width:95%;height:80%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 설치 로그</div>
+			<div style="height:80%;">
+				<textarea id="installLogs" style="width:97%;height:88%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">

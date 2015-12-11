@@ -1,5 +1,6 @@
 package org.openpaas.ieda.web.config.bootstrap;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,7 +10,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -20,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,12 +44,10 @@ public class IEDABootstrapService {
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 	
+	final private String PRIVATE_KEY_PATH = System.getProperty("user.home") + System.getProperty("file.separator") + ".ssh" + System.getProperty("file.separator");
+	
 	public List<BootstrapListDto> listBootstrap() {
 		List<IEDABootstrapAwsConfig> awsConfigsList = awsRepository.findAll();
-		log.info("### AWS List Size ::: " +  awsConfigsList.size() );
-		//List<IEDABootstrapOpenstackConfig> openstackConfigsList = openstackRepository.findAll();
-		//log.info("### AWS List Size ::: " +  awsConfigsList.size() );
-		log.info("### AWSLIST :::" + awsConfigsList.toString());
 		List<BootstrapListDto> listDtos = new ArrayList<>();
 		int recid =0;
 		if(awsConfigsList.size() > 0){
@@ -60,26 +63,6 @@ public class IEDABootstrapService {
 				listDtos.add(dto);
 			}
 		}
-		log.info("### LIST :::" + listDtos.toString());
-		
-		/*if(openstackConfigsList.siBootstrapListDtoze() > 0 ){
-			for(IEDABootstrapOpenstackConfig openstackConfig : openstackConfigsList){
-				BootstrapListDto dto = new BootstrapListDto();
-				dto.setId(openstackConfig.getId()); 
-				dto.setIaas("OPENSTACK");
-				dto.setCreatedDate(dto.getCreatedDate());
-				dto.setUpdatedDate(dto.getUpdatedDate());
-				dto.setDirectorPrivateIp(dto.getDirectorPrivateIp());
-				dto.setDirectorPublicIp(dto.getDirectorPublicIp());
-				listDtos.add(dto);
-			}
-		}*/
-		
-//		if (listDtos.size() == 0) {
-//			throw new IEDACommonException("nocontent.bootstrap.exception", "BOOTSTRAP 정보가 존재하지 않습니다.",
-//					HttpStatus.NO_CONTENT);
-//		}
-
 		return listDtos;
 	}
 	
@@ -104,16 +87,11 @@ public class IEDABootstrapService {
 			stubContent = IOUtils.toString(new FileInputStream(stubDeploy), "UTF-8");
 			
 			List<BootstrapItem> bootstrapItems = makeBootstrapItems(id, iaas);
-			log.info(":::SIZE::: "+bootstrapItems.size());
 			for (BootstrapItem item : bootstrapItems) {
 				log.info(item.getTargetItem() +" / "+  item.getSourceItem());
 				content = content.replace(item.getTargetItem(), item.getSourceItem());
 			}
 
-			log.info("*******************************************************");
-			log.info("\n"+content+"\n");
-			log.info("*******************************************************");
-			
 			IOUtils.write(stubContent, new FileOutputStream(iedaConfiguration.getTempDir() + stubDeploy.getName()), "UTF-8");
 			IOUtils.write(content, new FileOutputStream(iedaConfiguration.getTempDir() + targetFileName), "UTF-8");
 			if(iaas == "AWS"){
@@ -127,7 +105,6 @@ public class IEDABootstrapService {
 			}
 			deployFileName = setSpiffMerge(iaas, id, stubDeploy.getName(), targetFileName);
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -215,7 +192,6 @@ public class IEDABootstrapService {
 				command += iedaConfiguration.getDeploymentDir()+deployFileName;
 								
 				Process process = r.exec(command);
-				log.info("### PROCESS ::: " + process.toString());
 				process.getInputStream();
 				inputStream = process.getInputStream();
 				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -229,7 +205,6 @@ public class IEDABootstrapService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO: handle exception
 			e.printStackTrace();
 		} finally {
 			try {
@@ -257,7 +232,6 @@ public class IEDABootstrapService {
 			command += iedaConfiguration.getDeploymentDir()+fileName + " ";
 					
 			Process process = r.exec(command);
-			log.info("### PROCESS ::: " + process.toString());
 			process.getInputStream();
 			inputStream = process.getInputStream();
 			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -265,13 +239,11 @@ public class IEDABootstrapService {
 			String streamLogs = "";
 			while ((info = bufferedReader.readLine()) != null){
 				streamLogs += info;
-				log.info("=== Delete Deploy File \n"+ info );
 				messagingTemplate.convertAndSend("/bootstrap/bootstrapDelete", info);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO: handle exception
 			e.printStackTrace();
 		} finally {
 			try {
@@ -294,7 +266,6 @@ public class IEDABootstrapService {
 		BufferedReader bufferedReader = null;
 		Runtime r = Runtime.getRuntime();
 		String command = "";
-		log.info("%%%% Deploy File Name : " + deployFileName);
 		try{
 			command += iedaConfiguration.getScriptDir() + "aws-microbosh-deploy.sh ";
 			command += iedaConfiguration.getDeploymentDir() + deployFileName ;
@@ -308,7 +279,6 @@ public class IEDABootstrapService {
 			String streamLogs = "";
 			while ((info = bufferedReader.readLine()) != null){
 				streamLogs += info;
-				log.info("=== InstallBootstrap Logs \n"+ info );
 				messagingTemplate.convertAndSend("/bootstrap/bootstrapInstall", info);
 			}
 		} catch (IOException e) {
@@ -334,19 +304,50 @@ public class IEDABootstrapService {
 
 
 	public List<String> getKeyPathFileList() {
+		
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("KeyFile only","pem");
-		String keyPath = System.getProperty("user.home") + System.getProperty("file.separator") + ".ssh" + System.getProperty("file.separator");
-		log.info("## KeyPath ::: " + keyPath);
-		File dir = new File(keyPath);
-		File[] listFiles = dir.listFiles();
-		log.info("::: Local keyPath ::: "+ listFiles.length);
-		List<String> localFiles = new ArrayList<>();
+		
+		File keyPathFile = new File(PRIVATE_KEY_PATH);
+		if ( !keyPathFile.isDirectory() ) return null;
+		
+		List<String> localFiles = null;
+		
+		File[] listFiles = keyPathFile.listFiles();
 		for (File file : listFiles) {
-			if(file.getName().endsWith(".pem") || file.getName().endsWith(".PEM")){
-				localFiles.add(file.getName());
-			}
+			
+			if(!file.getName().endsWith(".pem") && !file.getName().endsWith(".PEM"))
+				continue;
+			
+			if ( localFiles == null )
+				localFiles = new ArrayList<String>();
+
+			localFiles.add(file.getName());
 		}
+		
 		return localFiles;
+	}
+
+	public void uploadKeyPath(MultipartHttpServletRequest request) {
+		Iterator<String> itr =  request.getFileNames();
+		File keyPathFile = new File(PRIVATE_KEY_PATH);
+		if (!keyPathFile.isDirectory()){
+			keyPathFile.mkdir();
+		}
+			
+        if(itr.hasNext()) {
+            MultipartFile mpf = request.getFile(itr.next());
+            try {
+                byte[] bytes = mpf.getBytes();
+                BufferedOutputStream stream =
+                        new BufferedOutputStream(new FileOutputStream(new File(PRIVATE_KEY_PATH + mpf.getOriginalFilename())));
+                stream.write(bytes);
+                stream.close();
+            } catch (IOException e) {
+                log.info(e.getMessage());
+                e.printStackTrace();
+            }
+        } 
+		
 	}
 	
 }
