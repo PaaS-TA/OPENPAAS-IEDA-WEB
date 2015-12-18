@@ -29,8 +29,8 @@ public class IEDABootstrapOpenstackConfig {
 	private String cloudPrivateKey;
 
 	/** Openstack Info **/
-	private String privateStaticIps;
-	private String publicStaticIps;
+	private String privateStaticIp;
+	private String publicStaticIp;
 	private String directorName;
 	private String authUrl;
 	private String tenant;

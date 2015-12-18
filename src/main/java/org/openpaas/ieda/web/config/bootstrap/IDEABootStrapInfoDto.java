@@ -75,8 +75,8 @@ public class IDEABootStrapInfoDto{
 	public static class OpenStack{
 		@NotNull
 		private String id;		
-		private String privateStaticIps;
-		private String publicStaticIps;
+		private String privateStaticIp;
+		private String publicStaticIp;
 		private String directorName;
 		private String authUrl;
 		private String tenant;

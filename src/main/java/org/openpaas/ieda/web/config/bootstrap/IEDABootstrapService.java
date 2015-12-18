@@ -76,8 +76,8 @@ public class IEDABootstrapService {
 				dto.setIaas("OPENSTACK");
 				dto.setCreatedDate(openstackConfig.getCreatedDate());
 				dto.setUpdatedDate(openstackConfig.getUpdatedDate());
-				dto.setDirectorPrivateIp(openstackConfig.getPrivateStaticIps());
-				dto.setDirectorPublicIp(openstackConfig.getPublicStaticIps());
+				dto.setDirectorPrivateIp(openstackConfig.getPrivateStaticIp());
+				dto.setDirectorPublicIp(openstackConfig.getPublicStaticIp());
 				listDtos.add(dto);
 			}
 		}

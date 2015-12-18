@@ -37,9 +37,7 @@ public class IEDABootstrapOpenstackService {
 	public IEDABootstrapOpenstackConfig saveOpenstackBoshInfoSave(IDEABootStrapInfoDto.OsBosh dto) {
 		IEDABootstrapOpenstackConfig config = null;
 		Date now = new Date();
-		log.info("=== ID : " + dto.getId() );
 		if(StringUtils.isEmpty(dto.getId())) {
-			log.info("===NEW===");
 			config = new IEDABootstrapOpenstackConfig();		
 		}
 		else {
@@ -57,8 +55,8 @@ public class IEDABootstrapOpenstackService {
 
 	public IEDABootstrapOpenstackConfig saveOpenstackInfoSave(IDEABootStrapInfoDto.OpenStack dto) {
 		IEDABootstrapOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
-		config.setPrivateStaticIps(dto.getPrivateStaticIps());
-		config.setPublicStaticIps(dto.getPublicStaticIps());
+		config.setPrivateStaticIp(dto.getPrivateStaticIp());
+		config.setPublicStaticIp(dto.getPublicStaticIp());
 		config.setDirectorName(dto.getDirectorName());
 		config.setAuthUrl(dto.getAuthUrl());
 		config.setTenant(dto.getTenant());
