@@ -260,7 +260,7 @@ function settingOpenstackData(contents){
 	
 	openstackInfo = {
 			id					: bootstrapSeq,
-			privateStaticIp	: contents.privateStaticIp,
+			privateStaticIp		: contents.privateStaticIp,
 			publicStaticIp		: contents.publicStaticIp,
 			directorName		: contents.directorName,
 			authUrl				: contents.authUrl,

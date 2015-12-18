@@ -3,7 +3,6 @@
 <link rel="stylesheet" type="text/css" href="/css/progress-step.css"/>
 <style type="text/css">
 .w2ui-popup .w2ui-msg-body{background-color: #FFF; }
-
 #browse {
 	position: relative;
     display : inline-block;        

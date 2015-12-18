@@ -113,8 +113,7 @@ public class BoshManagementController {
 		content = awsService.getDeploymentInfos(id);
 		if(StringUtils.isEmpty(content) ) {
 			status = HttpStatus.NO_CONTENT;
-		}
-		
+		}		
 		return new ResponseEntity<>(content, status);
 	}
 	
