@@ -42,7 +42,7 @@ var awsInfo = "";
 var openstackInfo = "";
 var boshInfo = "";
 var networkInfo = "";
-var resourcesInfo = "";
+var resourceInfo = "";
 var keyPathFileList = "";
 var releases;
 var stemcells;
@@ -437,7 +437,7 @@ function settingAWSData(contents){
 			cloudSubnet			: contents.cloudSubnet,
 			cloudSecurityGroups	: contents.cloudSecurityGroups
 	}
-	resourcesInfo = {
+	resourceInfo = {
 			id				: contents.id,
 			stemcellName	: contents.stemcellName,
 			stemcellVersion	: contents.stemcellVersion,
@@ -479,7 +479,7 @@ function settingOpenstackData(contents){
 			cloudNetId		: contents.cloudNetId
 	}
 	
-	resourcesInfo = {
+	resourceInfo = {
 			id					: boshId,
 			stemcellName		: contents.stemcellName,
 			stemcellVersion		: contents.stemcellVersion,
@@ -583,7 +583,7 @@ function saveNetworkInfo(param){
 		async : true,
 		data : JSON.stringify(networkInfo), 
 		success : function(data, status) {
-			resourcesPopup();
+			resourcePopup();
 		},
 		error : function( e, status ) {
 			w2alert("Bosh Network 등록에 실패 하였습니다.", "Bosh 설치");
@@ -592,18 +592,18 @@ function saveNetworkInfo(param){
 	
 }
 
-function resourcesPopup(){
-	$("#resourcesInfoDiv").w2popup({
+function resourcePopup(){
+	$("#resourceInfoDiv").w2popup({
 		width 	: 670,
 		height	: 350,
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
-				if(resourcesInfo != ""){
-					$(".w2ui-msg-body input[name='stemcellName']").val(resourcesInfo.stemcellName);
-					$(".w2ui-msg-body input[name='stemcellVersion']").val(resourcesInfo.stemcellVersion);
-					//$(".w2ui-msg-body input[name='cloudInstanceType']").val(resourcesInfo.cloudInstanceType);
-					$(".w2ui-msg-body input[name='boshPassword']").val(resourcesInfo.boshPassword);
+				if(resourceInfo != ""){
+					$(".w2ui-msg-body input[name='stemcellName']").val(resourceInfo.stemcellName);
+					$(".w2ui-msg-body input[name='stemcellVersion']").val(resourceInfo.stemcellVersion);
+					//$(".w2ui-msg-body input[name='cloudInstanceType']").val(resourceInfo.cloudInstanceType);
+					$(".w2ui-msg-body input[name='boshPassword']").val(resourceInfo.boshPassword);
 				}
 			}
 		},
@@ -611,8 +611,8 @@ function resourcesPopup(){
 	});
 }
 
-function saveResourcesInfo(param){
-	resourcesInfo = {
+function saveResourceInfo(param){
+	resourceInfo = {
 			id					: boshId,
 			stemcellName		: $(".w2ui-msg-body input[name='stemcellName']").val(),
 			stemcellVersion		: $(".w2ui-msg-body input[name='stemcellVersion']").val(),
@@ -628,13 +628,13 @@ function saveResourcesInfo(param){
 	//Server send Bosh Info
 	$.ajax({
 		type : "PUT",
-		url : "/bosh/saveAwsResourcesInfo",
+		url : "/bosh/saveAwsResourceInfo",
 		contentType : "application/json",
 		//dataType: "json",
 		async : true,
 		data : JSON.stringify(boshInfo), 
 		success : function(data, status) {
-			resourcesPopup();
+			resourcePopup();
 		},
 		error : function( e, status ) {
 			w2alert("Bosh Network 등록에 실패 하였습니다.", "Bosh 설치");
@@ -686,10 +686,10 @@ function boshDeploy(param){
 	//Deploy 단에서 저장할 데이터가 있는지 확인 필요
 	//Confirm 설치하시겠습니까?
 	if(param == 'before' && iaas == "AWS" ){
-		resourcesPopup();
+		resourcePopup();
 		return;
 	} else if(param == 'before' && iaas == "OPENSTACK" ){
-		osResourcesPopup();
+		osResourcePopup();
 		return;
 	}
 	
@@ -941,11 +941,11 @@ function osResourceInfoPopup(){
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
-				if(resourcesInfo != ""){
-					$(".w2ui-msg-body input[name='stemcellName']").val(resourcesInfo.stemcellName);
-					$(".w2ui-msg-body input[name='stemcellVersion']").val(resourcesInfo.stemcellVersion);
-					$(".w2ui-msg-body input[name='cloudInstanceType']").val(resourcesInfo.cloudInstanceType);
-					$(".w2ui-msg-body input[name='boshPassword']").val(resourcesInfo.boshPassword);
+				if(resourceInfo != ""){
+					$(".w2ui-msg-body input[name='stemcellName']").val(resourceInfo.stemcellName);
+					$(".w2ui-msg-body input[name='stemcellVersion']").val(resourceInfo.stemcellVersion);
+					$(".w2ui-msg-body input[name='cloudInstanceType']").val(resourceInfo.cloudInstanceType);
+					$(".w2ui-msg-body input[name='boshPassword']").val(resourceInfo.boshPassword);
 				}
 			}
 		},
@@ -954,7 +954,7 @@ function osResourceInfoPopup(){
 }
 
 function saveOsResourceInfo(type){
-	resourcesInfo = {
+	resourceInfo = {
 			id				: boshId,
 			stemcellName	: $(".w2ui-msg-body input[name='stemcellName']").val(),
 			stemcellVersion	: $(".w2ui-msg-body input[name='stemcellVersion']").val(),
@@ -973,7 +973,7 @@ function saveOsResourceInfo(type){
 		contentType : "application/json",
 		//dataType: "json",
 		async : true,
-		data : JSON.stringify(resourcesInfo), 
+		data : JSON.stringify(resourceInfo), 
 		success : function(data, status) {
 			deployPopup();
 		},
@@ -988,7 +988,7 @@ function initSetting(){
 	awsInfo = "";
 	boshInfo = "";
 	networkInfo = "";
-	resourcesInfo = "";
+	resourceInfo = "";
 }
 
 function popupComplete(){
@@ -1249,8 +1249,8 @@ $( window ).resize(function() {
 		</div>
 	</div>
 	
-	<!-- Resources  설정 DIV -->
-	<div id="resourcesInfoDiv" style="width:100%;height:100%;" hidden="true">
+	<!-- Resource  설정 DIV -->
+	<div id="resourceInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left:3%;">
@@ -1293,9 +1293,9 @@ $( window ).resize(function() {
 			</div>
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveResourcesInfo('before');">이전</button>
+				<button class="btn" style="float: left;" onclick="saveResourceInfo('before');">이전</button>
 				<button class="btn" onclick="popupComplete();">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveResourcesInfo('after');">다음>></button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveResourceInfo('after');">다음>></button>
 			</div>
 		</div>
 	</div>
@@ -1319,7 +1319,7 @@ $( window ).resize(function() {
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float: left;" onclick="boshDeploy('before');">이전</button>
+			<button class="btn" style="float: left;" onclick="resourcePopup();">이전</button>
 			<button class="btn" onclick="popupComplete();">취소</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="boshDeploy('after');">다음>></button>
 		</div>
@@ -1344,7 +1344,7 @@ $( window ).resize(function() {
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float: left;" onclick="resourcesPopup();">이전</button>
+			<button class="btn" style="float: left;" onclick="resourcePopup();">이전</button>
 			<button class="btn" onclick="popupComplete();">취소</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
 		</div>		
@@ -1605,7 +1605,7 @@ $( window ).resize(function() {
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float: left;" onclick="boshDeploy('before');">이전</button>
+			<button class="btn" style="float: left;" onclick="osResourcePopup();">이전</button>
 			<button class="btn" onclick="popupComplete();">취소</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="boshDeploy('after');">다음>></button>
 		</div>

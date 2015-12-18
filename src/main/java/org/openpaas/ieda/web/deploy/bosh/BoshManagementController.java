@@ -95,7 +95,7 @@ public class BoshManagementController {
 		return new ResponseEntity<>(result, status);
 	}
 	
-	@RequestMapping(value="/bosh/saveAwsResourcesInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/bosh/saveAwsResourceInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveResourceInfo(@RequestBody @Valid BoshParam.AwsResource dto){
 		HttpStatus status = HttpStatus.OK;
 		Map<String, Object> result = new HashMap<>();

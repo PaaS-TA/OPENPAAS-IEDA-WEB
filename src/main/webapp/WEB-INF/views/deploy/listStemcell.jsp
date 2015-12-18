@@ -143,14 +143,15 @@ function doDeleteStemcell() {
 			version  : record.version
 		};
 	
-	w2confirm( { msg : '설치관리자에 업로드된 스템셀 <br>' + record.name + '<br>을 삭제하시겠습니까?'
+	
+	
+	w2confirm( { msg : record.version + '버전의 스템셀 <br>' + record.name + '<br>을 삭제하시겠습니까?'
 		, title : '스템셀 삭제'
 		, yes_text:'확인'
 		, no_text:'취소'
 	})
 	.yes(function() {
 		appendLogPopup("delete",requestParameter);
-
 	})
 	.no(function() {
 		// do nothing
