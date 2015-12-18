@@ -26,7 +26,7 @@ $(function() {
 		         {field: 'recid', caption: 'recid', hidden: true}
 		       , {field: 'name', caption: '릴리즈명', size: '20%'}
 		       , {field: 'version', caption: '릴리즈버전', size: '10%'}
-		       , {field: 'currentDeployed', caption: '배포 사용중 여부', size: '15%',
+		       , {field: 'currentDeployed', caption: '배포 여부', size: '15%',
 		    	   render: function(record) {
 		    		   if ( record.currentDeployed == 'true' )
 		    			   return '<span class="btn btn-success" style="width:70px">배포</span>';
@@ -157,7 +157,7 @@ function doDeleteRelease() {
 			version  : record.version
 		};
 	
-	w2confirm( { msg : '설치관리자에 업로드된 릴리즈 <br/>' + record.name + '<br/>을 삭제하시겠습니까?'
+	w2confirm( { msg : record.version + '버전의 ' + record.name + ' 릴리즈를 삭제하시겠습니까?'
 		, title : '릴리즈 삭제'
 		, yes_text:'확인'
 		, no_text:'취소'
