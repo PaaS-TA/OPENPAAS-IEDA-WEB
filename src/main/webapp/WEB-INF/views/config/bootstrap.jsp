@@ -260,8 +260,8 @@ function settingOpenstackData(contents){
 	
 	openstackInfo = {
 			id					: bootstrapSeq,
-			privateStaticIP	: contents.privateStaticIP,
-			publicStaticIP		: contents.publicStaticIP,
+			privateStaticIp	: contents.privateStaticIp,
+			publicStaticIp		: contents.publicStaticIp,
 			directorName		: contents.directorName,
 			authUrl				: contents.authUrl,
 			tenant				: contents.tenant,
@@ -840,8 +840,8 @@ function openstackInfoPopup(){
 		onOpen:function(event){
 			event.onComplete = function(){				
 				if(openstackInfo != ""){
-					$(".w2ui-msg-body input[name='privateStaticIP']").val(openstackInfo.privateStaticIP);
-					$(".w2ui-msg-body input[name='publicStaticIP']").val(openstackInfo.publicStaticIP);
+					$(".w2ui-msg-body input[name='privateStaticIp']").val(openstackInfo.privateStaticIp);
+					$(".w2ui-msg-body input[name='publicStaticIp']").val(openstackInfo.publicStaticIp);
 					$(".w2ui-msg-body input[name='directorName']").val(openstackInfo.directorName);
 					$(".w2ui-msg-body input[name='authUrl']").val(openstackInfo.authUrl);
 					$(".w2ui-msg-body input[name='tenant']").val(openstackInfo.tenant);
@@ -860,8 +860,8 @@ function openstackInfoPopup(){
 function saveOpenstackInfo(type){
 	openstackInfo = {
 			id					: bootstrapSeq,
-			privateStaticIP	: $(".w2ui-msg-body input[name='privateStaticIP']").val(),
-			publicStaticIP		: $(".w2ui-msg-body input[name='publicStaticIP']").val(),
+			privateStaticIp	: $(".w2ui-msg-body input[name='privateStaticIp']").val(),
+			publicStaticIp		: $(".w2ui-msg-body input[name='publicStaticIp']").val(),
 			directorName		: $(".w2ui-msg-body input[name='directorName']").val(),
 			authUrl				: $(".w2ui-msg-body input[name='authUrl']").val(),
 			tenant				: $(".w2ui-msg-body input[name='tenant']").val(),
@@ -1358,13 +1358,13 @@ function osDeployPopup(){
 		    	<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Private Static IP</label>
 					<div>
-						<input name="privateStaticIP" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="1"/>
+						<input name="privateStaticIp" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="1"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Public Static IP</label>
 					<div>
-						<input name="publicStaticIP" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="2"/>
+						<input name="publicStaticIp" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="2"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
