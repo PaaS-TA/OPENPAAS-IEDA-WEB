@@ -71,7 +71,7 @@ public class IEDAStemcellDownload {
 	    Boolean isError = Boolean.FALSE;
 	    try {
 	        in = new BufferedInputStream(new URL(downloadLink).openStream());
-	        fout = new FileOutputStream(iedaConfiguration.getStemcellDir()+"/" + dto.getFileName());
+	        fout = new FileOutputStream(iedaConfiguration.getStemcellDir()+ System.getProperty("file.separator")  + dto.getFileName());
 
 	        final byte data[] = new byte[4096];
 	        int count;
@@ -108,7 +108,7 @@ public class IEDAStemcellDownload {
 	            try {
 					fout.close();
 					if(isError){//에러발생시 파일 삭제
-						File targetFile = new File(iedaConfiguration.getStemcellDir()+"/" + dto.getFileName());
+						File targetFile = new File(iedaConfiguration.getStemcellDir()+ System.getProperty("file.separator") + dto.getFileName());
 						targetFile.delete();
 					}
 				} catch (IOException e) {

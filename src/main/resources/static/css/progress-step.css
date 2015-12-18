@@ -54,7 +54,7 @@ ul.progressStep_5 {
     font-size: 11px;
     clear: both;
     line-height: 1em;
-    margin: 0 auto;
+    margin: 3px; auto;
     text-align: center;
     width:100%;
 }
@@ -145,14 +145,14 @@ ul.progressStep_6 {
 
 ul.progressStep_6 li{
     float: left;
-    padding: 18px 10px;    /***  [내부영역 Padding] 내부 글자 크기에 따라 조절**/
+    padding: 18px 12px;    /***  [내부영역 Padding] 내부 글자 크기에 따라 조절**/
     color: #fff;
     position: relative;
     border-top: 1px solid #666;
     border-bottom: 1px solid #666;
     width: 16%;				/***  [Step비율] 갯수에 따라 조정 **/
     height:48px;			/***  [Step 높이] ***/
-    margin: 0 1px;
+    margin: 0 1.1px;
 }
 
 ul.progressStep_6 li:before {

@@ -8,11 +8,11 @@ networks:
     - reserved:
       - [subnetReserved]
       static: 
-      - [subnetStatic]
+      - [[subnetStatic]]
       range: [subnetRange]
       gateway: [subnetGateway]
       dns:
-        - [subnetDns]
+        - [[subnetDns]]
       cloud_properties:
         subnet: [cloudSubnet]
         security_groups:
@@ -38,7 +38,7 @@ jobs:
     networks:
       elastic:
         static_ips:
-        - [publicStaticIps]
+        - [[publicStaticIps]]
 properties:
 #  dns:
 #    recursor: 52.23.2.85
@@ -47,5 +47,5 @@ properties:
     secret_access_key: [secretAccessKey]
     region: [region]
     default_key_name: [defaultKeyName]
-    default_security_groups: [defaultSecurityGroups]
+    default_security_groups: [[defaultSecurityGroups]]
 

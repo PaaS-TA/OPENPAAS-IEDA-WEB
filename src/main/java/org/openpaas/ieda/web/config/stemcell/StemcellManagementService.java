@@ -259,9 +259,9 @@ public class StemcellManagementService {
 	// 다운로드 스템셀
 	public List<String> doDownloadStemcell(String subLink, String stemcellFile, BigDecimal fileSize) {
 		log.info("stemcell Dir     : " + iedaConfiguration.getStemcellDir());
-		log.info("Stemcell Name    : " + PUBLIC_STEMCELLS_BASE_URL + "/" + stemcellFile);
+		log.info("Stemcell Name    : " + PUBLIC_STEMCELLS_BASE_URL + "/"  + stemcellFile);
 		log.info("Stemcell Size    : " + fileSize);
-		log.info("downloaded  file : " + iedaConfiguration.getStemcellDir()+"/"+stemcellFile);
+		log.info("downloaded  file : " + iedaConfiguration.getStemcellDir()+ System.getProperty("file.separator") +stemcellFile);
 		
 		String downloadLink = PUBLIC_STEMCELLS_BASE_URL + "/" + subLink;
 		
@@ -270,7 +270,7 @@ public class StemcellManagementService {
 	    double received = 0;
 	    try {
 	        in = new BufferedInputStream(new URL(downloadLink).openStream());
-	        fout = new FileOutputStream(iedaConfiguration.getStemcellDir()+"/"+stemcellFile);
+	        fout = new FileOutputStream(iedaConfiguration.getStemcellDir()+ System.getProperty("file.separator") +stemcellFile);
 
 	        final byte data[] = new byte[4096];
 	        int count;
@@ -373,7 +373,7 @@ public class StemcellManagementService {
 	
 	// 스템셀 삭제
 	public void doDeleteStemcell(String stemcellFile) {
-		final String stemcellToDelete = iedaConfiguration.getStemcellDir() + "/" + stemcellFile;
+		final String stemcellToDelete = iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + stemcellFile;
 		try {
 			log.info("Stemcell to delete : " + stemcellToDelete);
 			

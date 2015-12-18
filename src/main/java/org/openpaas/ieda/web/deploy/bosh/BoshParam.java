@@ -9,20 +9,19 @@ public class BoshParam {
 	@Data
 	public static class AWS{
 		private String id;
-		private String iaas;
+		private String dnsRecursor;
 		private String accessKeyId;
 		private String secretAccessKey;
 		private String defaultKeyName;
 		private String defaultSecurityGroups;
-		private String region;
+		private String region;		
+		private String privateKeyPath;
 	}
 	
 	@Data
-	public static class Bosh{
+	public static class AwsBosh{
 		@NotNull
-		private int id;
-		@NotNull
-		private String iaas;
+		private String id;
 		@NotNull
 		private String boshName;
 		@NotNull
@@ -32,17 +31,11 @@ public class BoshParam {
 	}
 	
 	@Data
-	public static class NetWork{
+	public static class AwsNetwork{
 		@NotNull
 		private int id;
 		@NotNull
-		private String iaas;
-		@NotNull
-		private String subnetReserved;
-		@NotNull
 		private String subnetStatic;
-		@NotNull
-		private String publicStaticIps;
 		@NotNull
 		private String subnetRange;
 		@NotNull
@@ -56,11 +49,9 @@ public class BoshParam {
 	}
 	
 	@Data
-	public static class Resource{
+	public static class AwsResource{
 		@NotNull
 		private int id;
-		@NotNull
-		private String iaas;
 		@NotNull
 		private String stemcellName;
 		@NotNull
@@ -76,4 +67,47 @@ public class BoshParam {
 		@NotNull
 		private int id;
 	}
+	
+	@Data
+	public static class OsBosh{
+		private String id;
+		private String boshName;
+		private String directorUuid;
+		private String releaseVersion;
+	}
+	
+	@Data
+	public static class Openstack{
+		private String id;
+		private String directorName;
+		private String directorStaticIps;
+		private String dnsRecursor;
+		private String authUrl;
+		private String tenant;
+		private String userName;
+		private String apiKey;
+		private String defaultKeyName;
+		private String defaultSecurityGroups;
+		private String ntp;		
+	}
+	
+	@Data
+	public static class OsNetwork{
+		private String id;
+		private String subnetStatic;
+		private String subnetRange;
+		private String subnetGateway;
+		private String subnetDns; 
+		private String cloudNetId;
+	}
+	
+	@Data
+	public static class OsResource{
+		private String id;
+		private String stemcellName;
+		private String stemcellVersion;
+		private String cloudInstanceType;
+		private String boshPassword;	
+	}
+	
 }

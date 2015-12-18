@@ -16,10 +16,11 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.common.ReplaceItem;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,89 +32,67 @@ public class IEDABootstrapOpenstackService {
 	private IEDAConfiguration iedaConfiguration;
 
 	@Autowired
-	private IEDABootstrapAwsRepository awsRepository;
+	private IEDABootstrapOpenstackRepository openstackRepository;
 	
-	@Autowired
-	private IEDABootstrapOpenstackRepository OpenstackRepository;
-	
-	@Autowired
-	private ResourceLoader resourceLoader;
-	
-	public List<IEDABootstrapAwsConfig> listBootstrap() {
-		List<IEDABootstrapAwsConfig> bootstrapAwsConfigsList = awsRepository.findAll();
-		if (bootstrapAwsConfigsList.size() == 0) {
-			throw new IEDACommonException("nocontent.bootstrap.exception", "BOOTSTRAP 정보가 존재하지 않습니다.",
-					HttpStatus.NO_CONTENT);
+	public IEDABootstrapOpenstackConfig saveOpenstackBoshInfoSave(IDEABootStrapInfoDto.OsBosh dto) {
+		IEDABootstrapOpenstackConfig config = null;
+		Date now = new Date();
+		log.info("=== ID : " + dto.getId() );
+		if(StringUtils.isEmpty(dto.getId())) {
+			log.info("===NEW===");
+			config = new IEDABootstrapOpenstackConfig();		
 		}
-
-		return bootstrapAwsConfigsList;
-	}
-
-	public Integer saveAwsInfo(IDEABootStrapInfoDto.Aws dto){
-		Date now = new Date();
-		IEDABootstrapAwsConfig config = new IEDABootstrapAwsConfig();
-		config.setAccessKey(dto.getAwsKey());
-		config.setSecretAccessKey(dto.getAwsPw());
-		config.setDefaultSecurityGroups(dto.getSecretGroupName());
-		config.setDefaultKeyName(dto.getPrivateKeyName());
-		config.setPrivateKeyPath(dto.getPrivateKeyPath());
+		else {
+			config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
+		}
+		
+		config.setBoshName(dto.getBoshName());
+		config.setBoshUrl(dto.getBoshUrl());
+		config.setBoshCpiUrl(dto.getBoshCpiUrl());
+		config.setCloudPrivateKey(dto.getPrivateKeyPath());
 		config.setCreatedDate(now);
 		config.setUpdatedDate(now);
-		config = awsRepository.save(config);
-		return config.getId();
-	}
-	
-	public Integer saveOpenstackInfo(IDEABootStrapInfoDto.Aws dto){
-		Date now = new Date();
-		IEDABootstrapOpenstackConfig config = new IEDABootstrapOpenstackConfig();
-		config.setAccessKey(dto.getAwsKey());
-		config.setSecretAccessKey(dto.getAwsPw());
-		config.setDefaultSecurityGroups(dto.getSecretGroupName());
-		config.setDefaultKeyName(dto.getPrivateKeyName());
-		config.setPrivateKeyPath(dto.getPrivateKeyPath());
-		config.setCreatedDate(now);
-		config.setUpdatedDate(now);
-		config = OpenstackRepository.save(config);
-		return config.getId();
+		return openstackRepository.save(config);
 	}
 
-	public void saveAwsNetworkInfos(IDEABootStrapInfoDto.Network dto) {
-		IEDABootstrapAwsConfig config = awsRepository.findById(Integer.parseInt(dto.getId()));
-		config.setSubnetRange(dto.getSubnetRange());
-		config.setDns(dto.getDns());
-		config.setSubnetId(dto.getSubnetId());
-		config.setGateway(dto.getGateway());
-		config.setDirectorPrivateIp(dto.getDirectorPrivateIp());
-		config.setDirectorPublicIp(dto.getDirectorPublicIp());
+	public IEDABootstrapOpenstackConfig saveOpenstackInfoSave(IDEABootStrapInfoDto.OpenStack dto) {
+		IEDABootstrapOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
+		config.setPrivateStaticIps(dto.getPrivateStaticIps());
+		config.setPublicStaticIps(dto.getPublicStaticIps());
+		config.setDirectorName(dto.getDirectorName());
+		config.setAuthUrl(dto.getAuthUrl());
+		config.setTenant(dto.getTenant());
+		config.setUserName(dto.getUserName());
+		config.setApiKey(dto.getApiKey());
+		config.setDefaultKeyName(dto.getDefaultKeyName());
+		config.setDefaultSecurityGroup(dto.getDefaultSecurityGroups());
+		config.setNtp(dto.getNtp());
 		Date now = new Date();
 		config.setUpdatedDate(now);
-		awsRepository.save(config);
+		return openstackRepository.save(config);
+	}
+
+	public IEDABootstrapOpenstackConfig saveOpenstackNetworkInfoSave(IDEABootStrapInfoDto.OsNetwork dto) {
+		IEDABootstrapOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
+		config.setSubnetRange(dto.getSubnetRange());
+		config.setSubnetGateway(dto.getSubnetGateway());
+		config.setSubnetDns(dto.getSubnetDns());
+		config.setCloudNetId(dto.getCloudNetId());
+		Date now = new Date();
+		config.setUpdatedDate(now);
+		return openstackRepository.save(config);
+	}
+
+	public IEDABootstrapOpenstackConfig saveOpenstackResourcesInfoSave(IDEABootStrapInfoDto.OsResource dto) {
+		IEDABootstrapOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
+		config.setStemcellUrl(dto.getStemcellUrl());
+		config.setEnvPassword(dto.getEnvPassword());
+		config.setCloudInstanceType(dto.getCloudInstanceType());
+		Date now = new Date();
+		config.setUpdatedDate(now);
+		return openstackRepository.save(config);
 	}
 	
-	public void saveOpenStackNetworkInfos(IDEABootStrapInfoDto.Network dto) {
-		IEDABootstrapOpenstackConfig config = OpenstackRepository.findById(Integer.parseInt(dto.getId()));
-		config.setSubnetRange(dto.getSubnetRange());
-		config.setDns(dto.getDns());
-		config.setSubnetId(dto.getSubnetId());
-		config.setGateway(dto.getGateway());
-		config.setDirectorPrivateIp(dto.getDirectorPrivateIp());
-		config.setDirectorPublicIp(dto.getDirectorPublicIp());
-		Date now = new Date();
-		config.setUpdatedDate(now);
-		OpenstackRepository.save(config);
-	}
- 
-	public void setReleaseInfos(IDEABootStrapInfoDto.Resources dto) {
-		IEDABootstrapAwsConfig config = awsRepository.findById(Integer.parseInt(dto.getId()));
-		config.setStemcellName(dto.getTargetStemcell());
-		config.setInstanceType(dto.getInstanceType());
-		config.setAvailabilityZone(dto.getAvailabilityZone());
-		config.setMicroBoshPw(dto.getMicroBoshPw());
-		Date now = new Date();
-		config.setUpdatedDate(now);
-		awsRepository.save(config);
-		downloadSettingFile(Integer.parseInt(dto.getId()));
-	}
 
 	public void downloadSettingFile(Integer bootstrapId) {
 		// 파일 가져오기
@@ -121,20 +100,17 @@ public class IEDABootstrapOpenstackService {
 		File sampleDeploy;
 		//log.info("==== ::: " + classPath.toString());
 		// GET BootStrap Info(DB 정보)
-		IEDABootstrapAwsConfig awsConfig = awsRepository.findById(bootstrapId);
+		IEDABootstrapOpenstackConfig config = openstackRepository.findOne(bootstrapId);
 		String content = "";
 		String tempContent = "";
 		String targetFileName = "bosh-init-aws-micro-input-tample.yml";
 		FileOutputStream fos = null;
 		try {
 			sampleDeploy = new File(classPath.toURI());//resource.getFile();
-			log.info("## FileName ::: "  + sampleDeploy.getName());
 			content = IOUtils.toString(new FileInputStream(sampleDeploy), "UTF-8");
-			List<BootstrapItem> bootstrapItems = makeBootstrapItems(awsConfig);
-			log.info(":::SIZE::: "+bootstrapItems.size());
+			List<ReplaceItem> bootstrapItems = makeBootstrapItems(config);
 			tempContent = content;
-			for (BootstrapItem item : bootstrapItems) {
-				log.info(item.getTargetItem() +" / "+  item.getSourceItem());
+			for (ReplaceItem item : bootstrapItems) {
 				tempContent = tempContent.replace(item.getTargetItem(), item.getSourceItem());
 			}
 
@@ -142,8 +118,8 @@ public class IEDABootstrapOpenstackService {
 			log.info("\n"+tempContent+"\n");
 			log.info("*******************************************************");
 			
-			IOUtils.write(content, new FileOutputStream(iedaConfiguration.getTempDir() + sampleDeploy.getName()), "UTF-8");
-			IOUtils.write(tempContent, new FileOutputStream(iedaConfiguration.getTempDir() + targetFileName), "UTF-8");
+			IOUtils.write(content, new FileOutputStream(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + sampleDeploy.getName()), "UTF-8");
+			IOUtils.write(tempContent, new FileOutputStream(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + targetFileName), "UTF-8");
 			
 			setSiffMerge(sampleDeploy.getName(), targetFileName);
 		} catch (URISyntaxException e) {
@@ -154,20 +130,20 @@ public class IEDABootstrapOpenstackService {
 		}
 	}
 
-	public List<BootstrapItem> makeBootstrapItems(IEDABootstrapAwsConfig config) {
-		List<BootstrapItem> items = new ArrayList<BootstrapItem>();
-		items.add(new BootstrapItem("[stemcell]", config.getStemcellName()));
-		items.add(new BootstrapItem("[microboshPw]", config.getMicroBoshPw()));
-		items.add(new BootstrapItem("[subnetRange]", config.getSubnetRange()));
-		items.add(new BootstrapItem("[dns]", config.getDns()));
-		items.add(new BootstrapItem("[subnetId]", config.getSubnetId()));
-		items.add(new BootstrapItem("[gateway]", config.getGateway()));
-		items.add(new BootstrapItem("[directorPrivateIp]", config.getDirectorPrivateIp()));
-		items.add(new BootstrapItem("[directorPublicIp]", config.getDirectorPublicIp()));
-		items.add(new BootstrapItem("[awsKey]", config.getAccessKey()));
-		items.add(new BootstrapItem("[secretAccessKey]", config.getSecretAccessKey()));
-		items.add(new BootstrapItem("[securGroupName]", config.getDefaultSecurityGroups()));
-		items.add(new BootstrapItem("[privateKey]", iedaConfiguration.getKeyPathDir()+config.getPrivateKeyPath()));
+	public List<ReplaceItem> makeBootstrapItems(IEDABootstrapOpenstackConfig config) {
+		List<ReplaceItem> items = new ArrayList<ReplaceItem>();
+//		items.add(new BootstrapItem("[stemcell]", config.getStemcellName()));
+//		items.add(new BootstrapItem("[microboshPw]", config.getMicroBoshPw()));
+//		items.add(new BootstrapItem("[subnetRange]", config.getSubnetRange()));
+//		items.add(new BootstrapItem("[dns]", config.getDns()));
+//		items.add(new BootstrapItem("[subnetId]", config.getSubnetId()));
+//		items.add(new BootstrapItem("[gateway]", config.getGateway()));
+//		items.add(new BootstrapItem("[directorPrivateIp]", config.getDirectorPrivateIp()));
+//		items.add(new BootstrapItem("[directorPublicIp]", config.getDirectorPublicIp()));
+//		items.add(new BootstrapItem("[awsKey]", config.getAccessKey()));
+//		items.add(new BootstrapItem("[secretAccessKey]", config.getSecretAccessKey()));
+//		items.add(new BootstrapItem("[securGroupName]", config.getDefaultSecurityGroups()));
+//		items.add(new BootstrapItem("[privateKey]", iedaConfiguration.getKeyPathDir()+ System.getProperty("file.separator") +config.getPrivateKeyPath()));
 		return items;
 	}
 
@@ -176,7 +152,7 @@ public class IEDABootstrapOpenstackService {
 		File settingFile = null;
 		String targetFileName = "bosh-init-aws-micro-input-tample.yml";
 		try {
-			settingFile = new File(iedaConfiguration.getTempDir() + targetFileName);
+			settingFile = new File(iedaConfiguration.getTempDir()+ System.getProperty("file.separator")  + targetFileName);
 			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -193,15 +169,15 @@ public class IEDABootstrapOpenstackService {
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
 		try {
-			sampleFile = new File(iedaConfiguration.getTempDir()+ sampleFileName);
-			tempFile = new File(iedaConfiguration.getTempDir()+tempFileName);
+			sampleFile = new File(iedaConfiguration.getTempDir()+ System.getProperty("file.separator") + sampleFileName);
+			tempFile = new File(iedaConfiguration.getTempDir()+ System.getProperty("file.separator") +tempFileName);
 			
 			if(sampleFile.exists() && tempFile.exists()){
 				String deployFileName = "bosh-init-aws-micro-input-deployment.yml";
-				command = iedaConfiguration.getScriptDir() + "merge-deploy.sh ";
-				command += iedaConfiguration.getTempDir()+sampleFileName + " ";
-				command += iedaConfiguration.getTempDir()+tempFileName + " ";
-				command += iedaConfiguration.getDeploymentDir()+deployFileName;
+				command = iedaConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "merge-deploy.sh ";
+				command += iedaConfiguration.getTempDir()+ System.getProperty("file.separator") +sampleFileName + " ";
+				command += iedaConfiguration.getTempDir()+ System.getProperty("file.separator") +tempFileName + " ";
+				command += iedaConfiguration.getDeploymentDir()+ System.getProperty("file.separator") +deployFileName;
 								
 				Process process = r.exec(command);
 				log.info("### PROCESS ::: " + process.toString());
@@ -233,5 +209,18 @@ public class IEDABootstrapOpenstackService {
 			} catch (Exception e) {
 			}
 		}
+	}
+
+	public IEDABootstrapOpenstackConfig getOpenstackInfo(int id) {
+		IEDABootstrapOpenstackConfig config =  null;
+		try{
+			config = openstackRepository.findOne(id);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			throw new IEDACommonException("illigalArgument.bootstrap.exception",
+					"해당하는 BOOTSTRAP이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+		}
+		return config;
 	}
 }

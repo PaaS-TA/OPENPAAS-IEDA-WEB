@@ -61,7 +61,7 @@ public class IEDABootstrapAwsService {
 		
 		config.setAccessKey(dto.getAwsKey());
 		config.setSecretAccessKey(dto.getAwsPw());
-		config.setDefaultSecurityGroups(dto.getSecretGroupName());
+		config.setDefaultSecurityGroups(dto.getDefaultSecurityGroups());
 		config.setDefaultKeyName(dto.getPrivateKeyName());
 		config.setPrivateKeyPath(dto.getPrivateKeyPath());
 		config.setCreatedDate(now);
@@ -76,8 +76,8 @@ public class IEDABootstrapAwsService {
 		config.setDns(dto.getDns());
 		config.setSubnetId(dto.getSubnetId());
 		config.setGateway(dto.getGateway());
-		config.setDirectorPrivateIp(dto.getDirectorPrivateIp());
-		config.setDirectorPublicIp(dto.getDirectorPublicIp());
+		config.setDirectorPrivateIps(dto.getDirectorPrivateIps());
+		config.setDirectorPublicIps(dto.getDirectorPublicIps());
 		Date now = new Date();
 		config.setUpdatedDate(now);
 		awsRepository.save(config);

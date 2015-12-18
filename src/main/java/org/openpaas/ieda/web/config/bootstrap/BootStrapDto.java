@@ -4,7 +4,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
-public class IDEABootStrapInfoDto{
+public class BootStrapDto{
 	
 	@Data
 	public static class Aws{
@@ -16,7 +16,7 @@ public class IDEABootStrapInfoDto{
 		@NotNull
 		private String awsPw;
 		@NotNull
-		private String defaultSecurityGroups;
+		private String secretGroupName;
 		@NotNull
 		private String privateKeyName;
 		@NotNull
@@ -24,7 +24,7 @@ public class IDEABootStrapInfoDto{
 	}
 	
 	@Data
-	public static class Network{
+	public static class AwsNetwork{
 		@NotNull
 		private String id;
 		@NotNull
@@ -36,13 +36,13 @@ public class IDEABootStrapInfoDto{
 		@NotNull
 		private String subnetId;
 		@NotNull
-		private String directorPrivateIps;
+		private String directorPrivateIp;
 		@NotNull
-		private String directorPublicIps;
+		private String directorPublicIp;
 	}
 	
 	@Data
-	public static class Resources{
+	public static class AwsResources{
 		@NotNull
 		private String id;
 		@NotNull
@@ -73,8 +73,7 @@ public class IDEABootStrapInfoDto{
 	
 	@Data 
 	public static class OpenStack{
-		@NotNull
-		private String id;		
+		private int id;		
 		private String privateStaticIps;
 		private String publicStaticIps;
 		private String directorName;
@@ -83,13 +82,13 @@ public class IDEABootStrapInfoDto{
 		private String userName;
 		private String apiKey;
 		private String defaultKeyName;
-		private String defaultSecurityGroups;
+		private String defaultSecurityGroup;
 		private String ntp;
 	}
 	
 	@Data 
 	public static class OsBosh{
-		private String id;
+		private int id;
 		private String boshName;
 		private String boshUrl;
 		private String boshCpiUrl;
@@ -98,8 +97,7 @@ public class IDEABootStrapInfoDto{
 	
 	@Data 
 	public static class OsNetwork{
-		@NotNull
-		private String id;
+		private int id;
 		private String subnetRange;
 		private String subnetGateway;
 		private String subnetDns;
@@ -108,8 +106,7 @@ public class IDEABootStrapInfoDto{
 	
 	@Data 
 	public static class OsResource{
-		@NotNull
-		private String id;
+		private int id;
 		private String stemcellUrl;
 		private String envPassword;
 		private String cloudInstanceType;;

@@ -20,7 +20,7 @@ networks:
     - range: [subnetRange]
       gateway: [gateway]
       dns:
-      - [dns]
+      - [[dns]]
       cloud_properties: 
         subnet: [subnetId]
 jobs:
@@ -28,10 +28,10 @@ jobs:
     networks:
       private:
         static_ips: 
-        - [directorPrivateIp]
+        - [[directorPrivateIps]]
       public:
         static_ips:
-        - [directorPublicIp]
+        - [[directorPublicIps]]
     properties:
       director: 
         name: my-bosh
@@ -40,12 +40,10 @@ jobs:
         secret_access_key: [secretAccessKey]
         default_key_name: bosh
         default_security_groups: 
-        - [securGroupName]
+        - [[defaultSecurityGroups]]
         region: [region]
       ntp: 
-      - 1.kr.pool.ntp.org
-        0.asia.pool.ntp.org
-        1.asia.pool.ntp.org
+      - [ntp]
 cloud_provider:
   ssh_tunnel:
     private_key: [privateKey]

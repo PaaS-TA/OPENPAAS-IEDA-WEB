@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import org.openpaas.ieda.common.IEDACommonException;
@@ -23,6 +26,9 @@ public class IEDABoshService {
 
 	@Autowired
 	private IEDABoshAwsRepository awsRepository;
+	
+	@Autowired
+	private IEDABoshOpenstackRepository openstackRepository;
 	@Autowired
 	private IEDAConfiguration iedaConfiguration;
 	
@@ -36,7 +42,7 @@ public class IEDABoshService {
 		
 		List<BoshInfo> boshList = new ArrayList();
 		List<IEDABoshAwsConfig> boshAwsList = awsRepository.findAll();
-		
+		List<IEDABoshOpenstackConfig> boshOpenstackList = openstackRepository.findAll();
 		if ( boshAwsList == null ) {
 			throw new IEDACommonException("notfound.bosh.exception",
 					"Bosh 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
@@ -49,13 +55,27 @@ public class IEDABoshService {
 				boshInfo.setRecid(recid++);
 				boshInfo.setId(awsConfig.getId());
 				boshInfo.setIaas("AWS");
-				boshInfo.setPublicStaticIps(awsConfig.getPublicStaticIps());
 				boshInfo.setSubnetRange(awsConfig.getSubnetRange());
+				boshInfo.setCreatedDate(awsConfig.getCreatedDate());
 				boshList.add(boshInfo);
 			}
 		}
+		
+		if( boshOpenstackList.size() >0 ){
+			for(IEDABoshOpenstackConfig openstackConfig : boshOpenstackList){
+				BoshInfo boshInfo = new BoshInfo();
+				boshInfo.setRecid(recid++);
+				boshInfo.setId(openstackConfig.getId());
+				boshInfo.setIaas("OPENSTACK");
+				boshInfo.setSubnetRange(openstackConfig.getSubnetRange());
+				boshInfo.setCreatedDate(openstackConfig.getCreatedDate());
+				boshList.add(boshInfo);
+			}
+		}
+		boshList.stream().sorted((BoshInfo o1, BoshInfo o2) -> o1.getCreatedDate().compareTo(o2.getCreatedDate()));
 		return boshList;
 	}
+	
 	
 	public Boolean setSpiffMerge(String tempFilePath, String stubFilePath, String deplyFilePath){
 		File stubFile = null;
@@ -71,7 +91,7 @@ public class IEDABoshService {
 			stubFile = new File(stubFilePath);
 			
 			if(stubFile.exists() && tempFile.exists()){
-				command = iedaConfiguration.getScriptDir() + "merge-deploy.sh ";
+				command = iedaConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "merge-deploy.sh ";
 				command += stubFilePath + " ";
 				command += tempFilePath + " ";
 				command += deplyFilePath;
@@ -114,8 +134,8 @@ public class IEDABoshService {
 		BufferedReader bufferedReader = null;
 		Runtime r = Runtime.getRuntime();
 		try{
-			String command = iedaConfiguration.getScriptDir() + "bosh-delete.sh ";
-			command += iedaConfiguration.getDeploymentDir()+deploymentFile + " ";
+			String command = iedaConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "bosh-delete.sh ";
+			command += iedaConfiguration.getDeploymentDir()+ System.getProperty("file.separator") +deploymentFile + " ";
 					
 			Process process = r.exec(command);
 			log.info("### PROCESS ::: " + process.toString());
@@ -157,8 +177,8 @@ public class IEDABoshService {
 		String command = "";
 		log.info("%%%% Deploy File Name : " + deployFileName);
 		try{
-			command += iedaConfiguration.getScriptDir() + "bosh-deploy.sh ";
-			command += iedaConfiguration.getDeploymentDir() + deployFileName ;
+			command += iedaConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "bosh-deploy.sh ";
+			command += iedaConfiguration.getDeploymentDir()+ System.getProperty("file.separator")  + deployFileName ;
 					
 			Process process = r.exec(command);
 			log.info("### PROCESS ::: " + process.toString());

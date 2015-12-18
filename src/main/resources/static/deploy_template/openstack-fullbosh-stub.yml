@@ -1,0 +1,184 @@
+---
+name: (( merge || "bosh"))
+director_uuid: (( merge ))
+
+release:
+  name: bosh
+  version: (( merge || "latest" ))
+
+compilation:
+  workers: 3
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties:
+    instance_type: m1.medium
+
+update:
+  canaries: 1
+  canary_watch_time: 3000-120000
+  update_watch_time: 3000-120000
+  max_in_flight: 4
+
+networks:
+  - name: elastic
+    type: vip
+    cloud_properties: {}
+  - name: default
+    type: manual
+    subnets:
+    #- reserved: [(( merge ))]
+    - static: [(( merge ))]
+      range: (( merge ))
+      gateway: (( merge ))
+      dns: [(( merge ))]
+      cloud_properties:
+        net_id: (( merge ))
+
+resource_pools:
+  - name: small
+    network: default
+    size: (( auto ))
+    stemcell:
+      name: (( merge ))
+      version: (( merge || "latest" ))
+    cloud_properties:
+      instance_type: (( merge || "m1.small" ))
+  - name: medium
+    network: default
+    size: (( auto ))
+    stemcell:
+      name: (( merge ))
+      version: (( merge || "latest" ))
+    env:
+      bosh:
+        password: (( merge || "c1oudc0w"  ))
+    cloud_properties:
+      instance_type: (( merge || "m1.medium" ))
+  
+jobs:
+  - name: nats
+    template: nats
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]
+        static_ips: (( static_ips(0) ))
+
+  - name: redis
+    template: redis
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]
+        static_ips: (( static_ips(1) ))
+
+  - name: postgres
+    template: postgres
+    instances: 1
+    resource_pool: small
+    persistent_disk: 16384
+    networks:
+      - name: default
+        default: [dns, gateway]
+        static_ips: (( static_ips(2) ))
+
+  - name: blobstore
+    template: blobstore
+    instances: 1
+    resource_pool: small
+    persistent_disk: 51200
+    networks:
+      - name: default
+        default: [dns, gateway]
+        static_ips: (( static_ips(3) ))
+
+  - name: director
+    templates:
+    - {name: powerdns, release: bosh}
+    - {name: director, release: bosh}
+    instances: 1
+    resource_pool: medium
+    persistent_disk: 16384
+    networks:
+      - name: default
+        default: [dns, gateway]
+        static_ips: (( static_ips(4) ))
+      - name: elastic
+        static_ips: [(( merge ))]        
+
+  - name: registry
+    template: registry
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]
+        static_ips: (( static_ips(5) ))
+
+  - name: health_monitor
+    template: health_monitor
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]
+        static_ips: (( static_ips(6) ))
+
+properties:
+
+  nats:
+    address: (( jobs.nats.networks.default.static_ips.[0] ))
+    port: 4222
+    user: nats
+    password: nats
+
+  redis:
+    address: (( jobs.redis.networks.default.static_ips.[0] ))
+    password: redis
+
+  postgres: &bosh_db
+    host: (( jobs.postgres.networks.default.static_ips.[0] ))
+    user: postgres
+    password: postgres
+    database: bosh
+
+  blobstore:
+    address: (( jobs.blobstore.networks.default.static_ips.[0] ))
+    agent:
+      user: agent
+      password: agent
+    director:
+      user: director
+      password: director
+
+  director:
+    name: (( merge || "mDirector" ))
+    address: (( jobs.director.networks.default.static_ips.[0] ))
+    db: *bosh_db
+
+  registry:
+    address: (( jobs.registry.networks.default.static_ips.[0] ))
+    db: *bosh_db
+    http:
+      user: registry
+      password: registry
+
+  dns:
+    address: (( jobs.director.networks.default.static_ips.[0] ))
+    db: *bosh_db
+    recursor: (( merge ))
+
+  hm:
+    http:
+      user: hm
+      password: hm
+    director_account:
+      user: admin
+      password: admin
+    resurrector_enabled: true
+
+  ntp: [(( merge ))]
+
+  openstack: (( merge ))

@@ -1,0 +1,49 @@
+name: [boshName]
+releases:
+  bosh:
+    url: file:///[boshUrl]
+  bosh-openstack-cpi:
+    url: file:///[boshCpiUrl]
+resource_pools:
+  vms:
+    stemcell:
+      url: file:///[stemcellUrl]
+    env:
+      bosh:
+        password: [envPassword]
+    cloud_properties:
+      instance_type: m1.xlarge
+networks:
+  private:
+    subnets:
+    - range: [privateSubnetRange]
+      gateway: [subnetGateway]
+      dns: 
+      - [[subnetDns]]
+      cloud_properties: 
+        net_id: [cloudNetId]
+jobs:
+  bosh:
+    networks:
+      private:
+        static_ips: 
+        - [[privateStaticIps]]
+      public:
+        static_ips:
+        - [[publicStaticIpd]]
+    properties:
+      director:
+        name: [directorName]
+      openstack:
+        auth_url: [authUrl]
+        tenant: [tenant]
+        username: [userName]
+        api_key: [apiKey]
+        default_key_name: [defaultKeyName]
+        default_security_groups:
+        - [[defaultSecurityGroups]]
+      ntp: 
+      - [[ntp]]
+cloud_provider:
+  ssh_tunnel:
+    private_key: [cloudPrivateKey]

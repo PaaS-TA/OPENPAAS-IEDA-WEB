@@ -1,0 +1,51 @@
+name: [boshName]
+director_uuid: [directorUuid]
+release:
+  version: [releaseVersion]
+networks:
+  default:
+    subnets:
+    - range: [subnetRange]
+      gateway: [subnetGateway]
+      dns:
+      - [[subnetDns]]
+      static: 
+      - [[subnetStatic]]
+      cloud_properties:
+        net_id: [subnetNetId]
+jobs:
+  director:
+    networks:
+      elastic:
+        static_ips:
+        - [[directorStaticIps]]
+resource_pools:
+  small:
+    stemcell:
+      name: [stemcellName]
+      version: [stemcellVersion]
+    cloud_properties:
+      instance_type: [cloudInstanceType]
+  medium:
+    stemcell:
+      name: [stemcellName]
+      version: [stemcellVersion]
+    env:
+      bosh:
+        password: [boshPassword]
+    cloud_properties:
+      instance_type: [cloudInstanceType]
+properties:
+  director: [directorName]
+  dns:
+    recursor: [directorRecursor]
+  ntp:
+    - [[ntp]]
+  openstack:
+    auth_url: [authUrl]
+    tenant: [tenant]
+    username: [userName]
+    api_key: [apiKey]
+    default_key_name: [defaultKeyName]
+    private_key: [privateKeyPath]
+    default_security_groups: [[defaultSecurityGroups]]

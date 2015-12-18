@@ -23,17 +23,17 @@ public class IEDABoshAwsConfig {
 	@Temporal(TemporalType.DATE)
 	private Date updatedDate;
 	
+	private String dnsRecursor;
 	private String accessKeyId;
 	private String secretAccessKey;
 	private String defaultKeyName;
 	private String defaultSecurityGroups;
 	private String region;
+	private String privateKeyPath;
 	private String boshName;
 	private String directorUuid;
 	private String releaseVersion;
-	private String subnetReserved;
 	private String subnetStatic;
-	private String publicStaticIps;
 	private String subnetRange;
 	private String subnetGateway;
 	private String subnetDns;
@@ -41,7 +41,6 @@ public class IEDABoshAwsConfig {
 	private String cloudSecurityGroups;
 	private String stemcellName;
 	private String stemcellVersion;
-	//private String cloudInstanceType;
 	private String boshPassword;
 	private String deploymentFile;
 }

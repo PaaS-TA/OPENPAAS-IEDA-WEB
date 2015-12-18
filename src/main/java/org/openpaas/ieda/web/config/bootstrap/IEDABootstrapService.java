@@ -10,8 +10,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.web.deploy.bosh.BoshInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -41,6 +43,7 @@ public class IEDABootstrapService {
 	@Autowired
 	private IEDABootstrapOpenstackRepository openstackRepository;
 	
+	
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 	
@@ -48,6 +51,7 @@ public class IEDABootstrapService {
 	
 	public List<BootstrapListDto> listBootstrap() {
 		List<IEDABootstrapAwsConfig> awsConfigsList = awsRepository.findAll();
+		List<IEDABootstrapOpenstackConfig> openstackConfigsList = openstackRepository.findAll();
 		List<BootstrapListDto> listDtos = new ArrayList<>();
 		int recid =0;
 		if(awsConfigsList.size() > 0){
@@ -58,14 +62,27 @@ public class IEDABootstrapService {
 				dto.setIaas("AWS");
 				dto.setCreatedDate(awsConfig.getCreatedDate());
 				dto.setUpdatedDate(awsConfig.getUpdatedDate());
-				dto.setDirectorPrivateIp(awsConfig.getDirectorPrivateIp());
-				dto.setDirectorPublicIp(awsConfig.getDirectorPublicIp());
+				dto.setDirectorPrivateIp(awsConfig.getDirectorPrivateIps());
+				dto.setDirectorPublicIp(awsConfig.getDirectorPublicIps());
+				listDtos.add(dto);
+			}
+		}
+		
+		if(openstackConfigsList.size() > 0){
+			for(IEDABootstrapOpenstackConfig openstackConfig :openstackConfigsList){
+				BootstrapListDto dto = new BootstrapListDto();
+				dto.setRecid(recid++);
+				dto.setId(openstackConfig.getId());
+				dto.setIaas("OPENSTACK");
+				dto.setCreatedDate(openstackConfig.getCreatedDate());
+				dto.setUpdatedDate(openstackConfig.getUpdatedDate());
+				dto.setDirectorPrivateIp(openstackConfig.getPrivateStaticIps());
+				dto.setDirectorPublicIp(openstackConfig.getPublicStaticIps());
 				listDtos.add(dto);
 			}
 		}
 		return listDtos;
 	}
-	
 
 	public String downloadSettingFile(Integer id, String iaas) {
 		// 파일 가져오기
@@ -92,8 +109,8 @@ public class IEDABootstrapService {
 				content = content.replace(item.getTargetItem(), item.getSourceItem());
 			}
 
-			IOUtils.write(stubContent, new FileOutputStream(iedaConfiguration.getTempDir() + stubDeploy.getName()), "UTF-8");
-			IOUtils.write(content, new FileOutputStream(iedaConfiguration.getTempDir() + targetFileName), "UTF-8");
+			IOUtils.write(stubContent, new FileOutputStream(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName()), "UTF-8");
+			IOUtils.write(content, new FileOutputStream(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + targetFileName), "UTF-8");
 			if(iaas == "AWS"){
 				IEDABootstrapAwsConfig config = awsRepository.findById(id);
 				config.setDeploymentFile("aws-microbosh-setting-"+id+".yml");
@@ -119,40 +136,40 @@ public class IEDABootstrapService {
 		
 		if(iaas == "AWS"){
 			IEDABootstrapAwsConfig  awsConfig = awsRepository.findOne(id);
-			items.add(new BootstrapItem("[stemcell]", iedaConfiguration.getStemcellDir()+awsConfig.getStemcellName()));
+			items.add(new BootstrapItem("[stemcell]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") + awsConfig.getStemcellName()));
 			items.add(new BootstrapItem("[microboshPw]", awsConfig.getMicroBoshPw()));
 			items.add(new BootstrapItem("[subnetRange]", awsConfig.getSubnetRange()));
 			items.add(new BootstrapItem("[dns]", awsConfig.getDns()));
 			items.add(new BootstrapItem("[subnetId]", awsConfig.getSubnetId()));
 			items.add(new BootstrapItem("[gateway]", awsConfig.getGateway()));
-			items.add(new BootstrapItem("[directorPrivateIp]", awsConfig.getDirectorPrivateIp()));
-			items.add(new BootstrapItem("[directorPublicIp]", awsConfig.getDirectorPublicIp()));
+			items.add(new BootstrapItem("[directorPrivateIps]", awsConfig.getDirectorPrivateIps()));
+			items.add(new BootstrapItem("[directorPublicIps]", awsConfig.getDirectorPublicIps()));
 			items.add(new BootstrapItem("[awsKey]", awsConfig.getAccessKey()));
 			items.add(new BootstrapItem("[secretAccessKey]", awsConfig.getSecretAccessKey()));
-			items.add(new BootstrapItem("[securGroupName]", awsConfig.getDefaultSecurityGroups()));
-			items.add(new BootstrapItem("[privateKey]", awsConfig.getPrivateKeyPath() + awsConfig.getPrivateKeyPath()));
+			items.add(new BootstrapItem("[defaultSecurityGroups]", awsConfig.getDefaultSecurityGroups()));
+			items.add(new BootstrapItem("[privateKey]", awsConfig.getPrivateKeyPath() + System.getProperty("file.separator") +awsConfig.getPrivateKeyPath()));
 			items.add(new BootstrapItem("[region]", awsConfig.getAvailabilityZone()));
 			items.add(new BootstrapItem("[flavor]", awsConfig.getInstanceType()));	
 			
 			
 		}
-		else{
-			IEDABootstrapOpenstackConfig openstackConfig = openstackRepository.findOne(id);
-			items.add(new BootstrapItem("[stemcell]", openstackConfig.getStemcellName()));
-			items.add(new BootstrapItem("[microboshPw]", openstackConfig.getMicroBoshPw()));
-			items.add(new BootstrapItem("[subnetRange]", openstackConfig.getSubnetRange()));
-			items.add(new BootstrapItem("[dns]", openstackConfig.getDns()));
-			items.add(new BootstrapItem("[subnetId]", openstackConfig.getSubnetId()));
-			items.add(new BootstrapItem("[gateway]", openstackConfig.getGateway()));
-			items.add(new BootstrapItem("[directorPrivateIp]", openstackConfig.getDirectorPrivateIp()));
-			items.add(new BootstrapItem("[directorPublicIp]", openstackConfig.getDirectorPublicIp()));
-			items.add(new BootstrapItem("[awsKey]", openstackConfig.getAccessKey()));
-			items.add(new BootstrapItem("[secretAccessKey]", openstackConfig.getSecretAccessKey()));
-			items.add(new BootstrapItem("[securGroupName]", openstackConfig.getDefaultSecurityGroups()));
-			items.add(new BootstrapItem("[privateKey]", iedaConfiguration.getKeyPathDir()+ openstackConfig.getPrivateKeyPath()));
-			items.add(new BootstrapItem("[region]", openstackConfig.getAvailabilityZone()));
-			items.add(new BootstrapItem("[flavor]", openstackConfig.getInstanceType()));
-		}
+//		else{
+//			IEDABootstrapOpenstackConfig openstackConfig = openstackRepository.findOne(id);
+//			items.add(new BootstrapItem("[stemcell]", openstackConfig.getStemcellName()));
+//			items.add(new BootstrapItem("[microboshPw]", openstackConfig.getMicroBoshPw()));
+//			items.add(new BootstrapItem("[subnetRange]", openstackConfig.getSubnetRange()));
+//			items.add(new BootstrapItem("[dns]", openstackConfig.getDns()));
+//			items.add(new BootstrapItem("[subnetId]", openstackConfig.getSubnetId()));
+//			items.add(new BootstrapItem("[gateway]", openstackConfig.getGateway()));
+//			items.add(new BootstrapItem("[directorPrivateIp]", openstackConfig.getDirectorPrivateIp()));
+//			items.add(new BootstrapItem("[directorPublicIp]", openstackConfig.getDirectorPublicIp()));
+//			items.add(new BootstrapItem("[awsKey]", openstackConfig.getAccessKey()));
+//			items.add(new BootstrapItem("[secretAccessKey]", openstackConfig.getSecretAccessKey()));
+//			items.add(new BootstrapItem("[securGroupName]", openstackConfig.getDefaultSecurityGroups()));
+//			items.add(new BootstrapItem("[privateKey]", iedaConfiguration.getKeyPathDir()+ System.getProperty("file.separator") + openstackConfig.getPrivateKeyPath()));
+//			items.add(new BootstrapItem("[region]", openstackConfig.getAvailabilityZone()));
+//			items.add(new BootstrapItem("[flavor]", openstackConfig.getInstanceType()));
+//		}
 		return items;
 	}
 
@@ -161,7 +178,7 @@ public class IEDABootstrapService {
 		File settingFile = null;
 		String targetFileName = "aws-microbosh-merge.yml";
 		try {
-			settingFile = new File(iedaConfiguration.getDeploymentDir() + targetFileName);
+			settingFile = new File(iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + targetFileName);
 			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -179,17 +196,17 @@ public class IEDABootstrapService {
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
 		try {
-			stubFile = new File(iedaConfiguration.getTempDir()+ stubFileName);
-			tempFile = new File(iedaConfiguration.getTempDir() + tempFileName);
+			stubFile = new File(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName);
+			tempFile = new File(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + tempFileName);
 			
 			deployFileName =  (iaas == "AWS") ? "aws-microbosh-merge-"+id+".yml"
 					:"openstack-microbosh-merge-"+id+".yml";
 			
 			if(stubFile.exists() && tempFile.exists()){
-				command = iedaConfiguration.getScriptDir() + "merge-deploy.sh ";
-				command += iedaConfiguration.getTempDir()+stubFileName + " ";
-				command += iedaConfiguration.getTempDir()+tempFileName + " ";
-				command += iedaConfiguration.getDeploymentDir()+deployFileName;
+				command = iedaConfiguration.getScriptDir() + System.getProperty("file.separator") + "merge-deploy.sh ";
+				command += iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName + " ";
+				command += iedaConfiguration.getTempDir() + System.getProperty("file.separator") + tempFileName + " ";
+				command += iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deployFileName;
 								
 				Process process = r.exec(command);
 				process.getInputStream();
@@ -228,8 +245,8 @@ public class IEDABootstrapService {
 		BufferedReader bufferedReader = null;
 		Runtime r = Runtime.getRuntime();
 		try{
-			String command = iedaConfiguration.getScriptDir() + "aws-microbosh-delete.sh ";
-			command += iedaConfiguration.getDeploymentDir()+fileName + " ";
+			String command = iedaConfiguration.getScriptDir() + System.getProperty("file.separator") + "aws-microbosh-delete.sh ";
+			command += iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + fileName + " ";
 					
 			Process process = r.exec(command);
 			process.getInputStream();
@@ -267,8 +284,8 @@ public class IEDABootstrapService {
 		Runtime r = Runtime.getRuntime();
 		String command = "";
 		try{
-			command += iedaConfiguration.getScriptDir() + "aws-microbosh-deploy.sh ";
-			command += iedaConfiguration.getDeploymentDir() + deployFileName ;
+			command += iedaConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "aws-microbosh-deploy.sh ";
+			command += iedaConfiguration.getDeploymentDir()+ System.getProperty("file.separator")  + deployFileName ;
 					
 			Process process = r.exec(command);
 			log.info("### PROCESS ::: " + process.toString());

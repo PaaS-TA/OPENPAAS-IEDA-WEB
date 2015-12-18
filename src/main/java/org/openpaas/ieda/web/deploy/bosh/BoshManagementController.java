@@ -29,6 +29,9 @@ public class BoshManagementController {
 	private IEDABoshAwsService awsService;
 	
 	@Autowired
+	private IEDABoshOpenstackService openstackService;
+	
+	@Autowired
 	private IEDABoshService boshService;
 	
 	@RequestMapping(value="/deploy/bosh")
@@ -57,7 +60,16 @@ public class BoshManagementController {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/deploy/bosh/saveAwsInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/bosh/openstack/{id}", method=RequestMethod.GET)
+	public ResponseEntity getOpenstackInfo(@PathVariable int id){
+		IEDABoshOpenstackConfig config = openstackService.getBoshOpenstackInfo(id);
+		
+		Map<String, Object> result =  new HashMap<>();
+		result.put("contents", config);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/bosh/saveAwsInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveAwsInfo(@RequestBody @Valid BoshParam.AWS dto){
 		log.info("### saveAwsInfo :: " + dto.toString());
 		IEDABoshAwsConfig awsInfo =  awsService.saveBoshAwsInfo(dto);	
@@ -65,44 +77,36 @@ public class BoshManagementController {
 		return new ResponseEntity<>(awsInfo.getId(), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/deploy/bosh/saveBoshInfo", method=RequestMethod.PUT)
-	public ResponseEntity saveBoshInfo(@RequestBody BoshParam.Bosh dto){
-//		Map<String, Object> result = new HashMap<>();
-//		if( "AWS".equals(dto.getIaas())){
-//			result.put("content", awsService.saveBoshInfo(dto));			
-//		}
+	@RequestMapping(value="/bosh/saveAwsBoshInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveBoshInfo(@RequestBody BoshParam.AwsBosh dto){
 		IEDABoshAwsConfig content = awsService.saveBoshInfo(dto);
 			
 		return new ResponseEntity<>(content, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/deploy/bosh/saveNetworkInfo", method=RequestMethod.PUT)
-	public ResponseEntity saveNetworkInfo(@RequestBody @Valid BoshParam.NetWork dto){
+	@RequestMapping(value="/bosh/saveAwsNetworkInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveNetworkInfo(@RequestBody @Valid BoshParam.AwsNetwork dto){
 		HttpStatus status = HttpStatus.OK;
 		Map<String, Object> result = new HashMap<>();
-		if( "AWS".equals(dto.getIaas())){
-			result.put("content", awsService.saveBoshNetworkInfo(dto));			
-		}
+		result.put("content", awsService.saveBoshNetworkInfo(dto));			
 			
 		if( result.get("content") == null) status = HttpStatus.NO_CONTENT;
 		
 		return new ResponseEntity<>(result, status);
 	}
 	
-	@RequestMapping(value="/deploy/bosh/saveResourceInfo", method=RequestMethod.PUT)
-	public ResponseEntity saveResourceInfo(@RequestBody @Valid BoshParam.Resource dto){
+	@RequestMapping(value="/bosh/saveAwsResourcesInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveResourceInfo(@RequestBody @Valid BoshParam.AwsResource dto){
 		HttpStatus status = HttpStatus.OK;
 		Map<String, Object> result = new HashMap<>();
-		if( "AWS".equals(dto.getIaas())){
-			result.put("content", awsService.saveBoshResourceInfo(dto));			
-		}
+		result.put("content", awsService.saveBoshResourceInfo(dto));			
 			
 		if( result.get("content") == null) status = HttpStatus.NO_CONTENT;
 		
 		return new ResponseEntity<>(result, status);
 	}
 	
-	@RequestMapping(value="/deploy/bosh/getBoshDeployInfo/{id}", method=RequestMethod.PUT)
+	@RequestMapping(value="/bosh/getBoshDeployInfo/{id}", method=RequestMethod.PUT)
 	public ResponseEntity getBoshDeployInfo(@PathVariable int id){
 		HttpStatus status = HttpStatus.OK;
 		String content = "";
@@ -114,7 +118,39 @@ public class BoshManagementController {
 		return new ResponseEntity<>(content, status);
 	}
 	
-	@MessageMapping("/boshInstall")
+	@RequestMapping(value="/bosh/saveOsBoshInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveOpenstackBoshInfo(@RequestBody @Valid BoshParam.OsBosh dto){
+		log.info("### saveAwsInfo :: " + dto.toString());
+		IEDABoshOpenstackConfig config = openstackService.saveBoshInfo(dto);	
+		
+		return new ResponseEntity<>(config, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/bosh/saveOpenstackInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveOpenstackInfo(@RequestBody @Valid BoshParam.Openstack dto){
+		log.info("### saveAwsInfo :: " + dto.toString());
+		IEDABoshOpenstackConfig config = openstackService.saveOpenstackInfo(dto);	
+		
+		return new ResponseEntity<>(config, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/bosh/saveOsNetworkInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveOsNetworkInfo(@RequestBody @Valid BoshParam.OsNetwork dto){
+		log.info("### saveAwsInfo :: " + dto.toString());
+		IEDABoshOpenstackConfig config = openstackService.saveOsNetworkInfo(dto);	
+		
+		return new ResponseEntity<>(config, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/bosh/saveOsResourceInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveOsResourceInfo(@RequestBody @Valid BoshParam.OsResource dto){
+		log.info("### saveAwsInfo :: " + dto.toString());
+		IEDABoshOpenstackConfig config = openstackService.saveOsResourceInfo(dto);	
+		
+		return new ResponseEntity<>(config, HttpStatus.OK);
+	}
+	
+	@MessageMapping("/bosh/install")
 	@SendTo("/bosh/boshInstall")
 	public ResponseEntity doInstallBootstrap(@RequestBody @Valid IDEABootStrapInfoDto.Install dto){
 		log.info("$$$$ SOCKET :  "+ dto.getDeployFileName());
