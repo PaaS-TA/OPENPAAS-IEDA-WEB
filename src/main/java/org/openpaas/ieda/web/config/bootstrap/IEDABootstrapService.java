@@ -62,8 +62,8 @@ public class IEDABootstrapService {
 				dto.setIaas("AWS");
 				dto.setCreatedDate(awsConfig.getCreatedDate());
 				dto.setUpdatedDate(awsConfig.getUpdatedDate());
-				dto.setDirectorPrivateIp(awsConfig.getDirectorPrivateIps());
-				dto.setDirectorPublicIp(awsConfig.getDirectorPublicIps());
+				dto.setDirectorPrivateIp(awsConfig.getDirectorPrivateIp());
+				dto.setDirectorPublicIp(awsConfig.getDirectorPublicIp());
 				listDtos.add(dto);
 			}
 		}
@@ -142,8 +142,8 @@ public class IEDABootstrapService {
 			items.add(new BootstrapItem("[dns]", awsConfig.getDns()));
 			items.add(new BootstrapItem("[subnetId]", awsConfig.getSubnetId()));
 			items.add(new BootstrapItem("[gateway]", awsConfig.getGateway()));
-			items.add(new BootstrapItem("[directorPrivateIps]", awsConfig.getDirectorPrivateIps()));
-			items.add(new BootstrapItem("[directorPublicIps]", awsConfig.getDirectorPublicIps()));
+			items.add(new BootstrapItem("[directorPrivateIp]", awsConfig.getDirectorPrivateIp()));
+			items.add(new BootstrapItem("[directorPublicIp]", awsConfig.getDirectorPublicIp()));
 			items.add(new BootstrapItem("[awsKey]", awsConfig.getAccessKey()));
 			items.add(new BootstrapItem("[secretAccessKey]", awsConfig.getSecretAccessKey()));
 			items.add(new BootstrapItem("[defaultSecurityGroups]", awsConfig.getDefaultSecurityGroups()));

@@ -459,7 +459,7 @@ function settingOpenstackData(contents){
 	openstackInfo = {
 			id						: boshId,
 			directorName			: contents.directorName,
-			directorStaticIps		: contents.directorStaticIps,
+			directorStaticIp		: contents.directorStaticIp,
 			dnsRecursor				: contents.dnsRecursor,
 			authUrl					: contents.authUrl,
 			tenant					: contents.tenant,
@@ -851,7 +851,7 @@ function saveOpenstackInfo(type){
 	openstackInfo = {
 			id						: boshId,
 			directorName			: $(".w2ui-msg-body input[name='directorName']").val(),
-			directorStaticIps		: $(".w2ui-msg-body input[name='directorStaticIps']").val(),
+			directorStaticIp		: $(".w2ui-msg-body input[name='directorStaticIp']").val(),
 			dnsRecursor				: $(".w2ui-msg-body input[name='dnsRecursor']").val(),
 			authUrl					: $(".w2ui-msg-body input[name='authUrl']").val(),
 			tenant					: $(".w2ui-msg-body input[name='tenant']").val(),
@@ -1417,9 +1417,9 @@ $( window ).resize(function() {
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Director Elastic Ips</label>
+		            <label style="text-align: left;width:250px;font-size:11px;">Director Elastic Ip</label>
 		            <div>
-		                <input name="directorStaticIps" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="directorStaticIp" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">

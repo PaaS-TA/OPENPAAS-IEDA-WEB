@@ -80,7 +80,7 @@ public class BoshParam {
 	public static class Openstack{
 		private String id;
 		private String directorName;
-		private String directorStaticIps;
+		private String directorStaticIp;
 		private String dnsRecursor;
 		private String authUrl;
 		private String tenant;

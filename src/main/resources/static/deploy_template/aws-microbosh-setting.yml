@@ -28,10 +28,10 @@ jobs:
     networks:
       private:
         static_ips: 
-        - [[directorPrivateIps]]
+        - [[directorPrivateIp]]
       public:
         static_ips:
-        - [[directorPublicIps]]
+        - [[directorPublicIp]]
     properties:
       director: 
         name: my-bosh

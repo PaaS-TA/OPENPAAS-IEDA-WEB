@@ -76,8 +76,8 @@ public class IEDABootstrapAwsService {
 		config.setDns(dto.getDns());
 		config.setSubnetId(dto.getSubnetId());
 		config.setGateway(dto.getGateway());
-		config.setDirectorPrivateIps(dto.getDirectorPrivateIps());
-		config.setDirectorPublicIps(dto.getDirectorPublicIps());
+		config.setDirectorPrivateIp(dto.getDirectorPrivateIp());
+		config.setDirectorPublicIp(dto.getDirectorPublicIp());
 		Date now = new Date();
 		config.setUpdatedDate(now);
 		awsRepository.save(config);

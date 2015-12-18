@@ -36,9 +36,9 @@ public class IDEABootStrapInfoDto{
 		@NotNull
 		private String subnetId;
 		@NotNull
-		private String directorPrivateIps;
+		private String directorPrivateIp;
 		@NotNull
-		private String directorPublicIps;
+		private String directorPublicIp;
 	}
 	
 	@Data

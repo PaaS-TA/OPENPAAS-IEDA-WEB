@@ -38,7 +38,7 @@ jobs:
     networks:
       elastic:
         static_ips:
-        - [[publicStaticIps]]
+        - [[publicStaticIp]]
 properties:
 #  dns:
 #    recursor: 52.23.2.85

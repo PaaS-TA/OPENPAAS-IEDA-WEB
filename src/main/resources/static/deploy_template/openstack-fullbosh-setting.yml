@@ -18,7 +18,7 @@ jobs:
     networks:
       elastic:
         static_ips:
-        - [[directorStaticIps]]
+        - [[directorStaticIp]]
 resource_pools:
   small:
     stemcell:

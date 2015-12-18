@@ -64,6 +64,20 @@ public class ReleaseController {
 		return new ResponseEntity( result, HttpStatus.OK);
 	}
 	
+	@RequestMapping( value="/releases/versions", method =RequestMethod.GET)
+	public ResponseEntity listReleaseVersion(){
+		List<ReleaseInfo> contents = releaseService.listRelease();
+		
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		if ( contents != null ) {
+			result.put("total", contents.size());
+			result.put("records", contents);
+		} else
+			result.put("total", 0);
+		
+		return new ResponseEntity( result, HttpStatus.OK);
+	}
+	
 	@RequestMapping( value="/localReleases", method =RequestMethod.GET)
 	public ResponseEntity listLocalRelease(){
 		List<ReleaseFile> contents = releaseService.listLocalRelease();

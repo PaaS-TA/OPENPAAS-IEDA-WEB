@@ -11,7 +11,7 @@ public class BoshInfo {
 	private int id;
 	private String iaas;
 	private String boshName;
-	//private String publicStaticIps;
+	//private String publicStaticIp;
 	private String subnetRange;
 	private Date createdDate;
 	private Date updatedDate;

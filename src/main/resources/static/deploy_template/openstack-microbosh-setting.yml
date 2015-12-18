@@ -27,7 +27,7 @@ jobs:
     networks:
       private:
         static_ips: 
-        - [[privateStaticIps]]
+        - [[privateStaticIp]]
       public:
         static_ips:
         - [[publicStaticIpd]]

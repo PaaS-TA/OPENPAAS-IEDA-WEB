@@ -42,9 +42,9 @@ public class IEDABootstrapAwsConfig {
 	
 	private String subnetId;
 	
-	private String directorPrivateIps;
+	private String directorPrivateIp;
 	
-	private String directorPublicIps;
+	private String directorPublicIp;
 	
 	private String stemcellName;
 	

@@ -133,7 +133,6 @@ public class IEDABoshOpenstackService {
 //		//network Info
 //		replaces.add(new ReplaceItem("[subnetReserved]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetReserved()));
 //		replaces.add(new ReplaceItem("[subnetStatic]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetStatic()));
-//		replaces.add(new ReplaceItem("[publicStaticIps]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getPublicStaticIps()));
 //		replaces.add(new ReplaceItem("[subnetRange]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetRange()));
 //		replaces.add(new ReplaceItem("[subnetGateway]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetGateway()));
 //		replaces.add(new ReplaceItem("[subnetDns]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetDns()));

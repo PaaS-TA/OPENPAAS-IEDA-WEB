@@ -74,8 +74,8 @@ public class BootStrapDto{
 	@Data 
 	public static class OpenStack{
 		private int id;		
-		private String privateStaticIps;
-		private String publicStaticIps;
+		private String privateStaticIp;
+		private String publicStaticIp;
 		private String directorName;
 		private String authUrl;
 		private String tenant;
