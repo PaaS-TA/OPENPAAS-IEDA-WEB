@@ -94,7 +94,7 @@ $(function(){
 		if ( directorName.indexOf("AWS") > 0 ) {
 			awsPopup();
 		} else if (directorName.indexOf("OPENSTACK") > 0 ) {
-			osBoshInfoPopup();
+			openstackPopup();
 		} else {
 			selectIaas();
 		}
@@ -106,7 +106,7 @@ $(function(){
 		if($("#modifyBtn").attr('disabled') == "disabled") return;
 		w2confirm({
 			title 	: "BOSH 설치",
-			msg		: "BOSH 를 수정하시겠습니까?",
+			msg		: "BOSH설치 정보를 수정하시겠습니까?",
 			yes_text: "확인",
 			yes_callBack : function(event){
 				var selected = w2ui['config_boshGrid'].getSelection();
@@ -183,7 +183,7 @@ function selectIaas(){
 				if( structureType == "AWS")
 					awsPopup();
 				else
-					osBoshInfoPopup();				
+					openstackPopup();				
 			}
 			else{
 				w2alert("설치할 Infrastructure 을 선택하세요");
@@ -295,6 +295,7 @@ function awsPopup(){
 	$("#awsInfoDiv").w2popup({
 		width 	: 670,
 		height	: 500,
+		title   : "BOSH설치 (AWS)",
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
@@ -500,7 +501,7 @@ function settingOpenstackData(contents){
 			cloudInstanceType	: contents.cloudInstanceType,
 			boshPassword		: contents.boshPassword
 	}
-	osBoshInfoPopup();	
+	openstackPopup();	
 }
 
 function  boshInfoPopup(){
@@ -749,10 +750,11 @@ function installPopup(){
 }
 
 //OPENSTACK BOSH INFO POPUP
-function osBoshInfoPopup(){
+function openstackPopup(){
 	$("#osBoshInfoDiv").w2popup({
 		width 	: 670,
 		height	: 450,
+		title   : "BOSH설치 (OPENSTACK)",
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
@@ -796,7 +798,6 @@ function getStamcellList(){
 		type : "GET",
 		url : "/stemcells",
 		contentType : "application/json",
-		//dataType: "json",
 		async : true,
 		data : JSON.stringify(boshInfo), 
 		success : function(data, status) {
@@ -876,7 +877,7 @@ function saveOpenstackInfo(type){
 	}
 	
 	if( type == 'before'){
-		osBoshInfoPopup();
+		openstackPopup();
 		return;
 	}
 	
@@ -1063,7 +1064,7 @@ $( window ).resize(function() {
 			<!-- //Btn -->
 	    </div>
 	</div>
-	<div id="config_boshGrid" style="width:100%; height:500px"></div>	
+	<div id="config_boshGrid" style="width:100%; height:500px"></div>
 </div>
 
 	<!-- IaaS 설정 DIV -->
@@ -1094,30 +1095,23 @@ $( window ).resize(function() {
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left:3%;">
 	            <ul class="progressStep_6" >
-		            <li class="active">AWS 설정</li>
-		            <li class="before">Bosh Info 설정</li>
-		            <li class="before">Network 설정</li>
-		            <li class="before">리소스 설정</li>
-		            <li class="before">배포 Manifest</li>
+		            <li class="active">AWS 정보</li>
+		            <li class="before">BOSH 정보</li>
+		            <li class="before">네트워크 정보</li>
+		            <li class="before">리소스 정보</li>
+		            <li class="before">배포파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
 			<div class="cont_title">▶ AWS 설정정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    
-<!-- 		    	<div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">MicroBOSH(Bootstrap) IP</label>
-		            <div>
-		            	<input name="dnsRecursor" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div> -->
-		        
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Access Key ID</label>
 		            <div>
 		                <input name="accessKeyId" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
-				<div>
+				</div>
 				
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Secret Access Key</label>
@@ -1139,17 +1133,12 @@ $( window ).resize(function() {
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Private Key</label>
+		            <label style="text-align: left;width:250px;font-size:11px;">Private Key Name</label>
 		            <div>
 		                <input name="defaultKeyName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Private Key</label>
-		            <div>
-		                <input name="defaultKeyName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
+		        
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Private Key Path</label>
 	                <div >
@@ -1179,15 +1168,15 @@ $( window ).resize(function() {
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left:3%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">AWS 설정</li>
-		            <li class="active">Bosh Info 설정</li>
-		            <li class="before">Network 설정</li>
-		            <li class="before">리소스 설정</li>
-		            <li class="before">배포 Manifest</li>
+		            <li class="pass">AWS 정보</li>
+		            <li class="active">BOSH 정보</li>
+		            <li class="before">네트워크 정보</li>
+		            <li class="before">리소스 정보</li>
+		            <li class="before">배포파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div class="cont_title">▶ Bosh Info 설정정보</div>
+			<div class="cont_title">▶ BOSH 설정정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<div class="w2ui-field" hidden="true">
 		            <label>Iaas</label>
@@ -1202,13 +1191,13 @@ $( window ).resize(function() {
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Micro bosh 디렉터 UUID</label>
+		            <label style="text-align: left;width:250px;font-size:11px;">디렉터 UUID</label>
 		            <div>
 		                <input name="directorUuid" type="password" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Bosh 릴리즈 버전</label>
+		            <label style="text-align: left;width:250px;font-size:11px;">BOSH 릴리즈 버전</label>
 		            <div>
 		                <input name="releaseVersion" type="list" style="float:left;width:280px;"/>
 		            </div>
@@ -1229,11 +1218,11 @@ $( window ).resize(function() {
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left:3%;">
 	            <ul class="progressStep_6">
-		            <li class="pass">AWS 설정</li>
-		            <li class="pass">Bosh Info 설정</li>
-		            <li class="active">Network 설정</li>
-		            <li class="before">리소스 설정</li>
-		            <li class="before">배포 Manifest</li>
+					<li class="pass">AWS 정보</li>
+		            <li class="pass">BOSH 정보</li>
+		            <li class="active">네트워크 정보</li>
+		            <li class="before">리소스 정보</li>
+		            <li class="before">배포파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
@@ -1291,11 +1280,11 @@ $( window ).resize(function() {
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left:3%;">
 	            <ul class="progressStep_6">
-		            <li class="pass">AWS 설정</li>
-		            <li class="pass">Bosh Info 설정</li>
-		            <li class="pass">Network 설정</li>
-		            <li class="active">리소스 설정</li>
-		            <li class="before">배포 Manifest</li>
+					<li class="pass">AWS 정보</li>
+		            <li class="pass">BOSH 정보</li>
+		            <li class="pass">네트워크 정보</li>
+		            <li class="active">리소스 정보</li>
+		            <li class="before">배포파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
@@ -1341,11 +1330,11 @@ $( window ).resize(function() {
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left:2%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">Bosh Info 설정</li>
-		            <li class="pass">Openstack Info 설정</li>
-		            <li class="pass">Network 설정</li>
-		            <li class="pass">리소스 설정</li>
-		            <li class="active">배포 Manifest</li>
+		            <li class="pass">AWS 정보</li>
+		            <li class="pass">BOSH 정보</li>
+		            <li class="pass">네트워크 정보</li>
+		            <li class="pass">리소스 정보</li>
+		            <li class="active">배포파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
@@ -1652,11 +1641,11 @@ $( window ).resize(function() {
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left:3%;">
 	            <ul class="progressStep_6">
-		            <li class="pass">Bosh Info 설정</li>
-		            <li class="pass">Openstack Info 설정</li>
-		            <li class="pass">Network 설정</li>
-		            <li class="pass">리소스 설정</li>
-		            <li class="pass">배포 Manifest</li>
+		            <li class="pass">AWS 정보</li>
+		            <li class="pass">BOSH 정보</li>
+		            <li class="pass">네트워크 정보</li>
+		            <li class="pass">리소스 정보</li>
+		            <li class="pass">배포파일 정보</li>
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>
