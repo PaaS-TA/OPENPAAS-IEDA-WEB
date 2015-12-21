@@ -12,7 +12,7 @@
     background : #147ad0;
     color : #FFF;
     left: 5px;
-    text-decoration : none;
+    text-decoration : none;dto
     line-height : 25px;
     text-align : center;
     margin-top: 3px;

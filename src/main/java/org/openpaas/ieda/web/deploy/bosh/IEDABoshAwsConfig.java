@@ -31,6 +31,7 @@ public class IEDABoshAwsConfig {
 	private String privateKeyPath;
 	private String boshName;
 	private String directorUuid;
+	private String publicStaticIp;
 	private String releaseVersion;
 	private String subnetStatic;
 	private String subnetRange;
@@ -38,6 +39,7 @@ public class IEDABoshAwsConfig {
 	private String subnetDns;
 	private String cloudSubnet;
 	private String cloudSecurityGroups;
+	private String cloudInstanceType;
 	private String stemcellName;
 	private String stemcellVersion;
 	private String boshPassword;

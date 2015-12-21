@@ -1,12 +1,16 @@
 package org.openpaas.ieda.web.deploy.bosh;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.openpaas.ieda.api.ReleaseInfo;
+import org.openpaas.ieda.web.config.bootstrap.BootStrapDto;
 import org.openpaas.ieda.web.config.bootstrap.IDEABootStrapInfoDto;
+import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +37,9 @@ public class BoshManagementController {
 	
 	@Autowired
 	private IEDABoshService boshService;
+	
+	@Autowired
+	private ReleaseService releaseService;
 	
 	@RequestMapping(value="/deploy/bosh")
 	public String List(){
@@ -106,11 +113,22 @@ public class BoshManagementController {
 		return new ResponseEntity<>(result, status);
 	}
 	
-	@RequestMapping(value="/bosh/getBoshDeployInfo/{id}", method=RequestMethod.GET)
-	public ResponseEntity getBoshDeployInfo(@PathVariable int id){
+	@RequestMapping(value="/bosh/getAwsBoshDeployInfo", method=RequestMethod.POST)
+	public ResponseEntity getBoshAwsDeployInfo(@RequestBody @Valid BootStrapDto.Deployment dto){
 		HttpStatus status = HttpStatus.OK;
 		String content = "";
-		content = awsService.getDeploymentInfos(id);
+		content = awsService.getDeploymentInfos(dto.getDeploymentFile());
+		if(StringUtils.isEmpty(content) ) {
+			status = HttpStatus.NO_CONTENT;
+		}		
+		return new ResponseEntity<>(content, status);
+	}
+	
+	@RequestMapping(value="/bosh/getOpenstackBoshDeployInfo/{id}", method=RequestMethod.POST)
+	public ResponseEntity getBoshOpenstackDeployInfo(@PathVariable int id){
+		HttpStatus status = HttpStatus.OK;
+		String content = "";
+		content = openstackService.getDeploymentInfos(id);
 		if(StringUtils.isEmpty(content) ) {
 			status = HttpStatus.NO_CONTENT;
 		}		
@@ -164,6 +182,30 @@ public class BoshManagementController {
 		if("AWS".equals(dto.getIaas())) awsService.deleteAwsInfo(dto.getId());
 		//else openstackService.deleteOpenstackInfo(dto.getId());
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@RequestMapping( value="/bosh/releases", method =RequestMethod.GET)
+	public ResponseEntity listRelease(){
+		List<ReleaseInfo> contents = releaseService.listRelease();
+		List<ReleaseInfo> releases = new ArrayList<>();
+		if(contents != null ){
+			for(ReleaseInfo releaseInfo: contents){
+				if("bosh".equals(releaseInfo.getName())){
+					log.info("@@@@@ " + releaseInfo.getName()+ "/" + releaseInfo.getVersion());
+					releases.add(releaseInfo);
+				}
+			}
+		}
+		
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		
+		if ( contents != null ) {
+			result.put("total", releases.size());
+			result.put("records", releases);
+		} else
+			result.put("total", 0);
+		
+		return new ResponseEntity( result, HttpStatus.OK);
 	}
 	
 }

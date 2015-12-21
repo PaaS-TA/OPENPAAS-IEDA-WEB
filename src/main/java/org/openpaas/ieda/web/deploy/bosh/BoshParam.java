@@ -14,8 +14,10 @@ public class BoshParam {
 		private String secretAccessKey;
 		private String defaultKeyName;
 		private String defaultSecurityGroups;
-		private String region;		
+		private String region;	
+		@NotNull
 		private String privateKeyPath;
+		
 	}
 	
 	@Data
@@ -26,6 +28,8 @@ public class BoshParam {
 		private String boshName;
 		@NotNull
 		private String directorUuid;
+		@NotNull
+		private String publicStaticIp;
 		@NotNull
 		private String releaseVersion;
 	}
@@ -56,6 +60,8 @@ public class BoshParam {
 		private String stemcellName;
 		@NotNull
 		private String stemcellVersion;
+		@NotNull
+		private String cloudInstanceType;
 		@NotNull
 		private String boshPassword;
 	}

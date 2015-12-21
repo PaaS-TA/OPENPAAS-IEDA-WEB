@@ -5,18 +5,14 @@ release:
 networks:
   default:
     subnets:
-    - reserved:
-      - [subnetReserved]
-      static: 
-      - [[subnetStatic]]
+    - reserved: [subnetReserved]
+      static: [[subnetStatic]]
       range: [subnetRange]
       gateway: [subnetGateway]
-      dns:
-        - [[subnetDns]]
+      dns: [[subnetDns]]
       cloud_properties:
         subnet: [cloudSubnet]
-        security_groups:
-          - [cloudSecurityGroups]
+        security_groups: [cloudSecurityGroups]
 resource_pools:
   small:
     stemcell:
@@ -37,8 +33,7 @@ jobs:
   director:
     networks:
       elastic:
-        static_ips:
-        - [[publicStaticIp]]
+        static_ips: [[publicStaticIp]]
 properties:
 #  dns:
 #    recursor: 52.23.2.85

@@ -262,7 +262,6 @@ public class IEDABoshService {
 		if(iaas == "AWS"){
 			IEDABoshAwsConfig awsConfig = awsRepository.findOne(id);
 //			items.add(new ReplaceItem("[stemcell]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") + awsConfig.getStemcellName()));
-			//items.add(new ReplaceItem("[dnsRecursor]", awsConfig.getDnsRecursor()));
 			items.add(new ReplaceItem("[accessKeyId]", awsConfig.getAccessKeyId()));
 			items.add(new ReplaceItem("[secretAccessKey]", awsConfig.getSecretAccessKey()));
 			items.add(new ReplaceItem("[defaultKeyName]", awsConfig.getDefaultKeyName()));
@@ -271,6 +270,8 @@ public class IEDABoshService {
 			items.add(new ReplaceItem("[privateKeyPath]", awsConfig.getPrivateKeyPath()));
 			items.add(new ReplaceItem("[boshName]", awsConfig.getBoshName()));
 			items.add(new ReplaceItem("[directorUuid]", awsConfig.getDirectorUuid()));
+			items.add(new ReplaceItem("[publicStaticIp]", awsConfig.getPublicStaticIp()));
+			
 			items.add(new ReplaceItem("[releaseVersion]", awsConfig.getReleaseVersion()));
 			items.add(new ReplaceItem("[subnetStatic]", awsConfig.getSubnetStatic()));
 			items.add(new ReplaceItem("[subnetRange]", awsConfig.getSubnetRange()));
@@ -278,6 +279,7 @@ public class IEDABoshService {
 			items.add(new ReplaceItem("[subnetDns]", awsConfig.getSubnetDns()));
 			items.add(new ReplaceItem("[cloudSubnet]", awsConfig.getCloudSubnet()));
 			items.add(new ReplaceItem("[cloudSecurityGroups]", awsConfig.getCloudSecurityGroups()));
+			items.add(new ReplaceItem("[cloudInstanceType]", awsConfig.getCloudInstanceType()));
 			items.add(new ReplaceItem("[stemcellName]", awsConfig.getStemcellName()));
 			items.add(new ReplaceItem("[stemcellVersion]", awsConfig.getStemcellVersion()));
 			items.add(new ReplaceItem("[boshPassword]", awsConfig.getBoshPassword()));
@@ -300,7 +302,6 @@ public class IEDABoshService {
 			items.add(new ReplaceItem("[boshPassword]", openstackConfig.getBoshPassword()));
 			items.add(new ReplaceItem("[directorName]", openstackConfig.getDirectorName()));
 			items.add(new ReplaceItem("[directorStaticIp]", openstackConfig.getDirectorStaticIp()));
-			//items.add(new ReplaceItem("[dnsRecursor]", openstackConfig.getDnsRecursor()));
 			items.add(new ReplaceItem("[authUrl]", openstackConfig.getAuthUrl()));
 			items.add(new ReplaceItem("[tenant]", openstackConfig.getTenant()));
 			items.add(new ReplaceItem("[userName]", openstackConfig.getUserName()));
@@ -326,15 +327,15 @@ public class IEDABoshService {
 			stubFile = new File(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName);
 			settingFile = new File(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName);
 
-			deploymentFileName =  (iaas == "AWS") ? "aws-microbosh-merge-"+id+".yml"
-					:"openstack-microbosh-merge-"+id+".yml";
-
+			deploymentFileName =  (iaas == "AWS") ? "aws-fullbosh-merge-"+id+".yml"
+					:"openstack-fullbosh-merge-"+id+".yml";
 			if(stubFile.exists() && settingFile.exists()){
 				command = iedaConfiguration.getScriptDir() + System.getProperty("file.separator") + "merge-deploy.sh ";
 				command += iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName + " ";
 				command += iedaConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName + " ";
 				command += iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
 
+				log.info("&&&&& \n" + command + "\n&&&");
 				Process process = r.exec(command);
 				process.getInputStream();
 				inputStream = process.getInputStream();

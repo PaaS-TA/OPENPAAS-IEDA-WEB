@@ -45,13 +45,11 @@ public class IEDABoshAwsService {
 		else {
 			config = boshAwsRepository.findOne(Integer.parseInt(dto.getId()));
 		}
-
 		config.setAccessKeyId(dto.getAccessKeyId());
 		config.setSecretAccessKey(dto.getSecretAccessKey());
 		config.setDefaultKeyName(dto.getDefaultKeyName());
 		config.setDefaultSecurityGroups(dto.getDefaultSecurityGroups());
 		config.setRegion(dto.getRegion());
-		
 		config.setPrivateKeyPath(dto.getPrivateKeyPath());
 		config.setCreatedDate(now);
 		config.setUpdatedDate(now);
@@ -63,6 +61,7 @@ public class IEDABoshAwsService {
 		IEDABoshAwsConfig config = boshAwsRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setBoshName(dto.getBoshName());
 		config.setDirectorUuid(dto.getDirectorUuid());
+		config.setPublicStaticIp(dto.getPublicStaticIp());
 		config.setReleaseVersion(dto.getReleaseVersion());
 		return boshAwsRepository.save(config);
 	}
@@ -83,34 +82,22 @@ public class IEDABoshAwsService {
 		config.setStemcellName(dto.getStemcellName());
 		config.setStemcellVersion(dto.getStemcellVersion());
 		config.setBoshPassword(dto.getBoshPassword());
-		
+		config.setCloudInstanceType(dto.getCloudInstanceType());
 		String deplymentFileName = boshService.createSettingFile(Integer.parseInt(dto.getId()), "AWS");
 		config.setDeploymentFile(deplymentFileName);
 		return boshAwsRepository.save(config);
 	}
 	
-	public String getDeploymentInfos(int id){
-		String content = ""; 
-		IEDABoshAwsConfig config = boshAwsRepository.findOne(id);
-		//Create tempFile, stubFile
-		List<ReplaceItem> replaces = getBoshAwsReplaceItems(config);
-		
-		//CreateFile && Merge
-		config = createTempFile(config, replaces);
-		
-		if( !StringUtils.isEmpty(config.getDeploymentFile())){
-			File deplymentFile = new File(iedaConfiguration.getDeploymentDir() +  System.getProperty("file.separator") + config.getDeploymentFile());
-			
-			try {
-				if(deplymentFile.exists()){
-					content = IOUtils.toString(new FileInputStream(deplymentFile), "UTF-8");
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
+	public String getDeploymentInfos(String deploymentFile){
+		String contents = "";
+		File settingFile = null;
+		try {
+			settingFile = new File(iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile);
+			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		return content;
+		return contents;
 	}
 	
 	public List<ReplaceItem> getBoshAwsReplaceItems(IEDABoshAwsConfig config){
