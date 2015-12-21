@@ -7,18 +7,15 @@ networks:
     subnets:
     - range: [subnetRange]
       gateway: [subnetGateway]
-      dns:
-      - [[subnetDns]]
-      static: 
-      - [[subnetStatic]]
+      dns: [[subnetDns]]
+      static: [[subnetStatic]]
       cloud_properties:
         net_id: [subnetNetId]
 jobs:
   director:
     networks:
       elastic:
-        static_ips:
-        - [[directorStaticIp]]
+        static_ips: [[directorStaticIp]]
 resource_pools:
   small:
     stemcell:
@@ -39,8 +36,7 @@ properties:
   director: [directorName]
   dns:
     recursor: [directorRecursor]
-  ntp:
-    - [[ntp]]
+  ntp: [[ntp]]
   openstack:
     auth_url: [authUrl]
     tenant: [tenant]

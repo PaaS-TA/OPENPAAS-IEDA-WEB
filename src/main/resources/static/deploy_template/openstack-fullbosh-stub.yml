@@ -26,11 +26,11 @@ networks:
   - name: default
     type: manual
     subnets:
-    #- reserved: [(( merge ))]
-    - static: [(( merge ))]
+    #- reserved: (( merge ))
+    - static: (( merge ))
       range: (( merge ))
       gateway: (( merge ))
-      dns: [(( merge ))]
+      dns: (( merge ))
       cloud_properties:
         net_id: (( merge ))
 
@@ -106,7 +106,7 @@ jobs:
         default: [dns, gateway]
         static_ips: (( static_ips(4) ))
       - name: elastic
-        static_ips: [(( merge ))]        
+        static_ips: (( merge ))        
 
   - name: registry
     template: registry
@@ -179,6 +179,6 @@ properties:
       password: admin
     resurrector_enabled: true
 
-  ntp: [(( merge ))]
+  ntp: (( merge ))
 
   openstack: (( merge ))

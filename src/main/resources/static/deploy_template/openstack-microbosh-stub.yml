@@ -28,7 +28,7 @@ networks:
   subnets:
   - range: (( merge ))
     gateway: (( merge ))
-    dns: [(( merge ))]
+    dns: (( merge ))
     cloud_properties:
       net_id: (( merge ))
 - name: public
@@ -108,7 +108,7 @@ jobs:
     agent:
       mbus: (( "nats://nats_user:password@" networks.private.static_ips.[0] ":4222" ))
 
-    ntp: [(( merge ))]
+    ntp: (( merge ))
 
 cloud_provider:
   template: {name: openstack_cpi, release: bosh-openstack-cpi}

@@ -610,7 +610,7 @@ function resourcePopup(){
 	});
 }
 
-function saveResourceInfo(param){
+function saveAwsResourceInfo(param){
 	resourceInfo = {
 			id					: boshId,
 			stemcellName		: $(".w2ui-msg-body input[name='stemcellName']").val(),
@@ -623,7 +623,7 @@ function saveResourceInfo(param){
 		networkPopup();
 		return;
 	}
-		
+	console.log("Release Save");
 	//Server send Bosh Info
 	$.ajax({
 		type : "PUT",
@@ -631,9 +631,9 @@ function saveResourceInfo(param){
 		contentType : "application/json",
 		//dataType: "json",
 		async : true,
-		data : JSON.stringify(boshInfo), 
+		data : JSON.stringify(resourceInfo), 
 		success : function(data, status) {
-			resourcePopup();
+			deployPopup();
 		},
 		error : function( e, status ) {
 			w2alert("Bosh Network 등록에 실패 하였습니다.", "Bosh 설치");
@@ -641,7 +641,6 @@ function saveResourceInfo(param){
 	});
 	deployPopup();
 }
-
 
 function deployPopup(){
 	var deployDiv = (iaas == "AWS") ? $("#deployManifestDiv") : $("#osDeployManifestDiv");
@@ -661,8 +660,8 @@ function deployPopup(){
 
 function getDeployInfo(){
 	$.ajax({
-		type : "POST",
-		url : "/bosh/geBoshDeployInfo",
+		type : "GET",
+		url : "/bosh/getBoshDeployInfo/"+ boshId,
 		contentType : "application/json",
 		//dataType: "json",
 		async : true, 
@@ -1077,40 +1076,38 @@ $( window ).resize(function() {
 	        </div>
 			<div class="cont_title">▶ AWS 설정정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Micro BOSH 공인 IP</label>
+<!-- 		    	<div class="w2ui-field">
+		            <label style="text-align: left;width:250px;font-size:11px;">MicroBOSH(Bootstrap) IP</label>
 		            <div>
 		            	<input name="dnsRecursor" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
-		        </div>
+		        </div> -->
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">AWS 접근 키 아이디</label>
+		            <label style="text-align: left;width:250px;font-size:11px;">Access Key ID</label>
 		            <div>
-		                <input name="accessKeyId" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">AWS 접근 키 암호</label>
+		            <label style="text-align: left;width:250px;font-size:11px;">Secret Access Key</label>
 		            <div>
 		                <input name="secretAccessKey" type="password" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div>
+
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">VPC 접속 키 명</label>
-		            <div>
-		                <input name="defaultKeyName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">VPC 접속 보안 정책 그룹명</label>
+		            <label style="text-align: left;width:250px;font-size:11px;">Security Group</label>
 		            <div>
 		                <input name="defaultSecurityGroups" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">VPC 네트워크 설정 지역</label>
+		            <label style="text-align: left;width:250px;font-size:11px;">Region</label>
 		            <div>
 		                <input name="region" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		            </div>
+		        </div>
+		        <div class="w2ui-field">
+		            <label style="text-align: left;width:250px;font-size:11px;">Private Key</label>
+		            <div>
+		                <input name="defaultKeyName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
@@ -1292,9 +1289,9 @@ $( window ).resize(function() {
 			</div>
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveResourceInfo('before');">이전</button>
+				<button class="btn" style="float: left;" onclick="saveAwsResourceInfo('before');">이전</button>
 				<button class="btn" onclick="popupComplete();">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveResourceInfo('after');">다음>></button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveAwsResourceInfo('after');">다음>></button>
 			</div>
 		</div>
 	</div>
@@ -1629,7 +1626,7 @@ $( window ).resize(function() {
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float: left;" onclick="deployPopup();">이전</button>
+			<button class="btn" style="float: left;" onclick="osResourceInfoPopup()">이전</button>
 			<button class="btn" onclick="popupComplete();">취소</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
 		</div>		

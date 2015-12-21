@@ -41,7 +41,7 @@ var structureType = "";
 var bootstrapSeq= "";
 var keyPathFileList = "";
 var networkInfo = "";
-var resourcesInfo = "";
+var resourceInfo = "";
 var deployInfo = "";
 var deployFileName = "";
 var installClient = "";
@@ -114,8 +114,14 @@ $(function() {
 				else{
 					var record = w2ui['config_bootstrapGrid'].get(selected);
 					console.log(record.iaas);
-					if(record.iaas == "AWS") getBootstrapAwsData(record);
-					else getBootstrapOpenstackData(record);
+					if(record.iaas == "AWS") {
+						getBootstrapAwsData(record);
+						return;
+					}
+					else{
+						getBootstrapOpenstackData(record);
+						return;
+					}
 				}
 			},
 			no_text : "취소"
@@ -141,8 +147,8 @@ $(function() {
 					else{
 						var record = w2ui['config_bootstrapGrid'].get(selected);
 						console.log(record.iaas);
-						if(record.iaas == "AWS") deletePop(record);
-						//else deleteBootstrapOpenstackData(record);
+						deletePop(record);
+						
 					}
 			//	}
 			},
@@ -219,6 +225,7 @@ function getBootstrapOpenstackData(record){
 
 function settingAWSData(contents){
 	bootstrapSeq = contents.id;
+	structureType = "AWS";
 	awsInfo = {
 			iaas		 	: "AWS",
 			awsKey			: contents.accessKey,
@@ -236,13 +243,14 @@ function settingAWSData(contents){
 			directorPrivateIp	: contents.directorPrivateIp,
 			directorPublicIp	: contents.directorPublicIp
 	}
-	resourcesInfo = {
+	resourceInfo = {
 			id				: contents.id,
 			targetStemcell	: contents.stemcellName,
 			instanceType	: contents.instanceType,
 			region			: contents.region,
 			availabilityZone: contents.availabilityZone,
-			microBoshPw		: contents.microBoshPw
+			microBoshPw		: contents.microBoshPw,
+			ntp				: contents.ntp
 	}
 	awsPopup();	
 }
@@ -250,7 +258,9 @@ function settingAWSData(contents){
 function settingOpenstackData(contents){
 	bootstrapSeq =  contents.id;
 	structureType = "OPENSTACK";
+	console.log(bootstrapSeq + "/" + structureType);
 	osBoshInfo = {
+			id				: bootstrapSeq,
 			iaas 			: structureType,
 			boshName		: contents.boshName,
 			boshUrl			: contents.boshUrl,
@@ -280,7 +290,7 @@ function settingOpenstackData(contents){
 			cloudNetId		: contents.cloudNetId
 	}
 	
-	resourcesInfo = {
+	resourceInfo = {
 			id					: bootstrapSeq,
 			stemcellUrl			: contents.stemcellUrl,
 			envPassword			: contents.envPassword,
@@ -304,6 +314,7 @@ function deletePop(record){
 		title : "<b>BOOTSTRAP 삭제</b>",
 		body  : body,
 		buttons : '<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();;">완료</button>',
+		showMax : true,
 		onOpen : function(event){
 			event.onComplete = function(){
 			console.log("Delete Pop");
@@ -317,6 +328,7 @@ function deletePop(record){
 			        	deleteLogs.append(data.body + "\n").scrollTop( deleteLogs[0].scrollHeight );
 			        	
 			        	if( data == "complete"){
+			        		deleteClient.res
 			        		deleteClient.disconnect(function(){
 			        			console.log("disconnect");
 			        		});//callback
@@ -482,7 +494,7 @@ function saveAwsSettingInfo(){
 		async : true,
 		data : JSON.stringify(awsInfo), 
 		success : function(data, status) {
-			bootstrapSeq = data;
+			bootstrapSeq = data.id;
 			console.log("keypath::"+ bootstrapSeq);
 			keyPathFileUpload(structureType);
 		},
@@ -541,7 +553,7 @@ function setNetworkData(){
 }
 
 //Save Network Setting Info
-function saveNetworkSettingInfo(param){
+function saveNetworkInfo(param){
 	if(bootstrapSeq == ""){ w2alert("BOOTSTRAP ID가 존재하지 않습니다."); return;}
 	
 	networkInfo = {
@@ -566,7 +578,7 @@ function saveNetworkSettingInfo(param){
 			async : true,
 			data : JSON.stringify(networkInfo), 
 			success : function(data, status) {
-				 resourcesPopup();
+				 resourcePopup();
 			},
 			error : function( e, status ) {
 				w2alert("네트워크 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
@@ -576,9 +588,9 @@ function saveNetworkSettingInfo(param){
 }
 
 
-function resourcesPopup(){
+function resourcePopup(){
 	//getStemcellList();
-	$("#resourcesSettingInfoDiv").w2popup({
+	$("#resourceSettingInfoDiv").w2popup({
 		width : 610,
 		height : 430,
 		modal	: true,
@@ -591,14 +603,15 @@ function resourcesPopup(){
 	});
 }
 
-function setReleaseData(){
-	if(resourcesInfo != ""){
-		$(".w2ui-msg-body input[name='targetStemcell']").data('selected', {text:resourcesInfo.targetStemcell});
+function setReourceData(){
+	if(resourceInfo != ""){
+		$(".w2ui-msg-body input[name='targetStemcell']").data('selected', {text:resourceInfo.targetStemcell});
 		
-		$(".w2ui-msg-body input[name='instanceType']").val(resourcesInfo.instanceType);
-		$(".w2ui-msg-body input[name='region']").val(resourcesInfo.region);
-		$(".w2ui-msg-body input[name='availabilityZone']").val(resourcesInfo.availabilityZone);
-		$(".w2ui-msg-body input[name='microBoshPw']").val(resourcesInfo.microBoshPw);
+		$(".w2ui-msg-body input[name='instanceType']").val(resourceInfo.instanceType);
+		$(".w2ui-msg-body input[name='region']").val(resourceInfo.region);
+		$(".w2ui-msg-body input[name='availabilityZone']").val(resourceInfo.availabilityZone);
+		$(".w2ui-msg-body input[name='microBoshPw']").val(resourceInfo.microBoshPw);
+		$(".w2ui-msg-body input[name='ntp']").val(resourceInfo.ntp);
 	}
 }
 
@@ -611,7 +624,7 @@ function getStemcellList(){
 		async : true,
 		success : function(data, status) {
 			$('#w2ui-popup input[type=list]').w2field('list', { items: data , maxDropHeight:300, width:500});
-			setReleaseData();
+			setReourceData();
 		},
 		error : function( e, status ) {
 			w2alert("스템셀 목록을 가져오는데 실패하였습니다.", "BOOTSTRAP 설치");
@@ -619,16 +632,17 @@ function getStemcellList(){
 	});
 }
 
-function saveResourcesSettingInfo(param){
+function saveResourceInfo(param){
 	if(bootstrapSeq == ""){ w2alert("BOOTSTRAP ID가 존재하지 않습니다."); return;}
 	
-	resourcesInfo = {
+	resourceInfo = {
 			id				: bootstrapSeq,
 			targetStemcell	: $(".w2ui-msg-body input[name='targetStemcell']").val(),
 			instanceType	: $(".w2ui-msg-body input[name='instanceType']").val(),
 			region			: $(".w2ui-msg-body input[name='region']").val(),
 			availabilityZone: $(".w2ui-msg-body input[name='availabilityZone']").val(),
-			microBoshPw		: $(".w2ui-msg-body input[name='microBoshPw']").val()
+			microBoshPw		: $(".w2ui-msg-body input[name='microBoshPw']").val(),
+			ntp				: $(".w2ui-msg-body input[name='ntp']").val()
 	}
 	
 	if( param == 'before') {
@@ -636,15 +650,15 @@ function saveResourcesSettingInfo(param){
 	}else {
 		$.ajax({
 			type : "PUT",
-			url : "/bootstrap/bootSetAwsResources",
+			url : "/bootstrap/bootSetAwsResource",
 			contentType : "application/json",
 			//dataType: "json",
 			async : true,
-			data : JSON.stringify(resourcesInfo), 
+			data : JSON.stringify(resourceInfo), 
 			success : function(data, status) {
 				if( data){
-					console.log("## DeployFileName :: " + data)
-					deployFileName = data;	
+					console.log("## DeployFileName :: " + data.deploymentFile)
+					deployFileName = data.deploymentFile;	
 				}
 				deployPopup();				
 			},
@@ -671,12 +685,14 @@ function deployPopup(){
 }
 
 function getDeployInfo(){
+	console.log(deployFileName);
 	$.ajax({
 		type : "POST",
 		url : "/bootstrap/getBootstrapDeployInfo",
 		contentType : "application/json",
 		//dataType: "json",
-		async : true, 
+		async : true,
+		data : JSON.stringify({deploymentFile:deployFileName}),
 		success : function(data, status) {
 			if(status == "success"){
 				//deployInfo = data;
@@ -692,7 +708,7 @@ function getDeployInfo(){
 	});
 }
 
-function saveDeployInfo(param){
+function confirmDeploy(param){
 	//Deploy 단에서 저장할 데이터가 있는지 확인 필요
 	//Confirm 설치하시겠습니까?
 	if(param == 'after'){		
@@ -706,14 +722,14 @@ function saveDeployInfo(param){
 		});
 	}
 	else{
-		resourcesPopup();
+		resourcePopup();
 	}
 }
 
 function installPopup(){
 	$("#installDiv").w2popup({
 		width : 610,
-		height : 470,
+		height : 490,
 		modal	: true,
 		showMax : true,
 		onOpen : function(event){
@@ -748,7 +764,7 @@ function initSetting(){
 	bootstrapSeq= "";
 	awsInfo = "";
 	networkInfo = "";
-	resourcesInfo = "";
+	resourceInfo = "";
 	deployInfo = "";
 	deployFileName = "";
 	installClient = "";
@@ -860,7 +876,7 @@ function openstackInfoPopup(){
 function saveOpenstackInfo(type){
 	openstackInfo = {
 			id					: bootstrapSeq,
-			privateStaticIp	: $(".w2ui-msg-body input[name='privateStaticIp']").val(),
+			privateStaticIp		: $(".w2ui-msg-body input[name='privateStaticIp']").val(),
 			publicStaticIp		: $(".w2ui-msg-body input[name='publicStaticIp']").val(),
 			directorName		: $(".w2ui-msg-body input[name='directorName']").val(),
 			authUrl				: $(".w2ui-msg-body input[name='authUrl']").val(),
@@ -945,27 +961,27 @@ function saveOsNetworkInfo(type){
 	});
 }
 
-//Openstack Resources Info Popup
+//Openstack Resource Info Popup
 function osResourceInfoPopup(){
-	$("#osResourcesInfoDiv").w2popup({
+	$("#osResourceInfoDiv").w2popup({
 		width : 670,
 		height : 400,
 		onClose : initSetting,
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
-				if(resourcesInfo != "" && structureType == "OPENSTACK"){
-					$(".w2ui-msg-body input[name='stemcellUrl']").val(resourcesInfo.stemcellUrl);
-					$(".w2ui-msg-body input[name='envPassword']").val(resourcesInfo.envPassword);
-					$(".w2ui-msg-body input[name='cloudInstanceType']").val(resourcesInfo.cloudInstanceType);
+				if(resourceInfo != "" && structureType == "OPENSTACK"){
+					$(".w2ui-msg-body input[name='stemcellUrl']").val(resourceInfo.stemcellUrl);
+					$(".w2ui-msg-body input[name='envPassword']").val(resourceInfo.envPassword);
+					$(".w2ui-msg-body input[name='cloudInstanceType']").val(resourceInfo.cloudInstanceType);
 				}
 			}
 		}
 	});	
 }
 
-function saveOsResourcesInfo(type){
-	resourcesInfo = {
+function saveOsResourceInfo(type){
+	resourceInfo = {
 			id					: bootstrapSeq,
 			stemcellUrl			: $(".w2ui-msg-body input[name='stemcellUrl']").val(),
 			envPassword			: $(".w2ui-msg-body input[name='envPassword']").val(),
@@ -977,11 +993,12 @@ function saveOsResourcesInfo(type){
 	//SAVE
 	$.ajax({
 		type : "PUT",
-		url : "/bootstrap/setOsResourcesInfo",
+		url : "/bootstrap/setOsResourceInfo",
 		contentType : "application/json",
 		async : true,
-		data : JSON.stringify(resourcesInfo),
+		data : JSON.stringify(resourceInfo),
 		success : function(data, status) {
+			deployFileName = data.deploymentFile;
 			osDeployPopup();
 		},
 		error : function( e, status ) {
@@ -1167,15 +1184,15 @@ function osDeployPopup(){
 			</div>
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveNetworkSettingInfo('before');" tabindex="7">이전</button>
+				<button class="btn" style="float: left;" onclick="saveNetworkInfo('before');" tabindex="7">이전</button>
 				<button class="btn" onclick="popupComplete();" tabindex="8">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveNetworkSettingInfo('after');" tabindex="9">다음>></button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveNetworkInfo('after');" tabindex="9">다음>></button>
 			</div>
 		</div>
 	</div>
 	
-	<!-- Resources  설정 DIV -->
-	<div id="resourcesSettingInfoDiv" style="width:100%;height:100%;" hidden="true">
+	<!-- Resource  설정 DIV -->
+	<div id="resourceSettingInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
 			<div style="margin-left:3%;">
@@ -1215,6 +1232,12 @@ function osDeployPopup(){
 					</div>
 				</div>
 				<div class="w2ui-field">
+					<label style="text-align: left; width: 200px; font-size: 11px;">NTP</label>
+					<div>
+						<input name="ntp" type="text" maxlength="100" size="30" style="float:left;width:330px;" tabindex="5"/>
+					</div>
+				</div>
+				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">MicroBOSH Password</label>
 					<div>
 						<input name="microBoshPw" type="password" maxlength="100" size="30" style="float:left;width:330px;" tabindex="5"/>
@@ -1223,9 +1246,9 @@ function osDeployPopup(){
 			</div>
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveResourcesSettingInfo('before');" tabindex="6">이전</button>
-				<button class="btn" onclick="p" tabindex="7">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveResourcesSettingInfo('after');" tabindex="8">다음>></button>
+				<button class="btn" style="float: left;" onclick="saveResourceInfo('before');" tabindex="6">이전</button>
+				<button class="btn" onclick="popupComplete();" tabindex="7">취소</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveResourceInfo('after');" tabindex="8">다음>></button>
 			</div>
 		</div>
 	</div>
@@ -1249,9 +1272,9 @@ function osDeployPopup(){
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float: left;" onclick="saveDeployInfo('before');">이전</button>
+			<button class="btn" style="float: left;" onclick="confirmDeploy('before');">이전</button>
 			<button class="btn" onclick="popupComplete();">취소</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="saveDeployInfo('after');">다음>></button>
+			<button class="btn" style="float: right; padding-right: 15%" onclick="confirmDeploy('after');">다음>></button>
 		</div>
 	</div>
 	
@@ -1275,7 +1298,7 @@ function osDeployPopup(){
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 				<!-- 설치 실패 시 -->
-				<button class="btn" style="float: left;" onclick="saveDeployInfo('before');">이전</button>
+				<button class="btn" style="float: left;" onclick="confirmDeploy('before');">이전</button>
 				<button class="btn" onclick="popupComplete();">취소</button>
 				<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
 		</div>		
@@ -1474,7 +1497,7 @@ function osDeployPopup(){
 		</div>
 	</div>
 	
-	<div id="osResourcesInfoDiv" style="width:100%;height:100%;" hidden="true">
+	<div id="osResourceInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
 			<div style="margin-left:2%;">
@@ -1510,9 +1533,9 @@ function osDeployPopup(){
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-		        <button class="btn" style="float: left;" onclick="saveOsResourcesInfo('before');" tabindex="5">이전</button>
+		        <button class="btn" style="float: left;" onclick="saveOsResourceInfo('before');" tabindex="5">이전</button>
 				<button class="btn" onclick="popupComplete();" tabindex="6">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOsResourcesInfo('after');" tabindex="7">다음>></button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOsResourceInfo('after');" tabindex="7">다음>></button>
 		    </div>
 		</div>
 	</div>
@@ -1537,9 +1560,9 @@ function osDeployPopup(){
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float: left;" onclick="saveDeployInfo('before');">이전</button>
+			<button class="btn" style="float: left;" onclick="confirmDeploy('before');">이전</button>
 			<button class="btn" onclick="popupComplete();">취소</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="saveDeployInfo('after');">다음>></button>
+			<button class="btn" style="float: right; padding-right: 15%" onclick="confirmDeploy('after');">다음>></button>
 		</div>
 	</div>
 	
@@ -1563,7 +1586,7 @@ function osDeployPopup(){
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 				<!-- 설치 실패 시 -->
-				<button class="btn" style="float: left;" onclick="saveDeployInfo('before');">이전</button>
+				<button class="btn" style="float: left;" onclick="confirmDeploy('before');">이전</button>
 				<button class="btn" onclick="popupComplete();">취소</button>
 				<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
 		</div>		

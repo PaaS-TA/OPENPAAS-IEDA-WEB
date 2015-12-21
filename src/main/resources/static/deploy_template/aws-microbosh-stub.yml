@@ -31,7 +31,7 @@ networks:
   subnets:
   - range: (( merge ))
     gateway: (( merge ))
-    dns: [(( merge ))]
+    dns: (( merge ))
     cloud_properties: {subnet: (( merge ))} # <--- Replace with Subnet ID
 - name: public
   type: vip
@@ -117,7 +117,7 @@ jobs:
     agent: 
       mbus: (( "nats://nats:nats-password@" networks.private.static_ips.[0] ":4222" ))
 
-    ntp: [(( merge ))]
+    ntp: (( merge ))
 
 cloud_provider:
   template: {name: aws_cpi, release: bosh-aws-cpi}

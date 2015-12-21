@@ -106,7 +106,7 @@ public class BoshManagementController {
 		return new ResponseEntity<>(result, status);
 	}
 	
-	@RequestMapping(value="/bosh/getBoshDeployInfo/{id}", method=RequestMethod.PUT)
+	@RequestMapping(value="/bosh/getBoshDeployInfo/{id}", method=RequestMethod.GET)
 	public ResponseEntity getBoshDeployInfo(@PathVariable int id){
 		HttpStatus status = HttpStatus.OK;
 		String content = "";

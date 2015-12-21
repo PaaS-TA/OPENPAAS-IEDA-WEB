@@ -59,5 +59,7 @@ public class IEDABootstrapAwsConfig {
 	private String microBoshPw;
 	
 	private String deploymentFile;
+	
+	private String ntp;
 
 }

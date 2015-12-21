@@ -32,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 public class ReleaseController {
 	
-
 	@Autowired
 	private IEDAConfiguration iedaConfiguration;
 
@@ -114,6 +113,18 @@ public class ReleaseController {
 	public ResponseEntity doDeleteRelease(@RequestBody @Valid ReleaseContentDto.Delete dto) {
 		
 		deleteReleaseService.deleteReleaseAsync(dto.getFileName(), dto.getVersion());
+		return new ResponseEntity(HttpStatus.OK);
+	}
+	
+	/**
+	 * 릴리즈 삭제
+	 * @param dto
+	 * @return
+	 */
+	@RequestMapping( value="/deleteLocalRelease", method=RequestMethod.PUT)
+	public ResponseEntity doDeleteLocalRelease(@RequestBody @Valid ReleaseContentDto.DeleteLocal dto) {
+		
+		releaseService.deleteLocalRelease(dto.getFileName());
 		return new ResponseEntity(HttpStatus.OK);
 	}
 	

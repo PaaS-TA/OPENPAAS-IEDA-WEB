@@ -48,7 +48,7 @@ public class DirectorConfigurationController {
 	private ModelMapper modelMapper;
 	
 	/**
-	 * 설치관리자 설정 화면
+	 * 설치관리자 설정화면
 	 * @return
 	 */
 	@RequestMapping(value="/config/listDirector", method=RequestMethod.GET)
@@ -56,6 +56,11 @@ public class DirectorConfigurationController {
 		return "/config/listDirector";
 	}
 	
+	
+	/**
+	 * 기본 설치관리자 정보 조회
+	 * @return IEDADirectorConfig
+	 */
 	@RequestMapping(value="/directors/default", method=RequestMethod.GET)
 	public ResponseEntity getDefaultDirector() {
 		IEDADirectorConfig content = service.getDefaultDirector();
@@ -85,19 +90,8 @@ public class DirectorConfigurationController {
 		return new ResponseEntity<>(modelMapper.map(newDirector, IEDADirectorConfigDto.Response.class), HttpStatus.CREATED);
 	}
 	
-/*	@RequestMapping(value="/directors", method=RequestMethod.GET)
-	@ResponseStatus(HttpStatus.OK)
-	public PageImpl<IEDADirectorConfigDto.Response> listDirector(Pageable pageable) {
-		Page<IEDADirectorConfig> page = repository.findAll(pageable);
-		
-		List<IEDADirectorConfigDto.Response> content = page.getContent().stream()
-											.map(code -> modelMapper.map(code, IEDADirectorConfigDto.Response.class))
-											.collect(Collectors.toList());
-		return new PageImpl<>(content, pageable, page.getTotalElements());
-	}*/
-	
 	/**
-	 * 관리자 리스트 조회
+	 * 관리자 목록 조회
 	 * @param pageable
 	 * @return
 	 */
@@ -121,18 +115,6 @@ public class DirectorConfigurationController {
 		
 		return new ResponseEntity<>(d, HttpStatus.OK);
 	}
-	
-/*	@RequestMapping(value="/directors", method=RequestMethod.GET)
-	@ResponseStatus(HttpStatus.OK)
-	public PageImpl<IEDADirectorConfigDto.Response> listDirector(Pageable pageable) {
-		Page<IEDADirectorConfig> page = repository.findAll(pageable);
-		
-		List<IEDADirectorConfigDto.Response> content = page.getContent().stream()
-											.map(code -> modelMapper.map(code, IEDADirectorConfigDto.Response.class))
-											.collect(Collectors.toList());
-		return new PageImpl<>(content, pageable, page.getTotalElements());
-	}*/
-	
 
 	/**
 	 * 관리자 기본정보
@@ -153,13 +135,13 @@ public class DirectorConfigurationController {
 	 * @param updateDto
 	 * @return
 	 */
-	@RequestMapping(value="/director/{seq}", method=RequestMethod.PUT)
-	@ResponseStatus(HttpStatus.OK)
-	public IEDADirectorConfigDto.Response updateDirector(@PathVariable int seq,
+	@RequestMapping(value="/directors/{seq}", method=RequestMethod.PUT)
+	public ResponseEntity updateDirector(@PathVariable int seq,
 			@RequestBody @Valid IEDADirectorConfigDto.Update updateDto) {
-		IEDADirectorConfig directorConfig = service.updateDirectorConfig(seq, updateDto);
 		
-		return modelMapper.map(directorConfig, IEDADirectorConfigDto.Response.class); 
+		IEDADirectorConfig directorConfig = service.updateDirectorConfig(updateDto);
+		
+		return new ResponseEntity<> (directorConfig, HttpStatus.OK); 
 	}
 	
 	/**
@@ -173,6 +155,18 @@ public class DirectorConfigurationController {
 		return new ResponseEntity<> (HttpStatus.NO_CONTENT); 
 	}
 	
+	/**
+	 * 기본 설치관리자 설정
+	 * @param seq
+	 * @return IEDADirectorConfigDto.Response
+	 */
+	@RequestMapping(value="/director/default/{seq}", method=RequestMethod.PUT)
+	public ResponseEntity setDefaultDirector(@PathVariable int seq) {
+		IEDADirectorConfig directorConfig = service.setDefaultDirector(seq);
+		
+		IEDADirectorConfigDto.Response response = modelMapper.map(directorConfig, IEDADirectorConfigDto.Response.class);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 	
 	@ExceptionHandler(IEDACommonException.class)
 	public ResponseEntity handleIEDACommonException(IEDACommonException e) {
@@ -183,13 +177,5 @@ public class DirectorConfigurationController {
 		
 		return new ResponseEntity<>(errorResponse, e.getStatusCode());
 	}
-	
-	// 기본 관리자 로 설정
-	@RequestMapping(value="/director/default/{seq}", method=RequestMethod.PUT)
-	public ResponseEntity setDefaultDirector(@PathVariable int seq) {
-		IEDADirectorConfig directorConfig = service.setDefaultDirector(seq);
-		
-		IEDADirectorConfigDto.Response response = modelMapper.map(directorConfig, IEDADirectorConfigDto.Response.class);
-		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
+
 }

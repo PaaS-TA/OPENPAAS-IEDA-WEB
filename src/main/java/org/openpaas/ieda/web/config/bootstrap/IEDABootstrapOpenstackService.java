@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
@@ -34,7 +36,10 @@ public class IEDABootstrapOpenstackService {
 	@Autowired
 	private IEDABootstrapOpenstackRepository openstackRepository;
 	
-	public IEDABootstrapOpenstackConfig saveOpenstackBoshInfoSave(IDEABootStrapInfoDto.OsBosh dto) {
+	@Autowired
+	private IEDABootstrapService bootstrapService;
+	
+	public IEDABootstrapOpenstackConfig saveOpenstackBoshInfoSave(BootStrapDto.OsBosh dto) {
 		IEDABootstrapOpenstackConfig config = null;
 		Date now = new Date();
 		if(StringUtils.isEmpty(dto.getId())) {
@@ -53,7 +58,7 @@ public class IEDABootstrapOpenstackService {
 		return openstackRepository.save(config);
 	}
 
-	public IEDABootstrapOpenstackConfig saveOpenstackInfoSave(IDEABootStrapInfoDto.OpenStack dto) {
+	public IEDABootstrapOpenstackConfig saveOpenstackInfoSave(BootStrapDto.OpenStack dto) {
 		IEDABootstrapOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setPrivateStaticIp(dto.getPrivateStaticIp());
 		config.setPublicStaticIp(dto.getPublicStaticIp());
@@ -70,7 +75,7 @@ public class IEDABootstrapOpenstackService {
 		return openstackRepository.save(config);
 	}
 
-	public IEDABootstrapOpenstackConfig saveOpenstackNetworkInfoSave(IDEABootStrapInfoDto.OsNetwork dto) {
+	public IEDABootstrapOpenstackConfig saveOpenstackNetworkInfoSave(BootStrapDto.OsNetwork dto) {
 		IEDABootstrapOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setSubnetRange(dto.getSubnetRange());
 		config.setSubnetGateway(dto.getSubnetGateway());
@@ -81,13 +86,17 @@ public class IEDABootstrapOpenstackService {
 		return openstackRepository.save(config);
 	}
 
-	public IEDABootstrapOpenstackConfig saveOpenstackResourcesInfoSave(IDEABootStrapInfoDto.OsResource dto) {
+	public IEDABootstrapOpenstackConfig saveOpenstackResourcesInfoSave(BootStrapDto.OsResource dto) {
 		IEDABootstrapOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setStemcellUrl(dto.getStemcellUrl());
 		config.setEnvPassword(dto.getEnvPassword());
 		config.setCloudInstanceType(dto.getCloudInstanceType());
 		Date now = new Date();
 		config.setUpdatedDate(now);
+
+		//Sample/Stub File Create & Merge create Deploy File
+		String deplymentFileName = bootstrapService.createSettingFile(Integer.parseInt(dto.getId()), "OPENSTACK");
+		config.setDeploymentFile(deplymentFileName);
 		return openstackRepository.save(config);
 	}
 	
@@ -220,5 +229,22 @@ public class IEDABootstrapOpenstackService {
 					"해당하는 BOOTSTRAP이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 		return config;
+	}
+
+	public void deleteOpenstackInfo(int id) {
+		log.info("+++++++++deleteOpenstackInfo");
+		IEDABootstrapOpenstackConfig config = null; 
+		try{
+			config = openstackRepository.findOne(id);
+			openstackRepository.delete(id);
+			bootstrapService.deleteDeploy(config.getDeploymentFile());
+		} catch (EntityNotFoundException e) {
+			throw new IEDACommonException("illigalArgument.bootstrap.exception",
+					"삭제할 BOOTSTRAP이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			throw new IEDACommonException("illigalArgument.bootstrap.exception",
+					"BOOTSTRAP 삭제 중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
+		}
+		
 	}
 }

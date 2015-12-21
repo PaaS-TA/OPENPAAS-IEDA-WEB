@@ -26,14 +26,14 @@ networks:
   - name: default
     type: manual
     subnets:
-    - reserved: [(( merge ))]
-      static: [(( merge ))]
+    - reserved: (( merge ))
+      static: (( merge ))
       range: (( merge ))
       gateway: (( merge ))
-      dns: [(( merge ))]
+      dns: (( merge ))
       cloud_properties:
         subnet: (( merge ))
-        security_groups: [(( merge ))]
+        security_groups: (( merge ))
 
 resource_pools:
   - name: small
@@ -117,7 +117,7 @@ jobs:
         default: [dns, gateway]
         static_ips: (( static_ips(5) ))
       - name: elastic
-        static_ips: [(( merge ))]
+        static_ips: (( merge ))
 
   - name: health_monitor
     template: health_monitor

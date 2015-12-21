@@ -26,7 +26,7 @@ $(function() {
 		         {field: 'recid', caption: 'recid', hidden: true}
 		       , {field: 'name', caption: '릴리즈명', size: '20%'}
 		       , {field: 'version', caption: '릴리즈버전', size: '10%'}
-		       , {field: 'currentDeployed', caption: '배포 사용중 여부', size: '15%',
+		       , {field: 'currentDeployed', caption: '배포 여부', size: '15%',
 		    	   render: function(record) {
 		    		   if ( record.currentDeployed == 'true' )
 		    			   return '<span class="btn btn-success" style="width:70px">배포</span>';
@@ -75,10 +75,12 @@ $(function() {
 				var sel = grid.getSelection();
 				if ( sel == null || sel == "") {
 					setDisable($('#doUploadRelease'), true);
+					setDisable($('#doDeleteLocalRelease'), true);
 					return;
 				}
 				else{
 					setDisable($('#doUploadRelease'), false);
+					setDisable($('#doDeleteLocalRelease'), false);
 				}
 			}
 		},
@@ -87,7 +89,6 @@ $(function() {
 			gridErrorMsg(event);
 		}
 	});
- 	
  	
  	initView(bDefaultDirector);
  	
@@ -98,11 +99,15 @@ $(function() {
  	
  	//릴리즈 업로드
  	$("#doUploadRelease").click(function(){
- 		doUploadRelease();
+ 		LocalStemcellUploadOrDelete("upload");
+    });
+ 	
+ 	//로컬 릴리즈 삭제
+ 	$("#doDeleteLocalRelease").click(function(){
+ 		LocalStemcellUploadOrDelete("delete");
     });
  	
 });
-
 
 function initView(bDefaultDirector) {
 	
@@ -117,6 +122,8 @@ function initView(bDefaultDirector) {
 	// 컨트롤 
 	setDisable($('#doDeleteRelease'), true);
 	setDisable($('#doUploadRelease'), true);
+	setDisable($('#doDeleteLocalRelease'), true);
+	
 }
 
 function setDisable(object, flag) {
@@ -157,7 +164,7 @@ function doDeleteRelease() {
 			version  : record.version
 		};
 	
-	w2confirm( { msg : '설치관리자에 업로드된 릴리즈 <br/>' + record.name + '<br/>을 삭제하시겠습니까?'
+	w2confirm( { msg : record.version + '버전의 ' + record.name + ' 릴리즈를 삭제하시겠습니까?'
 		, title : '릴리즈 삭제'
 		, yes_text:'확인'
 		, no_text:'취소'
@@ -171,8 +178,9 @@ function doDeleteRelease() {
 	});	
 }
 
-//릴리즈 업로드
-function doUploadRelease() {
+// delete or upload local release
+function LocalStemcellUploadOrDelete(op) {
+	
 	var selected = w2ui['ru_localReleasesGrid'].getSelection();
 	if ( selected == "" || selected == null) return;
 	
@@ -183,21 +191,60 @@ function doUploadRelease() {
 			fileName : record.releaseFile
 		};
 	
-	w2confirm( { msg : '릴리즈 ' + record.releaseFile + '을(를) <br> 설치관리자에 업로드하시겠습니까?'
-		, title : '릴리즈 업로드'
+	var message = "";
+	if ( op == "upload" )
+		message = record.releaseFile + '릴리즈 파일을<BR>설치관리자에 업로드 하시겠습니까?'
+	else if ( op == "delete" )
+		message = record.releaseFile + ' 릴리즈 파일을 삭제하시겠습니까?';
+	else
+		return;
+	
+	w2confirm( { msg : message
+		, title : '릴리즈'
 		, yes_text:'확인'
 		, no_text:'취소'
 		})
 		.yes(function() {
-			appendLogPopup("upload",requestParameter);
+			if ( op == "upload" )
+				appendLogPopup("upload",requestParameter);
+			else if ( op == "delete" )
+				doDeleteLocalRelease(requestParameter);
 		})
 		.no(function() {
 			// do nothing
 		});	
 }
 
+// Delete Local Release
+function doDeleteLocalRelease(requestParameter) {
+	 
+	w2popup.lock("로컬 릴리즈 삭제중...", true);
+	
+	$.ajax({
+		type : "PUT",
+		url : "/deleteLocalRelease",
+		contentType : "application/json",
+		data : JSON.stringify(requestParameter),
+		success : function(data, status) {
+			w2popup.unlock();
+			w2popup.close();
+			
+			w2alert(requestParameter.fileName + " 릴리즈 파일이 삭제되었습니다.", "로컬 릴리즈 삭제");
+			
+			doSearchLocalReleases();
+			w2ui['ru_localReleasesGrid'].reset();
+		},
+		error : function(request, status, error) {
+			w2popup.unlock();
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message, "로컬 릴리즈 삭제");
+		}
+	});
+}
+
 //Log Popup Create
 function appendLogPopup(type, requestParameter){
+	
 	w2popup.open({
 		title	: (type == "upload") ? '<b>릴리즈 업로드</b>':'<b>릴리즈 삭제</b>',
 		body	: appendLogPopupBody,
@@ -273,9 +320,11 @@ function doDeleteConnect(requestParameter){
         
     });
 }
+
 function socketSendUploadData(requestParameter){
 	uploadClient.send('/app/releaseUploading', {}, JSON.stringify(requestParameter));
 }
+
 function socketSendDeleteData(requestParameter){
 	deleteClient.send('/app/releaseDelete', {}, JSON.stringify(requestParameter));
 }
@@ -332,8 +381,9 @@ function popupClose() {
 	<div id="ru_uploadedReleasesGrid" style="width:100%; height:200px"></div>	
 	<div class="pdt20"> 
 		<div class="title fl">다운로드된 릴리즈 목록</div>
-		<div class="fr"> 
-			<span class="btn btn-primary" style="width:120px" id="doUploadRelease">릴리즈 업로드</span>
+		<div class="fr">
+			<span class="btn btn-primary" style="width:120px" id="doUploadRelease">릴리즈 업로드</span> 
+			<span class="btn btn-danger" style="width:120px" id="doDeleteLocalRelease">릴리즈 삭제</span>
 		</div>
 	</div>
 	<div id="ru_localReleasesGrid" style="width:100%; height:200px"></div>

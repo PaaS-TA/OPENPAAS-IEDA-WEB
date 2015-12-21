@@ -98,7 +98,7 @@ public class IEDADirectorConfigService {
 			throw new IEDACommonException("notfound.director.exception",
 					"요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
 		}
-
+		
 		return info;
 	}
 
@@ -122,7 +122,7 @@ public class IEDADirectorConfigService {
 		
 		if ( info == null || info.getUser() == null || info.getUser().equals("") ) {
 			throw new IEDACommonException("unauthenticated.director.exception",
-					"해당 디렉터에 로그인 실패하였습니다.", HttpStatus.BAD_REQUEST);
+					"디렉터에 로그인 실패하였습니다.", HttpStatus.BAD_REQUEST);
 		}
 		
 		Date now = new Date();
@@ -146,7 +146,7 @@ public class IEDADirectorConfigService {
 		
 		// Target 설정
 		if( director.getDefaultYn().equals("Y") ) {
-			setTarget(director);
+			setBoshConfigFile(director);
 		}	
 
 		return directorConfigRepository.save(director);
@@ -164,43 +164,30 @@ public class IEDADirectorConfigService {
 		return directorConfig;
 	}
 
-	public IEDADirectorConfig updateDirectorConfig(int seq,
-			IEDADirectorConfigDto.Update updateDto) {
-
-		// TODO : 추후 구현
-		/*
-		IEDADirectorConfig directorConfig = directorConfigRepository
-				.findByIedaDirectorConfigSeq(seq);
-
-		if (directorConfig == null) {
-			throw new IEDACommonException("illigalArgument.director.exception",
-					"해당하는 디렉터가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
-		}
-
-		try {
-			
-			Info info = getDirectorInfo(directorConfig.getDirectorUrl()
-					, directorConfig.getDirectorPort()
-					, directorConfig.getUserId()
-					, directorConfig.getUserPassword());
-
-			log.info(info.toString());
-
-		} catch (ResourceAccessException e) {
-			throw new IEDACommonException("notfound.director.exception", "["
-					+ directorConfig.getDirectorUrl() + "] 디렉터를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			throw new IEDACommonException("unknown.director.exception",
-					"수정 중 알수없는 에러가 발생하였습니다.", HttpStatus.BAD_REQUEST);
-		}
+	public IEDADirectorConfig updateDirectorConfig(IEDADirectorConfigDto.Update updateDto) {
+		IEDADirectorConfig directorConfig = directorConfigRepository.findByIedaDirectorConfigSeq(updateDto.getIedaDirectorConfigSeq());
+		if ( directorConfig == null )
+			throw new IEDACommonException("notfound.director_update.exception",
+					"디렉터가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+		
+		
+		Info info = getDirectorInfo(directorConfig.getDirectorUrl()
+				, directorConfig.getDirectorPort()
+				, updateDto.getUserId()
+				, updateDto.getUserPassword());
+		
+		if ( info == null || info.getUser() == null || info.getUser().equals("") )
+			throw new IEDACommonException("unauthenticated.director.exception",
+					"디렉터에 로그인 실패하였습니다.", HttpStatus.BAD_REQUEST);
 
 		directorConfig.setUserId(updateDto.getUserId());
 		directorConfig.setUserPassword(updateDto.getUserPassword());
+		directorConfig = directorConfigRepository.save(directorConfig);
 
-		return directorConfigRepository.save(directorConfig);
-		*/
-		
-		return null;
+		// .bosh_config 수정
+		setBoshConfigFile(directorConfig);
+
+		return directorConfig;
 	}
 
 	public void deleteDirectorConfig(int seq) {
@@ -273,7 +260,7 @@ public class IEDADirectorConfigService {
 		directorConfig= directorConfigRepository.save(directorConfig);
 		
 		// target 설정 (.bosh_config 설정 변경)
-		setTarget(directorConfig);
+		setBoshConfigFile(directorConfig);
 		
 		return directorConfig;
 	}
@@ -283,9 +270,8 @@ public class IEDADirectorConfigService {
 	 * @param url
 	 * @param port
 	 */
-	public void setTarget(IEDADirectorConfig directorConfig) {
+	public void setBoshConfigFile(IEDADirectorConfig directorConfig) {
 		
-		// set target
 		String directorLink = "https://" + directorConfig.getDirectorUrl() + ":" + directorConfig.getDirectorPort();
 
 		// Config File이 존재하느냐?
@@ -297,10 +283,12 @@ public class IEDADirectorConfigService {
 				Map<String, Object> object = (Map<String, Object>)yaml.load(input);
 				
 				// set target
-				object.put("target", directorLink);
-				object.put("target_name", directorConfig.getDirectorName());
-				object.put("target_version", directorConfig.getDirectorVersion());
-				object.put("target_uuid", directorConfig.getDirectorUuid());
+				if ( directorConfig.getDefaultYn().equals("Y")) {
+					object.put("target", directorLink);
+					object.put("target_name", directorConfig.getDirectorName());
+					object.put("target_version", directorConfig.getDirectorVersion());
+					object.put("target_uuid", directorConfig.getDirectorUuid());
+				}
 				
 				// set ca_cert
 				Map<String, String> certMap = (Map<String,String>)object.get("ca_cert");
@@ -338,10 +326,19 @@ public class IEDADirectorConfigService {
 				Map<String, Object> newConfig = new HashMap<String, Object>();
 				
 				// set target
-				newConfig.put("target", directorLink);
-				newConfig.put("target_name", directorConfig.getDirectorName());
-				newConfig.put("target_version", directorConfig.getDirectorVersion());
-				newConfig.put("target_uuid", directorConfig.getDirectorUuid());
+				if ( directorConfig.getDefaultYn().equals("Y")) {
+					newConfig.put("target", directorLink);
+					newConfig.put("target_name", directorConfig.getDirectorName());
+					newConfig.put("target_version", directorConfig.getDirectorVersion());
+					newConfig.put("target_uuid", directorConfig.getDirectorUuid());
+				}
+				else {
+					IEDADirectorConfig defaultDirectorConfig = getDefaultDirector();
+					newConfig.put("target", "https://" + defaultDirectorConfig.getDirectorUrl() + ":" + defaultDirectorConfig.getDirectorPort());
+					newConfig.put("target_name", defaultDirectorConfig.getDirectorName());
+					newConfig.put("target_version", defaultDirectorConfig.getDirectorVersion());
+					newConfig.put("target_uuid", defaultDirectorConfig.getDirectorUuid());
+				}
 				
 				// set ca_cert
 				Map<String, Object> certMap = new HashMap<String, Object>();

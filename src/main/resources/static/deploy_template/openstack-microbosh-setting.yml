@@ -12,25 +12,22 @@ resource_pools:
       bosh:
         password: [envPassword]
     cloud_properties:
-      instance_type: m1.xlarge
+      instance_type: [cloudInstanceType]
 networks:
   private:
     subnets:
     - range: [privateSubnetRange]
       gateway: [subnetGateway]
-      dns: 
-      - [[subnetDns]]
+      dns: [[subnetDns]]
       cloud_properties: 
         net_id: [cloudNetId]
 jobs:
   bosh:
     networks:
       private:
-        static_ips: 
-        - [[privateStaticIp]]
+        static_ips: [[privateStaticIp]]
       public:
-        static_ips:
-        - [[publicStaticIpd]]
+        static_ips: [[publicStaticIpd]]
     properties:
       director:
         name: [directorName]
@@ -40,10 +37,8 @@ jobs:
         username: [userName]
         api_key: [apiKey]
         default_key_name: [defaultKeyName]
-        default_security_groups:
-        - [[defaultSecurityGroups]]
-      ntp: 
-      - [[ntp]]
+        default_security_groups: [[defaultSecurityGroups]]
+      ntp: [[ntp]]
 cloud_provider:
   ssh_tunnel:
     private_key: [cloudPrivateKey]

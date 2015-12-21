@@ -21,6 +21,12 @@ public class ReleaseContentDto {
 	}
 	
 	@Data
+	public static class DeleteLocal{
+		@NotBlank
+		private String fileName;
+	}
+	
+	@Data
 	public static class Download {
 		@NotBlank
 		private String key;

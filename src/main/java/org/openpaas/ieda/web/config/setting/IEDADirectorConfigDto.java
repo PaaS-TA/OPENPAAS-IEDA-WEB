@@ -42,6 +42,9 @@ public class IEDADirectorConfigDto {
 	
 	@Data
 	public static class Update {
+		
+		private Integer iedaDirectorConfigSeq;
+		
 		@NotBlank
 		@Size(min=4)
 		private String  userId;
@@ -49,9 +52,6 @@ public class IEDADirectorConfigDto {
 		@NotBlank
 		@Size(min=4)
 		private String  userPassword;
-		
-		@NotBlank
-		private String  defaultYn;
 	}
 
 	@Data

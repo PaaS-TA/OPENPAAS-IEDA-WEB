@@ -19,31 +19,26 @@ networks:
     subnets:
     - range: [subnetRange]
       gateway: [gateway]
-      dns:
-      - [[dns]]
+      dns: [[dns]]
       cloud_properties: 
         subnet: [subnetId]
 jobs:
   bosh:
     networks:
       private:
-        static_ips: 
-        - [[directorPrivateIp]]
+        static_ips: [[directorPrivateIp]]
       public:
-        static_ips:
-        - [[directorPublicIp]]
+        static_ips: [[directorPublicIp]]
     properties:
       director: 
-        name: my-bosh
+        name: [directorName]
       aws:
         access_key_id: [awsKey]
         secret_access_key: [secretAccessKey]
-        default_key_name: bosh
-        default_security_groups: 
-        - [[defaultSecurityGroups]]
+        default_key_name: [defaultKeyName]
+        default_security_groups: [[defaultSecurityGroups]]
         region: [region]
-      ntp: 
-      - [ntp]
+      ntp: [[ntp]]
 cloud_provider:
   ssh_tunnel:
     private_key: [privateKey]

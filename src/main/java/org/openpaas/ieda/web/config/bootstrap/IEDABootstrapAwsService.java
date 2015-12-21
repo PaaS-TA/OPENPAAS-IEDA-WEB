@@ -49,7 +49,7 @@ public class IEDABootstrapAwsService {
 		}
 	}
 	
-	public Integer saveAwsInfo(IDEABootStrapInfoDto.Aws dto){
+	public IEDABootstrapAwsConfig saveAwsInfo(BootStrapDto.Aws dto){
 		Date now = new Date();
 		IEDABootstrapAwsConfig config = null;
 		if(dto.getId() == null || "".equals(dto.getId())){
@@ -66,11 +66,10 @@ public class IEDABootstrapAwsService {
 		config.setPrivateKeyPath(dto.getPrivateKeyPath());
 		config.setCreatedDate(now);
 		config.setUpdatedDate(now);
-		config = awsRepository.save(config);
-		return config.getId();
+		return awsRepository.save(config);
 	}
 	
-	public void saveAwsNetworkInfos(IDEABootStrapInfoDto.Network dto) {
+	public IEDABootstrapAwsConfig saveAwsNetworkInfos(BootStrapDto.Network dto) {
 		IEDABootstrapAwsConfig config = awsRepository.findById(Integer.parseInt(dto.getId()));
 		config.setSubnetRange(dto.getSubnetRange());
 		config.setDns(dto.getDns());
@@ -80,21 +79,24 @@ public class IEDABootstrapAwsService {
 		config.setDirectorPublicIp(dto.getDirectorPublicIp());
 		Date now = new Date();
 		config.setUpdatedDate(now);
-		awsRepository.save(config);
+		return awsRepository.save(config);
 	}
 	
-	public String saveAwsResourcesInfos(IDEABootStrapInfoDto.Resources dto) {
+	public IEDABootstrapAwsConfig saveAwsResourcesInfos(BootStrapDto.Resources dto) {
 		IEDABootstrapAwsConfig config = awsRepository.findById(Integer.parseInt(dto.getId()));
 		config.setStemcellName(dto.getTargetStemcell());
 		config.setInstanceType(dto.getInstanceType());
 		config.setRegion(dto.getRegion());
 		config.setAvailabilityZone(dto.getAvailabilityZone());
 		config.setMicroBoshPw(dto.getMicroBoshPw());
-		config.setDeploymentFile("aws-microbosh-setting-"+dto.getId()+".yml");
+		config.setNtp(dto.getNtp());
 		Date now = new Date();
 		config.setUpdatedDate(now);
 		awsRepository.save(config);
-		return bootstrapService.downloadSettingFile(Integer.parseInt(dto.getId()), "AWS");
+		//Sample/Stub File Create & Merge create Deploy File
+		String deplymentFileName = bootstrapService.createSettingFile(Integer.parseInt(dto.getId()), "AWS");
+		config.setDeploymentFile(deplymentFileName);
+		return awsRepository.save(config);
 	}
 	
 }

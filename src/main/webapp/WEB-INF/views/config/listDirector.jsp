@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <script type="text/javascript">
+
+var fadeOutTime = 3000;
 
 $(function() {
 	
@@ -42,17 +45,20 @@ $(function() {
 				if ( sel == null || sel == "") {
 					$('#setDefaultDirector').attr('disabled', true);
 					$('#deleteSetting').attr('disabled', true);
+					$('#updateSetting').attr('disabled', true);
 					return;
 				}
 				
 				var record = grid.get(sel);
 				if ( record.defaultYn == 'Y' ) {
-					$('#setDefaultDirector').attr('disabled', true);// 기본관리자 설정 Disable
+					$('#setDefaultDirector').attr('disabled', true);
+					
 				}
 				else {
-					$('#setDefaultDirector').attr('disabled', false);// 기본관리자 설정 Enable
+					$('#setDefaultDirector').attr('disabled', false);
 				}
 				
+				$('#updateSetting').attr('disabled', false);
 				$('#deleteSetting').attr('disabled', false);
 			}
 		},
@@ -64,7 +70,7 @@ $(function() {
   	
  	initView();
  	
- 	//기본관리자 설정
+ 	// 기본관리자 설정
  	$("#setDefaultDirector").click(function(){
  		if($("#setDefaultDirector").attr('disabled') == "disabled") return;
  		
@@ -97,18 +103,33 @@ $(function() {
  		}
 	});
 		 			
-	//설정 관리자 추가 버튼
+	// 설정 관리자 추가 버튼
 	$("#addSetting").click(function(){
 		w2popup.open({
 			title 	: "<b>설치관리자 설정추가</b>",
-			width 	: 600,
-			height	: 250,
+			width 	: 500,
+			height	: 330,
+			modal	: true,
 			body	: $("#regPopupDiv").html(),
 			buttons : $("#regPopupBtnDiv").html()
 		});
 	});
 	
-	//설정관리자 삭제 버튼
+	// 설정 관리자 수정 버튼
+	$("#updateSetting").click(function(){
+		if($("#updateSetting").attr('disabled') == "disabled") return;
+		
+		var selected = w2ui['config_directorGrid'].getSelection();
+		
+		if( selected.length == 0 ){
+			w2alert("선택된 정보가 없습니다.", "설치 관리자 삭제");
+			return;
+		}
+		
+		updateDirectorConfigPopup(w2ui['config_directorGrid'].get(selected));
+	});
+	
+	// 설정관리자 삭제 버튼
 	$("#deleteSetting").click(function(){
 		if($("#deleteSetting").attr('disabled') == "disabled") return;
 
@@ -137,7 +158,7 @@ $(function() {
 			        console.log("user clicked NO")
 			    });
 		}
-	});//설정관리자 삭제 버튼 END
+	});// 설정관리자 삭제 버튼 END
 });
 
 function initView() {
@@ -156,15 +177,96 @@ function doSearch() {
 function doButtonStyle(){
 	var girdTotal = w2ui['config_directorGrid'].records.length;
 	
-	//기본관리자 버튼 Hide
-	$('#setDefaultDirector').attr('disabled', true);// 기본관리자 설정 Disable
+	$('#setDefaultDirector').attr('disabled', true);
+	$('#updateSetting').attr('disabled', true);
+	$('#deleteSetting').attr('disabled', true);
+}
+
+function validateInputField(inputField, value) {
+	var isOk = true;
 	
-	//삭제 버튼 hide
-	$('#deleteSetting').attr('disabled', true);// 기본관리자 설정 Disable
+	switch ( inputField ) {
+	case 'ip':
+		if ( value.length <= 7 || !validateIP(value) ) {
+			setGuideMessage($(".w2ui-msg-body #ipSuccMsg"), "", $(".w2ui-msg-body #ipErrMsg"), "IP주소를 정확히 입력하세요.");
+			isOk = false;
+		} else {
+			setGuideMessage($(".w2ui-msg-body #ipSuccMsg"), "OK", $(".w2ui-msg-body #ipErrMsg"), "");
+			isOk = true;
+		}
+		break;
+	case 'port':
+		if ( value <= 0 ) {
+			setGuideMessage($(".w2ui-msg-body #portSuccMsg"), "", $(".w2ui-msg-body #portErrMsg"), "포트번호를 정확히 입력하세요.");
+			isOk = false;
+		}
+		else {
+			setGuideMessage($(".w2ui-msg-body #portSuccMsg"), "OK", $(".w2ui-msg-body #portErrMsg"), "");
+			isOk = true;
+		}
+
+		break;
+	case 'user':
+		if ( value.length <= 3 ) {
+			setGuideMessage($(".w2ui-msg-body #userSuccMsg"), "", $(".w2ui-msg-body #userErrMsg"), "계정을 입력하세요.(4자리 이상)");
+			isOk = false;			
+		} else {
+			setGuideMessage($(".w2ui-msg-body #userSuccMsg"), "OK", $(".w2ui-msg-body #userErrMsg"), "");
+			isOk = true;
+		}
+		break;
+	case 'pwd':
+		if ( value.length <= 3 ) {
+			setGuideMessage($(".w2ui-msg-body #pwdSuccMsg"), "", $(".w2ui-msg-body #pwdErrMsg"), "비밀번호를 입력하세요.(4자리 이상)");
+			isOk = false;
+			
+		} else {
+			setGuideMessage($(".w2ui-msg-body #pwdSuccMsg"), "OK", $(".w2ui-msg-body #pwdErrMsg"), "");
+			isOk = true;
+		}
+		break;
+	}
+	
+	return isOk;
+}
+
+function validateIP(input)  
+{
+	if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(input))  
+		return true;
+	else 
+		return false;  
+}
+
+function setGuideMessage(successObject, successMessage, errorObject, errorMessage) {
+	if ( successMessage == "" )
+		successObject.html(successMessage);
+	else {
+		errorObject.css("color", "grey");
+		successObject.html(successMessage).show().fadeOut(fadeOutTime);
+	}
+	
+	errorObject.css("color", "red");
+	errorObject.html(errorMessage);
+}
+
+function validateAllInputField() {
+	var isOk = true;
+	if ( !validateInputField('ip', $(".w2ui-msg-body input[name='ip']").val()) )
+		isOk = false;
+	if ( !validateInputField('port', $(".w2ui-msg-body input[name='port']").val()) )
+		isOk = false;
+	if ( !validateInputField('user', $(".w2ui-msg-body input[name='user']").val()) )
+		isOk = false;
+	if ( !validateInputField('pwd', $(".w2ui-msg-body input[name='pwd']").val()) )
+		isOk = false;
+
+	return isOk;
 }
 
 //기본관리자 설정
 function registDefault(seq, target){
+	
 	$.ajax({
 		type : "PUT",
 		url : "/director/default/"+seq,
@@ -183,7 +285,12 @@ function registDefault(seq, target){
 }
 
 //설정관리자 등록
-function registSetting(){
+function registDirectorConfig(){
+	if ( !validateAllInputField() ) {
+		return;
+	}
+	
+	//TODO : Check Field Value
 	lock( '등록 중입니다.', true);
 
 	$.ajax({
@@ -193,10 +300,10 @@ function registSetting(){
 		//dataType: "json",
 		async : true,
 		data : JSON.stringify({
-			userId : $(".w2ui-msg-body input[name='userId']").val(),
-			userPassword : $(".w2ui-msg-body input[name='userPassword']").val(),
-			directorUrl : $(".w2ui-msg-body input[name='directorUrl']").val(),
-			directorPort : parseInt($(".w2ui-msg-body input[name='directorPort']").val())
+			directorUrl : $(".w2ui-msg-body input[name='ip']").val(),
+			directorPort : parseInt($(".w2ui-msg-body input[name='port']").val()),
+			userId : $(".w2ui-msg-body input[name='user']").val(),
+			userPassword : $(".w2ui-msg-body input[name='pwd']").val(),
 		}),
 		success : function(data, status) {
 			// ajax가 성공할때 처리...
@@ -204,6 +311,7 @@ function registSetting(){
 			w2popup.close();
 			
 			doSearch();
+			
 			// 기본 설치 관리자 정보 조회
 		 	getDefaultDirector("<c:url value='/directors/default'/>");
 		},
@@ -216,7 +324,83 @@ function registSetting(){
 	});
 }
 
-//설정관리자 삭제
+// 설치관리자 수정팝업
+function updateDirectorConfigPopup(record) {
+	
+	w2confirm({
+		title 	: "설치관리자 정보수정 확인",
+		msg		: "설치관리자 정보를 수정하시겠습니까?",
+		yes_text: "확인",
+		yes_callBack : function(envent){
+			
+ 			w2popup.open({
+				title 	: "<b>설치관리자 정보수정</b>",
+				width 	: 500,
+				height	: 330,
+				modal	: true,
+				body	: $("#regPopupDiv").html(),
+				buttons : $("#updatePopupBtnDiv").html(),
+				onOpen : function(event){
+					event.onComplete = function(){
+						$(".w2ui-msg-body input[name='seq']").val(record.iedaDirectorConfigSeq);
+						$(".w2ui-msg-body input[name='ip']").val(record.directorUrl);
+						$(".w2ui-msg-body input[name='ip']").attr("disabled", true);
+						$(".w2ui-msg-body input[name='port']").val(record.directorPort);
+						$(".w2ui-msg-body input[name='port']").attr("disabled", true);
+						$(".w2ui-msg-body input[name='user']").val(record.userId);
+						$(".w2ui-msg-body input[name='pwd']").val("");
+					}
+				}
+			});
+
+		},
+		no_text : "취소"
+	});
+}
+
+//설치관리자 수정
+function updateDirectorConfig() {
+	console.log('updateDirectorConfig');
+	
+	if ( !validateAllInputField() ) {
+		return;
+	}
+	
+	//TODO : Check Field Value
+	lock( '수정 중입니다.', true);
+
+	$.ajax({
+		type : "PUT",
+		url : "/directors/" + $(".w2ui-msg-body input[name='seq']").val(),
+		contentType : "application/json",
+		async : true,
+		data : JSON.stringify({
+			iedaDirectorConfigSeq : parseInt($(".w2ui-msg-body input[name='seq']").val()),
+			userId : $(".w2ui-msg-body input[name='user']").val(),
+			userPassword : $(".w2ui-msg-body input[name='pwd']").val(),
+		}),
+		success : function(data, status) {
+			// ajax가 성공할때 처리...
+			w2popup.unlock();
+			w2popup.close();
+			
+			w2ui['config_directorGrid'].reset();
+			
+			doSearch();
+			
+			// 기본 설치 관리자 정보 조회
+		 	getDefaultDirector("<c:url value='/directors/default'/>");
+		},
+		error : function(request, status, error) {
+			// ajax가 실패할때 처리...
+			w2popup.unlock();
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message);
+		}
+	});
+}
+
+//설치관리자 삭제
 function deleteDirector(seq){
 	$.ajax({
 		type : "DELETE",
@@ -268,6 +452,7 @@ function lock (msg) {
 		<!-- Btn -->
 		<span id="setDefaultDirector" class="btn btn-primary" style="width:150px" >기본관리자로 설정</span>
 		<span id="addSetting" class="btn btn-primary" style="width:130px" >설정 추가</span>
+		<span id="updateSetting" class="btn btn-info" style="width:130px" >설정 수정</span>
 		<span id="deleteSetting" class="btn btn-danger" style="width:130px" >설정 삭제</span>
 		<!-- //Btn -->
 	    </div>
@@ -277,38 +462,57 @@ function lock (msg) {
 	
 	<div id="config_directorGrid" style="width:100%; height:500px"></div>	
 </div>
+
+<!-- 설치관리자 정보추가/수정 팝업 -->
 <div id="regPopupDiv" hidden="true">
-	<form id="addSettingForm" action="POST">
+	<form id="settingForm" action="POST">
 		<div class="w2ui-page page-0" style="width: 100%">
-			<label>●&nbsp;설치관리자 설정 정보</label>
+			<br>
+			<label>●&nbsp;설치관리자 정보</label>
+			<br>
+			
+			<input name="seq" type="hidden"/>
+			
 			<div class="w2ui-field">
-				<label style="width:30%;text-align: left;padding-left: 20px;">관리자 계정명</label>
+				<label style="width:30%;text-align: left;padding-left: 20px;">디렉터 IP</label>
+				<div style="width: 70%;">
+					<input name="ip" type="url" maxlength="100" style="width: 250px" required="required" placeholder="xxx.xx.xx.xxx" onchange="validateInputField('ip', this.value)"/>
+					<span id="ipSuccMsg"></span><BR><span id="ipErrMsg"></span>
+				</div>
+			</div>
+			<div class="w2ui-field">
+				<label style="width:30%;text-align: left;padding-left: 20px;">포트번호</label>
+				<div style="width: 70%;">
+					<input name="port" type="number" maxlength="100" style="width: 250px" required="required" min="50" placeholder="25555" onchange="validateInputField('port', this.value)"/>
+					<span id="portSuccMsg"></span><BR><span id="portErrMsg"></span>
+				</div>
+			</div>
+			<div class="w2ui-field">
+				<label style="width:30%;text-align: left;padding-left: 20px;">계정</label>
 				<div style="width: 70%">
-					<input name="userId" type="text" maxlength="100" style="width: 250px" required="required" value="admin"/>
+					<input name="user" type="text" maxlength="100" style="width: 250px" required="required" placeholder="admin" onchange="validateInputField('user', this.value)"/>
+					<span id="userSuccMsg"></span><BR><span id="userErrMsg" style="color:'red'"></span>
 				</div>
 			</div>
 			<div class="w2ui-field">
-				<label style="width:30%;text-align: left;padding-left: 20px;">관리자 계정 비밀번호</label>
+				<label style="width:30%;text-align: left;padding-left: 20px;">비밀번호</label>
 				<div style="width: 70%;">
-					<input name="userPassword" type="password" maxlength="100" style="width: 250px" required="required" value="admin"/>
+					<input name="pwd" type="password" maxlength="100" style="width: 250px" required="required" placeholder="admin" onchange="validateInputField('pwd', this.value)"/>
+					<span id="pwdSuccMsg"></span><BR><span id="pwdErrMsg"></span>
 				</div>
 			</div>
-			<div class="w2ui-field">
-				<label style="width:30%;text-align: left;padding-left: 20px;">디텍터 Url</label>
-				<div style="width: 70%;">
-					<input name="directorUrl" type="url" maxlength="100" style="width: 250px" required="required" value="52.23.2.85"/>
-				</div>
-			</div>
-			<div class="w2ui-field">
-				<label style="width:30%;text-align: left;padding-left: 20px;">디텍터 Port</label>
-				<div style="width: 70%;">
-					<input name="directorPort" type="number" maxlength="100" style="width: 250px" required="required" value="25555"/>
-				</div>
-			</div>
+			
 		</div>
 	</form>	
 </div>
+
 <div id="regPopupBtnDiv" hidden="true">
-	<button class="btn" id="registBtn"onclick="registSetting();">설정</button>
-	<button class="btn" id="popClose" onclick="w2popup.close();">취소</button>
+	<button class="btn" id="registBtn" onclick="registDirectorConfig();">확인</button>
+	<button class="btn" id="popClose"  onclick="w2popup.close();">취소</button>
 </div>
+
+<div id="updatePopupBtnDiv" hidden="true">
+	<button class="btn" id="updateBtn" onclick="updateDirectorConfig();">확인</button>
+	<button class="btn" id="popClose"  onclick="w2popup.close();">취소</button>
+</div>
+

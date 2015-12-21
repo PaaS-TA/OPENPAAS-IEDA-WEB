@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  *
  */
 public interface IEDABootstrapOpenstackRepository extends  JpaRepository<IEDABootstrapOpenstackConfig, Integer>  {
-	public IEDABootstrapOpenstackConfig findById(Integer id);
+	//public IEDABootstrapOpenstackConfig findById(Integer id);
 }

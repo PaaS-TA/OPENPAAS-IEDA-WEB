@@ -76,9 +76,6 @@ public class ReleaseService {
 							releaseInfoList = new ArrayList<ReleaseInfo>();
 						
 						releaseInfoList.add(releaseInfo);
-						
-						log.info("===============");
-						log.info("--> " + releaseInfo.toString());
 					}
 				}
 				
@@ -121,14 +118,31 @@ public class ReleaseService {
 			ReleaseFile releaseFile = new ReleaseFile();
 			releaseFile.setRecid(idx++);
 			releaseFile.setReleaseFile(fileInfo.getName());
-			
-			DecimalFormat numberFormatter = new DecimalFormat("###,###");
-			releaseFile.setReleaseFileSize(numberFormatter.format(fileInfo.length()));
+			releaseFile.setReleaseFileSize(formatSizeUnit(fileInfo.length()));
 			
 			localReleaseList.add(releaseFile);
 			
 		}
 		return localReleaseList;
+	}
+	
+	private String formatSizeUnit(long size) {
+	    if (size <= 0) return "0";
+	    final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
+	    int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
+	    return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+	}
+	
+	/**
+	 * Delete Local Release File 
+	 * @return void
+	 */
+	public void deleteLocalRelease(String releaseFile) {
+		File localFile = new File(iedaConfiguration.getReleaseDir() + System.getProperty("file.separator")+ releaseFile);
+		if ( localFile.isFile() )
+			localFile.delete();
+		else
+			throw new IEDACommonException("notfound.localrelease.exception", "릴리즈 파일이 존재하지 않습니다.", HttpStatus.BAD_REQUEST); 
 	}
 
 }
