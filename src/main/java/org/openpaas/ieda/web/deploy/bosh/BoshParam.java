@@ -33,7 +33,7 @@ public class BoshParam {
 	@Data
 	public static class AwsNetwork{
 		@NotNull
-		private int id;
+		private String id;
 		@NotNull
 		private String subnetStatic;
 		@NotNull
@@ -51,7 +51,7 @@ public class BoshParam {
 	@Data
 	public static class AwsResource{
 		@NotNull
-		private int id;
+		private String id;
 		@NotNull
 		private String stemcellName;
 		@NotNull

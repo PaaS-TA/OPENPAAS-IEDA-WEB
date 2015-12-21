@@ -1,9 +1,12 @@
 package org.openpaas.ieda.web.deploy.bosh;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -16,6 +19,9 @@ import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
 import org.openpaas.ieda.common.ReplaceItem;
+import org.openpaas.ieda.web.config.bootstrap.BootstrapItem;
+import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapAwsConfig;
+import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapOpenstackConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -96,6 +102,8 @@ public class IEDABoshOpenstackService {
 		config.setCloudInstanceType(dto.getCloudInstanceType());
 		config.setBoshPassword(dto.getBoshPassword());
 		
+		String deplymentFileName = boshService.createSettingFile(Integer.parseInt(dto.getId()), "OPENPAAS");
+		config.setDeploymentFile(deplymentFileName);
 		return opentstackRepository.save(config);
 	}
 	

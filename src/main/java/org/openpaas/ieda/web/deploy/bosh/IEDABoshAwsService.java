@@ -69,7 +69,7 @@ public class IEDABoshAwsService {
 	}
 	
 	public IEDABoshAwsConfig saveBoshNetworkInfo(BoshParam.AwsNetwork dto){
-		IEDABoshAwsConfig config = boshAwsRepository.findOne(dto.getId());
+		IEDABoshAwsConfig config = boshAwsRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setSubnetStatic(dto.getSubnetStatic());
 		config.setSubnetRange(dto.getSubnetRange());
 		config.setSubnetGateway(dto.getSubnetGateway());
@@ -80,10 +80,13 @@ public class IEDABoshAwsService {
 	}
 	
 	public IEDABoshAwsConfig saveBoshResourceInfo(BoshParam.AwsResource dto){
-		IEDABoshAwsConfig config = boshAwsRepository.findOne(dto.getId());
+		IEDABoshAwsConfig config = boshAwsRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setStemcellName(dto.getStemcellName());
 		config.setStemcellVersion(dto.getStemcellVersion());
 		config.setBoshPassword(dto.getBoshPassword());
+		
+		String deplymentFileName = boshService.createSettingFile(Integer.parseInt(dto.getId()), "AWS");
+		config.setDeploymentFile(deplymentFileName);
 		return boshAwsRepository.save(config);
 	}
 	
