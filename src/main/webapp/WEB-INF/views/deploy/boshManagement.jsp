@@ -89,11 +89,11 @@ $(function(){
 	
 	$("#installBtn").click(function(){
 		
-		var directorName = $("#directorName").text().toUpperCase());
+		var directorName = $("#directorName").text().toUpperCase();
 		
-		if ( directorName.indexof("AWS") > 0 ) {
+		if ( directorName.indexOf("AWS") > 0 ) {
 			awsPopup();
-		} else if (directorName.indexof("OPENSTACK") > 0 ) {
+		} else if (directorName.indexOf("OPENSTACK") > 0 ) {
 			osBoshInfoPopup();
 		} else {
 			selectIaas();
@@ -299,7 +299,6 @@ function awsPopup(){
 		onOpen:function(event){
 			event.onComplete = function(){				
 				if(awsInfo != ""){					
-					$(".w2ui-msg-body input[name='dnsRecursor']").val(awsInfo.dnsRecursor);
 					$(".w2ui-msg-body input[name='accessKeyId']").val(awsInfo.accessKeyId);
 					$(".w2ui-msg-body input[name='secretAccessKey']").val(awsInfo.secretAccessKey);
 					$(".w2ui-msg-body input[name='defaultKeyName']").val(awsInfo.defaultKeyName);
@@ -1065,7 +1064,6 @@ $( window ).resize(function() {
 	    </div>
 	</div>
 	<div id="config_boshGrid" style="width:100%; height:500px"></div>	
-	
 </div>
 
 	<!-- IaaS 설정 DIV -->
@@ -1106,15 +1104,21 @@ $( window ).resize(function() {
 	        </div>
 			<div class="cont_title">▶ AWS 설정정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
+		    
 <!-- 		    	<div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">MicroBOSH(Bootstrap) IP</label>
 		            <div>
 		            	<input name="dnsRecursor" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div> -->
+		        
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Access Key ID</label>
 		            <div>
+		                <input name="accessKeyId" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		            </div>
+				<div>
+				
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Secret Access Key</label>
 		            <div>
@@ -1148,13 +1152,13 @@ $( window ).resize(function() {
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Private Key Path</label>
-	               
 	                <div >
   						<span onclick="changeKeyPathType('file');" style="width:200px;"><label><input type="radio" name="keyPathType" value="file"/>&nbsp;파일업로드</label></span>
 						&nbsp;&nbsp;
 						<span onclick="changeKeyPathType('list');" style="width:200px;"><label><input type="radio" name="keyPathType" value="list"/>&nbsp;리스트</label></span>
 					</div>
 		        </div>
+		        
 		        <div class="w2ui-field">			         	
 	                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();"/>
 		            <label style="text-align: left;width:250px;font-size:11px;" class="control-label"></label>

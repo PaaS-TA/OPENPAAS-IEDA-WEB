@@ -45,8 +45,7 @@ public class IEDABoshAwsService {
 		else {
 			config = boshAwsRepository.findOne(Integer.parseInt(dto.getId()));
 		}
-		log.info("##### ::: " + dto.getDnsRecursor());
-		config.setDnsRecursor(dto.getDnsRecursor());
+
 		config.setAccessKeyId(dto.getAccessKeyId());
 		config.setSecretAccessKey(dto.getSecretAccessKey());
 		config.setDefaultKeyName(dto.getDefaultKeyName());

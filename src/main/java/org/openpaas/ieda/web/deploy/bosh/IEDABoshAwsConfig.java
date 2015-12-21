@@ -23,7 +23,6 @@ public class IEDABoshAwsConfig {
 	@Temporal(TemporalType.DATE)
 	private Date updatedDate;
 	
-	private String dnsRecursor;
 	private String accessKeyId;
 	private String secretAccessKey;
 	private String defaultKeyName;

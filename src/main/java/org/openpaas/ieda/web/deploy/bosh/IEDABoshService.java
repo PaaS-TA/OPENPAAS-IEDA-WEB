@@ -262,7 +262,7 @@ public class IEDABoshService {
 		if(iaas == "AWS"){
 			IEDABoshAwsConfig awsConfig = awsRepository.findOne(id);
 //			items.add(new ReplaceItem("[stemcell]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") + awsConfig.getStemcellName()));
-			items.add(new ReplaceItem("[dnsRecursor]", awsConfig.getDnsRecursor()));
+			//items.add(new ReplaceItem("[dnsRecursor]", awsConfig.getDnsRecursor()));
 			items.add(new ReplaceItem("[accessKeyId]", awsConfig.getAccessKeyId()));
 			items.add(new ReplaceItem("[secretAccessKey]", awsConfig.getSecretAccessKey()));
 			items.add(new ReplaceItem("[defaultKeyName]", awsConfig.getDefaultKeyName()));
@@ -300,7 +300,7 @@ public class IEDABoshService {
 			items.add(new ReplaceItem("[boshPassword]", openstackConfig.getBoshPassword()));
 			items.add(new ReplaceItem("[directorName]", openstackConfig.getDirectorName()));
 			items.add(new ReplaceItem("[directorStaticIp]", openstackConfig.getDirectorStaticIp()));
-			items.add(new ReplaceItem("[dnsRecursor]", openstackConfig.getDnsRecursor()));
+			//items.add(new ReplaceItem("[dnsRecursor]", openstackConfig.getDnsRecursor()));
 			items.add(new ReplaceItem("[authUrl]", openstackConfig.getAuthUrl()));
 			items.add(new ReplaceItem("[tenant]", openstackConfig.getTenant()));
 			items.add(new ReplaceItem("[userName]", openstackConfig.getUserName()));
