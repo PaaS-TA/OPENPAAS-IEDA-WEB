@@ -15,7 +15,7 @@ function getDefaultDirector(url) {
 			if ( data == null || data == "" )
 				isOk = false;
 			else {
-				$('#directorName').text(data.directorName);
+				$('#directorName').text(data.directorName + '(' + data.directorCpi + ')' );
 				$('#userId').text(data.userId);
 				
 				diretorUrl = "https://" + data.directorUrl + ":" + data.directorPort;
