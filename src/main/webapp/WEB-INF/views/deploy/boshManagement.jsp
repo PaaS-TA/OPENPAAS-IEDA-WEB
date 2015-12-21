@@ -1077,40 +1077,41 @@ $( window ).resize(function() {
 	        </div>
 			<div class="cont_title">▶ AWS 설정정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Micro BOSH 공인 IP</label>
+<!-- 		    	<div class="w2ui-field">
+		            <label style="text-align: left;width:250px;font-size:11px;">MicroBOSH(Bootstrap) IP</label>
 		            <div>
 		            	<input name="dnsRecursor" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
-		        </div>
+		        </div> -->
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">AWS 접근 키 아이디</label>
+		            <label style="text-align: left;width:250px;font-size:11px;">Access Key ID</label>
 		            <div>
 		                <input name="accessKeyId" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">AWS 접근 키 암호</label>
+		            <label style="text-align: left;width:250px;font-size:11px;">Secret Access Key</label>
 		            <div>
 		                <input name="secretAccessKey" type="password" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div>
+
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">VPC 접속 키 명</label>
-		            <div>
-		                <input name="defaultKeyName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">VPC 접속 보안 정책 그룹명</label>
+		            <label style="text-align: left;width:250px;font-size:11px;">Security Group</label>
 		            <div>
 		                <input name="defaultSecurityGroups" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">VPC 네트워크 설정 지역</label>
+		            <label style="text-align: left;width:250px;font-size:11px;">Region</label>
 		            <div>
 		                <input name="region" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		            </div>
+		        </div>
+		        <div class="w2ui-field">
+		            <label style="text-align: left;width:250px;font-size:11px;">Private Key</label>
+		            <div>
+		                <input name="defaultKeyName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
