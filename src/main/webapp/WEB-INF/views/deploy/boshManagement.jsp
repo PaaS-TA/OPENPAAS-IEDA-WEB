@@ -47,6 +47,10 @@ var releases;
 var stemcells;
 
 $(function(){
+	
+	// 기본 설치 관리자 정보 조회
+ 	var bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");
+	
 	$('#config_boshGrid').w2grid({
 		name: 'config_boshGrid',
 		header: '<b>Bosh 목록</b>',
@@ -84,7 +88,17 @@ $(function(){
 	});
 	
 	$("#installBtn").click(function(){
-		selectIaas();
+		
+		var directorName = $("#directorName").text().toUpperCase());
+		
+		if ( directorName.indexof("AWS") > 0 ) {
+			awsPopup();
+		} else if (directorName.indexof("OPENSTACK") > 0 ) {
+			osBoshInfoPopup();
+		} else {
+			selectIaas();
+		}
+		
 	});
 	
 	//Bosh 수정
@@ -166,8 +180,10 @@ function selectIaas(){
 				console.log("iaas ::: " + structureType);
 				getReleaseVersionList();
 				
-				if( structureType == "AWS") awsPopup();
-				else osBoshInfoPopup();				
+				if( structureType == "AWS")
+					awsPopup();
+				else
+					osBoshInfoPopup();				
 			}
 			else{
 				w2alert("설치할 Infrastructure 을 선택하세요");
@@ -1021,6 +1037,20 @@ $( window ).resize(function() {
 <div id="main">
 	<div class="page_site">설치관리자 환경설정 > <strong>Bosh 설치</strong></div>
 	
+	<!-- 설치 관리자 -->
+	<div class="title">설치 관리자</div>
+	
+	<table class="tbl1" border="1" cellspacing="0">
+	<tr>
+		<th width="18%" class="th_fb">관리자 이름</th><td class="td_fb"><b id="directorName"></b></td>
+		<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb"><b id="userId"></b></td>
+	</tr>
+	<tr>
+		<th width="18%" >관리자 URL</th><td><b id="directorUrl"></b></td>
+		<th width="18%" >관리자 UUID</th><td ><b id="directorUuid"></b></td>
+	</tr>
+	</table>
+	
 	<!-- Bosh 목록-->
 	<div class="pdt20"> 
 		<div class="title fl">Bosh 목록</div>
@@ -1038,7 +1068,7 @@ $( window ).resize(function() {
 	
 </div>
 
-	<!-- Infrastructure  설정 DIV -->
+	<!-- IaaS 설정 DIV -->
 	<div id="bootSelectBody" style="width:100%; height: 80px;" hidden="true">
 		<div class="w2ui-lefted" style="text-align: left;">
 			설치할 Infrastructure 을 선택하세요<br />
@@ -1058,7 +1088,7 @@ $( window ).resize(function() {
 		</div>
 	</div>
 
-<!-- Start AWS Popup  -->
+	<!-- Start AWS Popup  -->
 
 	<!-- AWS  설정 DIV -->
 	<div id="awsInfoDiv" style="width:100%;height:100%;" hidden="true">
@@ -1102,6 +1132,12 @@ $( window ).resize(function() {
 		            <label style="text-align: left;width:250px;font-size:11px;">Region</label>
 		            <div>
 		                <input name="region" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		            </div>
+		        </div>
+		        <div class="w2ui-field">
+		            <label style="text-align: left;width:250px;font-size:11px;">Private Key</label>
+		            <div>
+		                <input name="defaultKeyName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
