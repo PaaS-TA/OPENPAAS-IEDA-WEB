@@ -86,7 +86,7 @@ public class DirectorRestHelper {
 	// deploy
 	public static String getDeployURI(String host, int port) {
 		return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).path("deployments")
-				.queryParam("force", "true").build().toUri().toString();
+				.queryParam("recreate", "true").queryParam("skip_drain", "true").build().toUri().toString();
 	}
 
 	public static String getDeleteDeploymentURI(String host, int port, String deploymentName) {
@@ -222,8 +222,8 @@ public class DirectorRestHelper {
 								responseMessage.add("  Failed      " + output.getStage() + " > " + output.getTask());
 								System.out.println("  Failed     " + output.getStage() + " > " + output.getTask());
 							} else {
-								responseMessage.add("  Processing " + output.getStage() + " > " + output.getTask());
-								System.out.println("  Processing " + output.getStage() + " > " + output.getTask());
+								responseMessage.add("  Processing " + output.getStage() + " > " + output.getTask() + "" + output.getProgress());
+								System.out.println("  Processing " + output.getStage() + " > " + output.getTask() + "" + output.getProgress());
 							}
 						} else {
 							HashMap<String, String> error = output.getError();

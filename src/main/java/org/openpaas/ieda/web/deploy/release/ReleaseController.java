@@ -10,7 +10,7 @@ import javax.validation.Valid;
 
 import org.openpaas.ieda.api.ReleaseFile;
 import org.openpaas.ieda.api.ReleaseInfo;
-import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 public class ReleaseController {
 	
-	@Autowired
-	private IEDAConfiguration iedaConfiguration;
-
 	@Autowired
 	private ReleaseService releaseService;
 	
@@ -99,7 +96,7 @@ public class ReleaseController {
 	@MessageMapping("/releaseUploading")
 	@SendTo("/socket/uploadRelease")
 	public ResponseEntity doUploadRelease(@RequestBody @Valid ReleaseContentDto.Upload dto) {
-		uploadReleaseService.uploadReleaseAsync(iedaConfiguration.getReleaseDir(), dto.getFileName());
+		uploadReleaseService.uploadReleaseAsync(LocalDirectoryConfiguration.getReleaseDir(), dto.getFileName());
 		return new ResponseEntity(HttpStatus.OK);
 	}
 	

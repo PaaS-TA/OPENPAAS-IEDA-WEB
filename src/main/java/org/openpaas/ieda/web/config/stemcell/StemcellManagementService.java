@@ -24,7 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.modelmapper.ModelMapper;
 import org.openpaas.ieda.common.IEDACommonException;
-import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,13 +52,10 @@ public class StemcellManagementService {
 	@Autowired
 	private ModelMapper modelMapper;
 
-	@Autowired
-	private IEDAConfiguration iedaConfiguration;
-
 	private String key;
 	
 	public List<String> getLocalStemcellList() {
-		File dir = new File(iedaConfiguration.getStemcellDir());
+		File dir = new File(LocalDirectoryConfiguration.getStemcellDir());
 		File[] localFiles = dir.listFiles();
 		List<String> localStemcells = new ArrayList<>();
 		for (File file : localFiles) {
@@ -144,7 +141,9 @@ public class StemcellManagementService {
 	 * . IEDA_PUBLIC_STEMCELL 저장
 	 */
 	public void syncPublicStemcell() {
-
+		
+		repository.deleteAll();
+		
 		// AWS S3로부터 스템셀 목록 조회
 		List<StemcellContent> publicStemcells = getAllPublicStemcell();
 
@@ -258,10 +257,10 @@ public class StemcellManagementService {
 
 	// 다운로드 스템셀
 	public List<String> doDownloadStemcell(String subLink, String stemcellFile, BigDecimal fileSize) {
-		log.info("stemcell Dir     : " + iedaConfiguration.getStemcellDir());
+		log.info("stemcell Dir     : " + LocalDirectoryConfiguration.getStemcellDir());
 		log.info("Stemcell Name    : " + PUBLIC_STEMCELLS_BASE_URL + "/"  + stemcellFile);
 		log.info("Stemcell Size    : " + fileSize);
-		log.info("downloaded  file : " + iedaConfiguration.getStemcellDir()+ System.getProperty("file.separator") +stemcellFile);
+		log.info("downloaded  file : " + LocalDirectoryConfiguration.getStemcellDir()+ System.getProperty("file.separator") +stemcellFile);
 		
 		String downloadLink = PUBLIC_STEMCELLS_BASE_URL + "/" + subLink;
 		
@@ -270,7 +269,7 @@ public class StemcellManagementService {
 	    double received = 0;
 	    try {
 	        in = new BufferedInputStream(new URL(downloadLink).openStream());
-	        fout = new FileOutputStream(iedaConfiguration.getStemcellDir()+ System.getProperty("file.separator") +stemcellFile);
+	        fout = new FileOutputStream(LocalDirectoryConfiguration.getStemcellDir()+ System.getProperty("file.separator") +stemcellFile);
 
 	        final byte data[] = new byte[4096];
 	        int count;
@@ -373,7 +372,7 @@ public class StemcellManagementService {
 	
 	// 스템셀 삭제
 	public void doDeleteStemcell(String stemcellFile) {
-		final String stemcellToDelete = iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + stemcellFile;
+		final String stemcellToDelete = LocalDirectoryConfiguration.getStemcellDir() + System.getProperty("file.separator")  + stemcellFile;
 		try {
 			log.info("Stemcell to delete : " + stemcellToDelete);
 			
@@ -396,7 +395,7 @@ public class StemcellManagementService {
 	public List<Map<String, String>> getLocalStemcellFileList(){
 		List<Map<String, String>> fileInfos = new ArrayList<>();
 		
-		File dir = new File(iedaConfiguration.getStemcellDir());
+		File dir = new File(LocalDirectoryConfiguration.getStemcellDir());
 		File[] localFiles = dir.listFiles();
 		 
 		for (File file : localFiles) {

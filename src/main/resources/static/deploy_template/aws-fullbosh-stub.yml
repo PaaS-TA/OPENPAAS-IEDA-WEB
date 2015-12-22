@@ -26,8 +26,8 @@ networks:
   - name: default
     type: manual
     subnets:
-    - reserved: (( merge ))
-      static: (( merge ))
+    - static: (( merge ))
+#      reserved: (( merge ))
       range: (( merge ))
       gateway: (( merge ))
       dns: (( merge ))
@@ -176,7 +176,6 @@ properties:
       basic_auth: replication:zxKDUBeCfKYX
       user: replication
       password: powerdns
-#    recursor: (( merge ))
 
   director:
     name: bosh

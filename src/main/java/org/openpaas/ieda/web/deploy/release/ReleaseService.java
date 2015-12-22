@@ -16,10 +16,9 @@ import org.openpaas.ieda.api.Release;
 import org.openpaas.ieda.api.ReleaseFile;
 import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.api.ReleaseVersion;
-import org.openpaas.ieda.api.Stemcell;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
-import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class ReleaseService {
-	@Autowired
-	private IEDAConfiguration iedaConfiguration;
 	
 	@Autowired
 	private IEDADirectorConfigService directorConfigService;
@@ -103,7 +100,7 @@ public class ReleaseService {
 	 */
 	
 	public List<ReleaseFile> listLocalRelease() {
-		File file = new File(iedaConfiguration.getReleaseDir());
+		File file = new File(LocalDirectoryConfiguration.getReleaseDir());
 		File[] localFiles = file.listFiles();
 		
 		List<ReleaseFile> localReleaseList = null; 
@@ -138,7 +135,7 @@ public class ReleaseService {
 	 * @return void
 	 */
 	public void deleteLocalRelease(String releaseFile) {
-		File localFile = new File(iedaConfiguration.getReleaseDir() + System.getProperty("file.separator")+ releaseFile);
+		File localFile = new File(LocalDirectoryConfiguration.getReleaseDir() + System.getProperty("file.separator")+ releaseFile);
 		if ( localFile.isFile() )
 			localFile.delete();
 		else

@@ -2,13 +2,11 @@ package org.openpaas.ieda.web.deploy.stemcell;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.Valid;
 
-import org.openpaas.ieda.api.Stemcell;
 import org.openpaas.ieda.api.StemcellInfo;
-import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.config.stemcell.StemcellContent;
 import org.openpaas.ieda.web.config.stemcell.StemcellContentDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +27,6 @@ public class StemcellController {
 
 	@Autowired
 	private StemcellService service;
-
-	@Autowired
-	private IEDAConfiguration iedaConfiguration;
 
 	@Autowired
 	private DeleteStemcellAsyncService deleteStemcellAsyncService;
@@ -76,7 +71,7 @@ public class StemcellController {
 	@MessageMapping("/stemcellUploading")
     @SendTo("/socket/uploadStemcell")
 	public ResponseEntity doUploadStemcell(@RequestBody @Valid StemcellContentDto.Upload dto) {
-		uploadStemcellAsyncService.uploadStemcellAsync(iedaConfiguration.getStemcellDir(), dto.getFileName());
+		uploadStemcellAsyncService.uploadStemcellAsync(LocalDirectoryConfiguration.getStemcellDir(), dto.getFileName());
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

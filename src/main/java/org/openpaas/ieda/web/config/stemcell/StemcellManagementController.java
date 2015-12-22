@@ -9,8 +9,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.openpaas.ieda.common.IEDAConfiguration;
 import org.openpaas.ieda.common.IEDAErrorResponse;
+import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,9 +37,6 @@ public class StemcellManagementController {
 	@Autowired
 	private StemcellManagementService service;
 	
-	@Autowired
-	private IEDAConfiguration iedaConfiguration;
-
 	@Autowired
 	private IEDAStemcellDownload stemcellDownloadService;
 	
@@ -69,7 +66,7 @@ public class StemcellManagementController {
 	@MessageMapping("/stemcellDownloading")
 	@SendTo("/stemcell/downloadStemcell")
 	public ResponseEntity doDownloadStemcell(@RequestBody @Valid StemcellContentDto.Download dto) {
-		log.info("stemcell dir : " + iedaConfiguration.getStemcellDir());
+		log.info("stemcell dir : " + LocalDirectoryConfiguration.getStemcellDir());
 		log.info("doDownload key      : " + dto.getKey());
 		log.info("doDownload fileName : " + dto.getFileName());
 		log.info("doDownload fileSize : " + new BigDecimal(dto.getFileSize()));
@@ -97,6 +94,14 @@ public class StemcellManagementController {
 		}
 		
 		service.doDeleteStemcell(stemcellFileName);
+		
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+	
+	@RequestMapping(value="/syncPublicStemcell", method=RequestMethod.PUT)
+	public ResponseEntity doDeleteStemcell() {
+		
+		service.syncPublicStemcell();
 		
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}

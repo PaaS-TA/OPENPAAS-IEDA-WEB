@@ -4,7 +4,9 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.openpaas.ieda.web.config.bootstrap.BootStrapDto;
+import org.openpaas.ieda.web.config.bootstrap.IDEABootStrapInfoDto;
 import org.openpaas.ieda.web.config.bootstrap.BootStrapDto.Deployment;
+import org.openpaas.ieda.web.config.bootstrap.IDEABootStrapInfoDto.Install;
 
 import lombok.Data;
 
@@ -15,7 +17,7 @@ public class BoshParam {
 		private String id;
 		private String accessKeyId;
 		private String secretAccessKey;
-		private String defaultKeyName;
+		private String privateKeyName;
 		private String defaultSecurityGroups;
 		private String region;	
 		@NotNull
@@ -28,7 +30,7 @@ public class BoshParam {
 		@NotNull
 		private String id;
 		@NotNull
-		private String boshName;
+		private String deploymentName;
 		@NotNull
 		private String directorUuid;
 		@NotNull
@@ -42,7 +44,9 @@ public class BoshParam {
 		@NotNull
 		private String id;
 		@NotNull
-		private String subnetStatic;
+		private String subnetStaticFrom;
+		@NotNull
+		private String subnetStaticTo;
 		@NotNull
 		private String subnetRange;
 		@NotNull
@@ -50,9 +54,7 @@ public class BoshParam {
 		@NotNull
 		private String subnetDns;
 		@NotNull
-		private String cloudSubnet;
-		@NotNull
-		private String cloudSecurityGroups;		
+		private String subnetId;
 	}
 	
 	@Data
@@ -139,4 +141,9 @@ public class BoshParam {
 		private String deploymentFile;
 	}
 	
+	@Data
+	public static class Install{
+		@NotNull
+		private String deployFileName;
+	}
 }

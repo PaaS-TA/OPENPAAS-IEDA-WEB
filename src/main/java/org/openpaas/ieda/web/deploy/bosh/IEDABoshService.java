@@ -11,18 +11,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
 import org.apache.commons.io.IOUtils;
-import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.common.IEDACommonException;
-import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.common.ReplaceItem;
-import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapAwsConfig;
-import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
-import org.openpaas.ieda.web.config.stemcell.StemcellContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -41,9 +36,6 @@ public class IEDABoshService {
 	@Autowired
 	private IEDABoshOpenstackRepository openstackRepository;
 	
-	@Autowired
-	private IEDAConfiguration iedaConfiguration;
-
 	@Autowired
 	private IEDABoshAwsService awsService;
 
@@ -103,7 +95,7 @@ public class IEDABoshService {
 			stubFile = new File(stubFilePath);
 
 			if(stubFile.exists() && tempFile.exists()){
-				command = iedaConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "merge-deploy.sh ";
+				command = LocalDirectoryConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "merge-deploy.sh ";
 				command += stubFilePath + " ";
 				command += tempFilePath + " ";
 				command += deplyFilePath;
@@ -146,8 +138,8 @@ public class IEDABoshService {
 		BufferedReader bufferedReader = null;
 		Runtime r = Runtime.getRuntime();
 		try{
-			String command = iedaConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "bosh-delete.sh ";
-			command += iedaConfiguration.getDeploymentDir()+ System.getProperty("file.separator") +deploymentFile + " ";
+			String command = LocalDirectoryConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "bosh-delete.sh ";
+			command += LocalDirectoryConfiguration.getDeploymentDir()+ System.getProperty("file.separator") +deploymentFile + " ";
 
 			Process process = r.exec(command);
 			log.info("### PROCESS ::: " + process.toString());
@@ -182,26 +174,23 @@ public class IEDABoshService {
 
 	}
 
-	public void installBootstrap(String deployFileName) {
+	public void boshInstall(String deployFileName) {
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
 		Runtime r = Runtime.getRuntime();
 		String command = "";
-		log.info("%%%% Deploy File Name : " + deployFileName);
+		
 		try{
-			command += iedaConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "bosh-deploy.sh ";
-			command += iedaConfiguration.getDeploymentDir()+ System.getProperty("file.separator")  + deployFileName ;
+			command += LocalDirectoryConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "bosh-deploy.sh ";
+			command += LocalDirectoryConfiguration.getDeploymentDir()+ System.getProperty("file.separator")  + deployFileName ;
 
 			Process process = r.exec(command);
-			log.info("### PROCESS ::: " + process.toString());
-			process.getInputStream();
 			inputStream = process.getInputStream();
 			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 			String info = null;
 			String streamLogs = "";
 			while ((info = bufferedReader.readLine()) != null){
 				streamLogs += info;
-				log.info("=== InstallBootstrap Logs \n"+ info );
 				messagingTemplate.convertAndSend("/bosh/boshInstall", info);
 			}
 		} catch (IOException e) {
@@ -246,14 +235,14 @@ public class IEDABoshService {
 			content = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
 			stubContent = IOUtils.toString(new FileInputStream(stubDeploy), "UTF-8");
 
-			List<ReplaceItem> bootstrapItems = makeBootstrapItems(id, iaas);
-			for (ReplaceItem item : bootstrapItems) {
+			List<ReplaceItem> replaceItems = setReplaceBoshItems(id, iaas);
+			for (ReplaceItem item : replaceItems) {
 				log.info(item.getTargetItem() +" / "+  item.getSourceItem());
 				content = content.replace(item.getTargetItem(), item.getSourceItem());
 			}
 
-			IOUtils.write(stubContent, new FileOutputStream(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName()), "UTF-8");
-			IOUtils.write(content, new FileOutputStream(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName), "UTF-8");
+			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName()), "UTF-8");
+			IOUtils.write(content, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName), "UTF-8");
 			deplymentFileName = setSpiffMerge(iaas, id, stubDeploy.getName(), settingFileName);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -264,35 +253,39 @@ public class IEDABoshService {
 		return deplymentFileName;
 	}
 
-	public List<ReplaceItem> makeBootstrapItems(Integer id, String iaas) {
+	public List<ReplaceItem> setReplaceBoshItems(Integer id, String iaas) {
 
 		List<ReplaceItem> items = new ArrayList<ReplaceItem>();
 
 		if(iaas == "AWS"){
 			IEDABoshAwsConfig awsConfig = awsRepository.findOne(id);
-//			items.add(new ReplaceItem("[stemcell]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") + awsConfig.getStemcellName()));
+			
+			// AWS
 			items.add(new ReplaceItem("[accessKeyId]", awsConfig.getAccessKeyId()));
 			items.add(new ReplaceItem("[secretAccessKey]", awsConfig.getSecretAccessKey()));
-			items.add(new ReplaceItem("[defaultKeyName]", awsConfig.getDefaultKeyName()));
 			items.add(new ReplaceItem("[defaultSecurityGroups]", awsConfig.getDefaultSecurityGroups()));
 			items.add(new ReplaceItem("[region]", awsConfig.getRegion()));
+			items.add(new ReplaceItem("[privateKeyName]", awsConfig.getPrivateKeyName()));
 			items.add(new ReplaceItem("[privateKeyPath]", awsConfig.getPrivateKeyPath()));
-			items.add(new ReplaceItem("[boshName]", awsConfig.getBoshName()));
+			
+			// Basic
+			items.add(new ReplaceItem("[deploymentName]", awsConfig.getDeploymentName()));
 			items.add(new ReplaceItem("[directorUuid]", awsConfig.getDirectorUuid()));
 			items.add(new ReplaceItem("[publicStaticIp]", awsConfig.getPublicStaticIp()));
+			items.add(new ReplaceItem("[releaseVersion]", awsConfig.getReleaseVersion().split("/")[1]));
 			
-			items.add(new ReplaceItem("[releaseVersion]", awsConfig.getReleaseVersion()));
-			items.add(new ReplaceItem("[subnetStatic]", awsConfig.getSubnetStatic()));
+			// Network
+			items.add(new ReplaceItem("[subnetId]", awsConfig.getSubnetId()));			
+			items.add(new ReplaceItem("[subnetStatic]", awsConfig.getSubnetStaticFrom() + " - " + awsConfig.getSubnetStaticTo()));
 			items.add(new ReplaceItem("[subnetRange]", awsConfig.getSubnetRange()));
 			items.add(new ReplaceItem("[subnetGateway]", awsConfig.getSubnetGateway()));
 			items.add(new ReplaceItem("[subnetDns]", awsConfig.getSubnetDns()));
-			items.add(new ReplaceItem("[cloudSubnet]", awsConfig.getCloudSubnet()));
-			items.add(new ReplaceItem("[cloudSecurityGroups]", awsConfig.getCloudSecurityGroups()));
-			items.add(new ReplaceItem("[cloudInstanceType]", awsConfig.getCloudInstanceType()));
+			
+			// Resource
 			items.add(new ReplaceItem("[stemcellName]", awsConfig.getStemcellName()));
 			items.add(new ReplaceItem("[stemcellVersion]", awsConfig.getStemcellVersion()));
+			items.add(new ReplaceItem("[cloudInstanceType]", awsConfig.getCloudInstanceType()));
 			items.add(new ReplaceItem("[boshPassword]", awsConfig.getBoshPassword()));
-			
 		}
 		else{
 			IEDABoshOpenstackConfig openstackConfig = openstackRepository.findOne(id);
@@ -326,39 +319,42 @@ public class IEDABoshService {
 	}
 
 	public String setSpiffMerge(String iaas, Integer id, String stubFileName, String settingFileName) {
+		
+		String deploymentFileName = iaas.toLowerCase() +"-fullbosh-merge-"+id+".yml";		
+		String templateFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName;
+		String parameterFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName;
+		String deploymentPath= LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
+
 		File stubFile = null;
 		File settingFile = null;
 		String command = "";
 		Runtime r = Runtime.getRuntime();
-		String deploymentFileName = "";
 
 		InputStream inputStream = null;
+
 		BufferedReader bufferedReader = null;
 		try {
-			stubFile = new File(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName);
-			settingFile = new File(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName);
+			stubFile = new File(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName);
+			settingFile = new File(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName);
 
-			deploymentFileName =  iaas.toLowerCase() +"-fullbosh-merge-"+id+".yml";
-			
 			if(stubFile.exists() && settingFile.exists()){
-				command = iedaConfiguration.getScriptDir() + System.getProperty("file.separator") + "merge-deploy.sh ";
-				command += iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName + " ";
-				command += iedaConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName + " ";
-				command += iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
-
+				command = "spiff merge " + templateFile + " " + parameterFile;;
+				
 				Process process = r.exec(command);
-				process.getInputStream();
+
 				inputStream = process.getInputStream();
 				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 				String info = null;
-				String streamLogs = "";
+				String deloymentContent = "";
 				while ((info = bufferedReader.readLine()) != null){
-					streamLogs += info;
+					deloymentContent += info + "\n";
 					log.info("=== Deployment File Merge \n"+ info );
 				}
+				
+				IOUtils.write(deloymentContent, new FileOutputStream(deploymentPath), "UTF-8");
 			}
 			else{
-				throw new IEDACommonException("illigalArgument.bootstrap.exception",
+				throw new IEDACommonException("illigalArgument.bosh.exception",
 						"Merge할 File이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 			}
 		} catch (IOException e) {
@@ -384,7 +380,7 @@ public class IEDABoshService {
 		String contents = "";
 		File settingFile = null;
 		try {
-			settingFile = new File(iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile);
+			settingFile = new File(LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile);
 			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -409,36 +405,13 @@ public class IEDABoshService {
 			}
 			if( StringUtils.isEmpty(deploymentFileName)) deleteDeploy(deploymentFileName);
 		} catch (EntityNotFoundException e) {
-			throw new IEDACommonException("illigalArgument.bootstrap.exception",
-					"삭제할 BOOTSTRAP이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+			throw new IEDACommonException("illigalArgument.bosh.exception",
+					"삭제할 BOSH가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			throw new IEDACommonException("illigalArgument.bootstrap.exception",
-					"BOOTSTRAP 삭제 중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
+			throw new IEDACommonException("illigalArgument.bosh.exception",
+					"BOSH 삭제 중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
 		
 	}
 
-
-	public List<ReleaseInfo> getLocalBoshList() {
-		// IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
-		
-//		// 디럭터의 CPI에 맞는 로컬 스템셀 목록만 출력
-//		if ( defaultDirector.getDirectorCpi().toUpperCase().contains("AWS") ) filterString = "AWS";
-//		if ( defaultDirector.getDirectorCpi().toUpperCase().contains("OPENSTACK") ) filterString = "OPENSTACK";
-//
-//		List<StemcellContent> returnList = null;
-//		List<String> localStemcellList = stemcellManagementService.getLocalStemcellList();
-//
-//		if ( filterString != null && filterString.length() > 0 )
-//			returnList = stemcellContentRepository.findByStemcellFileNameInOrderByStemcellVersionDesc(localStemcellList).stream()
-//			.filter(t -> t.getIaas().equalsIgnoreCase(filterString))
-//			.collect(Collectors.toList());
-//		else
-//			returnList = stemcellContentRepository.findByStemcellFileNameInOrderByStemcellVersionDesc(localStemcellList);
-//
-//		filterString = null;
-//					
-//		return returnList;
-		return null;
-	}
 }

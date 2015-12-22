@@ -20,7 +20,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.openpaas.ieda.api.Info;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
-import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -40,14 +40,11 @@ public class IEDADirectorConfigService {
 	@Autowired
 	private IEDADirectorConfigRepository directorConfigRepository;
 
-	@Autowired
-	private IEDAConfiguration iedaConfiguration;
-	
 	public IEDADirectorConfig getDefaultDirector() {
 		
-		log.info("getDeploymentDir : " + iedaConfiguration.getDeploymentDir());
-		log.info("getReleaseDir    : " + iedaConfiguration.getReleaseDir());
-		log.info("getStemcellDir   : " + iedaConfiguration.getStemcellDir());
+		log.info("getDeploymentDir : " + LocalDirectoryConfiguration.getDeploymentDir());
+		log.info("getReleaseDir    : " + LocalDirectoryConfiguration.getReleaseDir());
+		log.info("getStemcellDir   : " + LocalDirectoryConfiguration.getStemcellDir());
 		
 		IEDADirectorConfig directorConfig = directorConfigRepository.findOneByDefaultYn("Y");
 

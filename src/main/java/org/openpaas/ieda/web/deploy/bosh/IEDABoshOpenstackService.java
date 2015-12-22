@@ -1,12 +1,9 @@
 package org.openpaas.ieda.web.deploy.bosh;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -17,11 +14,8 @@ import javax.persistence.EntityNotFoundException;
 
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
-import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.common.ReplaceItem;
-import org.openpaas.ieda.web.config.bootstrap.BootstrapItem;
-import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapAwsConfig;
-import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapOpenstackConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -38,9 +32,6 @@ public class IEDABoshOpenstackService {
 	
 	@Autowired
 	private IEDABoshService boshService;
-	
-	@Autowired
-	private IEDAConfiguration iedaConfiguration;
 	
 	public IEDABoshOpenstackConfig getBoshOpenstackInfo(int id){
 		return opentstackRepository.findOne(id);
@@ -110,60 +101,6 @@ public class IEDABoshOpenstackService {
 		return opentstackRepository.save(config);
 	}
 	
-	public String getDeploymentInfos(int id){
-		String content = ""; 
-		IEDABoshOpenstackConfig config = opentstackRepository.findOne(id);
-		//Create tempFile, stubFile
-		List<ReplaceItem> replaces = getBoshOpentstackReplaceItems(config);
-		
-		//CreateFile && Merge
-		config = createTempFile(config, replaces);
-		
-		if( !StringUtils.isEmpty(config.getDeploymentFile())){
-			File deplymentFile = new File(iedaConfiguration.getDeploymentDir() +  System.getProperty("file.separator") + config.getDeploymentFile());
-			
-			try {
-				if(deplymentFile.exists()){
-					content = IOUtils.toString(new FileInputStream(deplymentFile), "UTF-8");
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
-		}
-		return content;
-	}
-	
-	public List<ReplaceItem> getBoshOpentstackReplaceItems(IEDABoshOpenstackConfig config){
-		List<ReplaceItem> replaces = new ArrayList<>();
-		//boshInfo
-//		replaces.add(new ReplaceItem("[boshName]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getBoshName()));
-//		replaces.add(new ReplaceItem("[directorUuid]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") +config.getDirectorUuid()));
-//		replaces.add(new ReplaceItem("[releaseVersion]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getReleaseVersion()));
-//		
-//		//network Info
-//		replaces.add(new ReplaceItem("[subnetReserved]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetReserved()));
-//		replaces.add(new ReplaceItem("[subnetStatic]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetStatic()));
-//		replaces.add(new ReplaceItem("[subnetRange]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetRange()));
-//		replaces.add(new ReplaceItem("[subnetGateway]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetGateway()));
-//		replaces.add(new ReplaceItem("[subnetDns]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetDns()));
-//		replaces.add(new ReplaceItem("[cloudSubnet]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getCloudSubnet()));
-//		replaces.add(new ReplaceItem("[cloudSecurityGroups]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getCloudSecurityGroups()));
-//		
-//		//resources Info
-//		replaces.add(new ReplaceItem("[stemcellName]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") +config.getStemcellName()));
-//		replaces.add(new ReplaceItem("[stemcellVersion]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") +config.getStemcellVersion()));
-//		replaces.add(new ReplaceItem("[boshPassword]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") +config.getBoshPassword()));
-//		
-//		//Opentstack Info
-//		replaces.add(new ReplaceItem("[accessKeyId]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getAccessKeyId()));
-//		replaces.add(new ReplaceItem("[secretAccessKey]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getSecretAccessKey() ));
-//		replaces.add(new ReplaceItem("[defaultKeyName]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getDefaultKeyName()));
-//		replaces.add(new ReplaceItem("[defaultSecurityGroups]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getDefaultSecurityGroups()));
-//		replaces.add(new ReplaceItem("[region]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") +config.getRegion()));
-		return replaces;
-	}
-	
 	public IEDABoshOpenstackConfig createTempFile(IEDABoshOpenstackConfig config, List<ReplaceItem> replaceItems){
 		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-fullbosh-setting.yml");
 		URL stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-fullbosh-stub.yml");
@@ -182,9 +119,9 @@ public class IEDABoshOpenstackService {
 			tempDeploy = new File(classPath.toURI());//resource.getFile();
 			stubDeploy = new File(stubPath.toURI());
 			
-			tempFile = iedaConfiguration.getTempDir() +  System.getProperty("file.separator") + "aws-fullbosh-setting-"+config.getId()+".yml";
-			stubFile = iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName();
-			deployFile = iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") +deployFileName;
+			tempFile = LocalDirectoryConfiguration.getTempDir() +  System.getProperty("file.separator") + "aws-fullbosh-setting-"+config.getId()+".yml";
+			stubFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName();
+			deployFile = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") +deployFileName;
 			
 			content = IOUtils.toString(new FileInputStream(tempDeploy), "UTF-8");
 			stubContent = IOUtils.toString(new FileInputStream(stubDeploy), "UTF-8");

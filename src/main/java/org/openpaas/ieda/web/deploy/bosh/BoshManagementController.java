@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.openpaas.ieda.api.ReleaseInfo;
-import org.openpaas.ieda.web.config.bootstrap.IDEABootStrapInfoDto;
 import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +35,9 @@ public class BoshManagementController {
 	
 	@Autowired
 	private IEDABoshService boshService;
+	
+	@Autowired
+	private BoshDeployAsyncService boshDeployAsyncService;
 	
 	@Autowired
 	private ReleaseService releaseService;
@@ -166,11 +168,12 @@ public class BoshManagementController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 	
-	@MessageMapping("/bosh/install")
+	@MessageMapping("/boshInstall")
 	@SendTo("/bosh/boshInstall")
-	public ResponseEntity doInstallBootstrap(@RequestBody @Valid IDEABootStrapInfoDto.Install dto){
+	public ResponseEntity doBoshInstall(@RequestBody @Valid BoshParam.Install dto){
 		log.info("$$$$ SOCKET :  "+ dto.getDeployFileName());
-		boshService.installBootstrap(dto.getDeployFileName());
+		
+		boshDeployAsyncService.deployAsync(dto.getDeployFileName());
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
@@ -205,31 +208,5 @@ public class BoshManagementController {
 		
 		return new ResponseEntity( result, HttpStatus.OK);
 	}
-	
-	
-	@RequestMapping( value="/bosh/localBoshList", method =RequestMethod.GET)
-	public ResponseEntity localBoshList(){
-		List<ReleaseInfo> contents = boshService.getLocalBoshList();
-		List<ReleaseInfo> releases = new ArrayList<>();
-		if(contents != null ){
-			for(ReleaseInfo releaseInfo: contents){
-				if("bosh".equals(releaseInfo.getName())){
-					log.info("@@@@@ " + releaseInfo.getName()+ "/" + releaseInfo.getVersion());
-					releases.add(releaseInfo);
-				}
-			}
-		}
-		
-		HashMap<String, Object> result = new HashMap<String, Object>();
-		
-		if ( contents != null ) {
-			result.put("total", releases.size());
-			result.put("records", releases);
-		} else
-			result.put("total", 0);
-		
-		return new ResponseEntity( result, HttpStatus.OK);
-	}
-	
 	
 }

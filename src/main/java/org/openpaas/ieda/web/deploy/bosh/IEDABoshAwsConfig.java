@@ -25,20 +25,20 @@ public class IEDABoshAwsConfig {
 	
 	private String accessKeyId;
 	private String secretAccessKey;
-	private String defaultKeyName;
+	private String privateKeyName;
 	private String defaultSecurityGroups;
 	private String region;
 	private String privateKeyPath;
-	private String boshName;
+	private String deploymentName;
 	private String directorUuid;
 	private String publicStaticIp;
 	private String releaseVersion;
-	private String subnetStatic;
+	private String subnetStaticFrom;
+	private String subnetStaticTo;
 	private String subnetRange;
 	private String subnetGateway;
 	private String subnetDns;
-	private String cloudSubnet;
-	private String cloudSecurityGroups;
+	private String subnetId;
 	private String cloudInstanceType;
 	private String stemcellName;
 	private String stemcellVersion;

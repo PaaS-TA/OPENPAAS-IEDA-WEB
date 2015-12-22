@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -14,12 +13,11 @@ import javax.persistence.EntityNotFoundException;
 
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
-import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.common.ReplaceItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,9 +31,6 @@ public class IEDABoshAwsService {
 	@Autowired
 	private IEDABoshService boshService;
 	
-	@Autowired
-	private IEDAConfiguration iedaConfiguration;
-
 	public IEDABoshAwsConfig saveBoshAwsInfo(BoshParam.AWS dto){
 		IEDABoshAwsConfig config = null ;
 		Date now = new Date();
@@ -47,7 +42,7 @@ public class IEDABoshAwsService {
 		}
 		config.setAccessKeyId(dto.getAccessKeyId());
 		config.setSecretAccessKey(dto.getSecretAccessKey());
-		config.setDefaultKeyName(dto.getDefaultKeyName());
+		config.setPrivateKeyName(dto.getPrivateKeyName());
 		config.setDefaultSecurityGroups(dto.getDefaultSecurityGroups());
 		config.setRegion(dto.getRegion());
 		config.setPrivateKeyPath(dto.getPrivateKeyPath());
@@ -59,7 +54,7 @@ public class IEDABoshAwsService {
 	
 	public IEDABoshAwsConfig saveBoshInfo(BoshParam.AwsBosh dto){
 		IEDABoshAwsConfig config = boshAwsRepository.findOne(Integer.parseInt(dto.getId()));
-		config.setBoshName(dto.getBoshName());
+		config.setDeploymentName(dto.getDeploymentName());
 		config.setDirectorUuid(dto.getDirectorUuid());
 		config.setPublicStaticIp(dto.getPublicStaticIp());
 		config.setReleaseVersion(dto.getReleaseVersion());
@@ -68,12 +63,12 @@ public class IEDABoshAwsService {
 	
 	public IEDABoshAwsConfig saveBoshNetworkInfo(BoshParam.AwsNetwork dto){
 		IEDABoshAwsConfig config = boshAwsRepository.findOne(Integer.parseInt(dto.getId()));
-		config.setSubnetStatic(dto.getSubnetStatic());
+		config.setSubnetStaticFrom(dto.getSubnetStaticFrom());
+		config.setSubnetStaticTo(dto.getSubnetStaticTo());
 		config.setSubnetRange(dto.getSubnetRange());
 		config.setSubnetGateway(dto.getSubnetGateway());
 		config.setSubnetDns(dto.getSubnetDns());
-		config.setCloudSubnet(dto.getCloudSubnet());
-		config.setCloudSecurityGroups(dto.getCloudSecurityGroups());
+		config.setSubnetId(dto.getSubnetId());
 		return boshAwsRepository.save(config);
 	}
 	
@@ -88,10 +83,10 @@ public class IEDABoshAwsService {
 		return boshAwsRepository.save(config);
 	}
 	
-	public List<ReplaceItem> getBoshAwsReplaceItems(IEDABoshAwsConfig config){
+/*	public List<ReplaceItem> getBoshAwsReplaceItems(IEDABoshAwsConfig config){
 		List<ReplaceItem> replaces = new ArrayList<>();
 		//boshInfo
-		replaces.add(new ReplaceItem("[boshName]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getBoshName()));
+		replaces.add(new ReplaceItem("[deploymentName]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getDeploymentName()));
 		replaces.add(new ReplaceItem("[directorUuid]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") +config.getDirectorUuid()));
 		replaces.add(new ReplaceItem("[releaseVersion]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getReleaseVersion()));
 		
@@ -111,11 +106,11 @@ public class IEDABoshAwsService {
 		//Aws Info
 		replaces.add(new ReplaceItem("[accessKeyId]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getAccessKeyId()));
 		replaces.add(new ReplaceItem("[secretAccessKey]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getSecretAccessKey() ));
-		replaces.add(new ReplaceItem("[defaultKeyName]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getDefaultKeyName()));
+		replaces.add(new ReplaceItem("[defaultKeyName]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getPrivateKeyName()));
 		replaces.add(new ReplaceItem("[defaultSecurityGroups]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getDefaultSecurityGroups()));
 		replaces.add(new ReplaceItem("[region]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") +config.getRegion()));
 		return replaces;
-	}
+	}*/
 	
 	public IEDABoshAwsConfig createTempFile(IEDABoshAwsConfig config, List<ReplaceItem> replaceItems){
 		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-fullbosh-setting.yml");
@@ -135,9 +130,9 @@ public class IEDABoshAwsService {
 			tempDeploy = new File(classPath.toURI());//resource.getFile();
 			stubDeploy = new File(stubPath.toURI());
 			
-			tempFile = iedaConfiguration.getTempDir() +  System.getProperty("file.separator") + "aws-fullbosh-setting-"+config.getId()+".yml";
-			stubFile = iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName();
-			deployFile = iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") +deployFileName;
+			tempFile = LocalDirectoryConfiguration.getTempDir() +  System.getProperty("file.separator") + "aws-fullbosh-setting-"+config.getId()+".yml";
+			stubFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName();
+			deployFile = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") +deployFileName;
 			
 			content = IOUtils.toString(new FileInputStream(tempDeploy), "UTF-8");
 			stubContent = IOUtils.toString(new FileInputStream(stubDeploy), "UTF-8");

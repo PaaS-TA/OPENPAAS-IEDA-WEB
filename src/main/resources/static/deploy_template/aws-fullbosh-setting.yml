@@ -1,4 +1,4 @@
-name: [boshName]
+name: [deploymentName]
 director_uuid: [directorUuid]
 release:
   version: [releaseVersion]
@@ -11,15 +11,15 @@ networks:
       gateway: [subnetGateway]
       dns: [[subnetDns]]
       cloud_properties:
-        subnet: [cloudSubnet]
-        security_groups: [cloudSecurityGroups]
+        subnet: [subnetId]
+        security_groups: [defaultSecurityGroups]
 resource_pools:
   small:
     stemcell:
       name: [stemcellName]
       version: [stemcellVersion]
-#    cloud_properties:
-#      instance_type: [cloudInstanceType]
+    cloud_properties:
+      instance_type: [cloudInstanceType]
   medium:
     stemcell:
       name: [stemcellName]
@@ -27,8 +27,8 @@ resource_pools:
     env:
       bosh:
         password: [boshPassword]
-#    cloud_properties:
-#      instance_type: [cloudInstanceType]
+    cloud_properties:
+      instance_type: [cloudInstanceType]
 jobs:
   director:
     networks:
@@ -41,6 +41,6 @@ properties:
     access_key_id: [accessKeyId]
     secret_access_key: [secretAccessKey]
     region: [region]
-    default_key_name: [defaultKeyName]
+    default_key_name: [privateKeyName]
     default_security_groups: [[defaultSecurityGroups]]
 

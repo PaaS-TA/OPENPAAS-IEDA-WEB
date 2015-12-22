@@ -17,7 +17,7 @@ import javax.persistence.EntityNotFoundException;
 
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
-import org.openpaas.ieda.common.IEDAConfiguration;
+import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.common.ReplaceItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,9 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class IEDABootstrapOpenstackService {
-
-	@Autowired
-	private IEDAConfiguration iedaConfiguration;
 
 	@Autowired
 	private IEDABootstrapOpenstackRepository openstackRepository;
@@ -125,8 +122,8 @@ public class IEDABootstrapOpenstackService {
 			log.info("\n"+tempContent+"\n");
 			log.info("*******************************************************");
 			
-			IOUtils.write(content, new FileOutputStream(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + sampleDeploy.getName()), "UTF-8");
-			IOUtils.write(tempContent, new FileOutputStream(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + targetFileName), "UTF-8");
+			IOUtils.write(content, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + sampleDeploy.getName()), "UTF-8");
+			IOUtils.write(tempContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + targetFileName), "UTF-8");
 			
 			setSiffMerge(sampleDeploy.getName(), targetFileName);
 		} catch (URISyntaxException e) {
@@ -159,7 +156,7 @@ public class IEDABootstrapOpenstackService {
 		File settingFile = null;
 		String targetFileName = "bosh-init-aws-micro-input-tample.yml";
 		try {
-			settingFile = new File(iedaConfiguration.getTempDir()+ System.getProperty("file.separator")  + targetFileName);
+			settingFile = new File(LocalDirectoryConfiguration.getTempDir()+ System.getProperty("file.separator")  + targetFileName);
 			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -176,15 +173,15 @@ public class IEDABootstrapOpenstackService {
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
 		try {
-			sampleFile = new File(iedaConfiguration.getTempDir()+ System.getProperty("file.separator") + sampleFileName);
-			tempFile = new File(iedaConfiguration.getTempDir()+ System.getProperty("file.separator") +tempFileName);
+			sampleFile = new File(LocalDirectoryConfiguration.getTempDir()+ System.getProperty("file.separator") + sampleFileName);
+			tempFile = new File(LocalDirectoryConfiguration.getTempDir()+ System.getProperty("file.separator") +tempFileName);
 			
 			if(sampleFile.exists() && tempFile.exists()){
 				String deployFileName = "bosh-init-aws-micro-input-deployment.yml";
-				command = iedaConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "merge-deploy.sh ";
-				command += iedaConfiguration.getTempDir()+ System.getProperty("file.separator") +sampleFileName + " ";
-				command += iedaConfiguration.getTempDir()+ System.getProperty("file.separator") +tempFileName + " ";
-				command += iedaConfiguration.getDeploymentDir()+ System.getProperty("file.separator") +deployFileName;
+				command = LocalDirectoryConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "merge-deploy.sh ";
+				command += LocalDirectoryConfiguration.getTempDir()+ System.getProperty("file.separator") +sampleFileName + " ";
+				command += LocalDirectoryConfiguration.getTempDir()+ System.getProperty("file.separator") +tempFileName + " ";
+				command += LocalDirectoryConfiguration.getDeploymentDir()+ System.getProperty("file.separator") +deployFileName;
 								
 				Process process = r.exec(command);
 				log.info("### PROCESS ::: " + process.toString());

@@ -97,6 +97,11 @@ $(function() {
  		doSearch();
     });
  	
+ 	// 목록 동기화
+ 	$("#doSync").click(function(){
+ 		doSync();
+    });
+ 	
  	//  스템셀 다운로드
  	$("#doDownload").click(function(){
  		if($("#doDownload").attr('disabled') == "disabled") return;
@@ -144,130 +149,169 @@ function changeOS() {
 	setCommonCode('<c:url value="/codes/child/"/>' + $("#os option:selected").val(), 'osVersion');
 }
 
-	//스템셀 목록 조회
-	function doSearch() {
-		var requestParam = "?os=" + $("#os option:selected").text();
-		requestParam += "&osVersion=" + $("#osVersion option:selected").text();
-		requestParam += "&iaas=" + $("#iaas option:selected").text();
-	
-		w2ui['config_opStemcellsGrid'].load("<c:url value='/publicStemcells'/>" + requestParam);
-	}
+// 스템셀 목록 조회
+function doSearch() {
+	var requestParam = "?os=" + $("#os option:selected").text();
+	requestParam += "&osVersion=" + $("#osVersion option:selected").text();
+	requestParam += "&iaas=" + $("#iaas option:selected").text();
 
+	w2ui['config_opStemcellsGrid'].load("<c:url value='/publicStemcells'/>" + requestParam);
+}
 
-	// 스템셀 다운로드
-	function doDownload() {
-		var selected = w2ui['config_opStemcellsGrid'].getSelection();
+// 스템셀 목록 동기화
+function doSync() {
+	w2confirm({
+		msg : '스템셀 목록을 동기화 하시겠습니까?',
+		title : '스템셀 목록 동기화',
+		yes_text : '확인',
+		no_text : '취소'
+	}).yes(function() {
+		
+		w2popup.lock('스템셀 목록 동기화 중입니다.', true);
 
-		var record = w2ui['config_opStemcellsGrid'].get(selected);
-
-		var requestParameter = {
-			recid : record.recid,
-			key : record.key,
-			fileName : record.stemcellFileName,
-			fileSize : record.size
-		};
-		progressGrow(requestParameter);
-	}
-
-	//PROGRESSBAR 생성
-	function progressGrow(requestParameter) {
-		var progressbar = $("td #isExisted_" + requestParameter.recid);
-		var progressLabel = $(".progress-label");
-		var downloadPercentage = 0;
-		progressbar.progressbar({
-			value : false,
-			change : function() {
-				progressLabel.text( progressbar.progressbar("value") + "%" );
+		$.ajax({
+			method : 'PUT',
+			type : "json",
+			url : "/syncPublicStemcell",
+			contentType : "application/json",
+			success : function(data, status) {
+				
+				w2ui['config_opStemcellsGrid'].reset();
+				doSearch();
+				w2popup.unlock();
+				w2alert("스템셀 목록 동기화 처리가 완료되었습니다.", "스템셀 목록 동기화");
 			},
-			complete : function() {
-				//progressLabel.text("Complete!");
+			error : function(request, status, error) {
+				w2popup.unlock();
+				var errorResult = JSON.parse(request.responseText);
+				w2alert(errorResult.message, "스템셀 목록 동기화");
 			}
 		});
-		getDownloadStatus(requestParameter);
-	}
-	
-	function getDownloadStatus(requestParameter){
-		var progressbar = $("td #isExisted_" + requestParameter.recid);
-		var progressLabel = $(".progress-label");
-		//소켓 연결
-		var socket = new SockJS('/stemcellDownloading');
-		downloadClient = Stomp.over(socket);
-		var status = 0;
-		downloadClient.connect({}, function(frame) {
-			console.log('Connected: ' + frame);
-	        downloadClient.subscribe('/socket/downloadStemcell', function(data){
-	        	//데이터에서 타겟을 받아서 지정
-	        	//progressbar status change
-	        	status = data.body.split('/')[1];
-	        	var recid = data.body.split('/')[0];
-	        	console
-	    		var targetProgressbar =  $("td #isExisted_" + recid);
-	    		
-	        	console.log("### Download Status ::: " + status);
-	        	 if ( status < 100 ) {
-	        		 $("td #isExisted_" + recid +" "+ ".progress-label").text( status+ "%" );
-	        		 targetProgressbar.progressbar("value", status);
-			    }
-			    else if(status == 100) {
-			    	progressLabel.text('');
-			    	targetProgressbar.parent().html(completeButton);
-			    }      		
-	        });
-			socketSendDownLoadData(requestParameter);
-		});
-	}
-
-	function socketSendDownLoadData(requestParameter) {
-		downloadClient.send("/send/stemcellDownloading", {}, JSON
-				.stringify(requestParameter));
-	}
-
-	// 스템셀 삭제
-	function doDelete() {
-		var selected = w2ui['config_opStemcellsGrid'].getSelection();
-		var record = w2ui['config_opStemcellsGrid'].get(selected);
-
-		var requestParameter = {
-			stemcellFileName : record.stemcellFileName
-		};
-
-		w2confirm({
-			msg : '선택된 스템셀 ' + record.stemcellFileName + '을 삭제하시겠습니까?',
-			title : '스템셀 삭제',
-			yes_text : '확인',
-			no_text : '취소'
-		}).yes(function() {
-			$.ajax({
-				method : 'delete',
-				type : "json",
-				url : "/deletePublicStemcell",
-				contentType : "application/json",
-				data : JSON.stringify(requestParameter),
-				success : function(data, status) {
-					record.isExisted = 'N';
-					w2ui['config_opStemcellsGrid'].reload();
-					$('#doDelete').attr('disabled', true);
-					w2ui['config_opStemcellsGrid'].selectNone();
-					w2alert("삭제 처리가 완료되었습니다.", "스템셀  삭제");
-				},
-				error : function(e) {
-					w2alert("오류가 발생하였습니다.");
-				}
-			});
-		}).no(function() {
-			// do nothing
-		});
-	}
-
-	//다른페이지 이동시 호출
-	function clearMainPage() {
-		$().w2destroy('config_opStemcellsGrid');
-	}
-
-	//화면 리사이즈시 호출
-	$(window).resize(function() {
-		setLayoutContainerHeight();
+	}).no(function() {
+		// do nothing
 	});
+	
+}
+
+// 스템셀 다운로드
+function doDownload() {
+	var selected = w2ui['config_opStemcellsGrid'].getSelection();
+
+	var record = w2ui['config_opStemcellsGrid'].get(selected);
+
+	var requestParameter = {
+		recid : record.recid,
+		key : record.key,
+		fileName : record.stemcellFileName,
+		fileSize : record.size
+	};
+	progressGrow(requestParameter);
+}
+
+//PROGRESSBAR 생성
+function progressGrow(requestParameter) {
+	var progressbar = $("td #isExisted_" + requestParameter.recid);
+	var progressLabel = $(".progress-label");
+	var downloadPercentage = 0;
+	progressbar.progressbar({
+		value : false,
+		change : function() {
+			progressLabel.text( progressbar.progressbar("value") + "%" );
+		},
+		complete : function() {
+			//progressLabel.text("Complete!");
+		}
+	});
+	getDownloadStatus(requestParameter);
+}
+
+function getDownloadStatus(requestParameter){
+	var progressbar = $("td #isExisted_" + requestParameter.recid);
+	var progressLabel = $(".progress-label");
+	//소켓 연결
+	var socket = new SockJS('/stemcellDownloading');
+	downloadClient = Stomp.over(socket);
+	var status = 0;
+	downloadClient.connect({}, function(frame) {
+		console.log('Connected: ' + frame);
+        downloadClient.subscribe('/socket/downloadStemcell', function(data){
+        	//데이터에서 타겟을 받아서 지정
+        	//progressbar status change
+        	status = data.body.split('/')[1];
+        	var recid = data.body.split('/')[0];
+        	console
+    		var targetProgressbar =  $("td #isExisted_" + recid);
+    		
+        	console.log("### Download Status ::: " + status);
+        	 if ( status < 100 ) {
+        		 $("td #isExisted_" + recid +" "+ ".progress-label").text( status+ "%" );
+        		 targetProgressbar.progressbar("value", status);
+		    }
+		    else if(status == 100) {
+		    	progressLabel.text('');
+		    	targetProgressbar.parent().html(completeButton);
+		    }      		
+        });
+		socketSendDownLoadData(requestParameter);
+	});
+}
+
+function socketSendDownLoadData(requestParameter) {
+	downloadClient.send("/send/stemcellDownloading", {}, JSON
+			.stringify(requestParameter));
+}
+
+// 스템셀 삭제
+function doDelete() {
+	var selected = w2ui['config_opStemcellsGrid'].getSelection();
+	var record = w2ui['config_opStemcellsGrid'].get(selected);
+
+	var requestParameter = {
+		stemcellFileName : record.stemcellFileName
+	};
+
+	w2confirm({
+		msg : '선택된 스템셀 ' + record.stemcellFileName + '을 삭제하시겠습니까?',
+		title : '스템셀 삭제',
+		yes_text : '확인',
+		no_text : '취소'
+	}).yes(function() {
+		
+		$.ajax({
+			method : 'delete',
+			type : "json",
+			url : "/deletePublicStemcell",
+			contentType : "application/json",
+			data : JSON.stringify(requestParameter),
+			success : function(data, status) {
+				record.isExisted = 'N';
+				w2ui['config_opStemcellsGrid'].reload();
+				$('#doDelete').attr('disabled', true);
+				w2ui['config_opStemcellsGrid'].selectNone();
+				w2alert("삭제 처리가 완료되었습니다.", "스템셀  삭제");
+			},
+			error : function(e) {
+				w2alert("오류가 발생하였습니다.");
+			}
+		});
+	}).no(function() {
+		// do nothing
+	});
+}
+
+function lock (msg) {
+    w2popup.lock(msg, true);
+}
+
+//다른페이지 이동시 호출
+function clearMainPage() {
+	$().w2destroy('config_opStemcellsGrid');
+}
+
+//화면 리사이즈시 호출
+$(window).resize(function() {
+	setLayoutContainerHeight();
+});
 </script>
 
 <div id="main">
@@ -293,6 +337,7 @@ function changeOS() {
 		
 		<!-- Btn -->
 		<span id="doSearch" class="btn btn-info" style="width:100px" >조회</span>
+		<span id="doSync" class="btn btn-primary" style="width:100px" >목록 동기화</span>
 		<span id="doDownload" class="btn btn-primary" style="width:100px" >다운로드</span>
 		<span id="doDelete" class="btn btn-danger" style="width:100px" >삭제</span>
 		<!-- //Btn -->

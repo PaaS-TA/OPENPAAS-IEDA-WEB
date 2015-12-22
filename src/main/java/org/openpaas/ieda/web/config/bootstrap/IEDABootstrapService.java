@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,8 +11,6 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,8 +18,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
-import org.openpaas.ieda.common.IEDAConfiguration;
-import org.openpaas.ieda.web.deploy.bosh.BoshInfo;
+import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -36,9 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class IEDABootstrapService {
-
-	@Autowired
-	private IEDAConfiguration iedaConfiguration;
 
 	@Autowired
 	private IEDABootstrapAwsRepository awsRepository;
@@ -112,8 +105,8 @@ public class IEDABootstrapService {
 				content = content.replace(item.getTargetItem(), item.getSourceItem());
 			}
 
-			IOUtils.write(stubContent, new FileOutputStream(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName()), "UTF-8");
-			IOUtils.write(content, new FileOutputStream(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName), "UTF-8");
+			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName()), "UTF-8");
+			IOUtils.write(content, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName), "UTF-8");
 			deplymentFileName = setSpiffMerge(iaas, id, stubDeploy.getName(), settingFileName);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -130,7 +123,7 @@ public class IEDABootstrapService {
 		
 		if(iaas == "AWS"){
 			IEDABootstrapAwsConfig  awsConfig = awsRepository.findOne(id);
-			items.add(new BootstrapItem("[stemcell]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") + awsConfig.getStemcellName()));
+			items.add(new BootstrapItem("[stemcell]", LocalDirectoryConfiguration.getStemcellDir() + System.getProperty("file.separator") + awsConfig.getStemcellName()));
 			items.add(new BootstrapItem("[microboshPw]", awsConfig.getMicroBoshPw()));
 			items.add(new BootstrapItem("[subnetRange]", awsConfig.getSubnetRange()));
 			items.add(new BootstrapItem("[dns]", awsConfig.getDns()));
@@ -184,7 +177,7 @@ public class IEDABootstrapService {
 		String contents = "";
 		File settingFile = null;
 		try {
-			settingFile = new File(iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile);
+			settingFile = new File(LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile);
 			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -202,17 +195,17 @@ public class IEDABootstrapService {
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
 		try {
-			stubFile = new File(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName);
-			settingFile = new File(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName);
+			stubFile = new File(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName);
+			settingFile = new File(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName);
 			
 			deploymentFileName =  (iaas == "AWS") ? "aws-microbosh-merge-"+id+".yml"
 					:"openstack-microbosh-merge-"+id+".yml";
 			
 			if(stubFile.exists() && settingFile.exists()){
-				command = iedaConfiguration.getScriptDir() + System.getProperty("file.separator") + "merge-deploy.sh ";
-				command += iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName + " ";
-				command += iedaConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName + " ";
-				command += iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
+				command = LocalDirectoryConfiguration.getScriptDir() + System.getProperty("file.separator") + "merge-deploy.sh ";
+				command += LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName + " ";
+				command += LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName + " ";
+				command += LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
 								
 				Process process = r.exec(command);
 				process.getInputStream();
@@ -255,8 +248,8 @@ public class IEDABootstrapService {
 		BufferedReader bufferedReader = null;
 		Runtime r = Runtime.getRuntime();
 		try{
-			String command = iedaConfiguration.getScriptDir() + System.getProperty("file.separator") + "aws-microbosh-delete.sh ";
-			command += iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + fileName + " ";
+			String command = LocalDirectoryConfiguration.getScriptDir() + System.getProperty("file.separator") + "aws-microbosh-delete.sh ";
+			command += LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + fileName + " ";
 					
 			Process process = r.exec(command);
 			process.getInputStream();
@@ -295,8 +288,8 @@ public class IEDABootstrapService {
 		Runtime r = Runtime.getRuntime();
 		String command = "";
 		try{
-			command += iedaConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "aws-microbosh-deploy.sh ";
-			command += iedaConfiguration.getDeploymentDir()+ System.getProperty("file.separator")  + deployFileName ;
+			command += LocalDirectoryConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "microbosh-deploy.sh ";
+			command += LocalDirectoryConfiguration.getDeploymentDir()+ System.getProperty("file.separator")  + deployFileName ;
 					
 			Process process = r.exec(command);
 			log.info("### PROCESS ::: " + process.toString());
