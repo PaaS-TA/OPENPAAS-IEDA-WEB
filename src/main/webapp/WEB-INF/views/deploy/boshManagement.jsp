@@ -63,10 +63,23 @@ $(function(){
 		columns:[
 		      {field: 'recid', 	caption: 'recid', hidden: true}
 			, {field: 'id', caption: 'ID', hidden: true}
-			, {field: 'iaas', caption: 'IaaS', size: '20%'}
-			, {field: 'directorPrivateIp', caption: 'PrivateIp', size: '30%'}
-			, {field: 'directorPublicIp', caption: 'PublicIp', size: '30%'}
-			, {field: 'createdDate', caption: 'created', size: '10%'}
+			, {field: 'deploymentName', caption: '배포명', size: '10%'}
+			, {field: 'deployed', caption: '배포여부', size: '10%', 
+				render: function(record) {
+					console.log(record.deployed);
+		    		   if ( record.deployed == true )
+		    			   return '<span class="btn btn-primary" style="width:70px">배포</span>';
+		    		   else
+		    			   return '';
+		    	   }
+				}
+			, {field: 'iaas', caption: 'IaaS', size: '10%'}
+			, {field: 'releaseVersion', caption: '릴리즈', size: '10%'}
+			, {field: 'stemcell', caption: '스템셀', size: '30%'}
+			, {field: 'publicIp', caption: '고정 IP', size: '10%'}
+			, {field: 'subnetRange', caption: '서브넷 범위', size: '10%'}
+			, {field: 'gateway', caption: '게이트웨이', size: '10%'}
+			, {field: 'dns', caption: 'DNS', size: '10%'}
 			],
 		onClick:function(event) {
 			var grid = this;
@@ -135,29 +148,29 @@ $(function(){
  	//Bosh 삭제
 	$("#deleteBtn").click(function(){
 		if($("#deleteBtn").attr('disabled') == "disabled") return;
+		
+		var selected = w2ui['config_boshGrid'].getSelection();
+		var record = w2ui['config_boshGrid'].get(selected);
+		
+		var message = "";
+		
+		if ( record.deploymentName )
+			message = "BOSH (배포명 : " + record.deploymentName + ")를 삭제하시겠습니까?";
+		else
+			message = "선택된 BOSH를 삭제하시겠습니까?";
+			
 		w2confirm({
 			title 	: "BOSH 삭제",
-			msg		: "BOSH 를 삭제하시겠습니까?",
+			msg		: message,
 			yes_text: "확인",
 			yes_callBack : function(event){
-				//event.onComplete= function(){
-					//ajax data call
-					var selected = w2ui['config_boshGrid'].getSelection();
-					//console.log("Delete Click!!!");
-					if( selected.length == 0 ){
-						w2alert("선택된 정보가 없습니다.", "BOSH 삭제");
-						return;
-					}
-					else{
-						var record = w2ui['config_boshGrid'].get(selected);
-						//console.log(record.iaas);
-						deleteBoshPop(record);
-					}
-			//	}
+				deleteBoshPop(record);
 			},
 			no_text : "취소"
 		});
  	});
+ 	
+ 	
 	doSearch();
 });
 
@@ -250,49 +263,71 @@ function getBoshOpenstackData(record){
 
 //DELETE
 function deleteBoshPop(record){
-	var body = '<div style="margin:10px 0;"><b>▶ 설치 로그</b></div>';	
-	body +='<textarea name="deleteLogs" style="width:93%;height:85%;overflow-y:visible;resize:none;background-color: #FFF;margin:2%" readonly="readonly"></textarea>';
-	//body += '</div>';
 	
-	w2popup.open({
-		width : 610,
-		height : 500,
-		title : "<b>Bosh 삭제</b>",
-		body  : body,
-		buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="popupComplete();;">완료</button>',
-		showMax : true,
-		onOpen : function(event){
-			event.onComplete = function(){
-				var socket = new SockJS('/boshDelete');
-				deleteClient = Stomp.over(socket); 
-				deleteClient.connect({}, function(frame) {
-					deleteClient.subscribe('/bosh/boshDelete', function(data){
-				        var deleteLogs = $(".w2ui-msg-body textarea[name=deleteLogs]");
-			        	deleteLogs.append(data.body + "\n").scrollTop( deleteLogs[0].scrollHeight );
-			        	
-			        	if( data == "complete"){
-			        		deleteClient.disconnect(function(){
-			        			console.log("disconnect");
-			        		});
-			        	}
-			        });
-					deleteClient.send('/send/boshDelete', {}, JSON.stringify({iaas:record.iaas, id:record.id}));
-			    });
-			}
-		},
-		onClose : function (event){
-			event.onComplete= function(){
-				/* $("body ").remove("#deleteLogs");
-				deleteLogs.text(""); */
-				$("textarea").text("");
-				w2ui['config_boshGrid'].reset();
-				//console.log("close");
-				deleteClient.disconnect();
-				deleteClient = "";
+	var requestParameter = {iaas:record.iaas, id:record.id};
+	
+	if ( record.deployed == false ) {
+		// 단순 레코드 삭제
+		var url = "/bosh/delete";
+		$.ajax({
+			type : "PUT",
+			url : url,
+			data : JSON.stringify(requestParameter),
+			contentType : "application/json",
+			success : function(data, status) {
 				doSearch();
+			},
+			error : function(request, status, error) {
+				var errorResult = JSON.parse(request.responseText);
+				w2alert(errorResult.message, "BOSH 삭제");
 			}
-		}
-	});	
+		});
+		
+	} else {
+		var body = '<div style="margin:10px 0;"><b>▶ 설치 로그</b></div>';	
+		body +='<textarea name="deleteLogs" style="width:93%;height:85%;overflow-y:visible;resize:none;background-color: #FFF;margin:2%" readonly="readonly"></textarea>';
+		//body += '</div>';
+		
+		w2popup.open({
+			width : 610,
+			height : 500,
+			title : "<b>Bosh 삭제</b>",
+			body  : body,
+			buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="popupComplete();;">완료</button>',
+			showMax : true,
+			onOpen : function(event){
+				event.onComplete = function(){
+					var socket = new SockJS('/boshDelete');
+					deleteClient = Stomp.over(socket); 
+					deleteClient.connect({}, function(frame) {
+						deleteClient.subscribe('/bosh/boshDelete', function(data){
+					        var deleteLogs = $(".w2ui-msg-body textarea[name=deleteLogs]");
+				        	deleteLogs.append(data.body + "\n").scrollTop( deleteLogs[0].scrollHeight );
+				        	
+				        	if( data == "complete"){
+				        		deleteClient.disconnect(function(){
+				        			console.log("disconnect");
+				        		});
+				        	}
+				        });
+						deleteClient.send('/send/boshDelete', {}, JSON.stringify(requestParameter));
+				    });
+				}
+			},
+			onClose : function (event){
+				event.onComplete= function(){
+					/* $("body ").remove("#deleteLogs");
+					deleteLogs.text(""); */
+					$("textarea").text("");
+					w2ui['config_boshGrid'].reset();
+					//console.log("close");
+					deleteClient.disconnect();
+					deleteClient = "";
+					doSearch();
+				}
+			}
+		});
+	}		
 }
 //Aws Popup
 function awsPopup(){

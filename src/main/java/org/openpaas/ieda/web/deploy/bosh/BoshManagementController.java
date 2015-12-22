@@ -176,10 +176,17 @@ public class BoshManagementController {
 		boshDeployAsyncService.deployAsync(dto.getDeployFileName());
 		return new ResponseEntity(HttpStatus.OK);
 	}
+	
+	@RequestMapping( value="/bosh/delete", method=RequestMethod.PUT)
+	public ResponseEntity deleteJustOnlyBoshRecord(@RequestBody @Valid BoshParam.Delete dto){
+
+		boshService.deleteBoshInfoRecord(dto);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 
 	@MessageMapping("/boshDelete")
 	@SendTo("/bosh/boshDelete")
-	public ResponseEntity deleteBootstrap(@RequestBody @Valid BoshParam.Delete dto){
+	public ResponseEntity deleteBosh(@RequestBody @Valid BoshParam.Delete dto){
 		log.info("$$$$ DELETE Connection :: " + dto.toString());
 		boshService.deleteBoshInfo(dto);
 		return new ResponseEntity<>(HttpStatus.OK);

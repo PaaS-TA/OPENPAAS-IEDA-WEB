@@ -15,9 +15,11 @@ import java.util.List;
 import javax.persistence.EntityNotFoundException;
 
 import org.apache.commons.io.IOUtils;
+import org.openpaas.ieda.api.DeploymentInfo;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.common.ReplaceItem;
+import org.openpaas.ieda.web.information.deploy.DeploymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -38,6 +40,10 @@ public class IEDABoshService {
 	
 	@Autowired
 	private IEDABoshAwsService awsService;
+	
+	@Autowired
+	private DeploymentService deploymentService;
+	
 
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
@@ -47,32 +53,49 @@ public class IEDABoshService {
 		List<BoshInfo> boshList = new ArrayList();
 		List<IEDABoshAwsConfig> boshAwsList = awsRepository.findAll();
 		List<IEDABoshOpenstackConfig> boshOpenstackList = openstackRepository.findAll();
-		if ( boshAwsList == null ) {
+		
+		if ( boshAwsList == null && boshOpenstackList == null ) {
 			throw new IEDACommonException("notfound.bosh.exception",
 					"Bosh 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
+		
+		List<DeploymentInfo> deployedList = deploymentService.listDeployment();
 
 		int recid = 0;
 		if( boshAwsList.size() >0 ){
-			for(IEDABoshAwsConfig awsConfig : boshAwsList){
+			for(IEDABoshAwsConfig aws : boshAwsList){
 				BoshInfo boshInfo = new BoshInfo();
 				boshInfo.setRecid(recid++);
-				boshInfo.setId(awsConfig.getId());
+				boshInfo.setId(aws.getId());
+				boshInfo.setDeploymentName(aws.getDeploymentName());
 				boshInfo.setIaas("AWS");
-				boshInfo.setSubnetRange(awsConfig.getSubnetRange());
-				boshInfo.setCreatedDate(awsConfig.getCreatedDate());
+				boshInfo.setReleaseVersion(aws.getReleaseVersion());
+				boshInfo.setStemcell(aws.getStemcellName() + "/" + aws.getStemcellVersion());
+				boshInfo.setPublicIp(aws.getPublicStaticIp());
+				boshInfo.setSubnetRange(aws.getSubnetRange());
+				boshInfo.setGateway(aws.getSubnetGateway());
+				boshInfo.setDns(aws.getSubnetDns());
+				boshInfo.setDeployed(false);
+				for ( DeploymentInfo deployment : deployedList ) {
+					if ( deployment.getName().equals(aws.getDeploymentName()) ) {
+						boshInfo.setDeployed(true);
+						break;
+					}
+				}
+				
+				boshInfo.setCreatedDate(aws.getCreatedDate());
 				boshList.add(boshInfo);
 			}
 		}
 
 		if( boshOpenstackList.size() >0 ){
-			for(IEDABoshOpenstackConfig openstackConfig : boshOpenstackList){
+			for(IEDABoshOpenstackConfig openstack : boshOpenstackList){
 				BoshInfo boshInfo = new BoshInfo();
 				boshInfo.setRecid(recid++);
-				boshInfo.setId(openstackConfig.getId());
+				boshInfo.setId(openstack.getId());
+				//boshInfo.setDeploymentName(openstack.g);
 				boshInfo.setIaas("OPENSTACK");
-				boshInfo.setSubnetRange(openstackConfig.getSubnetRange());
-				boshInfo.setCreatedDate(openstackConfig.getCreatedDate());
+				boshInfo.setCreatedDate(openstack.getCreatedDate());
 				boshList.add(boshInfo);
 			}
 		}
@@ -397,19 +420,33 @@ public class IEDABoshService {
 				IEDABoshAwsConfig config = awsRepository.findOne(Integer.parseInt(dto.getId()));
 				awsRepository.delete(Integer.parseInt(dto.getId()));
 				deploymentFileName = config.getDeploymentFile();
-			}
-			else{
+			} else {
 				IEDABoshOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 				openstackRepository.delete(Integer.parseInt(dto.getId()));
 				deploymentFileName = config.getDeploymentFile();
 			}
 			if( StringUtils.isEmpty(deploymentFileName)) deleteDeploy(deploymentFileName);
-		} catch (EntityNotFoundException e) {
-			throw new IEDACommonException("illigalArgument.bosh.exception",
-					"삭제할 BOSH가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			throw new IEDACommonException("illigalArgument.bosh.exception",
-					"BOSH 삭제 중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
+			throw new IEDACommonException("illigalArgument.boshdelete.exception",
+					"삭제중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
+		}
+		
+	}
+	
+	public void deleteBoshInfoRecord(BoshParam.Delete dto) {
+		try{
+			if( "AWS".equals(dto.getIaas())){ 
+				IEDABoshAwsConfig config = awsRepository.findOne(Integer.parseInt(dto.getId()));
+				awsRepository.delete(Integer.parseInt(dto.getId()));
+
+			} else {
+				IEDABoshOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
+				openstackRepository.delete(Integer.parseInt(dto.getId()));
+			}
+			
+		} catch (Exception e) {
+			throw new IEDACommonException("illigalArgument.boshdelete.exception",
+					"삭제중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
 		
 	}

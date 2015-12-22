@@ -9,10 +9,14 @@ public class BoshInfo {
 
 	private int recid;
 	private int id;
+	private String deploymentName;
 	private String iaas;
-	private String boshName;
-	//private String publicStaticIp;
+	private String releaseVersion;
+	private String stemcell;
+	private String publicIp;
 	private String subnetRange;
+	private String gateway;
+	private String dns;
+	private boolean deployed;
 	private Date createdDate;
-	private Date updatedDate;
 }
