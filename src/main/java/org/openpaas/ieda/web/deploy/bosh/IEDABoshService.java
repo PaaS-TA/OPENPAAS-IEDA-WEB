@@ -11,14 +11,18 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
 import org.apache.commons.io.IOUtils;
+import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
 import org.openpaas.ieda.common.ReplaceItem;
 import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapAwsConfig;
+import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
+import org.openpaas.ieda.web.config.stemcell.StemcellContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -315,11 +319,8 @@ public class IEDABoshService {
 			items.add(new ReplaceItem("[defaultKeyName]", openstackConfig.getDefaultKeyName()));
 			items.add(new ReplaceItem("[defaultSecurityGroups]", openstackConfig.getDefaultSecurityGroups()));
 			items.add(new ReplaceItem("[ntp]", openstackConfig.getNtp()));
-			items.add(new ReplaceItem("[directorRecursor]", openstackConfig.getDirectorRecursor()));
 			items.add(new ReplaceItem("[privateKeyPath]", openstackConfig.getPrivateKeyPath()));
 			
-			
-
 		}
 		return items;
 	}
@@ -415,5 +416,29 @@ public class IEDABoshService {
 					"BOOTSTRAP 삭제 중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
 		
+	}
+
+
+	public List<ReleaseInfo> getLocalBoshList() {
+		// IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
+		
+//		// 디럭터의 CPI에 맞는 로컬 스템셀 목록만 출력
+//		if ( defaultDirector.getDirectorCpi().toUpperCase().contains("AWS") ) filterString = "AWS";
+//		if ( defaultDirector.getDirectorCpi().toUpperCase().contains("OPENSTACK") ) filterString = "OPENSTACK";
+//
+//		List<StemcellContent> returnList = null;
+//		List<String> localStemcellList = stemcellManagementService.getLocalStemcellList();
+//
+//		if ( filterString != null && filterString.length() > 0 )
+//			returnList = stemcellContentRepository.findByStemcellFileNameInOrderByStemcellVersionDesc(localStemcellList).stream()
+//			.filter(t -> t.getIaas().equalsIgnoreCase(filterString))
+//			.collect(Collectors.toList());
+//		else
+//			returnList = stemcellContentRepository.findByStemcellFileNameInOrderByStemcellVersionDesc(localStemcellList);
+//
+//		filterString = null;
+//					
+//		return returnList;
+		return null;
 	}
 }

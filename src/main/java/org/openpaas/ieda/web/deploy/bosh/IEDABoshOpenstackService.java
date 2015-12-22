@@ -68,7 +68,6 @@ public class IEDABoshOpenstackService {
 		IEDABoshOpenstackConfig config = opentstackRepository.findOne(Integer.parseInt(dto.getId()));
 
 		config.setDirectorName(dto.getDirectorName());
-		config.setDnsRecursor(dto.getDnsRecursor());
 		config.setDirectorStaticIp(dto.getDirectorStaticIp());
 		config.setAuthUrl(dto.getAuthUrl());
 		config.setTenant(dto.getTenant());
@@ -77,7 +76,6 @@ public class IEDABoshOpenstackService {
 		config.setDefaultKeyName(dto.getDefaultKeyName());
 		config.setDefaultSecurityGroups(dto.getDefaultSecurityGroups());//? 배열?
 		config.setNtp(dto.getNtp());
-		config.setDirectorRecursor(dto.getDirectorRecursor());
 		Date now = new Date();
 		config.setUpdatedDate(now);
 		return opentstackRepository.save(config);

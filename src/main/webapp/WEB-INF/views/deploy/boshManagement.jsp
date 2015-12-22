@@ -524,8 +524,7 @@ function settingOpenstackData(contents){
 			apiKey					: contents.apiKey,
 			defaultKeyName			: contents.defaultKeyName,
 			defaultSecurityGroups	: contents.defaultSecurityGroups,
-			ntp						: contents.ntp,
-			directorRecursor		: contents.directorRecursor
+			ntp						: contents.ntp
 	}
 	
 	networkInfo = {
@@ -1023,8 +1022,6 @@ function openstackInfoPopup(){
 					$(".w2ui-msg-body input[name='defaultKeyName']").val(openstackInfo.defaultKeyName);
 					$(".w2ui-msg-body input[name='defaultSecurityGroups']").val(openstackInfo.defaultSecurityGroups);
 					$(".w2ui-msg-body input[name='ntp']").val(openstackInfo.ntp);
-					$(".w2ui-msg-body input[name='directorRecursor']").val(openstackInfo.directorRecursor);
-					
 				}
 			}
 		},
@@ -1043,8 +1040,7 @@ function saveOpenstackInfo(type){
 			apiKey					: $(".w2ui-msg-body input[name='apiKey']").val(),
 			defaultKeyName			: $(".w2ui-msg-body input[name='defaultKeyName']").val(),
 			defaultSecurityGroups	: $(".w2ui-msg-body input[name='defaultSecurityGroups']").val(),
-			ntp						: $(".w2ui-msg-body input[name='ntp']").val(),
-			directorRecursor		: $(".w2ui-msg-body input[name='directorRecursor']").val()
+			ntp						: $(".w2ui-msg-body input[name='ntp']").val()
 	}
 	if( checkEmpty(openstackInfo.directorName)){
 		w2alert("Director Name을 입력하세요.", "", function(){
@@ -1079,11 +1075,6 @@ function saveOpenstackInfo(type){
 	}else if( checkEmpty($(".w2ui-msg-body input[name='ntp']").val() )){
  		w2alert("NTP을 입력하세요.", "", function(){
 			$(".w2ui-msg-body input[name='ntp']").focus();
-		});
-		return;
-	}else if( checkEmpty($(".w2ui-msg-body input[name='directorRecursor']").val() )){
- 		w2alert("Director Recursor을 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name='directorRecursor']").focus();
 		});
 		return;
 	}else if( checkEmpty($(".w2ui-msg-body input[name='defaultSecurityGroups']").val() )){
@@ -1785,12 +1776,6 @@ $( window ).resize(function() {
 		            <label style="text-align: left;width:250px;font-size:11px;">default Security Groups</label>
 		            <div>
 		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:330px;" required placeholder="groupName0, groupName1,..."/>
-		            </div>
-		        </div>
-				<div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Director Recursor</label>
-		            <div>
-		                <input name="directorRecursor" type="text"  style="float:left;width:330px;" required placeholder="groupName0, groupName1,..."/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">

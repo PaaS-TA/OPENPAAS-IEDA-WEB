@@ -13,7 +13,6 @@ public class BoshParam {
 	@Data
 	public static class AWS{
 		private String id;
-		private String dnsRecursor;
 		private String accessKeyId;
 		private String secretAccessKey;
 		private String defaultKeyName;
@@ -96,7 +95,6 @@ public class BoshParam {
 		private String id;
 		private String directorName;
 		private String directorStaticIp;
-		private String dnsRecursor;
 		private String authUrl;
 		private String tenant;
 		private String userName;
@@ -104,7 +102,6 @@ public class BoshParam {
 		private String defaultKeyName;
 		private String defaultSecurityGroups;
 		private String ntp;
-		private String directorRecursor;
 	}
 	
 	@Data

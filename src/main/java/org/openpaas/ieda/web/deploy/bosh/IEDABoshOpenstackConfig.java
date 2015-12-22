@@ -44,7 +44,6 @@ public class IEDABoshOpenstackConfig {
 	//opensrack
 	private String directorName;
 	private String directorStaticIp;
-	private String dnsRecursor;
 	private String authUrl;
 	private String tenant;
 	private String userName;
@@ -52,7 +51,6 @@ public class IEDABoshOpenstackConfig {
 	private String defaultKeyName;
 	private String defaultSecurityGroups;
 	private String ntp;
-	private String directorRecursor;
 	private String privateKeyPath;
 	//deploy
 	private String deploymentFile;

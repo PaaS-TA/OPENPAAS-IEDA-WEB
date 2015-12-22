@@ -34,8 +34,8 @@ resource_pools:
       instance_type: [cloudInstanceType]
 properties:
   director: [directorName]
-  dns:
-    recursor: [directorRecursor]
+#  dns:
+#    recursor: [directorRecursor]
   ntp: [[ntp]]
   openstack:
     auth_url: [authUrl]

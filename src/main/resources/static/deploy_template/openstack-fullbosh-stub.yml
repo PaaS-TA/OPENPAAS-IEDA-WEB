@@ -168,7 +168,7 @@ properties:
   dns:
     address: (( jobs.director.networks.default.static_ips.[0] ))
     db: *bosh_db
-    recursor: (( merge ))
+#    recursor: (( merge ))
 
   hm:
     http:
