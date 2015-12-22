@@ -10,7 +10,7 @@ networks:
       dns: [[subnetDns]]
       static: [[subnetStatic]]
       cloud_properties:
-        net_id: [subnetNetId]
+        net_id: [cloudNetId]
 jobs:
   director:
     networks:

@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.openpaas.ieda.api.ReleaseInfo;
-import org.openpaas.ieda.web.config.bootstrap.BootStrapDto;
 import org.openpaas.ieda.web.config.bootstrap.IDEABootStrapInfoDto;
 import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,21 +113,21 @@ public class BoshManagementController {
 	}
 	
 	@RequestMapping(value="/bosh/getAwsBoshDeployInfo", method=RequestMethod.POST)
-	public ResponseEntity getBoshAwsDeployInfo(@RequestBody @Valid BootStrapDto.Deployment dto){
+	public ResponseEntity getBoshAwsDeployInfo(@RequestBody @Valid BoshParam.Deployment dto){
 		HttpStatus status = HttpStatus.OK;
 		String content = "";
-		content = awsService.getDeploymentInfos(dto.getDeploymentFile());
+		content = boshService.getDeploymentInfos(dto.getDeploymentFile());
 		if(StringUtils.isEmpty(content) ) {
 			status = HttpStatus.NO_CONTENT;
 		}		
 		return new ResponseEntity<>(content, status);
 	}
 	
-	@RequestMapping(value="/bosh/getOpenstackBoshDeployInfo/{id}", method=RequestMethod.POST)
-	public ResponseEntity getBoshOpenstackDeployInfo(@PathVariable int id){
+	@RequestMapping(value="/bosh/getOpenstackBoshDeployInfo", method=RequestMethod.POST)
+	public ResponseEntity getBoshOpenstackDeployInfo(@RequestBody @Valid BoshParam.Deployment dto){
 		HttpStatus status = HttpStatus.OK;
 		String content = "";
-		content = openstackService.getDeploymentInfos(id);
+		content = boshService.getDeploymentInfos(dto.getDeploymentFile());
 		if(StringUtils.isEmpty(content) ) {
 			status = HttpStatus.NO_CONTENT;
 		}		
@@ -179,8 +178,7 @@ public class BoshManagementController {
 	@SendTo("/bosh/boshDelete")
 	public ResponseEntity deleteBootstrap(@RequestBody @Valid BoshParam.Delete dto){
 		log.info("$$$$ DELETE Connection :: " + dto.toString());
-		if("AWS".equals(dto.getIaas())) awsService.deleteAwsInfo(dto.getId());
-		//else openstackService.deleteOpenstackInfo(dto.getId());
+		boshService.deleteBoshInfo(dto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	

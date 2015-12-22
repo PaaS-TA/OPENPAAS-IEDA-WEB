@@ -2,6 +2,10 @@ package org.openpaas.ieda.web.deploy.bosh;
 
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
+import org.openpaas.ieda.web.config.bootstrap.BootStrapDto;
+import org.openpaas.ieda.web.config.bootstrap.BootStrapDto.Deployment;
+
 import lombok.Data;
 
 public class BoshParam {
@@ -71,15 +75,20 @@ public class BoshParam {
 		@NotNull
 		private String iaas;
 		@NotNull
-		private int id;
+		private String id;
 	}
 	
 	@Data
 	public static class OsBosh{
 		private String id;
+		@NotNull
 		private String boshName;
+		@NotNull
 		private String directorUuid;
+		@NotNull
 		private String releaseVersion;
+		@NotNull
+		private String privateKeyPath;
 	}
 	
 	@Data
@@ -94,17 +103,28 @@ public class BoshParam {
 		private String apiKey;
 		private String defaultKeyName;
 		private String defaultSecurityGroups;
-		private String ntp;		
+		private String ntp;
+		private String directorRecursor;
 	}
 	
 	@Data
 	public static class OsNetwork{
+		@NotNull
 		private String id;
+		@NotNull
 		private String subnetStatic;
+		@NotNull
 		private String subnetRange;
+		@NotNull
 		private String subnetGateway;
-		private String subnetDns; 
+		@NotNull
+		private String subnetDns;
+		@NotNull
 		private String cloudNetId;
+		@NotNull
+		private String cloudSubnet;
+		@NotNull
+		private String cloudSecurityGroups;
 	}
 	
 	@Data
@@ -114,6 +134,12 @@ public class BoshParam {
 		private String stemcellVersion;
 		private String cloudInstanceType;
 		private String boshPassword;	
+	}
+	
+	@Data
+	public static class Deployment{
+		@NotNull
+		private String deploymentFile;
 	}
 	
 }

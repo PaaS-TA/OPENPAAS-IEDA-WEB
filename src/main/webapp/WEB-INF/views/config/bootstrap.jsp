@@ -136,21 +136,16 @@ $(function() {
 			msg		: "BOOTSTRAP 정보를 삭제하시겠습니까?",
 			yes_text: "확인",
 			yes_callBack : function(event){
-				//event.onComplete= function(){
-					//ajax data call
-					var selected = w2ui['config_bootstrapGrid'].getSelection();
-					console.log("Delete Click!!!");
-					if( selected.length == 0 ){
-						w2alert("선택된 정보가 없습니다.", "BOOTSTRAP 삭제");
-						return;
-					}
-					else{
-						var record = w2ui['config_bootstrapGrid'].get(selected);
-						console.log(record.iaas);
-						deletePop(record);
-						
-					}
-			//	}
+				var selected = w2ui['config_bootstrapGrid'].getSelection();
+				console.log("Delete Click!!!");
+				if( selected.length == 0 ){
+					w2alert("선택된 정보가 없습니다.", "BOOTSTRAP 삭제");
+					return;
+				}
+				else{
+					var record = w2ui['config_bootstrapGrid'].get(selected);
+					deletePop(record);						
+				}
 			},
 			no_text : "취소"
 		});
@@ -305,7 +300,7 @@ function settingOpenstackData(contents){
 function deletePop(record){
 	var body = '<div style="margin:10px 0;"><b>▶ 설치 로그</b></div>';
 	//body += '<div>';
-	body += '<textarea id="deleteLogs" style="width:95%;height:250px;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>';
+	body += '<textarea id="deleteLogs" style="width:95%;height:90%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>';
 	//body += '</div>';
 	
 	w2popup.open({
@@ -328,9 +323,9 @@ function deletePop(record){
 			        	deleteLogs.append(data.body + "\n").scrollTop( deleteLogs[0].scrollHeight );
 			        	
 			        	if( data == "complete"){
-			        		deleteClient.res
 			        		deleteClient.disconnect(function(){
 			        			console.log("disconnect");
+			        			deleteClient = "";
 			        		});//callback
 			        	}
 			        });
@@ -343,10 +338,11 @@ function deletePop(record){
 				/* $("body ").remove("#deleteLogs");
 				deleteLogs.text(""); */
 				$(".w2ui-msg-body #deleteLogs").text("");
-				w2ui['config_boshGrid'].reset();
-				console.log("close");
-				deleteClient.disconnect();
-				deleteClient.close();
+				w2ui['config_bootstrapGrid'].reset();
+				deleteClient.disconnect(function(){
+			        			console.log("disconnect");
+			        			deleteClient = "";
+				});
 				deleteClient = "";
 				doSearch();
 			}
@@ -478,6 +474,33 @@ function saveAwsSettingInfo(){
 			privateKeyPath  : $(".w2ui-msg-body input[name='privateKeyPath']").val()
 	}
 	
+	if( checkEmpty(awsInfo.awsKey) ){
+		w2alert("AWS Key를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='awsKey']").focus();
+			return;
+		})
+	}else if( checkEmpty(awsInfo.awsKey) ){
+		w2alert("AWS Password를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='awsKey']").focus();
+			return;
+		})
+	}else if( checkEmpty(awsInfo.defaultSecurityGroups) ){
+		w2alert("Default Security Groups를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='defaultSecurityGroups']").focus();
+			return;
+		})
+	}else if( checkEmpty(awsInfo.privateKeyName) ){
+		w2alert("Private KeyName를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='privateKeyName']").focus();
+			return;
+		})
+	}else if( checkEmpty(awsInfo.privateKeyPath) ){
+		w2alert("Private Key Path를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='privateKeyPath']").focus();
+			return;
+		})
+	}
+	
 	if( $(".w2ui-msg-body input[name='keyPathFile']").val() != null){
 		var keyPathFile =  $(".w2ui-msg-body input[name='keyPathFile']").val().split('.').pop().toLowerCase();
 		
@@ -566,8 +589,36 @@ function saveNetworkInfo(param){
 			directorPublicIp	: $(".w2ui-msg-body input[name='directorPublicIp']").val()
 	}
 	
+	if( checkEmpty(networkInfo.subnetRange) ){
+		w2alert("Subnet Range를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='subnetRange']").focus();
+			return;
+		})
+	}else if( checkEmpty(networkInfo.gateway) ){
+		w2alert("Subnet Gateway를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='gateway']").focus();
+			return;
+		})
+	}else if( checkEmpty(networkInfo.subnetId) ){
+		w2alert("Subnet Id 를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='subnetId']").focus();
+			return;
+		})
+	}else if( checkEmpty(networkInfo.directorPrivateIp) ){
+		w2alert("Director Private Ip 를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='directorPrivateIp']").focus();
+			return;
+		})
+	}else if( checkEmpty(networkInfo.directorPublicIp) ){
+		w2alert("Director Public Ip를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='directorPublicIp']").focus();
+			return;
+		})
+	}	
+	
 	if(param == 'before'){
 		awsPopup();
+		return;
 	}
 	else{
 		$.ajax({
@@ -643,6 +694,38 @@ function saveResourceInfo(param){
 			availabilityZone: $(".w2ui-msg-body input[name='availabilityZone']").val(),
 			microBoshPw		: $(".w2ui-msg-body input[name='microBoshPw']").val(),
 			ntp				: $(".w2ui-msg-body input[name='ntp']").val()
+	}
+	
+	if( checkEmpty(networkInfo.targetStemcell) ){
+		w2alert("Target Stemcell 을 선택하세요", "" , function(){
+			$(".w2ui-msg-body input[name='targetStemcell']").focus();
+			return;
+		})
+	}else if( checkEmpty(networkInfo.instanceType) ){
+		w2alert("Instance Type를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='instanceType']").focus();
+			return;
+		})
+	}else if( checkEmpty(networkInfo.region) ){
+		w2alert("Region 을 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='region']").focus();
+			return;
+		})
+	}else if( checkEmpty(networkInfo.availabilityZone) ){
+		w2alert("Availability Zone를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='availabilityZone']").focus();
+			return;
+		})
+	}else if( checkEmpty(networkInfo.microBoshPw) ){
+		w2alert("Micro Bosh Password를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='microBoshPw']").focus();
+			return;
+		})
+	}else if( checkEmpty(networkInfo.ntp) ){
+		w2alert("NTP 를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='ntp']").focus();
+			return;
+		})
 	}
 	
 	if( param == 'before') {
@@ -746,8 +829,10 @@ function installPopup(){
 			        	
 			        	if( data == "complete"){
 			        		installClient.close()
-			        		installClient.disconnect();//callback
-			        		installClient = "";
+			        		installClient.disconnect(function(){
+			        			console.log("disconnect");
+			        			installClient = "";
+			        		});//callback
 			        	}
 			        });
 			        installClient.send('/send/bootstrapInstall', {}, JSON.stringify({deployFileName:deployFileName}));
@@ -781,7 +866,8 @@ function popupComplete(){
 	//popup.close
 	w2popup.close();
 	//grid Reload
-	gridReload();	
+	gridReload();
+	
 }
 
 function setPrivateKeyPath(value){
@@ -827,6 +913,27 @@ function saveOsBoshInfo(){
 			boshUrl			: $(".w2ui-msg-body input[name=boshUrl]").val(),
 			boshCpiUrl		: $(".w2ui-msg-body input[name=boshCpiUrl]").val(),
 			privateKeyPath	: $(".w2ui-msg-body input[name=privateKeyPath]").val()			
+	}	
+	if( checkEmpty(osBoshINfo.boshName) ){
+		w2alert("Bosh Name 을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=boshName]").focus();
+			return;
+		});
+	}else if( checkEmpty(osBoshINfo.boshUrl) ){
+		w2alert("Bosh Url 을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=boshUrl]").focus();
+			return;
+		});
+	}else if( checkEmpty(osBoshINfo.boshCpiUrl) ){
+		w2alert("Bosh Cpi Url 을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=boshCpiUrl]").focus();
+			return;
+		});
+	}else if( checkEmpty(osBoshINfo.privateKeyPath) ){
+		w2alert("Private Key Path 을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=privateKeyPath]").focus();
+			return;
+		});
 	}	
 	
 	//osBOshInfo SAVE
@@ -888,6 +995,64 @@ function saveOpenstackInfo(type){
 			ntp					: $(".w2ui-msg-body input[name='ntp']").val()
 	}
 	
+	if( checkEmpty(openstackInfo.privateStaticIp) ){
+		w2alert("Private Static Ip 를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=privateStaticIp]").focus();
+			return;
+		});
+	}else if( checkEmpty(openstackInfo.publicStaticIp) ){
+		w2alert("Public Static Ip 를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=publicStaticIp]").focus();
+			return;
+		});
+	}else if( checkEmpty(openstackInfo.directorName) ){
+		w2alert("Director Name 을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=directorName]").focus();
+			return;
+		});
+	}else if( checkEmpty(openstackInfo.authUrl) ){
+		w2alert("Auth Url 을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=authUrl]").focus();
+			return;
+		});
+	}
+	else if( checkEmpty(openstackInfo.tenant) ){
+		w2alert("tenant 을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=tenant]").focus();
+			return;
+		});
+	}
+	else if( checkEmpty(openstackInfo.userName) ){
+		w2alert("User Name 을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=userName]").focus();
+			return;
+		});
+	}
+	else if( checkEmpty(openstackInfo.apiKey) ){
+		w2alert("Api Key 를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=apiKey]").focus();
+			return;
+		});
+	}
+	else if( checkEmpty(openstackInfo.defaultKeyName) ){
+		w2alert("Default Key Name 을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=defaultKeyName]").focus();
+			return;
+		});
+	}
+	else if( checkEmpty(openstackInfo.defaultSecurityGroups) ){
+		w2alert("Default Security Groups 를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=defaultSecurityGroups]").focus();
+			return;
+		});
+	}
+	else if( checkEmpty(openstackInfo.ntp) ){
+		w2alert("NTP 를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=ntp]").focus();
+			return;
+		});
+	}
+	
 	if( type == 'before') {
 		osBoshInfoPop();
 		return;
@@ -940,6 +1105,28 @@ function saveOsNetworkInfo(type){
 			cloudNetId		: $(".w2ui-msg-body input[name='cloudNetId']").val()
 	}
 	
+	if( checkEmpty(openstackInfo.subnetRange) ){
+		w2alert("Subnet Range 를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=subnetRange]").focus();
+			return;
+		});
+	}else if( checkEmpty(openstackInfo.subnetGateway) ){
+		w2alert("Subnet Gateway 을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=subnetGateway]").focus();
+			return;
+		});
+	}else if( checkEmpty(openstackInfo.subnetDns) ){
+		w2alert("Subnet Dns 를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=subnetDns]").focus();
+			return;
+		});
+	}else if( checkEmpty(openstackInfo.cloudNetId) ){
+		w2alert("Cloud Net Id 를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=cloudNetId]").focus();
+			return;
+		});
+	}
+	
 	if( type == "before") {
 		openstackInfoPopup();
 		return;
@@ -988,7 +1175,27 @@ function saveOsResourceInfo(type){
 			cloudInstanceType	: $(".w2ui-msg-body input[name='cloudInstanceType']").val()
 	}
 	
-	if( type == "before") osNetworkInfoPopup();
+	if( checkEmpty(openstackInfo.stemcellUrl) ){
+		w2alert("Stemcell Url 를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=stemcellUrl]").focus();
+			return;
+		});
+	}else if( checkEmpty(openstackInfo.envPassword) ){
+		w2alert("ENV Password 를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=envPassword]").focus();
+			return;
+		});
+	}else if( checkEmpty(openstackInfo.cloudInstanceType) ){
+		w2alert("Cloud InstanceT ype 를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name=cloudInstanceType]").focus();
+			return;
+		});
+	}	
+	
+	if( type == "before"){
+		osNetworkInfoPopup();
+		return;
+	}
 	
 	//SAVE
 	$.ajax({

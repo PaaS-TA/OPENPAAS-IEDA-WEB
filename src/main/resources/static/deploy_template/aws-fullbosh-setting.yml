@@ -5,8 +5,8 @@ release:
 networks:
   default:
     subnets:
-    - reserved: [subnetReserved]
-      static: [[subnetStatic]]
+    - static: [[subnetStatic]]
+#      reserved: [subnetReserved]
       range: [subnetRange]
       gateway: [subnetGateway]
       dns: [[subnetDns]]

@@ -58,6 +58,7 @@ public class IEDABoshOpenstackService {
 		config.setBoshName(dto.getBoshName());;
 		config.setDirectorUuid(dto.getDirectorUuid());
 		config.setReleaseVersion(dto.getReleaseVersion());	
+		config.setPrivateKeyPath(dto.getPrivateKeyPath());
 		config.setCreatedDate(now);
 		config.setUpdatedDate(now);
 		return opentstackRepository.save(config);
@@ -68,6 +69,7 @@ public class IEDABoshOpenstackService {
 
 		config.setDirectorName(dto.getDirectorName());
 		config.setDnsRecursor(dto.getDnsRecursor());
+		config.setDirectorStaticIp(dto.getDirectorStaticIp());
 		config.setAuthUrl(dto.getAuthUrl());
 		config.setTenant(dto.getTenant());
 		config.setUserName(dto.getUserName());
@@ -75,6 +77,7 @@ public class IEDABoshOpenstackService {
 		config.setDefaultKeyName(dto.getDefaultKeyName());
 		config.setDefaultSecurityGroups(dto.getDefaultSecurityGroups());//? 배열?
 		config.setNtp(dto.getNtp());
+		config.setDirectorRecursor(dto.getDirectorRecursor());
 		Date now = new Date();
 		config.setUpdatedDate(now);
 		return opentstackRepository.save(config);
@@ -89,6 +92,8 @@ public class IEDABoshOpenstackService {
 		config.setSubnetGateway(dto.getSubnetGateway());
 		config.setSubnetDns(dto.getSubnetDns());
 		config.setCloudNetId(dto.getCloudNetId());
+		config.setCloudSecurityGroups(dto.getCloudSecurityGroups());
+		config.setCloudSubnet(dto.getCloudSubnet());
 		Date now = new Date();
 		config.setUpdatedDate(now);
 		return opentstackRepository.save(config);
@@ -102,7 +107,7 @@ public class IEDABoshOpenstackService {
 		config.setCloudInstanceType(dto.getCloudInstanceType());
 		config.setBoshPassword(dto.getBoshPassword());
 		
-		String deplymentFileName = boshService.createSettingFile(Integer.parseInt(dto.getId()), "OPENPAAS");
+		String deplymentFileName = boshService.createSettingFile(Integer.parseInt(dto.getId()), "OPENSTACK");
 		config.setDeploymentFile(deplymentFileName);
 		return opentstackRepository.save(config);
 	}

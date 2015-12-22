@@ -96,7 +96,7 @@ $(function(){
 		if ( directorName.indexOf("AWS") > 0 ) {
 			awsPopup();
 		} else if (directorName.indexOf("OPENSTACK") > 0 ) {
-			openstackPopup();
+			osBoshInfoPopup();
 		} else {
 			selectIaas();
 		}
@@ -149,7 +149,7 @@ $(function(){
 					else{
 						var record = w2ui['config_boshGrid'].get(selected);
 						//console.log(record.iaas);
-						if(record.iaas == "AWS") deleteBoshAwsPop(record);
+						deleteBoshPop(record);
 					}
 			//	}
 			},
@@ -188,7 +188,7 @@ function selectIaas(){
 				if( structureType == "AWS")
 					awsPopup();
 				else
-					openstackPopup();				
+					osBoshInfoPopup();				
 			}
 			else{
 				w2alert("설치할 Infrastructure 을 선택하세요");
@@ -247,33 +247,31 @@ function getBoshOpenstackData(record){
 }
 
 //DELETE
-function deleteBoshAwsPop(record){
-	var body = '<textarea name="deleteLogs" style="width:93%;height:93%;overflow-y:visible;resize:none;background-color: #FFF;margin:2%" readonly="readonly"></textarea>';
+function deleteBoshPop(record){
+	var body = '<div style="margin:10px 0;"><b>▶ 설치 로그</b></div>';	
+	body +='<textarea name="deleteLogs" style="width:93%;height:85%;overflow-y:visible;resize:none;background-color: #FFF;margin:2%" readonly="readonly"></textarea>';
 	//body += '</div>';
 	
 	w2popup.open({
 		width : 610,
-		height : 400,
+		height : 500,
 		title : "<b>Bosh 삭제</b>",
 		body  : body,
 		buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="popupComplete();;">완료</button>',
 		showMax : true,
 		onOpen : function(event){
 			event.onComplete = function(){
-			//console.log("Delete Pop");
 				var socket = new SockJS('/boshDelete');
 				deleteClient = Stomp.over(socket); 
 				deleteClient.connect({}, function(frame) {
-					//console.log('Connected Frame : ' + frame);
 					deleteClient.subscribe('/bosh/boshDelete', function(data){
-				        //console.log('Connected: Data : ' + data);
 				        var deleteLogs = $(".w2ui-msg-body textarea[name=deleteLogs]");
 			        	deleteLogs.append(data.body + "\n").scrollTop( deleteLogs[0].scrollHeight );
 			        	
 			        	if( data == "complete"){
 			        		deleteClient.disconnect(function(){
 			        			console.log("disconnect");
-			        		});//callback
+			        		});
 			        	}
 			        });
 					deleteClient.send('/send/boshDelete', {}, JSON.stringify({iaas:record.iaas, id:record.id}));
@@ -288,7 +286,6 @@ function deleteBoshAwsPop(record){
 				w2ui['config_boshGrid'].reset();
 				//console.log("close");
 				deleteClient.disconnect();
-				deleteClient.close();
 				deleteClient = "";
 				doSearch();
 			}
@@ -341,20 +338,25 @@ function getKeyPathFileList(){
 function changeKeyPathType(type){
 	console.log(type);
 	var keyPathDiv = $('.w2ui-msg-body #keyPathDiv');
-	var fileUploadInput = '<span><input type="file" name="keyPathFile" style="width:200px;" onchange="setPrivateKeyPathFileName(this);" hidden="true"/>';
+	var fileUploadInput = '<span><input type="file" name="keyPathFile" style="width:200px;" onchange="FileName(this);" hidden="true"/>';
 	fileUploadInput += '<input type="text" id="keyPathFileName" style="width:200px;" readonly  onClick="openBrowse();" placeholder="Key File을 선택해주세요."/>';
 	fileUploadInput += '<a href="#" id="browse" onClick="openBrowse();">Browse </a></span>';
-	var selectInput = '<input type="list" name="keyPathList" style="float: left;width:280px;" onchange="setPrivateKeyPath(this.value);"/>';
+	var selectInput = '<input type="list" name="keyPathList" style="float: left;width:330px;" onchange="setPrivateKeyPath(this.value);"/>';
 	
 	if(type == "list") {
 		keyPathDiv.html(selectInput);
 		$('#w2ui-popup #keyPathDiv input[type=list]').w2field('list', { items: keyPathFileList , maxDropHeight:200, width:250});
-		console.log("======== : " + awsInfo.privateKeyPath);
 		if(awsInfo.privateKeyPath) $(".w2ui-msg-body input[name='keyPathList']").data('selected', {text:awsInfo.privateKeyPath});
+		if(boshInfo.privateKeyPath) $(".w2ui-msg-body input[name='keyPathList']").data('selected', {text:boshInfo.privateKeyPath});
+		
 	}else{		
 		keyPathDiv.html(fileUploadInput);
 		$(".w2ui-msg-body input[name='keyPathFile']").hide();		
 	}
+}
+
+function setPrivateKeyPath(value){
+	$(".w2ui-msg-body input[name=privateKeyPath]").val(value);
 }
 
 function openBrowse(){
@@ -439,8 +441,9 @@ function saveAwsInfo(){
 }
 
 function keyPathFileUpload(){
-	var awsForm = $(".w2ui-msg-body #awsForm")[0];
-	var awsFormData = new FormData(awsForm);
+	var form = (iaas == "AWS") ? $(".w2ui-msg-body #awsForm")[0] : $(".w2ui-msg-body #osBoshForm")[0];
+	
+	var formData = new FormData(form);
 	$.ajax({
 		type : "POST",
 		url : "/bootstrap/keyPathFileUpload",
@@ -449,12 +452,15 @@ function keyPathFileUpload(){
 		async : true,
 		processData: false, 
 		contentType:false,
-		data : awsFormData,  
+		data : formData,  
 		success : function(data, status) {
-			boshInfoPopup();
+			if(iaas == "AWS")
+				boshInfoPopup();			
+			else 
+				openstackInfoPopup();
 		},
-		error : function( e, status ) {
-			w2alert("AWS 설정 등록에 실패 하였습니다.", "BOSH 설치");
+		error : function( e, status ) {			
+			w2alert(iaas + " 설정 등록에 실패 하였습니다.", "BOSH 설치");
 		}
 	});
 }
@@ -477,7 +483,7 @@ function settingAWSData(contents){
 			directorUuid	: contents.directorUuid,
 			publicStaticIp	: contents.publicStaticIp,
 			releaseVersion	: contents.releaseVersion
-	}
+	}	
 	networkInfo = {
 			id					: boshId,			
 			subnetStatic		: contents.subnetStatic,
@@ -499,12 +505,13 @@ function settingAWSData(contents){
 
 function settingOpenstackData(contents){
 	boshId = contents.id;
-	iaas = "OPENDTACK";
+	iaas = "OPENSTACK";
 	boshInfo = {
 			id				: boshId,
 			boshName 		: contents.boshName,
 			directorUuid	: contents.directorUuid,
-			releaseVersion	: contents.releaseVersion
+			releaseVersion	: contents.releaseVersion,
+			privateKeyPath	: contents.privateKeyPath
 	}
 	
 	openstackInfo = {
@@ -517,7 +524,8 @@ function settingOpenstackData(contents){
 			apiKey					: contents.apiKey,
 			defaultKeyName			: contents.defaultKeyName,
 			defaultSecurityGroups	: contents.defaultSecurityGroups,
-			ntp						: contents.ntp
+			ntp						: contents.ntp,
+			directorRecursor		: contents.directorRecursor
 	}
 	
 	networkInfo = {
@@ -526,7 +534,9 @@ function settingOpenstackData(contents){
 			subnetRange		: contents.subnetRange,
 			subnetGateway	: contents.subnetGateway,
 			subnetDns		: contents.subnetDns,
-			cloudNetId		: contents.cloudNetId
+			cloudNetId		: contents.cloudNetId,
+			cloudSecurityGroups : contents.cloudSecurityGroups,
+			cloudSubnet		: contents.cloudSubnet
 	}
 	
 	resourceInfo = {
@@ -536,7 +546,7 @@ function settingOpenstackData(contents){
 			cloudInstanceType	: contents.cloudInstanceType,
 			boshPassword		: contents.boshPassword
 	}
-	openstackPopup();	
+	osBoshInfoPopup();	
 }
 
 function  boshInfoPopup(){
@@ -552,18 +562,14 @@ function  boshInfoPopup(){
 					$(".w2ui-msg-body input[name='directorUuid']").val(boshInfo.directorUuid);
 					$(".w2ui-msg-body input[name='publicStaticIp']").val(boshInfo.publicStaticIp);
 					$(".w2ui-msg-body input[name='releaseVersion']").data('selected', {text:boshInfo.releaseVersion});
-				}
+				}				
 			}
 		},
 		onClose : initSetting
 	});
 }
 
-function checkEmpty(value){
-	return (value == null || value == "") ? true: false;
-}
-
-function saveBoshInfo(param){
+function saveBoshInfo(type){
 	boshInfo = {
 			id				: boshId,
 			boshName 		: $(".w2ui-msg-body input[name='boshName']").val(),
@@ -597,8 +603,9 @@ function saveBoshInfo(param){
 		return;
 	}
 	
-	if(param == 'before'){
-		awsPopup(); return;
+	if(type == 'before'){
+		awsPopup(); 
+		return;
 	}
 		
 	//Server send Bosh Info
@@ -626,7 +633,9 @@ function networkPopup(){
 		onOpen:function(event){
 			event.onComplete = function(){				
 				if(networkInfo != ""){
-					$(".w2ui-msg-body input[name='subnetStatic']").val(networkInfo.subnetStatic);
+					var subnetStatics  =  networkInfo.subnetStatic.split(" - ");
+					$(".w2ui-msg-body #subnetStaticFrom").val(subnetStatics[0]);
+					$(".w2ui-msg-body #subnetStaticTo").val(subnetStatics[1]);
 					$(".w2ui-msg-body input[name='subnetRange']").val(networkInfo.subnetRange);
 					$(".w2ui-msg-body input[name='subnetGateway']").val(networkInfo.subnetGateway);
 					$(".w2ui-msg-body input[name='subnetDns']").val(networkInfo.subnetDns);
@@ -639,10 +648,10 @@ function networkPopup(){
 	});
 }
 
-function saveNetworkInfo(param){
+function saveNetworkInfo(type){
 	networkInfo = {
 			id					: boshId,
-			subnetStatic		: $(".w2ui-msg-body input[name='subnetStatic']").val(),
+			subnetStatic		: $(".w2ui-msg-body #subnetStaticFrom").val() + " - " + $(".w2ui-msg-body #subnetStaticTo").val(),
 			subnetRange			: $(".w2ui-msg-body input[name='subnetRange']").val(),
 			subnetGateway		: $(".w2ui-msg-body input[name='subnetGateway']").val(),
 			subnetDns			: $(".w2ui-msg-body input[name='subnetDns']").val(),
@@ -682,7 +691,7 @@ function saveNetworkInfo(param){
 		return;
 	}
 	
-	if(param == 'before'){
+	if(type == 'before'){
 		boshInfoPopup();
 		return;
 	}
@@ -727,7 +736,7 @@ function resourcePopup(){
 	});
 }
 
-function saveAwsResourceInfo(param){
+function saveAwsResourceInfo(type){
 	
 	var stemcellInfo = $(".w2ui-msg-body input[name='stemcells']").val().split("/");
 	resourceInfo = {
@@ -738,20 +747,21 @@ function saveAwsResourceInfo(param){
 			boshPassword		: $(".w2ui-msg-body input[name='boshPassword']").val()
 	}
 	
-	if( checkEmpty($(".w2ui-msg-body input[name='stemcells']").val())){
+	if( checkEmpty(stemcellInfo)){
 		w2alert("스템셀 정보를 선택하세요.");
 		return;
-	} else if( checkEmpty($(".w2ui-msg-body input[name='cloudInstanceType']").val() )){
+	} else if( checkEmpty(resourceInfo.cloudInstanceType )){
+		console.log()
 		w2alert("cloud Instance Type 를 입력하세요.", "" , function(){
 			$(".w2ui-msg-body input[name='cloudInstanceType']").focus();
 		});
 		return;
-	} else if( checkEmpty($(".w2ui-msg-body input[name='boshPassword']").val() )){
+	} else if( checkEmpty(resourceInfo.boshPassword )){
 		w2alert("Bosh Password를 입력하세요.");
 		return;
 	}
 	
-	if(param == 'before'){
+	if(type == 'before'){
 		networkPopup();
 		return;
 	}
@@ -793,8 +803,8 @@ function deployPopup(){
 
 function getDeployInfo(){
 	console.log("IAAS :: " + iaas );
-	var url = (iaas == "AWS") ? "/bosh/getAwsBoshDeployInfo/": "/bosh/getOpenstackBoshDeployInfo/";
-	
+	var url = (iaas == "AWS") ? "/bosh/getAwsBoshDeployInfo": "/bosh/getOpenstackBoshDeployInfo";
+	console.log(" URL ::: " + url );
 	$.ajax({
 		type : "POST",
 		url : url,
@@ -817,13 +827,13 @@ function getDeployInfo(){
 	});
 }
 
-function boshDeploy(param){
+function boshDeploy(type){
 	//Deploy 단에서 저장할 데이터가 있는지 확인 필요
 	//Confirm 설치하시겠습니까?
-	if(param == 'before' && iaas == "AWS" ){
+	if(type == 'before' && iaas == "AWS" ){
 		resourcePopup();
 		return;
-	} else if(param == 'before' && iaas == "OPENSTACK" ){
+	} else if(type == 'before' && iaas == "OPENSTACK" ){
 		osResourceInfoPopup();
 		return;
 	}
@@ -857,12 +867,12 @@ function installPopup(){
 			        	installLogs.append(data.body + "\n").scrollTop( installLogs[0].scrollHeight );
 			        	
 			        	if( data == "complete"){
-			        		installClient.close();
 			        		installClient.disconnect();//callback
 			        		installClient = "";			        		
 			        	}
 			        });
-			        installClient.send('/send/boshInstall', {}, JSON.stringify({deployFileName:deployFileName}));
+			        console.log("###INSTALL ::  deployFileName:"+deploymentFile);
+			        installClient.send('/send/boshInstall', {}, JSON.stringify({deployFileName:deploymentFile}));
 			    });
 			}
 		},
@@ -871,7 +881,7 @@ function installPopup(){
 }
 
 //OPENSTACK BOSH INFO POPUP
-function openstackPopup(){
+function osBoshInfoPopup(){
 	$("#osBoshInfoDiv").w2popup({
 		width 	: 670,
 		height	: 450,
@@ -885,7 +895,11 @@ function openstackPopup(){
 					$(".w2ui-msg-body input[name='directorUuid']").val(boshInfo.directorUuid);
 					//list Type
 					$(".w2ui-msg-body input[name='releaseVersion']").data('selected', {text:boshInfo.releaseVersion});
-				}				
+					if( boshInfo.privateKeyPath ){
+						$(".w2ui-msg-body input[name='privateKeyPath']").val(boshInfo.privateKeyPath);
+					}
+				}
+				getKeyPathFileList();
 			}
 		},
 		onClose : initSetting
@@ -940,9 +954,40 @@ function saveOsBoshInfo(){
 			id				: boshId,
 			boshName 		: $(".w2ui-msg-body input[name='boshName']").val(),
 			directorUuid 	: $(".w2ui-msg-body input[name='directorUuid']").val(),
-			releaseVersion	: $(".w2ui-msg-body input[name='releaseVersion']").val()
+			releaseVersion	: $(".w2ui-msg-body input[name='releaseVersion']").val(),
+			privateKeyPath	: $(".w2ui-msg-body input[name='privateKeyPath']").val()
 	}
 	
+	if( checkEmpty(boshInfo.boshName )){
+		w2alert("Bosh Name을 입력하세요." , "" , function(){
+			$(".w2ui-msg-body input[name='boshName']").focus()
+		});
+		return;
+	}else if( checkEmpty(boshInfo.directorUuid )){
+		w2alert("Bosh UUID를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name='directorUuid']").focus();
+		});
+		return;
+	}else if( checkEmpty(boshInfo.releaseVersion )){
+		w2alert("Release Version을 선택하세요.", "", function(){
+			$(".w2ui-msg-body input[name='releaseVersion']").focus();
+		});
+		return;
+	}else if( checkEmpty(boshInfo.privateKeyPath )){
+		w2alert("Private Key Path를 선택하세요.", "", function(){
+			$(".w2ui-msg-body input[name='privateKeyPath']").focus();
+		});
+		return;
+	}
+	if( $(".w2ui-msg-body input[name='keyPathFile']").val() != null){
+		var keyPathFile =  $(".w2ui-msg-body input[name='keyPathFile']").val().split('.').pop().toLowerCase();
+		
+		if($.inArray(keyPathFile, ['pem']) == -1) {
+			w2alert("KeyPath File은 .pem 파일만 등록 가능합니다.", "BOSH 설치");
+			return;
+		}
+	}
+		
 	$.ajax({
 		type : "PUT",
 		url : "/bosh/saveOsBoshInfo",
@@ -952,7 +997,8 @@ function saveOsBoshInfo(){
 		data : JSON.stringify(boshInfo), 
 		success : function(data, status) {
 			boshId = data.id;
-			openstackInfoPopup();
+			keyPathFileUpload();
+			
 		},
 		error : function( e, status ) {
 			w2alert("Bosh Info 등록에 실패 하였습니다.", "Bosh 설치");
@@ -969,6 +1015,7 @@ function openstackInfoPopup(){
 			event.onComplete = function(){				
 				if(openstackInfo != ""){
 					$(".w2ui-msg-body input[name='directorName']").val(openstackInfo.directorName);
+					$(".w2ui-msg-body input[name='directorStaticIp']").val(openstackInfo.directorStaticIp);
 					$(".w2ui-msg-body input[name='authUrl']").val(openstackInfo.authUrl);
 					$(".w2ui-msg-body input[name='tenant']").val(openstackInfo.tenant);
 					$(".w2ui-msg-body input[name='userName']").val(openstackInfo.userName);
@@ -976,6 +1023,8 @@ function openstackInfoPopup(){
 					$(".w2ui-msg-body input[name='defaultKeyName']").val(openstackInfo.defaultKeyName);
 					$(".w2ui-msg-body input[name='defaultSecurityGroups']").val(openstackInfo.defaultSecurityGroups);
 					$(".w2ui-msg-body input[name='ntp']").val(openstackInfo.ntp);
+					$(".w2ui-msg-body input[name='directorRecursor']").val(openstackInfo.directorRecursor);
+					
 				}
 			}
 		},
@@ -994,11 +1043,58 @@ function saveOpenstackInfo(type){
 			apiKey					: $(".w2ui-msg-body input[name='apiKey']").val(),
 			defaultKeyName			: $(".w2ui-msg-body input[name='defaultKeyName']").val(),
 			defaultSecurityGroups	: $(".w2ui-msg-body input[name='defaultSecurityGroups']").val(),
-			ntp						: $(".w2ui-msg-body input[name='ntp']").val()
+			ntp						: $(".w2ui-msg-body input[name='ntp']").val(),
+			directorRecursor		: $(".w2ui-msg-body input[name='directorRecursor']").val()
+	}
+	if( checkEmpty(openstackInfo.directorName)){
+		w2alert("Director Name을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name='directorName']").focus();
+		});
+		return;
+	} else if( checkEmpty($(".w2ui-msg-body input[name='directorStaticIp']").val() )){
+		w2alert("Director Static Ip를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name='directorStaticIp']").focus();
+		});
+		return;
+	} else if( checkEmpty($(".w2ui-msg-body input[name='tenant']").val() )){
+		w2alert("tenant을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name='tnant']").focus();
+		});
+		return;
+	}else if( checkEmpty($(".w2ui-msg-body input[name='userName']").val() )){
+		w2alert("User Name을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name='userName']").focus();
+		});
+		return;
+	}else if( checkEmpty($(".w2ui-msg-body input[name='apiKey']").val() )){
+		w2alert("Api Key을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name='apiKey']").focus();
+		});
+		return;
+	}else if( checkEmpty($(".w2ui-msg-body input[name='defaultKeyName']").val() )){
+		w2alert("Default Key Name을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name='defaultKeyName']").focus();
+		});
+		return;
+	}else if( checkEmpty($(".w2ui-msg-body input[name='ntp']").val() )){
+ 		w2alert("NTP을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name='ntp']").focus();
+		});
+		return;
+	}else if( checkEmpty($(".w2ui-msg-body input[name='directorRecursor']").val() )){
+ 		w2alert("Director Recursor을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name='directorRecursor']").focus();
+		});
+		return;
+	}else if( checkEmpty($(".w2ui-msg-body input[name='defaultSecurityGroups']").val() )){
+			w2alert("Default Security Groups를 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name='defaultSecurityGroups']").focus();
+		});
+		return;
 	}
 	
 	if( type == 'before'){
-		openstackPopup();
+		osBoshInfoPopup();
 		return;
 	}
 	
@@ -1026,11 +1122,15 @@ function osNetworkInfoPopup(){
 		onOpen:function(event){
 			event.onComplete = function(){				
 				if(networkInfo != ""){
-					$(".w2ui-msg-body input[name='subnetStatic']").val(networkInfo.subnetStatic);
+					var subnetStatics  =  networkInfo.subnetStatic.split(" - ");
+					$(".w2ui-msg-body #subnetStaticFrom").val(subnetStatics[0]);
+					$(".w2ui-msg-body #subnetStaticTo").val(subnetStatics[1]);
 					$(".w2ui-msg-body input[name='subnetRange']").val(networkInfo.subnetRange);
 					$(".w2ui-msg-body input[name='subnetGateway']").val(networkInfo.subnetGateway);
 					$(".w2ui-msg-body input[name='subnetDns']").val(networkInfo.subnetDns);
 					$(".w2ui-msg-body input[name='cloudNetId']").val(networkInfo.cloudNetId);
+					$(".w2ui-msg-body input[name='cloudSecurityGroups']").val(networkInfo.cloudSecurityGroups);
+					$(".w2ui-msg-body input[name='cloudSubnet']").val(networkInfo.cloudSubnet);
 				}
 			}
 		},
@@ -1039,13 +1139,53 @@ function osNetworkInfoPopup(){
 }
 
 function saveOsNetworkInfo(type){
+	var directorStaticIp =  $(".w2ui-msg-body #subnetStaticFrom").val() + " - " +  $(".w2ui-msg-body #subnetStaticTo").val();
 	networkInfo = {
 			id				: boshId,
-			subnetStatic	: $(".w2ui-msg-body input[name='subnetStatic']").val(),
+			subnetStatic	: $(".w2ui-msg-body #subnetStaticFrom").val() + " - " + $(".w2ui-msg-body #subnetStaticTo").val(),
 			subnetRange		: $(".w2ui-msg-body input[name='subnetRange']").val(),
 			subnetGateway	: $(".w2ui-msg-body input[name='subnetGateway']").val(),
 			subnetDns		: $(".w2ui-msg-body input[name='subnetDns']").val(),
-			cloudNetId		: $(".w2ui-msg-body input[name='cloudNetId']").val()
+			cloudNetId		: $(".w2ui-msg-body input[name='cloudNetId']").val(),
+			cloudSecurityGroups : $(".w2ui-msg-body input[name='cloudSecurityGroups']").val(),
+			cloudSubnet		: $(".w2ui-msg-body input[name='cloudSubnet']").val()
+	}
+	
+	if(checkEmpty(networkInfo.subnetStatic)){
+		w2alert("Subnet Static 를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='subnetStatic']").focud();
+		});
+		return;
+	}else if(checkEmpty(networkInfo.subnetRange)){
+		w2alert("Subnet Range 를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='subnetRange']").focud();
+		});
+		return;
+	}else if(checkEmpty(networkInfo.subnetGateway)){
+		w2alert("Subnet Gateway 를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='subnetGateway']").focud();
+		});
+		return;
+	}else if(checkEmpty(networkInfo.subnetDns)){
+		w2alert("Subnet Dns 를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='subnetDns']").focud();
+		});
+		return;
+	}else if(checkEmpty(networkInfo.cloudNetId)){
+		w2alert("cloud Net Id 를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='cloudNetId']").focud();
+		});
+		return;
+	}else if(checkEmpty(networkInfo.cloudSecurityGroups)){
+		w2alert("Cloud Security Groups 를 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='cloudSecurityGroups']").focud();
+		});
+		return;
+	}else if(checkEmpty(networkInfo.cloudSubnet)){
+		w2alert("Cloud Subnet 을 입력하세요", "" , function(){
+			$(".w2ui-msg-body input[name='cloudSubnet']").focud();
+		});
+		return;
 	}
 	
 	if( type == 'before'){
@@ -1064,7 +1204,7 @@ function saveOsNetworkInfo(type){
 			osResourceInfoPopup();
 		},
 		error : function( e, status ) {
-			w2alert("Network Info 등록에 실패 하였습니다.", "Bosh 설치");
+			w2alert("Resource Info 등록에 실패 하였습니다.", "Bosh 설치");
 		}
 	});
 }
@@ -1076,9 +1216,11 @@ function osResourceInfoPopup(){
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
+				$(".w2ui-msg-body input[name='stemcells']").w2field('list', { items: stemcells , maxDropHeight:200, width:250});
 				if(resourceInfo != ""){
-					$(".w2ui-msg-body input[name='stemcellName']").val(resourceInfo.stemcellName);
-					$(".w2ui-msg-body input[name='stemcellVersion']").val(resourceInfo.stemcellVersion);
+					if( !checkEmpty(resourceInfo.stemcellName)){
+						$(".w2ui-msg-body input[name='stemcells']").data('selected', {text:resourceInfo.stemcellName+"/" + resourceInfo.stemcellVersion});
+					}
 					$(".w2ui-msg-body input[name='cloudInstanceType']").val(resourceInfo.cloudInstanceType);
 					$(".w2ui-msg-body input[name='boshPassword']").val(resourceInfo.boshPassword);
 				}
@@ -1089,12 +1231,28 @@ function osResourceInfoPopup(){
 }
 
 function saveOsResourceInfo(type){
+	var stemcellInfo = $(".w2ui-msg-body input[name='stemcells']").val().split("/");
 	resourceInfo = {
 			id				: boshId,
-			stemcellName	: $(".w2ui-msg-body input[name='stemcellName']").val(),
-			stemcellVersion	: $(".w2ui-msg-body input[name='stemcellVersion']").val(),
-			cloudInstan		: $(".w2ui-msg-body input[name='cloudInstanceType']").val(),
+			stemcellName		: stemcellInfo[0],
+			stemcellVersion		: stemcellInfo[1],
+			cloudInstanceType		: $(".w2ui-msg-body input[name='cloudInstanceType']").val(),
 			boshPassword	: $(".w2ui-msg-body input[name='boshPassword']").val()
+	}
+	
+	if( checkEmpty( stemcellInfo )){
+		w2alert("Stemcell 을 선택하세요.");
+		return;
+	}else if( checkEmpty(resourceInfo.cloudInstanceType )){
+		w2alert("Cloud Instance Type을 입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name='cloudInstanceType']").focus();
+		});
+		return;
+	}else if( checkEmpty(resourceInfo.boshPassword )){
+		w2alert("Bosh Password  입력하세요.", "", function(){
+			$(".w2ui-msg-body input[name='boshPassword']").focus();
+		});
+		return;
 	}
 	
 	if( type == 'before'){
@@ -1110,6 +1268,7 @@ function saveOsResourceInfo(type){
 		async : true,
 		data : JSON.stringify(resourceInfo), 
 		success : function(data, status) {
+			deploymentFile = data.deploymentFile;
 			deployPopup();
 		},
 		error : function( e, status ) {
@@ -1229,33 +1388,33 @@ $( window ).resize(function() {
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Access Key ID</label>
 		            <div>
-		                <input name="accessKeyId" type="text" maxlength="100" size="30" style="float:left;width:280px;" required/>
+		                <input name="accessKeyId" type="text"  style="float:left;width:330px;" required placeholder="AKI~"/>
 		            </div>
 				</div>
 				
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Secret Access Key</label>
 		            <div>
-		                <input name="secretAccessKey" type="password" maxlength="100" size="30" style="float:left;width:280px;" required/>
+		                <input name="secretAccessKey" type="password"  style="float:left;width:330px;" required placeholder="omK~"/>
 		            </div>
 		        </div>
 
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Security Group</label>
 		            <div>
-		                <input name="defaultSecurityGroups" type="text" maxlength="100" size="30" style="float:left;width:280px;" required/>
+		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:330px;" required placeholder="bosh"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Region</label>
 		            <div>
-		                <input name="region" type="text" maxlength="100" size="30" style="float:left;width:280px;" required/>
+		                <input name="region" type="text"  style="float:left;width:330px;" required placeholder="us-east-1"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Private Key Name</label>
 		            <div>
-		                <input name="defaultKeyName" type="text" maxlength="100" size="30" style="float:left;width:280px;" required/>
+		                <input name="defaultKeyName" type="text"  style="float:left;width:330px;" required placeholder="bosh"/>
 		            </div>
 		        </div>
 		        
@@ -1307,25 +1466,25 @@ $( window ).resize(function() {
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">배포명</label>
 		            <div>
-		                <input name="boshName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="boshName" type="text"  style="float:left;width:330px;" required placeholder="bosh"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">디렉터 UUID</label>
 		            <div>
-		                <input name="directorUuid" type="password" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="directorUuid" type="password"  style="float:left;width:330px;" required placeholder="3d44c981-d458-47b9-8e95-62d07b87c68f"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Public Static Ip</label>
 		            <div>
-		                <input name="publicStaticIp" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="publicStaticIp" type="text"  style="float:left;width:330px;" required placeholder="52.xx.xx.xx"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">BOSH 릴리즈 버전</label>
 		            <div>
-		                <input name="releaseVersion" type="list" style="float:left;width:280px;"/>
+		                <input name="releaseVersion" type="list" style="float:left;width:330px;"/>
 		            </div>
 		        </div>
 		    </div>
@@ -1357,37 +1516,45 @@ $( window ).resize(function() {
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">배열	고정 IP 대역</label>
 					<div>
-						<input name="subnetStatic" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
+						<span style="position: relative;">
+							<input name="subnetStatic" id="subnetStaticFrom"  type="text"  style="float:left;width:150px;" required placeholder="10.0.0.6"/>
+						</span>
+						<span style="position: relative;">
+							&nbsp;&ndash;&nbsp;
+						</span>
+						<span style="position: relative;">
+							<input name="subnetStatic" id="subnetStaticTo" type="text"  style="float:left;width:150px;" required placeholder="10.0.0.20"/>
+						</span>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">VPC IP 대역</label>
 					<div>
-						<input name="subnetRange" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
+						<input name="subnetRange" type="text"  style="float:left;width:330px;"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">VPC 게이트웨이 IP</label>
 					<div>
-						<input name="subnetGateway" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
+						<input name="subnetGateway" type="text"  style="float:left;width:330px;"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">DNS</label>
 					<div>
-						<input name="subnetDns" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
+						<input name="subnetDns" type="text"  style="float:left;width:330px;"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">VPC 서브넷 아이디</label>
 					<div>
-						<input name="cloudSubnet" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
+						<input name="cloudSubnet" type="text"  style="float:left;width:330px;"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">VPC 시큐리티 그룹명</label>
 					<div>
-						<input name="cloudSecurityGroups" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
+						<input name="cloudSecurityGroups" type="text"  style="float:left;width:330px;"/>
 					</div>
 				</div>
 			</div>
@@ -1426,13 +1593,13 @@ $( window ).resize(function() {
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Cloud Instance Type</label>
 					<div>
-						<input name="cloudInstanceType" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
+						<input name="cloudInstanceType" type="text"  style="float:left;width:330px;" placeholder="m1.small"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Bosh Password</label>
 					<div>
-						<input name="boshPassword" type="text" maxlength="100" size="30" style="float:left;width:330px;"/>
+						<input name="boshPassword" type="text"  style="float:left;width:330px;" placeholder="c1oudc0w"/>
 					</div>
 				</div>
 				
@@ -1514,24 +1681,39 @@ $( window ).resize(function() {
 	        </div>
 			<div class="cont_title">▶ OPENSTACK 설정정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Bosh Name</label>
-		            <div>
-		                <input name="boshName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Director UUID</label>
-		            <div>
-		                <input name="directorUuid" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Release Version</label>
-		            <div>
-		                <input name="releaseVersion" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
+		    	<form id="osBoshForm">
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:250px;font-size:11px;">Bosh Name</label>
+			            <div>
+			                <input name="boshName" type="text"  style="float:left;width:330px;" required placeholder="bosh"/>
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:250px;font-size:11px;">Director UUID</label>
+			            <div>
+			                <input name="directorUuid" type="text"  style="float:left;width:330px;" required placeholder="3d44c981-d458-47b9-8e95-62d07b87c68f"/>
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:250px;font-size:11px;">Release Version</label>
+			            <div>
+			                <input name="releaseVersion" type="text"  style="float:left;width:330px;" />
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+						<label style="text-align: left;width:40%;font-size:11px;">Private Key Path</label>
+						<div >
+							<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" tabindex="5"/>&nbsp;리스트</label></span>
+							&nbsp;&nbsp;
+		  					<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" tabindex="6"/>&nbsp;파일업로드</label></span>
+						</div>
+			        </div>
+			        <div class="w2ui-field">			         	
+		                <input name="privateKeyPath" type="text" style="width:250px;" hidden="true" onclick="openBrowse();"/>
+			            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
+						<div id="keyPathDiv" ></div>
+			        </div>
+		        </form>		        
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1560,55 +1742,61 @@ $( window ).resize(function() {
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Director Name</label>
 		            <div>
-		                <input name="directorName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="directorName" type="text"  style="float:left;width:330px;"  required placeholder="director-openstack"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Director Elastic Ip</label>
 		            <div>
-		                <input name="directorStaticIp" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="directorStaticIp" type="text"  style="float:left;width:330px;" required placeholder="1xx.xxx.xxx.xx"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Auth Url</label>
 		            <div>
-		                <input name="authUrl" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="authUrl" type="text"  style="float:left;width:330px;" required placeholder="http://172.16.100.1:5000/v2.0/tokens"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Tenant</label>
 		            <div>
-		                <input name="tenant" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="tenant" type="text"  style="float:left;width:330px;" required placeholder="bosh"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">User Name</label>
 		            <div>
-		                <input name="userName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="userName" type="text"  style="float:left;width:330px;" required placeholder="bosh"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Api Key</label>
 		            <div>
-		                <input name="apiKey" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="apiKey" type="text"  style="float:left;width:330px;" required placeholder="boshadmin"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Default Key Name</label>
 		            <div>
-		                <input name="defaultKeyName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="defaultKeyName" type="text"  style="float:left;width:330px;" required placeholder="bosh-key"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">default Security Groups</label>
 		            <div>
-		                <input name="defaultSecurityGroups" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:330px;" required placeholder="groupName0, groupName1,..."/>
+		            </div>
+		        </div>
+				<div class="w2ui-field">
+		            <label style="text-align: left;width:250px;font-size:11px;">Director Recursor</label>
+		            <div>
+		                <input name="directorRecursor" type="text"  style="float:left;width:330px;" required placeholder="groupName0, groupName1,..."/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">NTP</label>
 		            <div>
-		                <input name="ntp" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="ntp" type="text"  style="float:left;width:330px;" required placeholder="1.kr.pool.ntp.org,1.kr.pool.ntp.org,..."/>
 		            </div>
 		        </div>
 		    </div>
@@ -1640,33 +1828,54 @@ $( window ).resize(function() {
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Dubnet Static</label>
 		            <div>
-		                <input name="subnetStatic" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <div>
+							<span>
+								<input name="subnetStatic" id="subnetStaticFrom"  type="text"  style="float:left;width:130px;" required placeholder="10.0.0.6"/>
+							</span>
+							<span>
+								&nbsp; &ndash;&nbsp;
+								<input name="subnetStatic" id="subnetStaticTo" type="text"  style="float:left;width:130px;" required placeholder="10.0.0.20"/>
+							</span>
+						</div>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Subnet Range</label>
 		            <div>
-		                <input name="subnetRange" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="subnetRange" type="text"  style="float:left;width:330px;" required placeholder="10.0.0.0/24"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Subnet Gateway</label>
 		            <div>
-		                <input name="subnetGateway" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="subnetGateway" type="text"  style="float:left;width:330px;" required placeholder="10.0.0.1"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Subnet Dns</label>
 		            <div>
-		                <input name="subnetDns" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="subnetDns" type="text"  style="float:left;width:330px;" required placeholder="8.8.8.8"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Cloud NetId</label>
 		            <div>
-		                <input name="cloudNetId" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="cloudNetId" type="text"  style="float:left;width:330px;" placeholder="subnet-e8d03a9e"/>
 		            </div>
 		        </div>
+		        <div class="w2ui-field">
+					<label style="text-align: left; width: 250px; font-size: 11px;">VPC 시큐리티 그룹명</label>
+					<div>
+						<input name="cloudSecurityGroups" type="text"  style="float:left;width:330px;" placeholder="bosh"/>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align: left; width: 250px; font-size: 11px;">VPC 서브넷 아이디</label>
+					<div>
+						<input name="cloudSubnet" type="text"  style="float:left;width:330px;" placeholder="bosh"/>
+					</div>
+				</div>
+				
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1693,28 +1902,22 @@ $( window ).resize(function() {
 	        </div>
 			<div class="cont_title">▶ OPENSTACK 설정정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Stemcell Name</label>
+				 <div class="w2ui-field">
+		            <label style="text-align: left;width:250px;font-size:11px;">스템셀</label>
 		            <div>
-		                <input name="stemcellName" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Stemcell Version</label>
-		            <div>
-		                <input name="stemcellVersion" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
-		            </div>
-		        </div>
+						<div><input type="list" name="stemcells" style="float: left;width:330px;margin-top:1.5px;"></div>
+					</div>
+				</div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Cloud Instance Type</label>
 		            <div>
-		                <input name="cloudInstanceType" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="cloudInstanceType" type="text"  style="float:left;width:330px;" placeholder="m1.small"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Bosh Password</label>
 		            <div>
-		                <input name="boshPassword" type="text" maxlength="100" size="30" style="float:left;width:280px;"/>
+		                <input name="boshPassword" type="text"  style="float:left;width:330px;" placeholder="$6$JA/VRhS7guR2t$kruB3..."/>
 		            </div>
 		        </div>
 		    </div>

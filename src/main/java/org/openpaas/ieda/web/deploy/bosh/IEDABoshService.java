@@ -12,14 +12,18 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAConfiguration;
 import org.openpaas.ieda.common.ReplaceItem;
+import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapAwsConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -220,17 +224,18 @@ public class IEDABoshService {
 
 	public String createSettingFile(Integer id, String iaas) {
 		// 파일 가져오기
-		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-fullbosh-setting.yml");
-		URL stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-fullbosh-stub.yml");
+		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/"+iaas.toLowerCase()+"-fullbosh-setting.yml");
+		URL stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/"+iaas.toLowerCase()+"-fullbosh-stub.yml");
+		
 		File settingFile;
 		File stubDeploy;
 
 		String content = "";
 		String stubContent = "";
-		String settingFileName = (iaas == "AWS") ? "aws-fullbosh-setting-"+id+".yml" 
-				: "openstack-fullbosh-setting-"+id+".yml";
+		String settingFileName = iaas.toLowerCase()+"-fullbosh-setting-"+id+".yml";
+		
 		String deplymentFileName = ""; 
-
+		
 		try {
 			settingFile = new File(classPath.toURI());//resource.getFile();
 			stubDeploy = new File(stubPath.toURI());
@@ -290,7 +295,8 @@ public class IEDABoshService {
 			items.add(new ReplaceItem("[boshName]", openstackConfig.getBoshName()));
 			items.add(new ReplaceItem("[directorUuid]", openstackConfig.getDirectorUuid()));
 			items.add(new ReplaceItem("[releaseVersion]", openstackConfig.getReleaseVersion()));
-			//network
+			items.add(new ReplaceItem("[cloudSecurityGroups]", openstackConfig.getCloudSecurityGroups()));
+			items.add(new ReplaceItem("[cloudSubnet]", openstackConfig.getCloudSubnet()));
 			items.add(new ReplaceItem("[subnetStatic]", openstackConfig.getSubnetStatic()));
 			items.add(new ReplaceItem("[subnetRange]", openstackConfig.getSubnetRange()));
 			items.add(new ReplaceItem("[subnetGateway]", openstackConfig.getSubnetGateway()));
@@ -309,6 +315,10 @@ public class IEDABoshService {
 			items.add(new ReplaceItem("[defaultKeyName]", openstackConfig.getDefaultKeyName()));
 			items.add(new ReplaceItem("[defaultSecurityGroups]", openstackConfig.getDefaultSecurityGroups()));
 			items.add(new ReplaceItem("[ntp]", openstackConfig.getNtp()));
+			items.add(new ReplaceItem("[directorRecursor]", openstackConfig.getDirectorRecursor()));
+			items.add(new ReplaceItem("[privateKeyPath]", openstackConfig.getPrivateKeyPath()));
+			
+			
 
 		}
 		return items;
@@ -327,15 +337,14 @@ public class IEDABoshService {
 			stubFile = new File(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName);
 			settingFile = new File(iedaConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName);
 
-			deploymentFileName =  (iaas == "AWS") ? "aws-fullbosh-merge-"+id+".yml"
-					:"openstack-fullbosh-merge-"+id+".yml";
+			deploymentFileName =  iaas.toLowerCase() +"-fullbosh-merge-"+id+".yml";
+			
 			if(stubFile.exists() && settingFile.exists()){
 				command = iedaConfiguration.getScriptDir() + System.getProperty("file.separator") + "merge-deploy.sh ";
 				command += iedaConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName + " ";
 				command += iedaConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName + " ";
 				command += iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
 
-				log.info("&&&&& \n" + command + "\n&&&");
 				Process process = r.exec(command);
 				process.getInputStream();
 				inputStream = process.getInputStream();
@@ -368,5 +377,43 @@ public class IEDABoshService {
 			}
 		}
 		return deploymentFileName;
+	}
+	
+	public String getDeploymentInfos(String deploymentFile){
+		String contents = "";
+		File settingFile = null;
+		try {
+			settingFile = new File(iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile);
+			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return contents;
+	}
+
+
+	public void deleteBoshInfo(BoshParam.Delete dto) {
+		String deploymentFileName = "";
+		try{
+			//awsConfig = awsRepository.findOne(id);
+			if( "AWS".equals(dto.getIaas())){ 
+				IEDABoshAwsConfig config = awsRepository.findOne(Integer.parseInt(dto.getId()));
+				awsRepository.delete(Integer.parseInt(dto.getId()));
+				deploymentFileName = config.getDeploymentFile();
+			}
+			else{
+				IEDABoshOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
+				openstackRepository.delete(Integer.parseInt(dto.getId()));
+				deploymentFileName = config.getDeploymentFile();
+			}
+			if( StringUtils.isEmpty(deploymentFileName)) deleteDeploy(deploymentFileName);
+		} catch (EntityNotFoundException e) {
+			throw new IEDACommonException("illigalArgument.bootstrap.exception",
+					"삭제할 BOOTSTRAP이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			throw new IEDACommonException("illigalArgument.bootstrap.exception",
+					"BOOTSTRAP 삭제 중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
+		}
+		
 	}
 }

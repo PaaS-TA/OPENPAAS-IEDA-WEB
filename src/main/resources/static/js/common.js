@@ -62,3 +62,8 @@ function setCommonCode(url, id) {
 		}
 	});
 }
+
+//빈값 체크
+function checkEmpty(value){
+	return (value == null || value == "") ? true: false;
+}

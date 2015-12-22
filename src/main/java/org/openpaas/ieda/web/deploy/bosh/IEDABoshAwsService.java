@@ -88,18 +88,6 @@ public class IEDABoshAwsService {
 		return boshAwsRepository.save(config);
 	}
 	
-	public String getDeploymentInfos(String deploymentFile){
-		String contents = "";
-		File settingFile = null;
-		try {
-			settingFile = new File(iedaConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile);
-			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return contents;
-	}
-	
 	public List<ReplaceItem> getBoshAwsReplaceItems(IEDABoshAwsConfig config){
 		List<ReplaceItem> replaces = new ArrayList<>();
 		//boshInfo

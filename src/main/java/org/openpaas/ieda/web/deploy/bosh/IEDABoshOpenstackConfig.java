@@ -33,10 +33,13 @@ public class IEDABoshOpenstackConfig {
 	private String subnetGateway;
 	private String subnetDns;
 	private String cloudNetId;
+	private String cloudSecurityGroups;
+	private String cloudSubnet;
 	//resource
 	private String stemcellName;
 	private String stemcellVersion;
 	private String cloudInstanceType;
+	
 	private String boshPassword;
 	//opensrack
 	private String directorName;
@@ -49,6 +52,8 @@ public class IEDABoshOpenstackConfig {
 	private String defaultKeyName;
 	private String defaultSecurityGroups;
 	private String ntp;
+	private String directorRecursor;
+	private String privateKeyPath;
 	//deploy
 	private String deploymentFile;
 
