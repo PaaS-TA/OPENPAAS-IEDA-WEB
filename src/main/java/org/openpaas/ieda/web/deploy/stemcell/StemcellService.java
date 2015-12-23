@@ -84,10 +84,12 @@ public class StemcellService {
 				}
 				
 				// 스템셀 버전 역순으로 정렬
-				Comparator<StemcellInfo> byStemcellVersion = Collections.reverseOrder(Comparator.comparing(StemcellInfo::getVersion));
-				stemcellInfoList = stemcellInfoList.stream()
-						.sorted(byStemcellVersion)
-						.collect(Collectors.toList());
+				if ( stemcellInfoList != null && stemcellInfoList.size() > 0 ) {
+					Comparator<StemcellInfo> byStemcellVersion = Collections.reverseOrder(Comparator.comparing(StemcellInfo::getVersion));
+					stemcellInfoList = stemcellInfoList.stream()
+							.sorted(byStemcellVersion)
+							.collect(Collectors.toList());
+				}
 			}
 
 		} catch (Exception e) {

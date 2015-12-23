@@ -9,6 +9,7 @@ public class BoshInfo {
 
 	private int recid;
 	private int id;
+	private String directorUuid;
 	private String deploymentName;
 	private String iaas;
 	private String releaseVersion;
@@ -17,6 +18,6 @@ public class BoshInfo {
 	private String subnetRange;
 	private String gateway;
 	private String dns;
-	private boolean deployed;
+	private String deployStatus;
 	private Date createdDate;
 }

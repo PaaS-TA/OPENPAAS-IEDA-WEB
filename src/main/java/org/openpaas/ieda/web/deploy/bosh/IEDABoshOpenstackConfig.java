@@ -24,7 +24,7 @@ public class IEDABoshOpenstackConfig {
 	private Date updatedDate;
 	
 	//bosh
-	private String boshName;
+	private String deploymentName;
 	private String directorUuid;
 	private String releaseVersion;
 	//network
@@ -54,5 +54,6 @@ public class IEDABoshOpenstackConfig {
 	private String privateKeyPath;
 	//deploy
 	private String deploymentFile;
+	private String deployStatus;
 
 }

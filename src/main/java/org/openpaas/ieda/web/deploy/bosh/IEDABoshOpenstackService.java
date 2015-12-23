@@ -46,7 +46,7 @@ public class IEDABoshOpenstackService {
 		else{
 			config = opentstackRepository.findOne(Integer.parseInt(dto.getId()));
 		}
-		config.setBoshName(dto.getBoshName());;
+		config.setDeploymentName(dto.getDeploymentName());
 		config.setDirectorUuid(dto.getDirectorUuid());
 		config.setReleaseVersion(dto.getReleaseVersion());	
 		config.setPrivateKeyPath(dto.getPrivateKeyPath());
@@ -148,7 +148,7 @@ public class IEDABoshOpenstackService {
 		return config;
 	}
 
-	public void deleteOpentstackInfo(int id) {
+/*	public void deleteOpentstackInfo(int id) {
 		IEDABoshOpenstackConfig awsConfig = null; 
 		try{
 			awsConfig = opentstackRepository.findOne(id);
@@ -162,7 +162,7 @@ public class IEDABoshOpenstackService {
 					"BOSH 삭제 중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
 		
-	}
+	}*/
 
 	public IEDABoshOpenstackConfig getOpentstackInfo(int id) {
 		IEDABoshOpenstackConfig config =  null;

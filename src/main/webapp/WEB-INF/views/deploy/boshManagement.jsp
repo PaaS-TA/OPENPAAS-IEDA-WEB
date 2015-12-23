@@ -63,23 +63,30 @@ $(function(){
 		columns:[
 		      {field: 'recid', 	caption: 'recid', hidden: true}
 			, {field: 'id', caption: 'ID', hidden: true}
-			, {field: 'deploymentName', caption: '배포명', size: '10%'}
-			, {field: 'deployed', caption: '배포여부', size: '10%', 
+			, {field: 'deployStatus', caption: '배포상태', size: '80px', 
 				render: function(record) {
-					console.log(record.deployed);
-		    		   if ( record.deployed == true )
-		    			   return '<span class="btn btn-primary" style="width:70px">배포</span>';
-		    		   else
-		    			   return '';
+					console.log(record.deployStatus);
+		    			if ( record.deployStatus == 'done' )
+		    				return '<span class="btn btn-primary" style="width:60px">성공</span>';
+		    			else	if ( record.deployStatus == 'error' )
+		    				return '<span class="btn btn-primary" style="width:60px">오류</span>';
+		    			else	if ( record.deployStatus == 'cancelled' )
+		    				return '<span class="btn btn-primary" style="width:60px">취소</span>';
+		    			else	if ( record.deployStatus == 'deploying' )
+		    				return '<span class="btn btn-primary" style="width:60px">배포중</span>';
+						else
+		    				return 'N/A';
 		    	   }
 				}
-			, {field: 'iaas', caption: 'IaaS', size: '10%'}
-			, {field: 'releaseVersion', caption: '릴리즈', size: '10%'}
-			, {field: 'stemcell', caption: '스템셀', size: '30%'}
-			, {field: 'publicIp', caption: '고정 IP', size: '10%'}
-			, {field: 'subnetRange', caption: '서브넷 범위', size: '10%'}
-			, {field: 'gateway', caption: '게이트웨이', size: '10%'}
-			, {field: 'dns', caption: 'DNS', size: '10%'}
+			, {field: 'deploymentName', caption: '배포명', size: '100px'}
+			, {field: 'releaseVersion', caption: '릴리즈', size: '100px'}
+			, {field: 'stemcell', caption: '스템셀', size: '240px'}
+			, {field: 'iaas', caption: 'IaaS', size: '100px'}
+			, {field: 'directorUuid', caption: '설치관리자 UUID', size: '220px'}
+			, {field: 'publicIp', caption: '고정 IP', size: '100px'}
+			, {field: 'subnetRange', caption: '서브넷 범위', size: '100px'}
+			, {field: 'gateway', caption: '게이트웨이', size: '100px'}
+			, {field: 'dns', caption: 'DNS', size: '100px'}
 			],
 		onClick:function(event) {
 			var grid = this;
@@ -95,7 +102,6 @@ $(function(){
 					$('#modifyBtn').attr('disabled', false);
 					$('#deleteBtn').attr('disabled', false);
 				}
-				
 			}
 		}
 	});
@@ -182,6 +188,7 @@ function doSearch() {
 				doButtonStyle();
 			});
 }
+
 function selectIaas(){
 	//Bootstrap 
 	w2confirm({
@@ -193,11 +200,9 @@ function selectIaas(){
 		yes_text 		: "확인",
 		no_text 		: "취소",
 		yes_callBack 	: function(){
-			//alert($("input[name='structureType']").val());
 			structureType = $(".w2ui-msg-body input:radio[name='structureType']:checked").val();
 			if(structureType){
 				iaas = structureType;
-				//console.log("iaas ::: " + structureType);
 				getReleaseVersionList();
 				
 				if( structureType == "AWS")
@@ -220,20 +225,16 @@ function getBoshAwsData(record){
 		url : url,
 		contentType : "application/json",
 		success : function(data, status) {
-			//console.log("== /bosh/aws/ RESULT :: ");
 			if ( data == null || data == "" ){
-				//isOk = false;
+
 			} 
 			else {
 				initSetting();
-				//var content = JSON.parse(data.contents);
-				//console.log("=== Content ::: " + data.contents);
 				settingAWSData(data.contents);
 			}
 		},
 		error : function(request, status, error) {
 			var errorResult = JSON.parse(request.responseText);
-			//console.log("console log ::: " +errorResult.message);
 			w2alert(errorResult.message, "BOSH 설치");
 		}
 	});	
@@ -266,7 +267,7 @@ function deleteBoshPop(record){
 	
 	var requestParameter = {iaas:record.iaas, id:record.id};
 	
-	if ( record.deployed == false ) {
+	if ( record.deployStatus == null || record.deployStatus == '' ) {
 		// 단순 레코드 삭제
 		var url = "/bosh/delete";
 		$.ajax({
@@ -284,16 +285,15 @@ function deleteBoshPop(record){
 		});
 		
 	} else {
-		var body = '<div style="margin:10px 0;"><b>▶ 설치 로그</b></div>';	
-		body +='<textarea name="deleteLogs" style="width:93%;height:85%;overflow-y:visible;resize:none;background-color: #FFF;margin:2%" readonly="readonly"></textarea>';
-		//body += '</div>';
+		var message = "";
+		var body = '<textarea id="deleteLogs" style="width:95%;height:90%;overflow-y:visible;resize:none;background-color: #FFF; margin:2%" readonly="readonly"></textarea>';
 		
 		w2popup.open({
 			width : 610,
 			height : 500,
-			title : "<b>Bosh 삭제</b>",
+			title : "<b>BOSH 삭제</b>",
 			body  : body,
-			buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="popupComplete();;">완료</button>',
+			buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="popupComplete();;">닫기</button>',
 			showMax : true,
 			onOpen : function(event){
 				event.onComplete = function(){
@@ -301,14 +301,26 @@ function deleteBoshPop(record){
 					deleteClient = Stomp.over(socket); 
 					deleteClient.connect({}, function(frame) {
 						deleteClient.subscribe('/bosh/boshDelete', function(data){
-					        var deleteLogs = $(".w2ui-msg-body textarea[name=deleteLogs]");
-				        	deleteLogs.append(data.body + "\n").scrollTop( deleteLogs[0].scrollHeight );
+							
+				        	var deleteLogs = $(".w2ui-msg-body #deleteLogs");
 				        	
-				        	if( data == "complete"){
-				        		deleteClient.disconnect(function(){
-				        			console.log("disconnect");
-				        		});
+				        	var response = JSON.parse(data.body);
+				        	
+				        	if ( response.messages != null ) {
+						       	for ( var i=0; i < response.messages.length; i++) {
+						       		deleteLogs.append(response.messages[i] + "\n").scrollTop( deleteLogs[0].scrollHeight );
+						       	}
+						       	
+						       	if ( response.state.toLowerCase() != "started" ) {
+						            if ( response.state.toLowerCase() == "done" )	message = message + " 삭제가 완료되었습니다."; 
+						    		if ( response.state.toLowerCase() == "error" ) message = message + " 삭제 중 오류가 발생하였습니다.";
+						    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 삭제 중 취소되었습니다.";
+						    			
+						    		deleteClient.disconnect();
+									w2alert(message, "BOSH 삭제");
+						       	}
 				        	}
+				        	
 				        });
 						deleteClient.send('/send/boshDelete', {}, JSON.stringify(requestParameter));
 				    });
@@ -316,11 +328,8 @@ function deleteBoshPop(record){
 			},
 			onClose : function (event){
 				event.onComplete= function(){
-					/* $("body ").remove("#deleteLogs");
-					deleteLogs.text(""); */
 					$("textarea").text("");
 					w2ui['config_boshGrid'].reset();
-					//console.log("close");
 					deleteClient.disconnect();
 					deleteClient = "";
 					doSearch();
@@ -923,6 +932,11 @@ function installPopup(){
 	var installDiv = (iaas == 'AWS') ? $("#installDiv") : $("#osInstallDiv");
 	var message = "BOSH(배포명:" + boshInfo.deploymentName +  ") ";
 	
+	var requestParameter = {
+			id : boshId,
+			iaas: iaas
+	};
+	
 	installDiv.w2popup({
 		width 	: 670,
 		height 	: 470,
@@ -959,7 +973,7 @@ function installPopup(){
 			        });
 			        
 			        console.log("###INSTALL ::  deployFileName:"+deploymentFile);
-			        installClient.send('/send/boshInstall', {}, JSON.stringify({deployFileName:deploymentFile}));
+			        installClient.send('/send/boshInstall', {}, JSON.stringify(requestParameter));
 			    });
 			}
 		},
@@ -1410,10 +1424,10 @@ $( window ).resize(function() {
 	
 	<!-- Bosh 목록-->
 	<div class="pdt20"> 
-		<div class="title fl">Bosh 목록</div>
+		<div class="title fl">BOSH 목록</div>
 		<div class="fr"> 
 			<!-- Btn -->
-			<span id="installBtn" class="btn btn-primary"  style="width:120px">설&nbsp;&nbsp;치</span>
+			<span id="installBtn" class="btn btn-primary" style="width:120px">설&nbsp;&nbsp;치</span>
 			&nbsp;
 			<span id="modifyBtn" class="btn btn-info" style="width:120px">수&nbsp;&nbsp;정</span>
 			&nbsp;

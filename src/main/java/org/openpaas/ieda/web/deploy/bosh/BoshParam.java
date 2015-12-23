@@ -83,7 +83,7 @@ public class BoshParam {
 	public static class OsBosh{
 		private String id;
 		@NotNull
-		private String boshName;
+		private String deploymentName;
 		@NotNull
 		private String directorUuid;
 		@NotNull
@@ -144,6 +144,8 @@ public class BoshParam {
 	@Data
 	public static class Install{
 		@NotNull
-		private String deployFileName;
+		private String iaas;
+		@NotNull
+		private String id;
 	}
 }

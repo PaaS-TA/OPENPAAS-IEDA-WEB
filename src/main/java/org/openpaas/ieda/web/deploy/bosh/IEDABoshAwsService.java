@@ -159,12 +159,12 @@ public class IEDABoshAwsService {
 		return config;
 	}
 
-	public void deleteAwsInfo(int id) {
+/*	public void deleteAwsInfo(int id) {
 		IEDABoshAwsConfig awsConfig = null; 
 		try{
 			awsConfig = boshAwsRepository.findOne(id);
 			boshAwsRepository.delete(id);
-			boshService.deleteDeploy(awsConfig.getDeploymentFile());
+			//boshService.deleteDeploy(awsConfig.getDeploymentFile());
 		} catch (EntityNotFoundException e) {
 			throw new IEDACommonException("illigalArgument.bosh.exception",
 					"삭제할 BOSH가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
@@ -173,7 +173,7 @@ public class IEDABoshAwsService {
 					"BOSH 삭제 중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
 		
-	}
+	}*/
 
 	public IEDABoshAwsConfig getAwsInfo(int id) {
 		IEDABoshAwsConfig config =  null;

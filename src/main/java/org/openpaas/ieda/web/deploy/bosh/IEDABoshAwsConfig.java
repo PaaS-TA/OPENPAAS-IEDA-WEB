@@ -44,4 +44,5 @@ public class IEDABoshAwsConfig {
 	private String stemcellVersion;
 	private String boshPassword;
 	private String deploymentFile;
+	private String deployStatus;
 }

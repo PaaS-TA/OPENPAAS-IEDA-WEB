@@ -11,6 +11,7 @@ import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
+import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
@@ -20,8 +21,17 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class BoshDeployAsyncService {
+	
+	@Autowired
+	private IEDABoshAwsRepository awsRepository;
+
+	@Autowired
+	private IEDABoshOpenstackRepository openstackRepository;
 	
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
@@ -31,8 +41,37 @@ public class BoshDeployAsyncService {
 	
 	final private String messageEndpoint = "/bosh/boshInstall"; 
 	
-	public void deploy(String deployFileName) {
+	public void deploy(BoshParam.Install dto) {
 		
+		IEDABoshAwsConfig aws = null;
+		IEDABoshOpenstackConfig openstack = null;
+		String deploymentFileName = null;
+		
+		if( "AWS".equals(dto.getIaas())) { 
+			aws = awsRepository.findOne(Integer.parseInt(dto.getId()));
+			if ( aws != null ) deploymentFileName = aws.getDeploymentFile();
+
+		} else {
+			openstack = openstackRepository.findOne(Integer.parseInt(dto.getId()));
+			if ( openstack != null ) deploymentFileName = openstack.getDeploymentFile();
+		}
+			
+		if ( deploymentFileName == null || deploymentFileName.isEmpty() ) {
+			throw new IEDACommonException("illigalArgument.boshdelete.exception",
+					"배포파일 정보가 존재하지 않습니다..", HttpStatus.NOT_FOUND);
+		}
+		
+		if ( aws != null ) {
+			aws.setDeployStatus("deploying");
+			awsRepository.save(aws);
+		}
+		
+		if ( openstack != null ) {
+			openstack.setDeployStatus("deploying");
+			openstackRepository.save(openstack);
+		}
+		
+		String status = "";
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
 		
 		BufferedReader br = null;
@@ -46,7 +85,7 @@ public class BoshDeployAsyncService {
 			postMethod = (PostMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)postMethod);
 			postMethod.setRequestHeader("Content-Type", "text/yaml");
 			
-			String deployFile = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deployFileName;
+			String deployFile = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
 			
 			String content = "", temp = "";
 			
@@ -68,13 +107,14 @@ public class BoshDeployAsyncService {
 				Header location = postMethod.getResponseHeader("Location");
 				String taskId = DirectorRestHelper.getTaskId(location.getValue());
 				
-				DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId);
+				status = DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId);
 				
 			} else {
 				DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("배포 중 오류가 발생하였습니다.[" + statusCode + "]"));
 			}
 
 		} catch ( Exception e) {
+			status = "error";
 			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("배포 중 Exception이 발생하였습니다."));
 		} finally {
 			try {
@@ -85,11 +125,22 @@ public class BoshDeployAsyncService {
 				e.printStackTrace();
 			}
 		}
+		
+		log.info("### Deploy Status = " + status);
+		
+		if ( aws != null ) {
+			aws.setDeployStatus(status);
+			awsRepository.save(aws);
+		}
+		if ( openstack != null ) {
+			openstack.setDeployStatus(status);
+			openstackRepository.save(openstack);
+		}
 
 	}
 
 	@Async
-	public void deployAsync(String deployFileName) {
-		deploy(deployFileName);
+	public void deployAsync(BoshParam.Install dto) {
+		deploy(dto);
 	}	
 }

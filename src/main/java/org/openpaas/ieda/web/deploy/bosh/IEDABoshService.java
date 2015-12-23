@@ -19,6 +19,8 @@ import org.openpaas.ieda.api.DeploymentInfo;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.common.ReplaceItem;
+import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
+import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.openpaas.ieda.web.information.deploy.DeploymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,11 +46,15 @@ public class IEDABoshService {
 	@Autowired
 	private DeploymentService deploymentService;
 	
+	@Autowired
+	private IEDADirectorConfigService directroConfigService;
 
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 
 	public List<BoshInfo> getBoshList(){
+		
+		//IEDADirectorConfig defaultDirector = directroConfigService.getDefaultDirector();
 
 		List<BoshInfo> boshList = new ArrayList();
 		List<IEDABoshAwsConfig> boshAwsList = awsRepository.findAll();
@@ -62,26 +68,35 @@ public class IEDABoshService {
 		List<DeploymentInfo> deployedList = deploymentService.listDeployment();
 
 		int recid = 0;
-		if( boshAwsList.size() >0 ){
+		if( boshAwsList.size() > 0 ){
 			for(IEDABoshAwsConfig aws : boshAwsList){
+				
+/*				// 기본관리자 UUID와 다른 경우 목록에서 제외
+				if ( !defaultDirector.getDirectorUuid().equals(aws.getDirectorUuid()) )
+					continue;*/
+				
 				BoshInfo boshInfo = new BoshInfo();
 				boshInfo.setRecid(recid++);
 				boshInfo.setId(aws.getId());
 				boshInfo.setDeploymentName(aws.getDeploymentName());
 				boshInfo.setIaas("AWS");
+				boshInfo.setDirectorUuid(aws.getDirectorUuid());
 				boshInfo.setReleaseVersion(aws.getReleaseVersion());
 				boshInfo.setStemcell(aws.getStemcellName() + "/" + aws.getStemcellVersion());
 				boshInfo.setPublicIp(aws.getPublicStaticIp());
 				boshInfo.setSubnetRange(aws.getSubnetRange());
 				boshInfo.setGateway(aws.getSubnetGateway());
 				boshInfo.setDns(aws.getSubnetDns());
-				boshInfo.setDeployed(false);
-				for ( DeploymentInfo deployment : deployedList ) {
-					if ( deployment.getName().equals(aws.getDeploymentName()) ) {
-						boshInfo.setDeployed(true);
-						break;
+				boshInfo.setDeployStatus(aws.getDeployStatus());
+				
+/* 				if ( deployedList != null && deployedList.size() > 0 ) {
+					for ( DeploymentInfo deployment : deployedList ) {
+						if ( deployment.getName().equals(aws.getDeploymentName()) ) {
+							boshInfo.setDeployed(true);
+							break;
+						}
 					}
-				}
+				}*/
 				
 				boshInfo.setCreatedDate(aws.getCreatedDate());
 				boshList.add(boshInfo);
@@ -90,12 +105,28 @@ public class IEDABoshService {
 
 		if( boshOpenstackList.size() >0 ){
 			for(IEDABoshOpenstackConfig openstack : boshOpenstackList){
+				
+/*				// 기본관리자 UUID와 다른 경우 목록에서 제외
+				if ( !defaultDirector.getDirectorUuid().equals(openstack.getDirectorUuid()) )
+					continue;*/
+
+				
 				BoshInfo boshInfo = new BoshInfo();
 				boshInfo.setRecid(recid++);
 				boshInfo.setId(openstack.getId());
 				//boshInfo.setDeploymentName(openstack.g);
 				boshInfo.setIaas("OPENSTACK");
 				boshInfo.setCreatedDate(openstack.getCreatedDate());
+				
+/* 				if ( deployedList != null && deployedList.size() > 0 ) {
+					for ( DeploymentInfo deployment : deployedList ) {
+						if ( deployment.getName().equals(openstack.getDeploymentName()) ) {
+							boshInfo.setDeployed(true);
+							break;
+						}
+					}
+				} */
+				
 				boshList.add(boshInfo);
 			}
 		}
@@ -155,6 +186,7 @@ public class IEDABoshService {
 		return status;
 	}
 
+/*	
 	public void deleteDeploy(String deploymentFile) {
 
 		InputStream inputStream = null;
@@ -196,6 +228,7 @@ public class IEDABoshService {
 		}
 
 	}
+*/
 
 	public void boshInstall(String deployFileName) {
 		InputStream inputStream = null;
@@ -312,7 +345,7 @@ public class IEDABoshService {
 		}
 		else{
 			IEDABoshOpenstackConfig openstackConfig = openstackRepository.findOne(id);
-			items.add(new ReplaceItem("[boshName]", openstackConfig.getBoshName()));
+			items.add(new ReplaceItem("[deploymentName]", openstackConfig.getDeploymentName()));
 			items.add(new ReplaceItem("[directorUuid]", openstackConfig.getDirectorUuid()));
 			items.add(new ReplaceItem("[releaseVersion]", openstackConfig.getReleaseVersion()));
 			items.add(new ReplaceItem("[cloudSecurityGroups]", openstackConfig.getCloudSecurityGroups()));
@@ -412,7 +445,7 @@ public class IEDABoshService {
 	}
 
 
-	public void deleteBoshInfo(BoshParam.Delete dto) {
+/*	public void deleteBoshInfo(BoshParam.Delete dto) {
 		String deploymentFileName = "";
 		try{
 			//awsConfig = awsRepository.findOne(id);
@@ -425,13 +458,14 @@ public class IEDABoshService {
 				openstackRepository.delete(Integer.parseInt(dto.getId()));
 				deploymentFileName = config.getDeploymentFile();
 			}
-			if( StringUtils.isEmpty(deploymentFileName)) deleteDeploy(deploymentFileName);
+			//if( StringUtils.isEmpty(deploymentFileName)) deleteDeploy(deploymentFileName);
 		} catch (Exception e) {
 			throw new IEDACommonException("illigalArgument.boshdelete.exception",
 					"삭제중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
 		
 	}
+*/
 	
 	public void deleteBoshInfoRecord(BoshParam.Delete dto) {
 		try{
@@ -448,7 +482,7 @@ public class IEDABoshService {
 			throw new IEDACommonException("illigalArgument.boshdelete.exception",
 					"삭제중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
-		
 	}
+	
 
 }

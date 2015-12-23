@@ -86,7 +86,7 @@ public class DirectorRestHelper {
 	// deploy
 	public static String getDeployURI(String host, int port) {
 		return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).path("deployments")
-				.queryParam("recreate", "true").queryParam("skip_drain", "true").build().toUri().toString();
+				.queryParam("recreate", "true").build().toUri().toString();
 	}
 
 	public static String getDeleteDeploymentURI(String host, int port, String deploymentName) {
@@ -129,8 +129,10 @@ public class DirectorRestHelper {
 				.queryParam("type", type).build().expand(taskId).toUri().toString();
 	}
 
-	public static void trackToTask(IEDADirectorConfig defaultDirector, SimpMessagingTemplate messageTemplate,
+	public static String trackToTask(IEDADirectorConfig defaultDirector, SimpMessagingTemplate messageTemplate,
 			String messageEndpoint, HttpClient client, String taskId) {
+		
+		String status = "";
 
 		try {
 			sendTaskOutput(messageTemplate, messageEndpoint, "started", Arrays.asList("Director task " + taskId));
@@ -222,8 +224,8 @@ public class DirectorRestHelper {
 								responseMessage.add("  Failed      " + output.getStage() + " > " + output.getTask());
 								System.out.println("  Failed     " + output.getStage() + " > " + output.getTask());
 							} else {
-								responseMessage.add("  Processing " + output.getStage() + " > " + output.getTask() + "" + output.getProgress());
-								System.out.println("  Processing " + output.getStage() + " > " + output.getTask() + "" + output.getProgress());
+								responseMessage.add("  Processing " + output.getStage() + " > " + output.getTask() + " " + output.getProgress() + "%");
+								System.out.println("  Processing " + output.getStage() + " > " + output.getTask() + " " + output.getProgress() + "%");
 							}
 						} else {
 							HashMap<String, String> error = output.getError();
@@ -249,16 +251,20 @@ public class DirectorRestHelper {
 					System.out.println("Task " + taskId + " done");
 					sendTaskOutput(messageTemplate, messageEndpoint, "done",
 							Arrays.asList("", "Task " + taskId + " done"));
+					status = "done";
 					break;
 				} else if (taskInfo.getState().equalsIgnoreCase("error")) {
 					System.out.println("An error occurred while executing the task " + taskId);
 					sendTaskOutput(messageTemplate, messageEndpoint, "error",
 							Arrays.asList("", "An error occurred while executing the task " + taskId));
+					status = "error";
 					break;
 				} else if (taskInfo.getState().equalsIgnoreCase("cancelled")) {
 					System.out.println("Cancelled Task " + taskId);
 					sendTaskOutput(messageTemplate, messageEndpoint, "cancelled",
-							Arrays.asList("", "Canceled Task " + taskId));
+							Arrays.
+							asList("", "Canceled Task " + taskId));
+					status = "cancelled";
 					break;
 				}
 
@@ -268,7 +274,10 @@ public class DirectorRestHelper {
 			e.printStackTrace();
 			sendTaskOutput(messageTemplate, messageEndpoint, "error",
 					Arrays.asList("", "An exception occurred while executing the task " + taskId));
+			status = "error";
 		}
+		
+		return status;
 	}
 
 	public static void sendTaskOutput(SimpMessagingTemplate messageTemplate, String messageEndpoint, String status, List<String> messages) {
