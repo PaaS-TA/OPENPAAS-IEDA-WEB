@@ -1,4 +1,4 @@
-name: [boshName]
+name: [deploymentName]
 director_uuid: [directorUuid]
 release:
   version: [releaseVersion]
@@ -10,12 +10,12 @@ networks:
       dns: [[subnetDns]]
       static: [[subnetStatic]]
       cloud_properties:
-        net_id: [cloudNetId]
+        net_id: [subnetId]
 jobs:
   director:
     networks:
       elastic:
-        static_ips: [[directorStaticIp]]
+        static_ips: [[publicStaticIp]]
 resource_pools:
   small:
     stemcell:
@@ -33,15 +33,12 @@ resource_pools:
     cloud_properties:
       instance_type: [cloudInstanceType]
 properties:
-  director: [directorName]
-#  dns:
-#    recursor: [directorRecursor]
-  ntp: [[ntp]]
+#  ntp: [[ntp]]
   openstack:
     auth_url: [authUrl]
     tenant: [tenant]
     username: [userName]
     api_key: [apiKey]
-    default_key_name: [defaultKeyName]
+    default_key_name: [privateKeyName]
     private_key: [privateKeyPath]
     default_security_groups: [[defaultSecurityGroups]]

@@ -37,7 +37,8 @@ public class IEDABoshOpenstackService {
 		return opentstackRepository.findOne(id);
 	}
 
-	public IEDABoshOpenstackConfig saveBoshInfo(BoshParam.OsBosh dto){
+	
+	public IEDABoshOpenstackConfig saveOpenstackInfo(BoshParam.Openstack dto){
 		IEDABoshOpenstackConfig config = null;
 		Date now = new Date();
 		if( dto.getId() == null || "".equals(dto.getId())){
@@ -46,49 +47,54 @@ public class IEDABoshOpenstackService {
 		else{
 			config = opentstackRepository.findOne(Integer.parseInt(dto.getId()));
 		}
-		config.setDeploymentName(dto.getDeploymentName());
-		config.setDirectorUuid(dto.getDirectorUuid());
-		config.setReleaseVersion(dto.getReleaseVersion());	
-		config.setPrivateKeyPath(dto.getPrivateKeyPath());
-		config.setCreatedDate(now);
-		config.setUpdatedDate(now);
-		return opentstackRepository.save(config);
-	}
-	
-	public IEDABoshOpenstackConfig saveOpenstackInfo(BoshParam.Openstack dto){
-		IEDABoshOpenstackConfig config = opentstackRepository.findOne(Integer.parseInt(dto.getId()));
 
-		config.setDirectorName(dto.getDirectorName());
-		config.setDirectorStaticIp(dto.getDirectorStaticIp());
 		config.setAuthUrl(dto.getAuthUrl());
 		config.setTenant(dto.getTenant());
 		config.setUserName(dto.getUserName());
 		config.setApiKey(dto.getApiKey());
-		config.setDefaultKeyName(dto.getDefaultKeyName());
-		config.setDefaultSecurityGroups(dto.getDefaultSecurityGroups());//? 배열?
-		config.setNtp(dto.getNtp());
-		Date now = new Date();
+		config.setDefaultSecurityGroups(dto.getDefaultSecurityGroups());
+		config.setPrivateKeyName(dto.getPrivateKeyName());
+		config.setPrivateKeyPath(dto.getPrivateKeyPath());
+		config.setCreatedDate(now);
 		config.setUpdatedDate(now);
+
 		return opentstackRepository.save(config);
 	}
 	
-	
-	public IEDABoshOpenstackConfig saveOsNetworkInfo(BoshParam.OsNetwork dto){
+	public IEDABoshOpenstackConfig saveBoshInfo(BoshParam.OsBosh dto){
 		IEDABoshOpenstackConfig config = opentstackRepository.findOne(Integer.parseInt(dto.getId()));
 		
-		config.setSubnetStatic(dto.getSubnetStatic());
+		config.setDeploymentName(dto.getDeploymentName());
+		config.setDirectorUuid(dto.getDirectorUuid());
+		config.setReleaseVersion(dto.getReleaseVersion());	
+		
+		Date now = new Date();
+		config.setUpdatedDate(now);
+		
+		return opentstackRepository.save(config);
+	}
+	
+	public IEDABoshOpenstackConfig saveOsNetworkInfo(BoshParam.OsNetwork dto){
+		log.info("# dto: " + dto.toString());
+		
+		IEDABoshOpenstackConfig config = opentstackRepository.findOne(Integer.parseInt(dto.getId()));
+		
+		config.setPublicStaticIp(dto.getPublicStaticIp());
+		config.setSubnetId(dto.getSubnetId());
+		config.setSubnetStaticFrom(dto.getSubnetStaticFrom());
+		config.setSubnetStaticTo(dto.getSubnetStaticTo());
 		config.setSubnetRange(dto.getSubnetRange());
 		config.setSubnetGateway(dto.getSubnetGateway());
 		config.setSubnetDns(dto.getSubnetDns());
-		config.setCloudNetId(dto.getCloudNetId());
-		config.setCloudSecurityGroups(dto.getCloudSecurityGroups());
-		config.setCloudSubnet(dto.getCloudSubnet());
+		
 		Date now = new Date();
 		config.setUpdatedDate(now);
+		
 		return opentstackRepository.save(config);
 	}
 	
 	public IEDABoshOpenstackConfig saveOsResourceInfo(BoshParam.OsResource dto){
+		
 		IEDABoshOpenstackConfig config = opentstackRepository.findOne(Integer.parseInt(dto.getId()));
 		
 		config.setStemcellName(dto.getStemcellName());
@@ -99,6 +105,7 @@ public class IEDABoshOpenstackService {
 		String deplymentFileName = boshService.createSettingFile(Integer.parseInt(dto.getId()), "OPENSTACK");
 		config.setDeploymentFile(deplymentFileName);
 		return opentstackRepository.save(config);
+	
 	}
 	
 	public IEDABoshOpenstackConfig createTempFile(IEDABoshOpenstackConfig config, List<ReplaceItem> replaceItems){
@@ -116,7 +123,7 @@ public class IEDABoshOpenstackService {
 		String deployFile = ""; 
 		
 		try {
-			tempDeploy = new File(classPath.toURI());//resource.getFile();
+			tempDeploy = new File(classPath.toURI());
 			stubDeploy = new File(stubPath.toURI());
 			
 			tempFile = LocalDirectoryConfiguration.getTempDir() +  System.getProperty("file.separator") + "aws-fullbosh-setting-"+config.getId()+".yml";

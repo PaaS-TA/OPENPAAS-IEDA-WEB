@@ -26,7 +26,6 @@ networks:
   - name: default
     type: manual
     subnets:
-    #- reserved: (( merge ))
     - static: (( merge ))
       range: (( merge ))
       gateway: (( merge ))
@@ -154,7 +153,7 @@ properties:
       password: director
 
   director:
-    name: (( merge || "mDirector" ))
+    name: (( merge || "Director" ))
     address: (( jobs.director.networks.default.static_ips.[0] ))
     db: *bosh_db
 
@@ -168,7 +167,6 @@ properties:
   dns:
     address: (( jobs.director.networks.default.static_ips.[0] ))
     db: *bosh_db
-#    recursor: (( merge ))
 
   hm:
     http:
@@ -179,6 +177,6 @@ properties:
       password: admin
     resurrector_enabled: true
 
-  ntp: (( merge ))
+#  ntp: (( merge ))
 
   openstack: (( merge ))

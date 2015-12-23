@@ -196,16 +196,27 @@ function doSync() {
 // 스템셀 다운로드
 function doDownload() {
 	var selected = w2ui['config_opStemcellsGrid'].getSelection();
-
 	var record = w2ui['config_opStemcellsGrid'].get(selected);
+	
+	var message = record.stemcellVersion + '버전의 스템셀 ' + record.stemcellFileName + '을 다운로드 하시겠습니까?';
+	
+	w2confirm({
+		msg : message,
+		title : '스템셀 다운로드',
+		yes_text : '확인',
+		no_text : '취소'
+	}).yes(function() {
+		var requestParameter = {
+				recid : record.recid,
+				key : record.key,
+				fileName : record.stemcellFileName,
+				fileSize : record.size
+			};
+			progressGrow(requestParameter);		
 
-	var requestParameter = {
-		recid : record.recid,
-		key : record.key,
-		fileName : record.stemcellFileName,
-		fileSize : record.size
-	};
-	progressGrow(requestParameter);
+	}).no(function() {
+		// do nothing
+	});
 }
 
 //PROGRESSBAR 생성

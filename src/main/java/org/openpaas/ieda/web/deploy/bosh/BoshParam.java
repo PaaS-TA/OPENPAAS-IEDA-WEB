@@ -3,6 +3,7 @@ package org.openpaas.ieda.web.deploy.bosh;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.openpaas.ieda.common.ReplaceItem;
 import org.openpaas.ieda.web.config.bootstrap.BootStrapDto;
 import org.openpaas.ieda.web.config.bootstrap.IDEABootStrapInfoDto;
 import org.openpaas.ieda.web.config.bootstrap.BootStrapDto.Deployment;
@@ -34,8 +35,6 @@ public class BoshParam {
 		@NotNull
 		private String directorUuid;
 		@NotNull
-		private String publicStaticIp;
-		@NotNull
 		private String releaseVersion;
 	}
 	
@@ -43,6 +42,8 @@ public class BoshParam {
 	public static class AwsNetwork{
 		@NotNull
 		private String id;
+		@NotNull
+		private String publicStaticIp;
 		@NotNull
 		private String subnetStaticFrom;
 		@NotNull
@@ -80,6 +81,18 @@ public class BoshParam {
 	}
 	
 	@Data
+	public static class Openstack{
+		private String id;
+		private String authUrl;
+		private String tenant;
+		private String userName;
+		private String apiKey;
+		private String defaultSecurityGroups;
+		private String privateKeyName;
+		private String privateKeyPath;		
+	}
+	
+	@Data
 	public static class OsBosh{
 		private String id;
 		@NotNull
@@ -88,22 +101,6 @@ public class BoshParam {
 		private String directorUuid;
 		@NotNull
 		private String releaseVersion;
-		@NotNull
-		private String privateKeyPath;
-	}
-	
-	@Data
-	public static class Openstack{
-		private String id;
-		private String directorName;
-		private String directorStaticIp;
-		private String authUrl;
-		private String tenant;
-		private String userName;
-		private String apiKey;
-		private String defaultKeyName;
-		private String defaultSecurityGroups;
-		private String ntp;
 	}
 	
 	@Data
@@ -111,19 +108,19 @@ public class BoshParam {
 		@NotNull
 		private String id;
 		@NotNull
-		private String subnetStatic;
+		private String publicStaticIp;
+		@NotNull
+		private String subnetId;
+		@NotNull
+		private String subnetStaticFrom;
+		@NotNull
+		private String subnetStaticTo;
 		@NotNull
 		private String subnetRange;
 		@NotNull
 		private String subnetGateway;
 		@NotNull
 		private String subnetDns;
-		@NotNull
-		private String cloudNetId;
-		@NotNull
-		private String cloudSubnet;
-		@NotNull
-		private String cloudSecurityGroups;
 	}
 	
 	@Data

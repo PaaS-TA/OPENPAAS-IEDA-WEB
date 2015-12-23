@@ -25,11 +25,13 @@ import lombok.extern.slf4j.Slf4j;
 public class IEDAStemcellDownload {
 	
 	private boolean isAvailable;
-	private String PUBLIC_STEMCELLS_BASE_URL = "https://bosh-jenkins-artifacts.s3.amazonaws.com";
+	final private String PUBLIC_STEMCELLS_BASE_URL = "https://bosh-jenkins-artifacts.s3.amazonaws.com";
 
 	private String subLink;
 	private String stemcellFileName;
 	private int percentage;
+	
+	final private int DOWNLOAD_BUFFER_SIZE = 8196; 
 	
 	private DownloadStatus status;
 	
@@ -69,9 +71,9 @@ public class IEDAStemcellDownload {
 	        in = new BufferedInputStream(new URL(downloadLink).openStream());
 	        fout = new FileOutputStream(LocalDirectoryConfiguration.getStemcellDir()+ System.getProperty("file.separator")  + dto.getFileName());
 
-	        final byte data[] = new byte[4096];
+	        final byte data[] = new byte[DOWNLOAD_BUFFER_SIZE];
 	        int count;
-	        while ((count = in.read(data, 0, 4096)) != -1) {
+	        while ((count = in.read(data, 0, DOWNLOAD_BUFFER_SIZE)) != -1) {
 	            fout.write(data, 0, count);
 	            received += count;
 	            if(percentage != (int)((received/stemcellSize) *100)){ 

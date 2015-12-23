@@ -56,19 +56,27 @@ public class IEDABoshAwsService {
 		IEDABoshAwsConfig config = boshAwsRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setDeploymentName(dto.getDeploymentName());
 		config.setDirectorUuid(dto.getDirectorUuid());
-		config.setPublicStaticIp(dto.getPublicStaticIp());
 		config.setReleaseVersion(dto.getReleaseVersion());
+		
+		Date now = new Date();
+		config.setUpdatedDate(now);
+
 		return boshAwsRepository.save(config);
 	}
 	
 	public IEDABoshAwsConfig saveBoshNetworkInfo(BoshParam.AwsNetwork dto){
 		IEDABoshAwsConfig config = boshAwsRepository.findOne(Integer.parseInt(dto.getId()));
+		config.setPublicStaticIp(dto.getPublicStaticIp());
 		config.setSubnetStaticFrom(dto.getSubnetStaticFrom());
 		config.setSubnetStaticTo(dto.getSubnetStaticTo());
 		config.setSubnetRange(dto.getSubnetRange());
 		config.setSubnetGateway(dto.getSubnetGateway());
 		config.setSubnetDns(dto.getSubnetDns());
 		config.setSubnetId(dto.getSubnetId());
+		
+		Date now = new Date();
+		config.setUpdatedDate(now);
+
 		return boshAwsRepository.save(config);
 	}
 	
@@ -80,37 +88,12 @@ public class IEDABoshAwsService {
 		config.setCloudInstanceType(dto.getCloudInstanceType());
 		String deplymentFileName = boshService.createSettingFile(Integer.parseInt(dto.getId()), "AWS");
 		config.setDeploymentFile(deplymentFileName);
+		
+		Date now = new Date();
+		config.setUpdatedDate(now);
+
 		return boshAwsRepository.save(config);
 	}
-	
-/*	public List<ReplaceItem> getBoshAwsReplaceItems(IEDABoshAwsConfig config){
-		List<ReplaceItem> replaces = new ArrayList<>();
-		//boshInfo
-		replaces.add(new ReplaceItem("[deploymentName]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getDeploymentName()));
-		replaces.add(new ReplaceItem("[directorUuid]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") +config.getDirectorUuid()));
-		replaces.add(new ReplaceItem("[releaseVersion]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getReleaseVersion()));
-		
-		//network Info
-		replaces.add(new ReplaceItem("[subnetStatic]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetStatic()));
-		replaces.add(new ReplaceItem("[subnetRange]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetRange()));
-		replaces.add(new ReplaceItem("[subnetGateway]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetGateway()));
-		replaces.add(new ReplaceItem("[subnetDns]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getSubnetDns()));
-		replaces.add(new ReplaceItem("[cloudSubnet]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getCloudSubnet()));
-		replaces.add(new ReplaceItem("[cloudSecurityGroups]", iedaConfiguration.getStemcellDir() +  System.getProperty("file.separator") + config.getCloudSecurityGroups()));
-		
-		//resources Info
-		replaces.add(new ReplaceItem("[stemcellName]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") +config.getStemcellName()));
-		replaces.add(new ReplaceItem("[stemcellVersion]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") +config.getStemcellVersion()));
-		replaces.add(new ReplaceItem("[boshPassword]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") +config.getBoshPassword()));
-		
-		//Aws Info
-		replaces.add(new ReplaceItem("[accessKeyId]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getAccessKeyId()));
-		replaces.add(new ReplaceItem("[secretAccessKey]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getSecretAccessKey() ));
-		replaces.add(new ReplaceItem("[defaultKeyName]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getPrivateKeyName()));
-		replaces.add(new ReplaceItem("[defaultSecurityGroups]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator")  + config.getDefaultSecurityGroups()));
-		replaces.add(new ReplaceItem("[region]", iedaConfiguration.getStemcellDir() + System.getProperty("file.separator") +config.getRegion()));
-		return replaces;
-	}*/
 	
 	public IEDABoshAwsConfig createTempFile(IEDABoshAwsConfig config, List<ReplaceItem> replaceItems){
 		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-fullbosh-setting.yml");
@@ -127,7 +110,7 @@ public class IEDABoshAwsService {
 		String deployFile = ""; 
 		
 		try {
-			tempDeploy = new File(classPath.toURI());//resource.getFile();
+			tempDeploy = new File(classPath.toURI());
 			stubDeploy = new File(stubPath.toURI());
 			
 			tempFile = LocalDirectoryConfiguration.getTempDir() +  System.getProperty("file.separator") + "aws-fullbosh-setting-"+config.getId()+".yml";
@@ -150,7 +133,6 @@ public class IEDABoshAwsService {
 				boshAwsRepository.save(config);
 			}
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -159,32 +141,12 @@ public class IEDABoshAwsService {
 		return config;
 	}
 
-/*	public void deleteAwsInfo(int id) {
-		IEDABoshAwsConfig awsConfig = null; 
-		try{
-			awsConfig = boshAwsRepository.findOne(id);
-			boshAwsRepository.delete(id);
-			//boshService.deleteDeploy(awsConfig.getDeploymentFile());
-		} catch (EntityNotFoundException e) {
-			throw new IEDACommonException("illigalArgument.bosh.exception",
-					"삭제할 BOSH가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			throw new IEDACommonException("illigalArgument.bosh.exception",
-					"BOSH 삭제 중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
-		}
-		
-	}*/
-
 	public IEDABoshAwsConfig getAwsInfo(int id) {
 		IEDABoshAwsConfig config =  null;
 		try{
-			log.info("==="+id);
 			config = boshAwsRepository.findOne(id);
-			
-			log.info("==="+config.toString());
 		}catch(Exception e){
 			e.printStackTrace();
-			log.info("ERROR MESSAGE ::: " + e.getMessage());
 			throw new IEDACommonException("illigalArgument.bootstrap.exception",
 					"해당하는 BOOTSTRAP이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}

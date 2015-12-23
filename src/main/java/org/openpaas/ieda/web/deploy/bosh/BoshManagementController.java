@@ -120,6 +120,7 @@ public class BoshManagementController {
 	
 	@RequestMapping(value="/bosh/saveAwsResourceInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveResourceInfo(@RequestBody @Valid BoshParam.AwsResource dto){
+		
 		HttpStatus status = HttpStatus.OK;
 		Map<String, Object> result = new HashMap<>();
 		result.put("content", awsService.saveBoshResourceInfo(dto));			
@@ -150,26 +151,27 @@ public class BoshManagementController {
 		}		
 		return new ResponseEntity<>(content, status);
 	}
-	
+
+	@RequestMapping(value="/bosh/saveOpenstackInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveOpenstackInfo(@RequestBody @Valid BoshParam.Openstack dto){
+
+		IEDABoshOpenstackConfig config = openstackService.saveOpenstackInfo(dto);	
+		
+		return new ResponseEntity<>(config, HttpStatus.OK);
+	}
+
 	@RequestMapping(value="/bosh/saveOsBoshInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveOpenstackBoshInfo(@RequestBody @Valid BoshParam.OsBosh dto){
-		log.info("### saveAwsInfo :: " + dto.toString());
+
 		IEDABoshOpenstackConfig config = openstackService.saveBoshInfo(dto);	
 		
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/bosh/saveOpenstackInfo", method=RequestMethod.PUT)
-	public ResponseEntity saveOpenstackInfo(@RequestBody @Valid BoshParam.Openstack dto){
-		log.info("### saveAwsInfo :: " + dto.toString());
-		IEDABoshOpenstackConfig config = openstackService.saveOpenstackInfo(dto);	
-		
-		return new ResponseEntity<>(config, HttpStatus.OK);
-	}
 	
 	@RequestMapping(value="/bosh/saveOsNetworkInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveOsNetworkInfo(@RequestBody @Valid BoshParam.OsNetwork dto){
-		log.info("### saveAwsInfo :: " + dto.toString());
+		
 		IEDABoshOpenstackConfig config = openstackService.saveOsNetworkInfo(dto);	
 		
 		return new ResponseEntity<>(config, HttpStatus.OK);
@@ -177,10 +179,16 @@ public class BoshManagementController {
 	
 	@RequestMapping(value="/bosh/saveOsResourceInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveOsResourceInfo(@RequestBody @Valid BoshParam.OsResource dto){
-		log.info("### saveAwsInfo :: " + dto.toString());
-		IEDABoshOpenstackConfig config = openstackService.saveOsResourceInfo(dto);	
 		
-		return new ResponseEntity<>(config, HttpStatus.OK);
+		//IEDABoshOpenstackConfig config = openstackService.saveOsResourceInfo(dto);
+		
+		HttpStatus status = HttpStatus.OK;
+		Map<String, Object> result = new HashMap<>();
+		result.put("content", openstackService.saveOsResourceInfo(dto));			
+			
+		if( result.get("content") == null) status = HttpStatus.NO_CONTENT;
+		
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
 	@MessageMapping("/boshInstall")

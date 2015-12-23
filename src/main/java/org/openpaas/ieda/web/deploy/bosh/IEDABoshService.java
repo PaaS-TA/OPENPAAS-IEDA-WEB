@@ -109,14 +109,20 @@ public class IEDABoshService {
 /*				// 기본관리자 UUID와 다른 경우 목록에서 제외
 				if ( !defaultDirector.getDirectorUuid().equals(openstack.getDirectorUuid()) )
 					continue;*/
-
 				
 				BoshInfo boshInfo = new BoshInfo();
 				boshInfo.setRecid(recid++);
 				boshInfo.setId(openstack.getId());
-				//boshInfo.setDeploymentName(openstack.g);
+				boshInfo.setDeploymentName(openstack.getDeploymentName());
 				boshInfo.setIaas("OPENSTACK");
-				boshInfo.setCreatedDate(openstack.getCreatedDate());
+				boshInfo.setDirectorUuid(openstack.getDirectorUuid());
+				boshInfo.setReleaseVersion(openstack.getReleaseVersion());
+				boshInfo.setStemcell(openstack.getStemcellName() + "/" + openstack.getStemcellVersion());
+				boshInfo.setPublicIp(openstack.getPublicStaticIp());
+				boshInfo.setSubnetRange(openstack.getSubnetRange());
+				boshInfo.setGateway(openstack.getSubnetGateway());
+				boshInfo.setDns(openstack.getSubnetDns());
+				boshInfo.setDeployStatus(openstack.getDeployStatus());
 				
 /* 				if ( deployedList != null && deployedList.size() > 0 ) {
 					for ( DeploymentInfo deployment : deployedList ) {
@@ -345,30 +351,35 @@ public class IEDABoshService {
 		}
 		else{
 			IEDABoshOpenstackConfig openstackConfig = openstackRepository.findOne(id);
-			items.add(new ReplaceItem("[deploymentName]", openstackConfig.getDeploymentName()));
-			items.add(new ReplaceItem("[directorUuid]", openstackConfig.getDirectorUuid()));
-			items.add(new ReplaceItem("[releaseVersion]", openstackConfig.getReleaseVersion()));
-			items.add(new ReplaceItem("[cloudSecurityGroups]", openstackConfig.getCloudSecurityGroups()));
-			items.add(new ReplaceItem("[cloudSubnet]", openstackConfig.getCloudSubnet()));
-			items.add(new ReplaceItem("[subnetStatic]", openstackConfig.getSubnetStatic()));
-			items.add(new ReplaceItem("[subnetRange]", openstackConfig.getSubnetRange()));
-			items.add(new ReplaceItem("[subnetGateway]", openstackConfig.getSubnetGateway()));
-			items.add(new ReplaceItem("[subnetDns]", openstackConfig.getSubnetDns()));
-			items.add(new ReplaceItem("[cloudNetId]", openstackConfig.getCloudNetId()));
-			items.add(new ReplaceItem("[stemcellName]", openstackConfig.getStemcellName()));
-			items.add(new ReplaceItem("[stemcellVersion]", openstackConfig.getStemcellVersion()));
-			items.add(new ReplaceItem("[cloudInstanceType]", openstackConfig.getCloudInstanceType()));
-			items.add(new ReplaceItem("[boshPassword]", openstackConfig.getBoshPassword()));
-			items.add(new ReplaceItem("[directorName]", openstackConfig.getDirectorName()));
-			items.add(new ReplaceItem("[directorStaticIp]", openstackConfig.getDirectorStaticIp()));
+
+			// Openstack
 			items.add(new ReplaceItem("[authUrl]", openstackConfig.getAuthUrl()));
 			items.add(new ReplaceItem("[tenant]", openstackConfig.getTenant()));
 			items.add(new ReplaceItem("[userName]", openstackConfig.getUserName()));
 			items.add(new ReplaceItem("[apiKey]", openstackConfig.getApiKey()));
-			items.add(new ReplaceItem("[defaultKeyName]", openstackConfig.getDefaultKeyName()));
 			items.add(new ReplaceItem("[defaultSecurityGroups]", openstackConfig.getDefaultSecurityGroups()));
-			items.add(new ReplaceItem("[ntp]", openstackConfig.getNtp()));
+			items.add(new ReplaceItem("[privateKeyName]", openstackConfig.getPrivateKeyName()));
 			items.add(new ReplaceItem("[privateKeyPath]", openstackConfig.getPrivateKeyPath()));
+			
+			// BOSH
+			items.add(new ReplaceItem("[deploymentName]", openstackConfig.getDeploymentName()));
+			items.add(new ReplaceItem("[directorUuid]", openstackConfig.getDirectorUuid()));
+			items.add(new ReplaceItem("[releaseVersion]", openstackConfig.getReleaseVersion().split("/")[1]));
+			
+			// Network
+			items.add(new ReplaceItem("[publicStaticIp]", openstackConfig.getPublicStaticIp()));
+			items.add(new ReplaceItem("[subnetId]", openstackConfig.getSubnetId()));			
+			items.add(new ReplaceItem("[subnetStatic]", openstackConfig.getSubnetStaticFrom() + " - " + openstackConfig.getSubnetStaticTo()));
+			items.add(new ReplaceItem("[subnetRange]", openstackConfig.getSubnetRange()));
+			items.add(new ReplaceItem("[subnetGateway]", openstackConfig.getSubnetGateway()));
+			items.add(new ReplaceItem("[subnetDns]", openstackConfig.getSubnetDns()));
+			
+			// Resource
+			items.add(new ReplaceItem("[stemcellName]", openstackConfig.getStemcellName()));
+			items.add(new ReplaceItem("[stemcellVersion]", openstackConfig.getStemcellVersion()));
+			items.add(new ReplaceItem("[cloudInstanceType]", openstackConfig.getCloudInstanceType()));
+			items.add(new ReplaceItem("[boshPassword]", openstackConfig.getBoshPassword()));
+			
 			
 		}
 		return items;
