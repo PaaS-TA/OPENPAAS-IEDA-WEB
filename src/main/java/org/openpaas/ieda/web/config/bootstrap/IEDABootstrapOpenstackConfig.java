@@ -22,34 +22,35 @@ public class IEDABootstrapOpenstackConfig {
 	@Temporal(TemporalType.DATE)
 	private Date updatedDate;
 	
-	/** Openstack Bosh Info **/
-	private String boshName;
-	private String boshUrl;
-	private String boshCpiUrl;
-	private String cloudPrivateKey;
-
 	/** Openstack Info **/
-	private String privateStaticIp;
-	private String publicStaticIp;
-	private String directorName;
 	private String authUrl;
 	private String tenant;
 	private String userName;
 	private String apiKey;
-	private String defaultKeyName;
 	private String defaultSecurityGroup;
-	private String ntp;
+	private String privateKeyName;
+	private String privateKeyPath;
+
+	/** Openstack Default Info **/
+	private String deploymentName;
+	private String directorName;
+	private String boshRelease;
+	private String boshCpiRelease;
 
 	/** Network Info **/
-	private String subnetRange;
+	private String subnetId;
+	private String privateStaticIp;
+	private String publicStaticIp;
+	private String subnetRangeFrom;
+	private String subnetRangeTo;
 	private String subnetGateway;
 	private String subnetDns;
-	private String cloudNetId;
+	private String ntp;
 
 	/** Resource Info **/
-	private String stemcellUrl;
-	private String envPassword;
+	private String stemcell;
 	private String cloudInstanceType;
-
+	private String boshPassword;
+	
 	private String deploymentFile;
 }

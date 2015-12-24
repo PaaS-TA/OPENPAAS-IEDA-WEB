@@ -8,6 +8,7 @@ import org.openpaas.ieda.common.IEDACommonException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,7 +26,6 @@ public class IEDABootstrapAwsService {
 		IEDABootstrapAwsConfig config =  null;
 		try{
 			config = awsRepository.findOne(id);
-			
 		}catch(Exception e){
 			e.printStackTrace();
 			throw new IEDACommonException("illigalArgument.bootstrap.exception",
@@ -50,49 +50,65 @@ public class IEDABootstrapAwsService {
 	}
 	
 	public IEDABootstrapAwsConfig saveAwsInfo(BootStrapDto.Aws dto){
-		Date now = new Date();
-		IEDABootstrapAwsConfig config = null;
-		if(dto.getId() == null || "".equals(dto.getId())){
+		IEDABootstrapAwsConfig config;
+		
+		if(StringUtils.isEmpty(dto.getId())){
 			config = new IEDABootstrapAwsConfig();
 		}
 		else {
 			config = awsRepository.findOne(Integer.parseInt(dto.getId()));
 		}
 		
-		config.setAccessKey(dto.getAwsKey());
-		config.setSecretAccessKey(dto.getAwsPw());
+		config.setAccessKeyId(dto.getAccessKeyId());
+		config.setSecretAccessId(dto.getSecretAccessId());
 		config.setDefaultSecurityGroups(dto.getDefaultSecurityGroups());
-		config.setDefaultKeyName(dto.getPrivateKeyName());
+		config.setRegion(dto.getRegion());
+		config.setAvailabilityZone(dto.getAvailabilityZone());
+		config.setPrivateKeyName(dto.getPrivateKeyName());
 		config.setPrivateKeyPath(dto.getPrivateKeyPath());
+		
+		Date now = new Date();
 		config.setCreatedDate(now);
 		config.setUpdatedDate(now);
 		return awsRepository.save(config);
 	}
 	
-	public IEDABootstrapAwsConfig saveAwsNetworkInfos(BootStrapDto.Network dto) {
+	public IEDABootstrapAwsConfig saveAwsDefaultInfo(BootStrapDto.AwsDefault dto){
+		IEDABootstrapAwsConfig config = awsRepository.findOne(Integer.parseInt(dto.getId()));
+		config.setDeploymentName(dto.getDeploymentName());
+		config.setDirectorName(dto.getDirectorName());
+		config.setBoshRelease(dto.getBoshRelease());
+		config.setBoshCpiRelease(dto.getBoshCpiRelease());
+		
+		Date now = new Date();
+		config.setCreatedDate(now);
+		config.setUpdatedDate(now);
+		return awsRepository.save(config);
+	}
+	
+	public IEDABootstrapAwsConfig saveAwsNetworkInfos(BootStrapDto.AwsNetwork dto) {
 		IEDABootstrapAwsConfig config = awsRepository.findById(Integer.parseInt(dto.getId()));
-		config.setSubnetRange(dto.getSubnetRange());
-		config.setDns(dto.getDns());
 		config.setSubnetId(dto.getSubnetId());
-		config.setGateway(dto.getGateway());
-		config.setDirectorPrivateIp(dto.getDirectorPrivateIp());
-		config.setDirectorPublicIp(dto.getDirectorPublicIp());
+		config.setPrivateStaticIp(dto.getPrivateStaticIp());
+		config.setPublicStaticIp(dto.getPublicStaticIp());
+		config.setSubnetRangeFrom(dto.getSubnetRangeFrom());
+		config.setSubnetRangeTo(dto.getSubnetRangeTo());
+		config.setSubnetGateway(dto.getSubnetGateway());
+		config.setSubnetDns(dto.getSubnetDns());
+		config.setNtp(dto.getNtp());
 		Date now = new Date();
 		config.setUpdatedDate(now);
 		return awsRepository.save(config);
 	}
 	
-	public IEDABootstrapAwsConfig saveAwsResourcesInfos(BootStrapDto.Resources dto) {
+	public IEDABootstrapAwsConfig saveAwsResourcesInfos(BootStrapDto.AwsResource dto) {
 		IEDABootstrapAwsConfig config = awsRepository.findById(Integer.parseInt(dto.getId()));
-		config.setStemcellName(dto.getTargetStemcell());
-		config.setInstanceType(dto.getInstanceType());
-		config.setRegion(dto.getRegion());
-		config.setAvailabilityZone(dto.getAvailabilityZone());
-		config.setMicroBoshPw(dto.getMicroBoshPw());
-		config.setNtp(dto.getNtp());
+		config.setStemcell(dto.getStemcell());
+		config.setCloudInstanceType(dto.getCloudInstanceType());
+		config.setBoshPassword(dto.getBoshPassword());
 		Date now = new Date();
 		config.setUpdatedDate(now);
-		awsRepository.save(config);
+		
 		//Sample/Stub File Create & Merge create Deploy File
 		String deplymentFileName = bootstrapService.createSettingFile(Integer.parseInt(dto.getId()), "AWS");
 		config.setDeploymentFile(deplymentFileName);

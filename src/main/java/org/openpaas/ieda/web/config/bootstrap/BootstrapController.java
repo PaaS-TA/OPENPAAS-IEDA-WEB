@@ -9,7 +9,6 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
-import org.openpaas.ieda.web.config.stemcell.StemcellManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +38,6 @@ public class BootstrapController {
 	@Autowired
 	private IEDABootstrapService bootstrapService;
 	
-	@Autowired
-	private StemcellManagementService stemcellService;
-
 	@RequestMapping(value = "/config/bootstrap", method=RequestMethod.GET)
 	public String main() {
 		return "/config/bootstrap";
@@ -79,47 +75,32 @@ public class BootstrapController {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/bootstrap/bootstrapSetAws", method=RequestMethod.PUT)
-	public ResponseEntity doBootSetAwsSave(@RequestBody @Valid BootStrapDto.Aws dto){
+	@RequestMapping(value="/bootstrap/aws", method=RequestMethod.PUT)
+	public ResponseEntity doBootstrapAwsSave(@RequestBody @Valid BootStrapDto.Aws dto){
 		IEDABootstrapAwsConfig config = awsService.saveAwsInfo(dto);
 		
 		return new ResponseEntity(config, HttpStatus.OK);
-	}	
-	
-	@RequestMapping(value="/bootstrap/keyPathFileUpload", method=RequestMethod.POST)
-	public ResponseEntity doBootstrapKeyPathFileUpload(
-			MultipartHttpServletRequest request
-			){
-		bootstrapService.uploadKeyPath(request);
-		return new ResponseEntity(HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/bootstrap/getKeyPathFileList" , method=RequestMethod.GET)
-	public ResponseEntity getKeyPathFileList (){
-		List<String> keyPathFileList = bootstrapService.getKeyPathFileList();
+	@RequestMapping(value="/bootstrap/awsDefault", method=RequestMethod.PUT)
+	public ResponseEntity doBootstrapAwsDefaultSave(@RequestBody @Valid BootStrapDto.AwsDefault dto){
+		IEDABootstrapAwsConfig config = awsService.saveAwsDefaultInfo(dto);
 		
-		return new ResponseEntity<>(keyPathFileList, HttpStatus.OK);
+		return new ResponseEntity(config, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/bootstrap/bootstrapSetAwsNetwork", method=RequestMethod.PUT)
-	public ResponseEntity doBootSetNetworkSave(@RequestBody @Valid  BootStrapDto.Network dto){
+	@RequestMapping(value="/bootstrap/awsNetwork", method=RequestMethod.PUT)
+	public ResponseEntity doBootstrapNetworkSave(@RequestBody @Valid  BootStrapDto.AwsNetwork dto){
 		awsService.saveAwsNetworkInfos(dto);
 		return new ResponseEntity(HttpStatus.OK);
-	}	
+	}
 	
-	@RequestMapping(value="/bootstrap/bootSetAwsResource", method=RequestMethod.PUT)
-	public ResponseEntity doBootSetResourcesSave(@RequestBody @Valid BootStrapDto.Resources dto){
+	@RequestMapping(value="/bootstrap/awsResource", method=RequestMethod.PUT)
+	public ResponseEntity doBootstrapResourcesSave(@RequestBody @Valid BootStrapDto.AwsResource dto){
 		log.info( "Controll Value ::: " + dto);
 		IEDABootstrapAwsConfig config = awsService.saveAwsResourcesInfos(dto);
 		
 		return new ResponseEntity(config, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/bootstrap/getLocalStemcellList", method=RequestMethod.GET)
-	public ResponseEntity doBootSetStemcellList(){
-		List<String> contents = stemcellService.getLocalStemcellList();
-		
-		return new ResponseEntity(contents, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/bootstrap/getBootstrapDeployInfo", method=RequestMethod.POST)
@@ -145,27 +126,25 @@ public class BootstrapController {
 	}
 	
 	@RequestMapping(value="/bootstrap/setOsBoshInfo", method=RequestMethod.PUT)
-	public ResponseEntity doOpenstackBoshInfoSave(@RequestBody @Valid BootStrapDto.OsBosh dto){
-		log.info("### doOpenstackBoshInfoSave ::: " + dto);
-		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackBoshInfoSave(dto);
+	public ResponseEntity doOpenstackBoshInfoSave(@RequestBody @Valid BootStrapDto.OpenstackDefault dto){
+		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackDefaultInfoSave(dto);
 		return new ResponseEntity(config, HttpStatus.OK);
 	}
 		
 	@RequestMapping(value="/bootstrap/setOpenstackInfo", method=RequestMethod.PUT)
 	public ResponseEntity doOpenstackInfoSave(@RequestBody @Valid BootStrapDto.OpenStack dto){
-		log.info("&&&&&&& : " + dto);
 		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackInfoSave(dto);
 		return new ResponseEntity(config, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/bootstrap/setOsNetworkInfo", method=RequestMethod.PUT)
-	public ResponseEntity doOpenstackNetworkInfoSave(@RequestBody @Valid BootStrapDto.OsNetwork dto){
+	public ResponseEntity doOpenstackNetworkInfoSave(@RequestBody @Valid BootStrapDto.OpenstackNetwork dto){
 		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackNetworkInfoSave(dto);
 		return new ResponseEntity(config, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/bootstrap/setOsResourceInfo", method=RequestMethod.PUT)
-	public ResponseEntity doOpenstackResourcesInfoSave(@RequestBody @Valid BootStrapDto.OsResource dto){
+	public ResponseEntity doOpenstackResourcesInfoSave(@RequestBody @Valid BootStrapDto.OpenstackResource dto){
 		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackResourcesInfoSave(dto);
 		return new ResponseEntity(config, HttpStatus.OK);
 	}

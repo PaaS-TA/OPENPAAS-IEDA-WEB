@@ -31,15 +31,22 @@
     -webkit-writing-mode: horizontal-tb;
     cursor: auto;
 }
+.w2ui-field div.isMessage{
+	display: inline-block;
+	padding-left:10px;
+	height:10px;
+	font-size: 10px;
+}
 </style>
 <script type="text/javascript" src="/js/sockjs-0.3.4.js"></script>
 <script type="text/javascript" src="/js/stomp.js"></script>
 <script type="text/javascript">
 
 //private common variable
-var structureType = "";
-var bootstrapSeq= "";
+var iaas = "";
+var bootstrapId= "";
 var keyPathFileList = "";
+var defaultInfo = "";
 var networkInfo = "";
 var resourceInfo = "";
 var deployInfo = "";
@@ -52,7 +59,10 @@ var awsInfo = "";
 //private AWS variable
 var openstackInfo = "";
 var osBoshInfo = "";
+var fadeOutTime = 3000;
 
+var boshReleases;
+var boshCpiReleases;
 
 $(function() {	
  	$('#config_bootstrapGrid').w2grid({
@@ -67,10 +77,12 @@ $(function() {
 		columns:[
 		      {field: 'recid', 	caption: 'recid', hidden: true}
 			, {field: 'id', caption: 'ID', hidden: true}
-			, {field: 'iaas', caption: 'IaaS', size: '20%'}
-			, {field: 'directorPrivateIp', caption: 'PrivateIp', size: '30%'}
-			, {field: 'directorPublicIp', caption: 'PublicIp', size: '30%'}
-			, {field: 'createdDate', caption: 'created', size: '10%'}
+			, {field: 'boshName', caption: 'BOSH NAME', size: '10%'}
+			, {field: 'directorName', caption: 'DIRECTOR NAME', size: '10%'}
+			, {field: 'boshUrl', caption: 'BOSH URL', size: '20%'}
+			, {field: 'cloudNetId', caption: 'CLOUD NET ID', size: '20%'}
+			, {field: 'privateStaticIp', caption: 'PRIVATE STATIC IP', size: '20%'}
+			, {field: 'publicStaticIp', caption: 'PUBLIC STATIC IP', size: '20%'}
 			],
 		onClick:function(event) {
 			var grid = this;
@@ -93,7 +105,7 @@ $(function() {
  	
  	//BootStrap 설치
  	$("#installBtn").click(function(){
- 		bootSetPopup();
+ 		iaasSelectPopup();
  	});
  	
  	//BootStrap 수정
@@ -205,66 +217,76 @@ function getBootstrapOpenstackData(record){
 			} 
 			else {
 				initSetting();
-				//var content = JSON.parse(data.contents);
-				console.log("=== Content ::: " + data.contents);
-				settingOpenstackData(data.contents);
+				setOpenstackData(data.contents);
 			}
 		},
 		error : function(request, status, error) {
 			var errorResult = JSON.parse(request.responseText);
-			console.log("console log ::: " +errorResult.message);
 			w2alert(errorResult.message, "BOOTSTRAP 수정");
 		}
 	});
 }
 
 function settingAWSData(contents){
-	bootstrapSeq = contents.id;
-	structureType = "AWS";
+	bootstrapId = contents.id;
+	iaas = "AWS";
 	awsInfo = {
-			iaas		 	: "AWS",
-			awsKey			: contents.accessKey,
-			awsPw			: contents.secretAccessKey,
+			id						: contents.id,
+			iaas		 			: "AWS",
+			accessKeyId				: contents.accessKeyId,
+			secretAccessId			: contents.secretAccessId,
 			defaultSecurityGroups	: contents.defaultSecurityGroups,
-			privateKeyName	: contents.defaultKeyName,
-			privateKeyPath	: contents.privateKeyPath
+			region					: contents.region,
+			availabilityZone		: contents.availabilityZone,
+			privateKeyName			: contents.privateKeyName,
+			privateKeyPath			: contents.privateKeyPath
 	}
-	networkInfo = {
-			id					: contents.id,
-			subnetRange			: contents.subnetRange,
-			gateway				: contents.gateway,
-			dns					: contents.dns,
-			subnetId			: contents.subnetId,
-			directorPrivateIp	: contents.directorPrivateIp,
-			directorPublicIp	: contents.directorPublicIp
-	}
-	resourceInfo = {
+	
+	defaultInfo = {
 			id				: contents.id,
-			targetStemcell	: contents.stemcellName,
-			instanceType	: contents.instanceType,
-			region			: contents.region,
-			availabilityZone: contents.availabilityZone,
-			microBoshPw		: contents.microBoshPw,
+			deploymentName	: contents.deploymentName,
+			directorName	: contents.directorName,
+			boshRelease		: contents.boshRelease,
+			boshCpiRelease	: contents.boshCpiRelease			
+	}
+	
+	networkInfo = {
+			id				: contents.id,
+			privateStaticIp	: contents.privateStaticIp,
+			publicStaticIp	: contents.publicStaticIp,
+			subnetId		: contents.subnetId,
+			subnetRangeFrom	: contents.subnetRangeFrom,
+			subnetRangeTo	: contents.subnetRangeTo,
+			subnetGateway	: contents.subnetGateway,
+			subnetDns		: contents.subnetDns,
 			ntp				: contents.ntp
 	}
+	
+	resourceInfo = {
+			id					: contents.id,
+			stemcell			: contents.stemcell,
+			cloudInstanceType	: contents.cloudInstanceType,
+			boshPassword		: contents.boshPassword,
+	}
+	
 	awsPopup();	
 }
 
-function settingOpenstackData(contents){
-	bootstrapSeq =  contents.id;
-	structureType = "OPENSTACK";
-	console.log(bootstrapSeq + "/" + structureType);
+function setOpenstackData(contents){
+	bootstrapId =  contents.id;
+	iaas = "OPENSTACK";
+	console.log(bootstrapId + "/" + iaas);
 	osBoshInfo = {
-			id				: bootstrapSeq,
-			iaas 			: structureType,
+			id				: bootstrapId,
+			iaas 			: iaas,
 			boshName		: contents.boshName,
 			boshUrl			: contents.boshUrl,
 			boshCpiUrl		: contents.boshCpiUrl,
-			privateKeyPath	: contents.privateKeyPath			
+			privateKeyPath	: contents.cloudPrivateKey			
 	}
 	
 	openstackInfo = {
-			id					: bootstrapSeq,
+			id					: bootstrapId,
 			privateStaticIp		: contents.privateStaticIp,
 			publicStaticIp		: contents.publicStaticIp,
 			directorName		: contents.directorName,
@@ -278,7 +300,7 @@ function settingOpenstackData(contents){
 	}
 	
 	networkInfo = {
-			id				: bootstrapSeq,
+			id				: bootstrapId,
 			subnetRange		: contents.subnetRange,
 			subnetGateway	: contents.subnetGateway,
 			subnetDns		: contents.subnetDns,
@@ -286,13 +308,13 @@ function settingOpenstackData(contents){
 	}
 	
 	resourceInfo = {
-			id					: bootstrapSeq,
+			id					: bootstrapId,
 			stemcellUrl			: contents.stemcellUrl,
 			envPassword			: contents.envPassword,
 			cloudInstanceType	: contents.cloudInstanceType
 	}
 	
-	osBoshInfoPop();
+	openstackPopup();
 			
 }
 
@@ -374,7 +396,7 @@ $( window ).resize(function() {
 
 
 //Bootstrap 
-function bootSetPopup() {
+function iaasSelectPopup() {
 	w2confirm({
 		width 			: 500,
 		height 			: 180,
@@ -384,12 +406,12 @@ function bootSetPopup() {
 		yes_text 		: "확인",
 		no_text 		: "취소",
 		yes_callBack 	: function(){
-			//alert($("input[name='structureType']").val());
-			structureType = $(".w2ui-msg-body input:radio[name='structureType']:checked").val();
-			if(structureType){
-				console.log("iaas ::: " + structureType);
-				if( structureType == "AWS") awsPopup();
-				else osBoshInfoPop();				
+			//alert($("input[name='iaas']").val());
+			iaas = $(".w2ui-msg-body input:radio[name='iaas']:checked").val();
+			if(iaas){
+				console.log("iaas ::: " + iaas);
+				if( iaas == "AWS") awsPopup();
+				else openstackPopup();				
 			}
 			else{
 				w2alert("설치할 Infrastructure 을 선택하세요");
@@ -400,22 +422,25 @@ function bootSetPopup() {
 
 //AWS Info Setting Popup
 function awsPopup(){
-	$("#awsSettingInfoDiv").w2popup({
-		width : 610,
-		height : 430,
+	$("#awsDiv").w2popup({
+		width : 670,
+		height : 580,
 		onClose : initSetting,
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
 				if(awsInfo != ""){
-					$(".w2ui-msg-body input[name='awsKey']").val(awsInfo.awsKey);
-					$(".w2ui-msg-body input[name='awsPw']").val(awsInfo.awsPw);
+					$(".w2ui-msg-body input[name='accessKeyId']").val(awsInfo.accessKeyId);
+					$(".w2ui-msg-body input[name='secretAccessId']").val(awsInfo.secretAccessId);
 					$(".w2ui-msg-body input[name='defaultSecurityGroups']").val(awsInfo.defaultSecurityGroups);
+					$(".w2ui-msg-body input[name='region']").val(awsInfo.region);
+					$(".w2ui-msg-body input[name='availabilityZone']").val(awsInfo.availabilityZone);
 					$(".w2ui-msg-body input[name='privateKeyName']").val(awsInfo.privateKeyName);
 					$(".w2ui-msg-body input[name='privateKeyPath']").val(awsInfo.privateKeyPath);
 				}
-				//keyPathFile list 
-				getKeyPathFileList();				
+				getKeyPathFileList();
+				getLocalBoshReleaseList();
+				getLocalOpenstackBoshCpiReleaseList();
 			}
 		}
 	});
@@ -424,7 +449,7 @@ function awsPopup(){
 function getKeyPathFileList(){
 	$.ajax({
 		type : "GET",
-		url : "/bootstrap/getKeyPathFileList",
+		url : "/common/getKeyPathFileList",
 		contentType : "application/json",
 		//dataType: "json",
 		async : true,
@@ -435,6 +460,38 @@ function getKeyPathFileList(){
 		},
 		error : function( e, status ) {
 			w2alert("KeyPath File 목록을 가져오는데 실패하였습니다.", "BOOTSTRAP 설치");
+		}
+	});
+}
+
+function getLocalBoshCpiList(){
+	$.ajax({
+		type : "GET",
+		url : "/localBoshOpenstackCpiReleases",
+		contentType : "application/json",
+		async : true,
+		success : function(data, status) {
+			$('#w2ui-popup input[name=boshCpiUrl][type=list]').w2field('list', { items: data.records , maxDropHeight:200, width:250});
+			if(osBoshInfo.boshCpiUrl) $(".w2ui-msg-body input[name='boshCpiUrl']").data('selected', {text:osBoshInfo.boshCpiUrl});			
+		},
+		error : function( e, status ) {
+			w2alert("Bosh 목록을 가져오는데 실패하였습니다.", "BOOTSTRAP 설치");
+		}
+	});
+}
+
+function getLocalBoshList(){
+	$.ajax({
+		type : "GET",
+		url : "/localBoshReleases",
+		contentType : "application/json",
+		async : true,
+		success : function(data, status) {
+			$('#w2ui-popup input[name=boshUrl][type=list]').w2field('list', { items: data.records , maxDropHeight:200, width:250});
+			if(osBoshInfo.boshUrl) $(".w2ui-msg-body input[name='boshUrl']").data('selected', {text:osBoshInfo.boshUrl});
+		},
+		error : function( e, status ) {
+			w2alert("Bosh Cpi 목록을 가져오는데 실패하였습니다.", "BOOTSTRAP 설치");
 		}
 	});
 }
@@ -450,7 +507,10 @@ function changeKeyPathType(type){
 	if(type == "list") {
 		keyPathDiv.html(selectInput);		
 		$('#w2ui-popup #keyPathDiv input[type=list]').w2field('list', { items: keyPathFileList , maxDropHeight:200, width:250});
-		if(awsInfo.privateKeyPath) $(".w2ui-msg-body input[name='keyPathList']").data('selected', {text:awsInfo.privateKeyPath});
+		if( awsInfo.privateKeyPath )
+			$(".w2ui-msg-body input[name='keyPathList']").data('selected', {text:awsInfo.privateKeyPath});
+		else if(osBoshInfo.privateKeyPath)
+			$(".w2ui-msg-body input[name='keyPathList']").data('selected', {text:osBoshInfo.privateKeyPath});		
 	}else{		
 		keyPathDiv.html(fileUploadInput);
 		//FileInput Ui (bootstrap-fileInput)) 
@@ -463,68 +523,89 @@ function openBrowse(){
 }
 
 //Save AWS Setting Info
-function saveAwsSettingInfo(){
+function saveAwsInfo(){
+	
 	awsInfo = {
-			id				: bootstrapSeq,
-			iaas			: structureType,
-			awsKey			: $(".w2ui-msg-body input[name='awsKey']").val(),
-			awsPw			: $(".w2ui-msg-body input[name='awsPw']").val(),
+			id						: bootstrapId,
+			accessKeyId				: $(".w2ui-msg-body input[name='accessKeyId']").val(),
+			secretAccessId			: $(".w2ui-msg-body input[name='secretAccessId']").val(),
 			defaultSecurityGroups	: $(".w2ui-msg-body input[name='defaultSecurityGroups']").val(),
-			privateKeyName	: $(".w2ui-msg-body input[name='privateKeyName']").val(),
-			privateKeyPath  : $(".w2ui-msg-body input[name='privateKeyPath']").val()
+			region  				: $(".w2ui-msg-body input[name='region']").val(),
+			availabilityZone  		: $(".w2ui-msg-body input[name='availabilityZone']").val(),
+			privateKeyName  		: $(".w2ui-msg-body input[name='privateKeyName']").val(),
+			privateKeyPath  		: $(".w2ui-msg-body input[name='privateKeyPath']").val()
 	}
 	
-	if( checkEmpty(awsInfo.awsKey) ){
-		w2alert("AWS Key를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='awsKey']").focus();
-			return;
-		})
-	}else if( checkEmpty(awsInfo.awsKey) ){
-		w2alert("AWS Password를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='awsKey']").focus();
-			return;
-		})
-	}else if( checkEmpty(awsInfo.defaultSecurityGroups) ){
-		w2alert("Default Security Groups를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='defaultSecurityGroups']").focus();
-			return;
-		})
-	}else if( checkEmpty(awsInfo.privateKeyName) ){
-		w2alert("Private KeyName를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='privateKeyName']").focus();
-			return;
-		})
-	}else if( checkEmpty(awsInfo.privateKeyPath) ){
-		w2alert("Private Key Path를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='privateKeyPath']").focus();
-			return;
-		})
+	if(validationAwsInfo()){
+		$.ajax({
+			type : "PUT",
+			url : "/bootstrap/aws",
+			contentType : "application/json",
+			async : true,
+			data : JSON.stringify(awsInfo), 
+			success : function(data, status) {
+				bootstrapId = data.id;
+				console.log("keypath::"+ bootstrapId);
+				keyPathFileUpload(iaas);
+			},
+			error : function( e, status ) {
+				w2alert("AWS 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
+			}
+		});
 	}
-	
-	if( $(".w2ui-msg-body input[name='keyPathFile']").val() != null){
-		var keyPathFile =  $(".w2ui-msg-body input[name='keyPathFile']").val().split('.').pop().toLowerCase();
+	else{
+		w2alert("필드값을 확인해 주세요.");
+	}
+}
+
+function validationAwsInfo(){
+	var checkValidation = true;
+	var emptyFields = new Array();
 		
-		if($.inArray(keyPathFile, ['pem']) == -1) {
-			w2alert("KeyPath File은 .pem 파일만 등록 가능합니다.", "BOOTSTRAP 설치");
-			return;
-		}
+	if( checkEmpty( $(".w2ui-msg-body input[name='accessKeyId']").val() ) ){
+		emptyFields.push({name:"accessKeyId", label:"Access Key Id"});
+		checkValidation = (checkValidation) ? false:false; 
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='secretAccessId']").val() ) ){
+		emptyFields.push({name:"secretAccessId", label:"Secret Access Id"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='defaultSecurityGroups']").val() ) ){
+		emptyFields.push({name:"defaultSecurityGroups", label:"DEFAULT SECURITY GROUPS"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='region']").val() ) ){
+		emptyFields.push({name:"region", label:"REGION"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='availabilityZone']").val() ) ){
+		emptyFields.push({name:"availabilityZone", label:"Availability-Zone"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='privateKeyName']").val() ) ){
+		emptyFields.push({name:"privateKeyName", label:"Private Key Name"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='privateKeyPath']").val() ) ){
+		emptyFields.push({name:"privateKeyPath", label:"Private Key Path"});
+		checkValidation = (checkValidation) ? false:false;
 	}
 	
-	$.ajax({
-		type : "PUT",
-		url : "/bootstrap/bootstrapSetAws",
-		contentType : "application/json",
-		async : true,
-		data : JSON.stringify(awsInfo), 
-		success : function(data, status) {
-			bootstrapSeq = data.id;
-			console.log("keypath::"+ bootstrapSeq);
-			keyPathFileUpload(structureType);
-		},
-		error : function( e, status ) {
-			w2alert("AWS 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
-		}
-	});
+	errFieldMessage(emptyFields);
+	
+	return checkValidation;
+}
+
+function errFieldMessage(emptyFields){
+	if( emptyFields.length > 0 ){
+		$(".w2ui-msg-body input[type=text]").parent().find(".isMessage").text("");
+		
+		emptyFields.map(function(obj){
+			console.log("### Name/LABEL  " + obj.name+"/"+ obj.label);
+			$(".w2ui-msg-body input[name='"+obj.name+"']").parent().find(".isMessage")
+			.text(obj.label + "를(을) 입력하세요").css({"color":"red"});	
+		});		
+	}
 }
 
 function keyPathFileUpload(iaas){
@@ -532,7 +613,7 @@ function keyPathFileUpload(iaas){
 	var awsFormData = new FormData(awsForm);
 	$.ajax({
 		type : "POST",
-		url : "/bootstrap/keyPathFileUpload",
+		url : "/common/keyPathFileUpload",
 		enctype : 'multipart/form-data',
 		dataType: "text",
 		async : true,
@@ -540,109 +621,297 @@ function keyPathFileUpload(iaas){
 		contentType:false,
 		data : awsFormData,  
 		success : function(data, status) {
-			if(iaas=="AWS") awsNetworkPopup();
-			else openstackInfoPopup();
+			if(iaas=="AWS") awsDefaultPopup();
+			else osNetworkInfoPopup();
 		},
 		error : function( e, status ) {
-			w2alert("AWS 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
+			w2alert( iaas + " 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
 		}
 	});
 }
 
-//Network Info Setting Popup
-function awsNetworkPopup(){
-	$("#networkSettingInfoDiv").w2popup({
-		width : 610,
+function awsDefaultPopup(){
+	$("#awsDefaultDiv").w2popup({
+		width : 670,
 		height : 420,
 		modal	: true,
 		onClose : initSetting,
 		onOpen : function(event){
 			event.onComplete = function(){
-				setNetworkData();	
+				$('#w2ui-popup input[type=list][name=boshRelease]').w2field('list', { items: boshReleases , maxDropHeight:300, width:400});
+				$('#w2ui-popup input[type=list][name=boshCpiRelease]').w2field('list', { items: boshCpiReleases , maxDropHeight:300, width:400});
+				if(defaultInfo != "" ){
+					$(".w2ui-msg-body input[name='deploymentName']").val(defaultInfo.deploymentName);
+					$(".w2ui-msg-body input[name='directorName']").val(defaultInfo.directorName);
+					$(".w2ui-msg-body input[name='boshRelease']").data('selected', {text : defaultInfo.boshRelease});
+					$(".w2ui-msg-body input[name='boshCpiRelease']").data('selected', {text : defaultInfo.boshCpiRelease});
+				}
 			}
 		}
 	});
 }
 
-function setNetworkData(){
-	if( networkInfo != ""){
-		$(".w2ui-msg-body input[name='subnetRange']").val(networkInfo.subnetRange);
-		$(".w2ui-msg-body input[name='gateway']").val(networkInfo.gateway);
-		$(".w2ui-msg-body input[name='dns']").val(networkInfo.dns);
-		$(".w2ui-msg-body input[name='subnetId']").val(networkInfo.subnetId);
-		$(".w2ui-msg-body input[name='directorPrivateIp']").val(networkInfo.directorPrivateIp);
-		$(".w2ui-msg-body input[name='directorPublicIp']").val(networkInfo.directorPublicIp);
+function getReleaseVersionList(){
+	$.ajax({
+		type : "GET",
+		url : "/bosh/releases",
+		contentType : "application/json",
+		//dataType: "json",
+		async : true,
+		data : JSON.stringify(boshInfo), 
+		success : function(data, status) {
+			console.log("Release List");
+			releases = new Array();
+			data.records.map(function (obj){
+				console.log(obj.name+"/"+obj.version);
+				releases.push(obj.name+"/"+obj.version);
+			});			
+		},
+		error : function( e, status ) {
+			w2alert("Release Version List 를 가져오는데 실패하였습니다.", "Bosh 설치");
+		}
+	});
+}
+
+function getLocalBoshReleaseList(){
+	$.ajax({
+		type : "GET",
+		url : "/release/localBoshList",
+		contentType : "application/json",
+		//dataType: "json",
+		async : true,
+		success : function(data, status) {
+			boshReleases = data;			
+		},
+		error : function( e, status ) {
+			w2alert("BOSH Release List 를 가져오는데 실패하였습니다.", "BOOTSTRAP 설치");
+		}
+	});
+}
+
+function getLocalAwsBoshCpiReleaseList(){
+	$.ajax({
+		type : "GET",
+		url : "/release/localBoshAwsCpiList",
+		contentType : "application/json",
+		//dataType: "json",
+		async : true,
+		success : function(data, status) {
+			boshCpiReleases = data;			
+		},
+		error : function( e, status ) {
+			w2alert("BOSH AWS CPI Release List 를 가져오는데 실패하였습니다.", "BOOTSTRAP 설치");
+		}
+	});
+}
+
+function getLocalOpenstackBoshCpiReleaseList(){
+	$.ajax({
+		type : "GET",
+		url : "/release/localBoshOpenstackCpiList",
+		contentType : "application/json",
+		//dataType: "json",
+		async : true,
+		success : function(data, status) {
+			boshCpiReleases = data;
+			//$('#w2ui-popup input[type=list][name=boshCpiRelease]').w2field('list', { items: data , maxDropHeight:300, width:400});
+		},
+		error : function( e, status ) {
+			w2alert("OPENSTACK BOSH CPI Release List 를 가져오는데 실패하였습니다.", "BOOTSTRAP 설치");
+		}
+	});
+}
+
+function getStamcellList(){
+	$.ajax({
+		type : "GET",
+		url : "/stemcells",
+		contentType : "application/json",
+		async : true,
+		data : JSON.stringify(boshInfo), 
+		success : function(data, status) {
+			console.log("Stemcell List");
+			stemcells = new Array();
+			data.records.map(function (obj){
+			 	stemcells.push(obj.name+"/"+obj.version);
+			});
+		},
+		error : function( e, status ) {
+			w2alert("Stemcell List 를 가져오는데 실패하였습니다.", "Bosh 설치");
+		}
+	});
+}
+
+
+function saveAwsDefaultInfo(type){
+	defaultInfo = {
+			id				: bootstrapId,
+			deploymentName 	: $(".w2ui-msg-body input[name='deploymentName']").val(),
+			directorName 	:$(".w2ui-msg-body input[name='directorName']").val(),
+			boshRelease 	:$(".w2ui-msg-body input[name='boshRelease']").val(),
+			boshCpiRelease 	:$(".w2ui-msg-body input[name='boshCpiRelease']").val()
 	}
+	
+	if( type == 'after'){
+		if(validationAwsDefaultInfo()){
+			$.ajax({
+				type : "PUT",
+				url : "/bootstrap/awsDefault",
+				contentType : "application/json",
+				async : true,
+				data : JSON.stringify(defaultInfo), 
+				success : function(data, status) {
+					awsNetworkPopup();
+				},
+				error : function( e, status ) {
+					w2alert("AWS 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
+				}
+			});
+		}
+	}
+	else if(type == 'before'){
+		awsPopup();
+	}
+}
+
+function validationAwsDefaultInfo(){
+	var checkValidation = true;
+	var emptyFields = new Array();
+		
+	if( checkEmpty( $(".w2ui-msg-body input[name='deploymentName']").val() ) ){
+		emptyFields.push({name:"deploymentName", label:"배포명"});
+		checkValidation = (checkValidation) ? false:false; 
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='directorName']").val() ) ){
+		emptyFields.push({name:"directorName", label:"디렉터 명"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='boshRelease']").val() ) ){
+		emptyFields.push({name:"boshRelease", label:"BOSH RELEASE"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='boshCpiRelease']").val() ) ){
+		emptyFields.push({name:"boshCpiRelease", label:"BOSH CPI RELEASE"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	
+	errFieldMessage(emptyFields);
+	
+	return checkValidation;
+}
+
+//Network Info Setting Popup
+function awsNetworkPopup(){
+	$("#awsNetworkInfoDiv").w2popup({
+		width : 670,
+		height : 520,
+		modal	: true,
+		onClose : initSetting,
+		onOpen : function(event){
+			event.onComplete = function(){
+				if( networkInfo != ""){
+					$(".w2ui-msg-body input[name='subnetId']").val(networkInfo.subnetId);
+					$(".w2ui-msg-body input[name='privateStaticIp']").val(networkInfo.privateStaticIp);
+					$(".w2ui-msg-body input[name='publicStaticIp']").val(networkInfo.publicStaticIp);
+					$(".w2ui-msg-body input[name='subnetRangeFrom']").val(networkInfo.subnetRangeFrom);
+					$(".w2ui-msg-body input[name='subnetRangeTo']").val(networkInfo.subnetRangeTo);
+					$(".w2ui-msg-body input[name='subnetGateway']").val(networkInfo.subnetGateway);
+					$(".w2ui-msg-body input[name='subnetDns']").val(networkInfo.subnetDns);
+					$(".w2ui-msg-body input[name='ntp']").val(networkInfo.ntp);
+				}
+			}
+		}
+	});
 }
 
 //Save Network Setting Info
-function saveNetworkInfo(param){
-	if(bootstrapSeq == ""){ w2alert("BOOTSTRAP ID가 존재하지 않습니다."); return;}
+function saveAwsNetworkInfo(type){
+	if(bootstrapId == ""){ w2alert("BOOTSTRAP ID가 존재하지 않습니다."); return;}
 	
 	networkInfo = {
-			id			: bootstrapSeq,
-			subnetRange			: $(".w2ui-msg-body input[name='subnetRange']").val(),
-			gateway				: $(".w2ui-msg-body input[name='gateway']").val(),
-			dns					: $(".w2ui-msg-body input[name='dns']").val(),
+			id					: bootstrapId,
 			subnetId			: $(".w2ui-msg-body input[name='subnetId']").val(),
-			directorPrivateIp	: $(".w2ui-msg-body input[name='directorPrivateIp']").val(),
-			directorPublicIp	: $(".w2ui-msg-body input[name='directorPublicIp']").val()
+			privateStaticIp		: $(".w2ui-msg-body input[name='privateStaticIp']").val(),
+			publicStaticIp		: $(".w2ui-msg-body input[name='publicStaticIp']").val(),
+			subnetRangeFrom		: $(".w2ui-msg-body input[name='subnetRangeFrom']").val(),
+			subnetRangeTo		: $(".w2ui-msg-body input[name='subnetRangeTo']").val(),
+			subnetGateway		: $(".w2ui-msg-body input[name='subnetGateway']").val(),
+			subnetDns			: $(".w2ui-msg-body input[name='subnetDns']").val(),
+			ntp					: $(".w2ui-msg-body input[name='ntp']").val()
 	}
 	
-	if( checkEmpty(networkInfo.subnetRange) ){
-		w2alert("Subnet Range를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='subnetRange']").focus();
-			return;
-		})
-	}else if( checkEmpty(networkInfo.gateway) ){
-		w2alert("Subnet Gateway를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='gateway']").focus();
-			return;
-		})
-	}else if( checkEmpty(networkInfo.subnetId) ){
-		w2alert("Subnet Id 를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='subnetId']").focus();
-			return;
-		})
-	}else if( checkEmpty(networkInfo.directorPrivateIp) ){
-		w2alert("Director Private Ip 를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='directorPrivateIp']").focus();
-			return;
-		})
-	}else if( checkEmpty(networkInfo.directorPublicIp) ){
-		w2alert("Director Public Ip를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='directorPublicIp']").focus();
-			return;
-		})
-	}	
-	
-	if(param == 'before'){
-		awsPopup();
+	if(type == 'before'){
+		awsDefaultPopup();
 		return;
 	}
 	else{
-		$.ajax({
-			type : "PUT",
-			url : "/bootstrap/bootstrapSetAwsNetwork",
-			contentType : "application/json",
-			//dataType: "json",
-			async : true,
-			data : JSON.stringify(networkInfo), 
-			success : function(data, status) {
-				 resourcePopup();
-			},
-			error : function( e, status ) {
-				w2alert("네트워크 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
-			}
-		});
+		if(validationAwsNetworkInfo()){
+			$.ajax({
+				type : "PUT",
+				url : "/bootstrap/awsNetwork",
+				contentType : "application/json",
+				async : true,
+				data : JSON.stringify(networkInfo), 
+				success : function(data, status) {
+					 awsResourcePopup();
+				},
+				error : function( e, status ) {
+					w2alert("네트워크 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
+				}
+			});
+		}
+		else{
+			w2alert("필드값을 확인하세요.");
+		}
 	}
 }
 
+function validationAwsNetworkInfo(){
+	var checkValidation = true;
+	var emptyFields = new Array();
+		
+	if( checkEmpty( $(".w2ui-msg-body input[name='subnetId']").val() ) ){
+		emptyFields.push({name:"subnetId", label:"SUBNET ID"});
+		checkValidation = (checkValidation) ? false:false; 
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='privateStaticIp']").val() ) ){
+		emptyFields.push({name:"privateStaticIp", label:"PRIVATE STATIC IP"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='publicStaticIp']").val() ) ){
+		emptyFields.push({name:"publicStaticIp", label:"PUBLIC STATIC IP"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='subnetRangeFrom']").val() ) ){
+		emptyFields.push({name:"subnetRangeFrom", label:"SUBNET RANGE FROM"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='subnetRangeTo']").val() ) ){
+		emptyFields.push({name:"subnetRangeTo", label:"SUBNET RANGE TO"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='subnetGateway']").val() ) ){
+		emptyFields.push({name:"subnetGateway", label:"SUBNET GATEWAY"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='subnetDns']").val() ) ){
+		emptyFields.push({name:"subnetDns", label:"SUBNET DNS"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='ntp']").val() ) ){
+		emptyFields.push({name:"ntp", label:"NTP"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	
+	errFieldMessage(emptyFields);
+	
+	return checkValidation;
+}
 
-function resourcePopup(){
+function awsResourcePopup(){
 	//getStemcellList();
 	$("#resourceSettingInfoDiv").w2popup({
-		width : 610,
+		width : 670,
 		height : 430,
 		modal	: true,
 		onOpen : function(event){
@@ -683,11 +952,11 @@ function getStemcellList(){
 	});
 }
 
-function saveResourceInfo(param){
-	if(bootstrapSeq == ""){ w2alert("BOOTSTRAP ID가 존재하지 않습니다."); return;}
+function saveResourceInfo(type){
+	if(bootstrapId == ""){ w2alert("BOOTSTRAP ID가 존재하지 않습니다."); return;}
 	
 	resourceInfo = {
-			id				: bootstrapSeq,
+			id				: bootstrapId,
 			targetStemcell	: $(".w2ui-msg-body input[name='targetStemcell']").val(),
 			instanceType	: $(".w2ui-msg-body input[name='instanceType']").val(),
 			region			: $(".w2ui-msg-body input[name='region']").val(),
@@ -696,41 +965,42 @@ function saveResourceInfo(param){
 			ntp				: $(".w2ui-msg-body input[name='ntp']").val()
 	}
 	
-	if( checkEmpty(networkInfo.targetStemcell) ){
-		w2alert("Target Stemcell 을 선택하세요", "" , function(){
-			$(".w2ui-msg-body input[name='targetStemcell']").focus();
-			return;
-		})
-	}else if( checkEmpty(networkInfo.instanceType) ){
-		w2alert("Instance Type를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='instanceType']").focus();
-			return;
-		})
-	}else if( checkEmpty(networkInfo.region) ){
-		w2alert("Region 을 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='region']").focus();
-			return;
-		})
-	}else if( checkEmpty(networkInfo.availabilityZone) ){
-		w2alert("Availability Zone를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='availabilityZone']").focus();
-			return;
-		})
-	}else if( checkEmpty(networkInfo.microBoshPw) ){
-		w2alert("Micro Bosh Password를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='microBoshPw']").focus();
-			return;
-		})
-	}else if( checkEmpty(networkInfo.ntp) ){
-		w2alert("NTP 를 입력하세요", "" , function(){
-			$(".w2ui-msg-body input[name='ntp']").focus();
-			return;
-		})
-	}
-	
-	if( param == 'before') {
-		networkPopup();return;
+	if( type == 'before') {
+		networkPopup();
+		return;
 	}else {
+		if( checkEmpty( $(".w2ui-msg-body input[name='targetStemcell']").val() ) ){
+			w2alert("Target Stemcell 을 선택하세요", "" , function(){
+				$(".w2ui-msg-body input[name='targetStemcell']").focus();
+				return;
+			})
+		}else if( checkEmpty( $(".w2ui-msg-body input[name='instanceType']").val() ) ){
+			w2alert("Instance Type를 입력하세요", "" , function(){
+				$(".w2ui-msg-body input[name='instanceType']").focus();
+				return;
+			})
+		}else if( checkEmpty( $(".w2ui-msg-body input[name='region']").val() ) ){
+			w2alert("Region 을 입력하세요", "" , function(){
+				$(".w2ui-msg-body input[name='region']").focus();
+				return;
+			})
+		}else if( checkEmpty(  $(".w2ui-msg-body input[name='availabilityZone']").val() ) ){
+			w2alert("Availability Zone를 입력하세요", "" , function(){
+				$(".w2ui-msg-body input[name='availabilityZone']").focus();
+				return;
+			})
+		}else if( checkEmpty( $(".w2ui-msg-body input[name='microBoshPw']").val() ) ){
+			w2alert("Micro Bosh Password를 입력하세요", "" , function(){
+				$(".w2ui-msg-body input[name='microBoshPw']").focus();
+				return;
+			})
+		}else if( checkEmpty( $(".w2ui-msg-body input[name='ntp']").val() ) ){
+			w2alert("NTP 를 입력하세요", "" , function(){
+				$(".w2ui-msg-body input[name='ntp']").focus();
+				return;
+			})
+		}
+		
 		$.ajax({
 			type : "PUT",
 			url : "/bootstrap/bootSetAwsResource",
@@ -754,8 +1024,8 @@ function saveResourceInfo(param){
 
 function deployPopup(){
 	$("#deployManifestDiv").w2popup({
-		width 	: 610,
-		height 	: 470,
+		width 	: 670,
+		height 	: 500,
 		modal	: true,
 		showMax : true,
 		onClose : initSetting,
@@ -791,10 +1061,10 @@ function getDeployInfo(){
 	});
 }
 
-function confirmDeploy(param){
+function confirmDeploy(type){
 	//Deploy 단에서 저장할 데이터가 있는지 확인 필요
 	//Confirm 설치하시겠습니까?
-	if(param == 'after'){		
+	if(type == 'after'){		
 		w2confirm({
 			msg			: "설치하시겠습니까?",
 			title		: w2utils.lang('BOOTSTRAP 설치'),
@@ -805,13 +1075,13 @@ function confirmDeploy(param){
 		});
 	}
 	else{
-		resourcePopup();
+		deployPopup();
 	}
 }
 
 function installPopup(){
 	$("#installDiv").w2popup({
-		width : 610,
+		width : 670,
 		height : 490,
 		modal	: true,
 		showMax : true,
@@ -845,8 +1115,8 @@ function installPopup(){
 
 //팝업창 닫을 경우
 function initSetting(){
-	structureType = "";
-	bootstrapSeq= "";
+	iaas = "";
+	bootstrapId= "";
 	awsInfo = "";
 	networkInfo = "";
 	resourceInfo = "";
@@ -867,7 +1137,18 @@ function popupComplete(){
 	w2popup.close();
 	//grid Reload
 	gridReload();
-	
+	if(installClient != "" ){
+		installClient.disconnect(function(){
+			console.log("InstallClient Disconnection!");
+			installClient = "";
+		})
+	}
+	if(deleteClient != ""){
+		deleteClient.disconnection(function(){
+			console.log("DeleteClient Disconnection!");
+			deleteClient = "";
+		})
+	}
 }
 
 function setPrivateKeyPath(value){
@@ -894,67 +1175,77 @@ function osBoshInfoPop(){
 			event.onComplete = function(){				
 				if(osBoshInfo != ""){
 					$(".w2ui-msg-body input[name='boshName']").val(osBoshInfo.boshName);
-					$(".w2ui-msg-body input[name='boshUrl']").val(osBoshInfo.boshUrl);
-					$(".w2ui-msg-body input[name='boshCpiUrl']").val(osBoshInfo.boshCpiUrl);
+					//$(".w2ui-msg-body input[name='boshUrl']").val(osBoshInfo.boshUrl);
+					//$(".w2ui-msg-body input[name='boshCpiUrl']").val(osBoshInfo.boshCpiUrl);
 					$(".w2ui-msg-body input[name='privateKeyPath']").val(osBoshInfo.privateKeyPath);
 				}
 				//keyPathFile list 
-				getKeyPathFileList();				
+				getKeyPathFileList();
+				getLocalBoshList();
+				getLocalBoshCpiList();
 			}
 		}
 	});
 }
 
 //Openstack Bosh Info Save
-function saveOsBoshInfo(){
+function saveOsBoshInfo(type){
 	osBoshInfo = {
-			iaas 			: structureType,
+			id				: (bootstrapId) ? bootstrapId:"",
+			iaas 			: iaas,
 			boshName		: $(".w2ui-msg-body input[name=boshName]").val(),
 			boshUrl			: $(".w2ui-msg-body input[name=boshUrl]").val(),
 			boshCpiUrl		: $(".w2ui-msg-body input[name=boshCpiUrl]").val(),
 			privateKeyPath	: $(".w2ui-msg-body input[name=privateKeyPath]").val()			
-	}	
-	if( checkEmpty(osBoshINfo.boshName) ){
-		w2alert("Bosh Name 을 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name=boshName]").focus();
-			return;
-		});
-	}else if( checkEmpty(osBoshINfo.boshUrl) ){
-		w2alert("Bosh Url 을 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name=boshUrl]").focus();
-			return;
-		});
-	}else if( checkEmpty(osBoshINfo.boshCpiUrl) ){
-		w2alert("Bosh Cpi Url 을 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name=boshCpiUrl]").focus();
-			return;
-		});
-	}else if( checkEmpty(osBoshINfo.privateKeyPath) ){
-		w2alert("Private Key Path 을 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name=privateKeyPath]").focus();
-			return;
-		});
-	}	
+	}
 	
-	//osBOshInfo SAVE
-	$.ajax({
-		type : "PUT",
-		url : "/bootstrap/setOsBoshInfo",
-		contentType : "application/json",
-		async : true,
-		data : JSON.stringify(osBoshInfo),
-		success : function(data, status) {
-			bootstrapSeq = data.id;
-			keyPathFileUpload(structureType);
-		},
-		error : function( e, status ) {
-			w2alert("AWS 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
-		}
-	});
+	if(type == 'before'){
+		openstackPopup();
+		return;
+	}
+	else{
+		if( checkEmpty(osBoshInfo.boshName) ){
+			w2alert("Bosh Name 을 입력하세요.", "", function(){
+				$(".w2ui-msg-body input[name=boshName]").focus();
+				return;
+			});
+		}else if( checkEmpty(osBoshInfo.boshUrl) ){
+			w2alert("Bosh Url 을 입력하세요.", "", function(){
+				$(".w2ui-msg-body input[name=boshUrl]").focus();
+				return;
+			});
+		}else if( checkEmpty(osBoshInfo.boshCpiUrl) ){
+			w2alert("Bosh Cpi Url 을 입력하세요.", "", function(){
+				$(".w2ui-msg-body input[name=boshCpiUrl]").focus();
+				return;
+			});
+		}else if( checkEmpty(osBoshInfo.privateKeyPath) ){
+			w2alert("Private Key Path 을 입력하세요.", "", function(){
+				$(".w2ui-msg-body input[name=privateKeyPath]").focus();
+				return;
+			});
+		}	
+		
+		//osBOshInfo SAVE
+		$.ajax({
+			type : "PUT",
+			url : "/bootstrap/setOsBoshInfo",
+			contentType : "application/json",
+			async : true,
+			data : JSON.stringify(osBoshInfo),
+			success : function(data, status) {
+				bootstrapId = data.id;
+				keyPathFileUpload(iaas);
+			},
+			error : function( e, status ) {
+				w2alert("AWS 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
+			}
+		});
+	}
 }
 
 // Openstack Info Popup
-function openstackInfoPopup(){
+function openstackPopup(){
 	$("#openstackInfoDiv").w2popup({
 		width : 670,
 		height : 530,
@@ -980,9 +1271,9 @@ function openstackInfoPopup(){
 	});	
 }
 
-function saveOpenstackInfo(type){
+function saveOpenstackInfo(){
 	openstackInfo = {
-			id					: bootstrapSeq,
+			id					: bootstrapId,
 			privateStaticIp		: $(".w2ui-msg-body input[name='privateStaticIp']").val(),
 			publicStaticIp		: $(".w2ui-msg-body input[name='publicStaticIp']").val(),
 			directorName		: $(".w2ui-msg-body input[name='directorName']").val(),
@@ -1052,12 +1343,7 @@ function saveOpenstackInfo(type){
 			return;
 		});
 	}
-	
-	if( type == 'before') {
-		osBoshInfoPop();
-		return;
-	}
-	
+		
 	//SAVE
 	$.ajax({
 		type : "PUT",
@@ -1066,8 +1352,8 @@ function saveOpenstackInfo(type){
 		async : true,
 		data : JSON.stringify(openstackInfo),
 		success : function(data, status) {
-			//bootstrapSeq = data;
-			osNetworkInfoPopup();
+			//bootstrapId = data;
+			osBoshInfoPop();
 		},
 		error : function( e, status ) {
 			console.log(e + "status ::: " + status);
@@ -1085,7 +1371,7 @@ function osNetworkInfoPopup(){
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
-				if(networkInfo != "" && structureType == "OPENSTACK"){
+				if(networkInfo != "" && iaas == "OPENSTACK"){
 					$(".w2ui-msg-body input[name='subnetRange']").val(networkInfo.subnetRange);
 					$(".w2ui-msg-body input[name='subnetGateway']").val(networkInfo.subnetGateway);
 					$(".w2ui-msg-body input[name='subnetDns']").val(networkInfo.subnetDns);
@@ -1098,54 +1384,53 @@ function osNetworkInfoPopup(){
 
 function saveOsNetworkInfo(type){
 	networkInfo = {
-			id				: bootstrapSeq,
+			id				: bootstrapId,
 			subnetRange		: $(".w2ui-msg-body input[name='subnetRange']").val(),
 			subnetGateway	: $(".w2ui-msg-body input[name='subnetGateway']").val(),
 			subnetDns		: $(".w2ui-msg-body input[name='subnetDns']").val(),
 			cloudNetId		: $(".w2ui-msg-body input[name='cloudNetId']").val()
 	}
-	
-	if( checkEmpty(openstackInfo.subnetRange) ){
-		w2alert("Subnet Range 를 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name=subnetRange]").focus();
-			return;
-		});
-	}else if( checkEmpty(openstackInfo.subnetGateway) ){
-		w2alert("Subnet Gateway 을 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name=subnetGateway]").focus();
-			return;
-		});
-	}else if( checkEmpty(openstackInfo.subnetDns) ){
-		w2alert("Subnet Dns 를 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name=subnetDns]").focus();
-			return;
-		});
-	}else if( checkEmpty(openstackInfo.cloudNetId) ){
-		w2alert("Cloud Net Id 를 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name=cloudNetId]").focus();
-			return;
-		});
-	}
-	
 	if( type == "before") {
-		openstackInfoPopup();
+		osBoshInfoPop();
 		return;
 	}
-	
-	//SAVE
-	$.ajax({
-		type : "PUT",
-		url : "/bootstrap/setOsNetworkInfo",
-		contentType : "application/json",
-		async : true,
-		data : JSON.stringify(networkInfo),
-		success : function(data, status) {
-			osResourceInfoPopup();
-		},
-		error : function( e, status ) {
-			w2alert("OPENSTACK Network 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
+	else{
+		if( checkEmpty($(".w2ui-msg-body input[name='subnetRange']").val()) ){
+			w2alert("Subnet Range 를 입력하세요.", "", function(){
+				$(".w2ui-msg-body input[name=subnetRange]").focus();
+				return;
+			});
+		}else if( checkEmpty($(".w2ui-msg-body input[name='subnetGateway']").val()) ){
+			w2alert("Subnet Gateway 을 입력하세요.", "", function(){
+				$(".w2ui-msg-body input[name=subnetGateway]").focus();
+				return;
+			});
+		}else if( checkEmpty($(".w2ui-msg-body input[name='subnetDns']").val()) ){
+			w2alert("Subnet Dns 를 입력하세요.", "", function(){
+				$(".w2ui-msg-body input[name=subnetDns]").focus();
+				return;
+			});
+		}else if( checkEmpty($(".w2ui-msg-body input[name=cloudNetId]").val()) ){
+			w2alert("Cloud Net Id 를 입력하세요.", "", function(){
+				$(".w2ui-msg-body input[name=cloudNetId]").focus();
+				return;
+			});
 		}
-	});
+		
+		$.ajax({
+			type : "PUT",
+			url : "/bootstrap/setOsNetworkInfo",
+			contentType : "application/json",
+			async : true,
+			data : JSON.stringify(networkInfo),
+			success : function(data, status) {
+				osResourceInfoPopup();
+			},
+			error : function( e, status ) {
+				w2alert("OPENSTACK Network 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
+			}
+		});
+	}
 }
 
 //Openstack Resource Info Popup
@@ -1157,7 +1442,7 @@ function osResourceInfoPopup(){
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
-				if(resourceInfo != "" && structureType == "OPENSTACK"){
+				if(resourceInfo != "" && iaas == "OPENSTACK"){
 					$(".w2ui-msg-body input[name='stemcellUrl']").val(resourceInfo.stemcellUrl);
 					$(".w2ui-msg-body input[name='envPassword']").val(resourceInfo.envPassword);
 					$(".w2ui-msg-body input[name='cloudInstanceType']").val(resourceInfo.cloudInstanceType);
@@ -1169,49 +1454,49 @@ function osResourceInfoPopup(){
 
 function saveOsResourceInfo(type){
 	resourceInfo = {
-			id					: bootstrapSeq,
+			id					: bootstrapId,
 			stemcellUrl			: $(".w2ui-msg-body input[name='stemcellUrl']").val(),
 			envPassword			: $(".w2ui-msg-body input[name='envPassword']").val(),
 			cloudInstanceType	: $(".w2ui-msg-body input[name='cloudInstanceType']").val()
 	}
 	
-	if( checkEmpty(openstackInfo.stemcellUrl) ){
-		w2alert("Stemcell Url 를 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name=stemcellUrl]").focus();
-			return;
-		});
-	}else if( checkEmpty(openstackInfo.envPassword) ){
-		w2alert("ENV Password 를 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name=envPassword]").focus();
-			return;
-		});
-	}else if( checkEmpty(openstackInfo.cloudInstanceType) ){
-		w2alert("Cloud InstanceT ype 를 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name=cloudInstanceType]").focus();
-			return;
-		});
-	}	
-	
 	if( type == "before"){
 		osNetworkInfoPopup();
 		return;
 	}
-	
-	//SAVE
-	$.ajax({
-		type : "PUT",
-		url : "/bootstrap/setOsResourceInfo",
-		contentType : "application/json",
-		async : true,
-		data : JSON.stringify(resourceInfo),
-		success : function(data, status) {
-			deployFileName = data.deploymentFile;
-			osDeployPopup();
-		},
-		error : function( e, status ) {
-			w2alert("OPENSTACK Resource 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
-		}
-	});
+	else{
+		if( checkEmpty(openstackInfo.stemcellUrl) ){
+			w2alert("Stemcell Url 를 입력하세요.", "", function(){
+				$(".w2ui-msg-body input[name=stemcellUrl]").focus();
+				return;
+			});
+		}else if( checkEmpty(openstackInfo.envPassword) ){
+			w2alert("ENV Password 를 입력하세요.", "", function(){
+				$(".w2ui-msg-body input[name=envPassword]").focus();
+				return;
+			});
+		}else if( checkEmpty(openstackInfo.cloudInstanceType) ){
+			w2alert("Cloud InstanceT ype 를 입력하세요.", "", function(){
+				$(".w2ui-msg-body input[name=cloudInstanceType]").focus();
+				return;
+			});
+		}	
+		
+		$.ajax({
+			type : "PUT",
+			url : "/bootstrap/setOsResourceInfo",
+			contentType : "application/json",
+			async : true,
+			data : JSON.stringify(resourceInfo),
+			success : function(data, status) {
+				deployFileName = data.deploymentFile;
+				osDeployPopup();
+			},
+			error : function( e, status ) {
+				w2alert("OPENSTACK Resource 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
+			}
+		});
+	}
 }
 
 function osDeployPopup(){
@@ -1262,11 +1547,11 @@ function osDeployPopup(){
 		<div class="col-sm-9">
 			<div class="btn-group" data-toggle="buttons" >
 				<label style="width: 100px;margin-left:40px;">
-					<input type="radio" name="structureType" id="type1" value="AWS" checked="checked" tabindex="1" />
+					<input type="radio" name="iaas" id="type1" value="AWS" checked="checked" tabindex="1" />
 					&nbsp;AWS
 				</label>
 				<label style="width: 130px;margin-left:50px;">
-					<input type="radio" name="structureType" id="type2" value="OPENSTACK" tabindex="2" />
+					<input type="radio" name="iaas" id="type2" value="OPENSTACK" tabindex="2" />
 					&nbsp;OPENSTACK
 				</label>
 			</div>
@@ -1274,51 +1559,71 @@ function osDeployPopup(){
 	</div>
 
 	<!-- AWS  설정 DIV -->
-	<div id="awsSettingInfoDiv" style="width:100%;height:100%;" hidden="true">
+	<div id="awsDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
-			<div style="margin-left:3%;">
-	            <ul class="progressStep_5" >
-		            <li class="active">AWS 설정</li>
-		            <li class="before">Network 설정</li>
-		            <li class="before">리소스 설정</li>
-		            <li class="before">배포 Manifest</li>
+			<div style="width:100%;height:60px;paddinf:0 3%;display: inline-block;">
+	            <ul class="progressStep_6" >
+		            <li class="active">AWS 정보</li>
+		            <li class="before">기본 정보</li>
+		            <li class="before">네트워크 정보</li>
+		            <li class="before">리소스 정보</li>
+		            <li class="before">배포 파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ AWS 설정정보</div>
+			<div style="width:100%;height:15px;paddinf-left:1.5%;display: inline-block;">▶ AWS 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<form id="awsForm" method="POST" enctype="multipart/form-data" action="/bootstrap/keyPathFileUpload">
+		    	<form id="awsForm" data-toggle="validator" >
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">AWS 키(access-key)</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">AWS 키(access-key-id)</label>
 			            <div>
-			                <input name="awsKey" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="1"/>
+			                <input name="accessKeyId" type="text"  style="float:left;width:60%;" tabindex="1" placeholder="AKIAIGLIMLV5...."/>
+			                <div class="isMessage"></div>			                
 			            </div>
 			        </div>
 			        <div class="w2ui-field">
 			            <label style="text-align: left;width:40%;font-size:11px;">AWS 비밀번호(secret-access-key)</label>
 			            <div>
-			                <input name="awsPw" type="password" maxlength="100" size="30" style="float:left;width:60%;" tabindex="2"/>
+			                <input name="secretAccessId" type="text"  style="float:left;width:60%;" tabindex="2" placeholder="******"/>
+			                <div class="isMessage"></div>
 			            </div>
 			        </div>
 			        <div class="w2ui-field">
 			            <label style="text-align: left;width:40%;font-size:11px;">시큐리티 그룹명</label>
 			            <div>
-			                <input name="defaultSecurityGroups" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="3"/>
+			                <input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;" tabindex="3" placeholder="bosh"/>
+			                <div class="isMessage"></div>
 			            </div>
 			        </div>
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">Private Key 명</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">REGION</label>
 			            <div>
-			                <input name="privateKeyName" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="4"/>
+			                <input name="region" type="text"  style="float:left;width:60%;" tabindex="3" placeholder="bosh"/>
+			                <div class="isMessage"></div>
 			            </div>
 			        </div>
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">Private Key Path</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">AVAILABILITY ZONE</label>
+			            <div>
+			                <input name="availabilityZone" type="text" style="display: inline-block;float:left;width:60%;" tabindex="3" placeholder="bosh"/>
+			                <div class="isMessage"></div>
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">PRIVATE-KEY-NAME</label>
+			            <div>
+			                <input name="privateKeyName" type="text"  style="display: inline-block;float:left;width:60%;" tabindex="3" placeholder="bosh"/>
+			                <div class="isMessage"></div>
+			            </div>
+			        </div>
+			        
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">Private Key File</label>
 		                <div >
-							<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" tabindex="5"/>&nbsp;리스트</label></span>
-							&nbsp;&nbsp;
 	  						<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" tabindex="6"/>&nbsp;파일업로드</label></span>
+							&nbsp;&nbsp;
+							<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" tabindex="5"/>&nbsp;목록에서 선택</label></span>
 						</div>
 			        </div>
 			        <div class="w2ui-field">			         	
@@ -1331,69 +1636,140 @@ function osDeployPopup(){
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
 		        <button class="btn" style="float: left;" onclick="w2popup.close();" tabindex="7">취소</button>
-		        <button class="btn" style="float: right;padding-right:15%" onclick="saveAwsSettingInfo();" tabindex="8">다음>></button>
+		        <button class="btn" style="float: right;padding-right:15%" onclick="saveAwsInfo();" tabindex="8">다음>></button>
 		    </div>
 		</div>
 	</div>
 	
-	
-	<!-- Network  설정 DIV -->
-	<div id="networkSettingInfoDiv" style="width:100%;height:100%;" hidden="true">
+	<div id="awsDefaultDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
-			<div style="margin-left:3%;">
-	            <ul class="progressStep_5">
-		            <li class="pass">AWS 설정</li>
-		            <li class="active">Network 설정</li>
-		            <li class="before">리소스 설정</li>
-		            <li class="before">배포 Manifest</li>
+			<div style="width:100%;height:60px;paddinf:0 3%;display: inline-block;">
+	            <ul class="progressStep_6" >
+		            <li class="pass">AWS 정보</li>
+		            <li class="active">기본 정보</li>
+		            <li class="before">네트워크 정보</li>
+		            <li class="before">리소스 정보</li>
+		            <li class="before">배포 파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ Network 설정정보</div>
+			<div style="width:100%;height:15px;paddinf-left:1.5%;display: inline-block;">▶ 기본 정보</div>
+		    <div class="w2ui-page page-0" style="padding-left:5%;">
+		    	<form id="awsDefaultForm" data-toggle="validator" >
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">배포명</label>
+			            <div>
+			                <input name="deploymentName" type="text"  style="float:left;width:60%;" tabindex="1" placeholder="AKIAIGLIMLV5...."/>
+			                <div class="isMessage"></div>
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">디렉터 명</label>
+			            <div>
+			                <input name="directorName" type="text"  style="float:left;width:60%;" tabindex="2" placeholder="******"/>
+			                <div class="isMessage"></div>
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">BOSH RELEASE</label>
+			            <div>
+			                <input name="boshRelease" type="list"  style="float:left;width:60%;" tabindex="3" placeholder="bosh"/>
+			                <!-- <div class="isMessage"></div> -->
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">BOSH CPI RELEASE</label>
+			            <div>
+			                <input name="boshCpiRelease" type="list"  style="float:left;width:60%;" tabindex="4" placeholder="bosh"/>
+			                <!-- <div class="isMessage"></div> -->
+			            </div>
+			        </div>			        
+		        </form>
+		    </div>
+			<br/>
+		    <div class="w2ui-buttons" rel="buttons" hidden="true">
+		    	<button class="btn" style="float: left;" onclick="saveAwsDefaultInfo('before');" tabindex="5">이전</button>
+		        <button class="btn" onclick="w2popup.close();" tabindex="6">취소</button>
+		        <button class="btn" style="float: right;padding-right:15%" onclick="saveAwsDefaultInfo('after');" tabindex="7">다음>></button>
+		    </div>
+		</div>
+	</div>
+	
+	<!-- 네트워크  설정 DIV -->
+	<div id="awsNetworkInfoDiv" style="width:100%;height:100%;" hidden="true">
+		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
+			<div style="margin-left:3%;">
+	            <ul class="progressStep_6">
+		            <li class="pass">AWS 정보</li>
+		            <li class="pass">기본 정보</li>
+		            <li class="active">네트워크 정보</li>
+		            <li class="before">리소스 정보</li>
+		            <li class="before">배포 파일 정보</li>
+		            <li class="before">설치</li>
+	            </ul>
+	        </div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 네트워크 정보</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">Subnet Range</label>
+					<label style="text-align: left; width: 200px; font-size: 11px;">SUBNET ID</label>
 					<div>
-						<input name="subnetRange" type="text" maxlength="100" size="30" style="float:left;width:330px;" tabindex="1"/>
+						<input name="subnetId" type="text"  style="float:left;width:330px;" tabindex="1" placeholder="subnet-e8d03a9e"/>
+						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">Gateway</label>
+					<label style="text-align: left; width: 200px; font-size: 11px;">PRIVATE STATIC IP</label>
 					<div>
-						<input name="gateway" type="text" maxlength="100" size="30" style="float:left;width:330px;" tabindex="2"/>
+						<input name="privateStaticIp" type="text"  style="float:left;width:330px;" tabindex="2" placeholder="10.0.0.110"/>
+						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">DNS</label>
+					<label style="text-align: left; width: 200px; font-size: 11px;">PUBLIC STATIC IP</label>
 					<div>
-						<input name="dns" type="text" maxlength="100" size="30" style="float:left;width:330px;" tabindex="3"/>
+						<input name="publicStaticIp" type="text"  style="float:left;width:330px;" tabindex="3" placeholder="52.23.2.85"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">Subnet ID</label>
+					<label style="text-align: left; width: 200px; font-size: 11px;">SUBNET RANGE</label>
 					<div>
-						<input name="subnetId" type="text" maxlength="100" size="30" style="float:left;width:330px;" tabindex="4"/>
+						<div style="display:inline-block;">
+						<span style="float:left;"><input name="subnetRangeFrom" id="subnetRangeTo" type="text"  style="float:left;width:152px;" tabindex="4" placeholder="10.0.0.2"/></span>
+						<span style="float:left;">&nbsp; &ndash; &nbsp;</span>
+						<span style="float:left;"><input name="subnetRangeTo" id="subnetRangeFrom" type="text"  style="float:left;width:152px;" tabindex="5" placeholder="10.0.0.4"/></span>
+						</div>
+						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">Director Private IP</label>
+					<label style="text-align: left; width: 200px; font-size: 11px;">SUBNET GATEWAY</label>
 					<div>
-						<input name="directorPrivateIp" type="text" maxlength="100" size="30" style="float:left;width:330px;" tabindex="5"/>
+						<input name="subnetGateway" type="text"  style="float:left;width:330px;" tabindex="6" placeholder="10.0.0.1"/>
+						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">Director Public IP</label>
+					<label style="text-align: left; width: 200px; font-size: 11px;">SUBNET DNS</label>
 					<div>
-						<input name="directorPublicIp" type="text" maxlength="100" size="30" style="float:left;width:330px;" tabindex="6"/>
+						<input name="subnetDns" type="text"  style="float:left;width:330px;" tabindex="7" placeholder="10.0.0.2"/>
+						<div class="isMessage"></div>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align: left; width: 200px; font-size: 11px;">NTP</label>
+					<div>
+						<input name="ntp" type="text"  style="float:left;width:330px;" tabindex="7" placeholder="10.0.0.2"/>
+						<div class="isMessage"></div>
 					</div>
 				</div>
 			</div>
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveNetworkInfo('before');" tabindex="7">이전</button>
+				<button class="btn" style="float: left;" onclick="saveAwsNetworkInfo('before');" tabindex="7">이전</button>
 				<button class="btn" onclick="popupComplete();" tabindex="8">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveNetworkInfo('after');" tabindex="9">다음>></button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveAwsNetworkInfo('after');" tabindex="9">다음>></button>
 			</div>
 		</div>
 	</div>
@@ -1403,15 +1779,16 @@ function osDeployPopup(){
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
 			<div style="margin-left:3%;">
-	            <ul class="progressStep_5">
-		            <li class="pass">AWS 설정</li>
-		            <li class="pass">Network 설정</li>
-		            <li class="active">리소스 설정</li>
-		            <li class="before">배포 Manifest</li>
+	            <ul class="progressStep_6">
+		            <li class="pass">AWS 정보</li>
+		            <li class="pass">기본 정보</li>
+		            <li class="pass">네트워크 정보</li>
+		            <li class="active">리소스 정보</li>
+		            <li class="before">배포 파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 리소스 설정정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 리소스 정보</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">스템셀 지정</label>
@@ -1423,31 +1800,31 @@ function osDeployPopup(){
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">인스턴스 유형</label>
 					<div>
-						<input name="instanceType" type="text" maxlength="100" size="30" style="float:left;width:330px;" tabindex="2"/>
+						<input name="instanceType" type="text"  style="float:left;width:330px;" tabindex="2" placeholder="m3.large"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Region</label>
 					<div>
-						<input name="region" type="text" maxlength="100" size="30" style="float:left;width:330px;" tabindex="3"/>
+						<input name="region" type="text"  style="float:left;width:330px;" tabindex="3" placeholder="us-east-1"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Availability Zone</label>
 					<div>
-						<input name="availabilityZone" type="text" maxlength="100" size="30" style="float:left;width:330px;" tabindex="4"/>
+						<input name="availabilityZone" type="text"  style="float:left;width:330px;" tabindex="4" placeholder="us-east-1a"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">NTP</label>
 					<div>
-						<input name="ntp" type="text" maxlength="100" size="30" style="float:left;width:330px;" tabindex="5"/>
+						<input name="ntp" type="text"  style="float:left;width:330px;" tabindex="5" placeholder="1.kr.pool.ntp.org,0.asia.pool.ntp.org"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">MicroBOSH Password</label>
 					<div>
-						<input name="microBoshPw" type="password" maxlength="100" size="30" style="float:left;width:330px;" tabindex="5"/>
+						<input name="microBoshPw" type="text"  style="float:left;width:330px;" tabindex="5" placeholder="$6$JA/VRhS7guR2t$kruB3wpqcgyi7Ql2IZI"/>
 					</div>
 				</div>
 			</div>
@@ -1465,17 +1842,18 @@ function osDeployPopup(){
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left:3%;">
-	            <ul class="progressStep_5">
-		            <li class="pass">AWS 설정</li>
-		            <li class="pass">Network 설정</li>
-		            <li class="pass">리소스 설정</li>
-		            <li class="active">배포 Manifest</li>
+	            <ul class="progressStep_6">
+		            <li class="pass">AWS 정보</li>
+		            <li class="pass">기본 정보</li>
+		            <li class="pass">네트워크 정보</li>
+		            <li class="pass">리소스 정보</li>
+		            <li class="active">배포 파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
 			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 배포 Manifest 정보</div>
 			<div style="width:95%;height:72%;float: left;">
-				<textarea id="deployInfo" style="width:100%;height:100%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
+				<textarea id="deployInfo" style="width:100%;height:90%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1490,17 +1868,18 @@ function osDeployPopup(){
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;">
 			<div style="margin-left:3%;">
-	            <ul class="progressStep_5">
-		            <li class="pass">AWS 설정</li>
-		            <li class="pass">Network 설정</li>
-		            <li class="pass">리소스 설정</li>
-		            <li class="pass">배포 Manifest</li>
+	            <ul class="progressStep_6">
+		            <li class="pass">AWS 정보</li>
+		            <li class="pass">기본 정보</li>
+		            <li class="pass">네트워크 정보</li>
+		            <li class="pass">리소스 정보</li>
+		            <li class="pass">배포 파일 정보</li>
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>
 			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 설치 로그</div>
-			<div style="height:80%;">
-				<textarea id="installLogs" style="width:97%;height:88%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
+			<div style="height:75%;">
+				<textarea id="installLogs" style="width:97%;height:100%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1518,41 +1897,41 @@ function osDeployPopup(){
 		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
 			<div style="margin-left:2%;">
 	            <ul class="progressStep_6" >
-		            <li class="active">BOSH 설정</li>
-		            <li class="before">OPENSTACK 설정</li>
-		            <li class="before">Network 설정</li>
-		            <li class="before">리소스 설정</li>		            
-		            <li class="before">배포 Manifest</li>
+		            <li class="pass">오픈스텍 설정</li>
+		            <li class="active">기본 설정</li>
+		            <li class="before">네트워크 정보</li>
+		            <li class="before">리소스 정보</li>		            
+		            <li class="before">배포 파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ BOSH 설정정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 기본 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<form id="osBoshInfoForm" method="POST" enctype="multipart/form-data" action="/bootstrap/keyPathFileUpload">
 			    	<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">Bosh Name</label>
+						<label style="text-align: left; width: 40%; font-size: 11px;">배포명</label>
 						<div>
-							<input name="boshName" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="1"/>
+							<input name="boshName" type="text"  style="float:left;width:60%;" tabindex="1"/>
 						</div>
 					</div>
 					<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Bosh Url</label>
-					<div>
-						<input name="boshUrl" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="2"/>
-					</div>
+						<label style="text-align: left; width: 40%; font-size: 11px;">BOSH 릴리즈</label>
+						<div>
+							<input name="boshUrl" type="list"  style="float:left;width:60%;" tabindex="2"/>
+						</div>
 					</div>
 					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">Bosh Cpi Url</label>
+						<label style="text-align: left; width: 40%; font-size: 11px;">BOSH CPI 릴리즈</label>
 						<div>
-							<input name="boshCpiUrl" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="3"/>
+							<input name="boshCpiUrl" type="list"  style="float:left;width:60%;" tabindex="3"/>
 						</div>
 					</div>
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">Private Key Path</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">Private Key 파일</label>
 		                <div >
-							<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" tabindex="4"/>&nbsp;리스트</label></span>
-							&nbsp;&nbsp;
 	  						<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" tabindex="5"/>&nbsp;파일업로드</label></span>
+							&nbsp;&nbsp;
+							<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" tabindex="4"/>&nbsp;목록에서 선택</label></span>
 						</div>
 			        </div>
 			        <div class="w2ui-field">			         	
@@ -1564,8 +1943,9 @@ function osDeployPopup(){
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-		        <button class="btn" style="float: left;" onclick="popupComplete();" tabindex="8">취소</button>
-		        <button class="btn" style="float: right;padding-right:15%" onclick="saveOsBoshInfo();" tabindex="9">다음>></button>
+		    	<button class="btn" style="float: left;" onclick="saveOsBoshInfo('before');">이전</button>
+		        <button class="btn" onclick="popupComplete();">취소</button>
+		        <button class="btn" style="float: right;padding-right:15%" onclick="saveOsBoshInfo('after');" tabindex="9">다음>></button>
 		    </div>
 		</div>
 	</div>
@@ -1575,82 +1955,81 @@ function osDeployPopup(){
 		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
 			<div style="margin-left:2%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">BOSH 설정</li>
-		            <li class="active">OPENSTACK 설정</li>
-		            <li class="before">Network 설정</li>
-		            <li class="before">리소스 설정</li>		            
-		            <li class="before">배포 Manifest</li>
+		            <li class="active">오픈스텍 설정</li>
+		            <li class="before">기본 설정</li>
+		            <li class="before">네트워크 정보</li>
+		            <li class="before">리소스 정보</li>		            
+		            <li class="before">배포 파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ OPENSTACK 설정정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ OPENSTACK 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Private Static IP</label>
 					<div>
-						<input name="privateStaticIp" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="1"/>
+						<input name="privateStaticIp" type="text"  style="float:left;width:60%;" tabindex="1"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Public Static IP</label>
 					<div>
-						<input name="publicStaticIp" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="2"/>
+						<input name="publicStaticIp" type="text"  style="float:left;width:60%;" tabindex="2"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Director Name</label>
 					<div>
-						<input name="directorName" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="3"/>
+						<input name="directorName" type="text"  style="float:left;width:60%;" tabindex="3"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Auth Url</label>
 					<div>
-						<input name="authUrl" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="4"/>
+						<input name="authUrl" type="text"  style="float:left;width:60%;" tabindex="4"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Tenant</label>
 					<div>
-						<input name="tenant" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="5"/>
+						<input name="tenant" type="text"  style="float:left;width:60%;" tabindex="5"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">User Name</label>
 					<div>
-						<input name="userName" type="text" maxlength="100" size="30" style="float:left;width:60%;"/>
+						<input name="userName" type="text"  style="float:left;width:60%;"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">API Key</label>
 					<div>
-						<input name="apiKey" type="text" maxlength="100" size="30" style="float:left;width:60%;"/>
+						<input name="apiKey" type="text"  style="float:left;width:60%;"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Default KeyName</label>
 					<div>
-						<input name="defaultKeyName" type="text" maxlength="100" size="30" style="float:left;width:60%;"/>
+						<input name="defaultKeyName" type="text"  style="float:left;width:60%;"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Default Security Groups</label>
 					<div>
-						<input name="defaultSecurityGroups" type="text" maxlength="100" size="30" style="float:left;width:60%;"/>
+						<input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">NTP</label>
 					<div>
-						<input name="ntp" type="text" maxlength="100" size="30" style="float:left;width:60%;"/>
+						<input name="ntp" type="text"  style="float:left;width:60%;"/>
 					</div>
 				</div>				
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveOpenstackInfo('before');">이전</button>
-				<button class="btn" onclick="popupComplete();">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOpenstackInfo('after');">다음>></button>
+				<button class="btn" style="float: left;" onclick="popupComplete();">취소</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOpenstackInfo();">다음>></button>
 		    </div>
 		</div>
 	</div>
@@ -1660,38 +2039,38 @@ function osDeployPopup(){
 		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
 			<div style="margin-left:2%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">BOSH 설정</li>
-		            <li class="pass">OPENSTACK 설정</li>
-		            <li class="active">Network 설정</li>
-		            <li class="before">리소스 설정</li>		            
-		            <li class="before">배포 Manifest</li>
+		            <li class="pass">오픈스텍 설정</li>
+		            <li class="pass">기본 설정</li>
+		            <li class="active">네트워크 정보</li>
+		            <li class="before">리소스 정보</li>		            
+		            <li class="before">배포 파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ Network 설정정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 네트워크 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">subnetRange</label>
 					<div>
-						<input name="subnetRange" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="1"/>
+						<input name="subnetRange" type="text"  style="float:left;width:60%;" tabindex="1"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 				<label style="text-align: left; width: 40%; font-size: 11px;">subnetGateway</label>
 				<div>
-					<input name="subnetGateway" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="2"/>
+					<input name="subnetGateway" type="text"  style="float:left;width:60%;" tabindex="2"/>
 				</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">subnetDns</label>
 					<div>
-						<input name="subnetDns" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="3"/>
+						<input name="subnetDns" type="text"  style="float:left;width:60%;" tabindex="3"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">cloudNetId</label>
 					<div>
-						<input name="cloudNetId" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="4"/>
+						<input name="cloudNetId" type="text"  style="float:left;width:60%;" tabindex="4"/>
 					</div>
 				</div>
 		    </div>
@@ -1709,32 +2088,32 @@ function osDeployPopup(){
 		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
 			<div style="margin-left:2%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">BOSH 설정</li>
-		            <li class="pass">OPENSTACK 설정</li>
-		            <li class="pass">Network 설정</li>
-		            <li class="active">리소스 설정</li>		            
-		            <li class="before">배포 Manifest</li>
+		            <li class="pass">오픈스텍 설정</li>
+		            <li class="pass">기본 설정</li>
+		            <li class="pass">네트워크 정보</li>
+		            <li class="active">리소스 정보</li>		            
+		            <li class="before">배포 파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ Resource 설정정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 리소스 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">stemcellUrl</label>
 					<div>
-						<input name="stemcellUrl" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="1"/>
+						<input name="stemcellUrl" type="text"  style="float:left;width:60%;" tabindex="1"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 				<label style="text-align: left; width: 40%; font-size: 11px;">envPassword</label>
 				<div>
-					<input name="envPassword" type="password" maxlength="100" size="30" style="float:left;width:60%;" tabindex="2"/>
+					<input name="envPassword" type="text"  style="float:left;width:60%;" tabindex="2"/>
 				</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">cloudInstanceType</label>
 					<div>
-						<input name="cloudInstanceType" type="text" maxlength="100" size="30" style="float:left;width:60%;" tabindex="3"/>
+						<input name="cloudInstanceType" type="text"  style="float:left;width:60%;" tabindex="3"/>
 					</div>
 				</div>
 		    </div>
@@ -1753,11 +2132,11 @@ function osDeployPopup(){
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left:2%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">BOSH 설정</li>
-		            <li class="pass">OPENSTACK 설정</li>
-		            <li class="pass">Network 설정</li>
-		            <li class="pass">리소스 설정</li>		            
-		            <li class="active">배포 Manifest</li>
+		            <li class="pass">오픈스텍 설정</li>
+		            <li class="pass">기본 설정</li>
+		            <li class="pass">네트워크 정보</li>
+		            <li class="pass">리소스 정보</li>		            
+		            <li class="active">배포 파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
@@ -1778,11 +2157,12 @@ function osDeployPopup(){
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;">
 			<div style="margin-left:3%;">
-	            <ul class="progressStep_5">
-		            <li class="pass">AWS 설정</li>
-		            <li class="pass">Network 설정</li>
-		            <li class="pass">리소스 설정</li>
-		            <li class="pass">배포 Manifest</li>
+	            <ul class="progressStep_6" >
+		            <li class="pass">오픈스텍 설정</li>
+		            <li class="pass">기본 설정</li>
+		            <li class="pass">네트워크 정보</li>
+		            <li class="pass">리소스 정보</li>		            
+		            <li class="pass">배포 파일 정보</li>
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>

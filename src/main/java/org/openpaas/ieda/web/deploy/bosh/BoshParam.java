@@ -2,13 +2,6 @@ package org.openpaas.ieda.web.deploy.bosh;
 
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
-import org.openpaas.ieda.common.ReplaceItem;
-import org.openpaas.ieda.web.config.bootstrap.BootStrapDto;
-import org.openpaas.ieda.web.config.bootstrap.IDEABootStrapInfoDto;
-import org.openpaas.ieda.web.config.bootstrap.BootStrapDto.Deployment;
-import org.openpaas.ieda.web.config.bootstrap.IDEABootStrapInfoDto.Install;
-
 import lombok.Data;
 
 public class BoshParam {

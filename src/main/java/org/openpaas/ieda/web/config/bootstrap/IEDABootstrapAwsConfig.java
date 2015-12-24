@@ -23,43 +23,35 @@ public class IEDABootstrapAwsConfig {
 	private Date updatedDate;
 	
 	/** AWS Setting Info **/
-	private String accessKey;
-	
-	private String secretAccessKey;
-	
-	private String defaultKeyName;
-	
+	private String accessKeyId;
+	private String secretAccessId;
 	private String defaultSecurityGroups;
-	
+	private String region;
+	private String availabilityZone;
+	private String privateKeyName;
 	private String privateKeyPath;
 	
+	/** AWS Default Info **/
+	private String deploymentName;
+	private String directorName;
+	private String boshRelease;
+	private String boshCpiRelease;
+	
 	/** Network Info **/
-	private String subnetRange;
-	
-	private String gateway;
-	
-	private String dns;
-	
 	private String subnetId;
+	private String privateStaticIp;
+	private String publicStaticIp;
+	private String subnetRangeFrom;
+	private String subnetRangeTo;
+	private String subnetGateway;
+	private String subnetDns;
+	private String ntp;
 	
-	private String directorPrivateIp;
-	
-	private String directorPublicIp;
-	
-	private String stemcellName;
-	
-	private String stemcellVersion;
-	
-	private String instanceType;
-	
-	private String region;
-	
-	private String availabilityZone;
-	
-	private String microBoshPw;
+	/** Resource Info **/
+	private String stemcell;
+	private String cloudInstanceType;
+	private String boshPassword;
 	
 	private String deploymentFile;
-	
-	private String ntp;
 
 }

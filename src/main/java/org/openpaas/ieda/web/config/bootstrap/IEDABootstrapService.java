@@ -1,6 +1,5 @@
 package org.openpaas.ieda.web.config.bootstrap;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,7 +10,6 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -19,13 +17,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
+import org.openpaas.ieda.common.ReplaceItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,29 +48,43 @@ public class IEDABootstrapService {
 		List<BootstrapListDto> listDtos = new ArrayList<>();
 		int recid =0;
 		if(awsConfigsList.size() > 0){
-			for(IEDABootstrapAwsConfig awsConfig :awsConfigsList){
+			for(IEDABootstrapAwsConfig config :awsConfigsList){
 				BootstrapListDto dto = new BootstrapListDto();
 				dto.setRecid(recid++);
-				dto.setId(awsConfig.getId());
+				dto.setId(config.getId());
 				dto.setIaas("AWS");
-				dto.setCreatedDate(awsConfig.getCreatedDate());
-				dto.setUpdatedDate(awsConfig.getUpdatedDate());
-				dto.setDirectorPrivateIp(awsConfig.getDirectorPrivateIp());
-				dto.setDirectorPublicIp(awsConfig.getDirectorPublicIp());
+				dto.setCreatedDate(config.getCreatedDate());
+				dto.setUpdatedDate(config.getUpdatedDate());
+				
+				dto.setDeploymentName(config.getDeploymentName());;
+				dto.setDirectorName(config.getDirectorName());;
+				dto.setBoshRelease(config.getBoshRelease());;
+				dto.setBoshCpiRelease(config.getBoshCpiRelease());;
+				dto.setSubnetId(config.getSubnetId());;
+				dto.setPrivateStaticIp(config.getPrivateStaticIp());
+				dto.setPublicStaticIp(config.getPublicStaticIp());;
+				
 				listDtos.add(dto);
 			}
 		}
 		
 		if(openstackConfigsList.size() > 0){
-			for(IEDABootstrapOpenstackConfig openstackConfig :openstackConfigsList){
+			for(IEDABootstrapOpenstackConfig config :openstackConfigsList){
 				BootstrapListDto dto = new BootstrapListDto();
 				dto.setRecid(recid++);
-				dto.setId(openstackConfig.getId());
+				dto.setId(config.getId());
 				dto.setIaas("OPENSTACK");
-				dto.setCreatedDate(openstackConfig.getCreatedDate());
-				dto.setUpdatedDate(openstackConfig.getUpdatedDate());
-				dto.setDirectorPrivateIp(openstackConfig.getPrivateStaticIp());
-				dto.setDirectorPublicIp(openstackConfig.getPublicStaticIp());
+				dto.setCreatedDate(config.getCreatedDate());
+				dto.setUpdatedDate(config.getUpdatedDate());
+				
+				dto.setDeploymentName(config.getDeploymentName());;
+				dto.setDirectorName(config.getDirectorName());;
+				dto.setBoshRelease(config.getBoshRelease());;
+				dto.setBoshCpiRelease(config.getBoshCpiRelease());;
+				dto.setSubnetId(config.getSubnetId());;
+				dto.setPrivateStaticIp(config.getPrivateStaticIp());
+				dto.setPublicStaticIp(config.getPublicStaticIp());;
+				
 				listDtos.add(dto);
 			}
 		}
@@ -99,13 +110,13 @@ public class IEDABootstrapService {
 			content = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
 			stubContent = IOUtils.toString(new FileInputStream(stubDeploy), "UTF-8");
 			
-			List<BootstrapItem> bootstrapItems = makeBootstrapItems(id, iaas);
-			for (BootstrapItem item : bootstrapItems) {
+			List<ReplaceItem> ReplaceItems = makeReplaceItems(id, iaas);
+			for (ReplaceItem item : ReplaceItems) {
 				log.info(item.getTargetItem() +" / "+  item.getSourceItem());
 				content = content.replace(item.getTargetItem(), item.getSourceItem());
 			}
 
-			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName()), "UTF-8");
+			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir()  + System.getProperty("file.separator") + stubDeploy.getName()), "UTF-8");
 			IOUtils.write(content, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName), "UTF-8");
 			deplymentFileName = setSpiffMerge(iaas, id, stubDeploy.getName(), settingFileName);
 		} catch (URISyntaxException e) {
@@ -117,57 +128,68 @@ public class IEDABootstrapService {
 		return deplymentFileName;
 	}
 
-	public List<BootstrapItem> makeBootstrapItems(Integer id, String iaas) {
+	public List<ReplaceItem> makeReplaceItems(Integer id, String iaas) {
 		
-		List<BootstrapItem> items = new ArrayList<BootstrapItem>();
+		List<ReplaceItem> items = new ArrayList<ReplaceItem>();
 		
 		if(iaas == "AWS"){
 			IEDABootstrapAwsConfig  awsConfig = awsRepository.findOne(id);
-			items.add(new BootstrapItem("[stemcell]", LocalDirectoryConfiguration.getStemcellDir() + System.getProperty("file.separator") + awsConfig.getStemcellName()));
-			items.add(new BootstrapItem("[microboshPw]", awsConfig.getMicroBoshPw()));
-			items.add(new BootstrapItem("[subnetRange]", awsConfig.getSubnetRange()));
-			items.add(new BootstrapItem("[dns]", awsConfig.getDns()));
-			items.add(new BootstrapItem("[subnetId]", awsConfig.getSubnetId()));
-			items.add(new BootstrapItem("[gateway]", awsConfig.getGateway()));
-			items.add(new BootstrapItem("[directorPrivateIp]", awsConfig.getDirectorPrivateIp()));
-			items.add(new BootstrapItem("[directorPublicIp]", awsConfig.getDirectorPublicIp()));
-			items.add(new BootstrapItem("[awsKey]", awsConfig.getAccessKey()));
-			items.add(new BootstrapItem("[secretAccessKey]", awsConfig.getSecretAccessKey()));
-			items.add(new BootstrapItem("[defaultSecurityGroups]", awsConfig.getDefaultSecurityGroups()));
-			items.add(new BootstrapItem("[privateKey]"
-					, System.getProperty("user.home") + System.getProperty("file.separator") + ".ssh"+ System.getProperty("file.separator") +awsConfig.getPrivateKeyPath()));
-			items.add(new BootstrapItem("[region]", awsConfig.getAvailabilityZone()));
-			items.add(new BootstrapItem("[flavor]", awsConfig.getInstanceType()));
-			items.add(new BootstrapItem("[availabilityZone]", awsConfig.getAvailabilityZone()));
-			items.add(new BootstrapItem("[ntp]", awsConfig.getNtp()));
+			items.add(new ReplaceItem("[accessKeyId]", awsConfig.getAccessKeyId()));
+			items.add(new ReplaceItem("[secretAccessId]", awsConfig.getSecretAccessId()));
+			items.add(new ReplaceItem("[defaultSecurityGroups]", awsConfig.getDefaultSecurityGroups()));
+			items.add(new ReplaceItem("[region]", awsConfig.getRegion()));
+			items.add(new ReplaceItem("[availabilityZone]", awsConfig.getAvailabilityZone()));
+			items.add(new ReplaceItem("[privateKeyName]", awsConfig.getPrivateKeyName()));
+			items.add(new ReplaceItem("[privateKeyPath]", System.getProperty("user.home") + System.getProperty("file.separator")
+										+ ".ssh"+ System.getProperty("file.separator") + awsConfig.getPrivateKeyPath()));
+			
+			items.add(new ReplaceItem("[deploymentName]", awsConfig.getDeploymentName()));
+			items.add(new ReplaceItem("[directorName]", awsConfig.getDirectorName()));
+			items.add(new ReplaceItem("[boshRelease]", LocalDirectoryConfiguration.getReleaseDir() + System.getProperty("file.separator") + awsConfig.getBoshRelease()));
+			items.add(new ReplaceItem("[boshCpiRelease]", LocalDirectoryConfiguration.getReleaseDir() + System.getProperty("file.separator") + awsConfig.getBoshCpiRelease()));
+			
+			items.add(new ReplaceItem("[subnetId]", awsConfig.getSubnetId()));
+			items.add(new ReplaceItem("[privateStaticIp]", awsConfig.getPrivateStaticIp()));
+			items.add(new ReplaceItem("[publicStaticIp]", awsConfig.getPublicStaticIp()));
+			items.add(new ReplaceItem("[subnetRange]", awsConfig.getSubnetRangeFrom() + " - " +  awsConfig.getSubnetRangeTo()));
+			items.add(new ReplaceItem("[subnetGateway]", awsConfig.getSubnetGateway()));
+			items.add(new ReplaceItem("[subnetDns]", awsConfig.getSubnetDns()));
+			items.add(new ReplaceItem("[ntp]", awsConfig.getNtp()));
+			
+			items.add(new ReplaceItem("[stemcell]", LocalDirectoryConfiguration.getStemcellDir() + System.getProperty("file.separator") + awsConfig.getStemcell()));
+			items.add(new ReplaceItem("[cloudInstanceType]", awsConfig.getCloudInstanceType()));
+			items.add(new ReplaceItem("[boshPassword]", awsConfig.getBoshPassword()));
+//			
+//			items.add(new ReplaceItem("[privateKey]"
+//					, System.getProperty("user.home") + System.getProperty("file.separator") + ".ssh"+ System.getProperty("file.separator") +awsConfig.getPrivateKeyPath()));
 		}
 		else{
 			IEDABootstrapOpenstackConfig openstackConfig = openstackRepository.findOne(id);
-			items.add(new BootstrapItem("[boshName]", openstackConfig.getBoshName()));
-			items.add(new BootstrapItem("[boshUrl]", openstackConfig.getBoshUrl()));
-			items.add(new BootstrapItem("[boshCpiUrl]", openstackConfig.getBoshCpiUrl()));
-			items.add(new BootstrapItem("[cloudPrivateKey]", openstackConfig.getCloudPrivateKey()));
+			items.add(new ReplaceItem("[authUrl]", openstackConfig.getAuthUrl()));
+			items.add(new ReplaceItem("[tenant]", openstackConfig.getTenant()));
+			items.add(new ReplaceItem("[userName]", openstackConfig.getUserName()));
+			items.add(new ReplaceItem("[apiKey]", openstackConfig.getApiKey()));
+			items.add(new ReplaceItem("[defaultSecurityGroup]", openstackConfig.getDefaultSecurityGroup()));
+			items.add(new ReplaceItem("[privateKeyName]", openstackConfig.getPrivateKeyName()));
+			items.add(new ReplaceItem("[privateKeyPath]", System.getProperty("user.home") + System.getProperty("file.separator")
+												+ ".ssh"+ System.getProperty("file.separator") +openstackConfig.getPrivateKeyPath()));
 			
-			items.add(new BootstrapItem("[privateStaticIp]", openstackConfig.getPrivateStaticIp()));
-			items.add(new BootstrapItem("[publicStaticIp]", openstackConfig.getPublicStaticIp()));
-			items.add(new BootstrapItem("[directorName]", openstackConfig.getDirectorName()));
-			items.add(new BootstrapItem("[boshUrl]", openstackConfig.getBoshUrl()));
-			items.add(new BootstrapItem("[authUrl]", openstackConfig.getAuthUrl()));
-			items.add(new BootstrapItem("[tenant]", openstackConfig.getTenant()));
-			items.add(new BootstrapItem("[userName]", openstackConfig.getUserName()));
-			items.add(new BootstrapItem("[apiKey]", openstackConfig.getApiKey()));
-			items.add(new BootstrapItem("[defaultKeyName]", openstackConfig.getDefaultKeyName()));
-			items.add(new BootstrapItem("[defaultSecurityGroup]", openstackConfig.getDefaultSecurityGroup()));
-			items.add(new BootstrapItem("[ntp]", openstackConfig.getNtp()));
+			items.add(new ReplaceItem("[deploymentName]", openstackConfig.getDeploymentName()));
+			items.add(new ReplaceItem("[directorName]", openstackConfig.getDirectorName()));
+			items.add(new ReplaceItem("[boshRelease]", LocalDirectoryConfiguration.getReleaseDir() + System.getProperty("file.separator") + openstackConfig.getBoshRelease()));
+			items.add(new ReplaceItem("[boshCpiRelease]", LocalDirectoryConfiguration.getReleaseDir() + System.getProperty("file.separator") + openstackConfig.getBoshCpiRelease()));
 			
-			items.add(new BootstrapItem("[subnetRange]", openstackConfig.getSubnetRange()));
-			items.add(new BootstrapItem("[subnetGateway]", openstackConfig.getSubnetGateway()));
-			items.add(new BootstrapItem("[subnetDns]", openstackConfig.getSubnetDns()));
-			items.add(new BootstrapItem("[cloudNetId]", openstackConfig.getCloudNetId()));
+			items.add(new ReplaceItem("[subnetId]", openstackConfig.getSubnetId()));
+			items.add(new ReplaceItem("[privateStaticIp]", openstackConfig.getPrivateStaticIp()));
+			items.add(new ReplaceItem("[publicStaticIp]", openstackConfig.getPublicStaticIp()));
+			items.add(new ReplaceItem("[subnetRange]", openstackConfig.getSubnetRangeFrom() + " - " + openstackConfig.getSubnetRangeTo() ));
+			items.add(new ReplaceItem("[subnetGateway]", openstackConfig.getSubnetGateway()));
+			items.add(new ReplaceItem("[subnetDns]", openstackConfig.getSubnetDns()));
+			items.add(new ReplaceItem("[ntp]", openstackConfig.getNtp()));
 			
-			items.add(new BootstrapItem("[stemcellUrl]", openstackConfig.getStemcellUrl()));
-			items.add(new BootstrapItem("[envPassword]", openstackConfig.getEnvPassword()));
-			items.add(new BootstrapItem("[cloudInstanceType]", openstackConfig.getCloudInstanceType()));
+			items.add(new ReplaceItem("[stemcell]", LocalDirectoryConfiguration.getStemcellDir() + System.getProperty("file.separator") + openstackConfig.getStemcell()));
+			items.add(new ReplaceItem("[cloudInstanceType]", openstackConfig.getCloudInstanceType()));
+			items.add(new ReplaceItem("[boshPassword]", openstackConfig.getBoshPassword()));
 			
 		}
 		return items;
@@ -288,8 +310,8 @@ public class IEDABootstrapService {
 		Runtime r = Runtime.getRuntime();
 		String command = "";
 		try{
-			command += LocalDirectoryConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "microbosh-deploy.sh ";
-			command += LocalDirectoryConfiguration.getDeploymentDir()+ System.getProperty("file.separator")  + deployFileName ;
+			command += LocalDirectoryConfiguration.getScriptDir() + System.getProperty("file.separator")  + "aws-microbosh-deploy.sh ";
+			command += LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator")  + deployFileName ;
 					
 			Process process = r.exec(command);
 			log.info("### PROCESS ::: " + process.toString());
@@ -348,27 +370,4 @@ public class IEDABootstrapService {
 		return localFiles;
 	}
 
-	public void uploadKeyPath(MultipartHttpServletRequest request) {
-		Iterator<String> itr =  request.getFileNames();
-		File keyPathFile = new File(PRIVATE_KEY_PATH);
-		if (!keyPathFile.isDirectory()){
-			keyPathFile.mkdir();
-		}
-			
-        if(itr.hasNext()) {
-            MultipartFile mpf = request.getFile(itr.next());
-            try {
-                byte[] bytes = mpf.getBytes();
-                BufferedOutputStream stream =
-                        new BufferedOutputStream(new FileOutputStream(new File(PRIVATE_KEY_PATH + mpf.getOriginalFilename())));
-                stream.write(bytes);
-                stream.close();
-            } catch (IOException e) {
-                log.info(e.getMessage());
-                e.printStackTrace();
-            }
-        } 
-		
-	}
-	
 }

@@ -2,8 +2,6 @@ package org.openpaas.ieda.web.config.bootstrap;
 
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
-
 import lombok.Data;
 
 public class BootStrapDto{
@@ -11,117 +9,156 @@ public class BootStrapDto{
 	@Data
 	public static class Aws{
 		private String id;
-		@NotNull @NotEmpty
-		private String iaas;
-		@NotNull @NotEmpty
-		private String awsKey;
-		@NotNull @NotEmpty
-		private String awsPw;
-		@NotNull @NotEmpty
+		@NotNull 
+		private String accessKeyId;
+		@NotNull 
+		private String secretAccessId;
+		@NotNull 
 		private String defaultSecurityGroups;
-		@NotNull @NotEmpty
-		private String privateKeyName;
-		@NotNull @NotEmpty
-		private String privateKeyPath;
-	}
-	
-	@Data
-	public static class Network{
-		@NotNull @NotEmpty
-		private String id;
-		@NotNull @NotEmpty
-		private String subnetRange;
-		@NotNull @NotEmpty
-		private String gateway;
-		@NotNull @NotEmpty
-		private String dns;
-		@NotNull @NotEmpty
-		private String subnetId;
-		@NotNull @NotEmpty
-		private String directorPrivateIp;
-		@NotNull @NotEmpty
-		private String directorPublicIp;
-	}
-	
-	@Data
-	public static class Resources{
-		@NotNull @NotEmpty
-		private String id;
-		@NotNull @NotEmpty
-		private String targetStemcell;
-		@NotNull @NotEmpty
-		private String instanceType;
-		@NotNull @NotEmpty
+		@NotNull 
 		private String region;
-		@NotNull @NotEmpty
+		@NotNull
 		private String availabilityZone;
-		@NotNull @NotEmpty
-		private String microBoshPw;
-		@NotNull @NotEmpty
+		@NotNull
+		private String privateKeyName;
+		@NotNull
+		private String privateKeyPath;
+
+	}
+	
+	@Data
+	public static class AwsDefault{
+		@NotNull
+		private String id;
+		@NotNull
+		private String deploymentName;
+		@NotNull
+		private String directorName;
+		@NotNull
+		private String boshRelease;
+		@NotNull
+		private String boshCpiRelease;
+
+	}
+	
+	@Data
+	public static class AwsNetwork{
+		@NotNull
+		private String id;
+		@NotNull
+		private String subnetId;
+		@NotNull
+		private String privateStaticIp;
+		@NotNull
+		private String publicStaticIp;
+		@NotNull
+		private String subnetRangeFrom;
+		@NotNull
+		private String subnetRangeTo;
+		@NotNull
+		private String subnetGateway;
+		@NotNull
+		private String subnetDns;
+		@NotNull
 		private String ntp;
 	}
 	
 	@Data
+	public static class AwsResource{
+		@NotNull
+		private String id;
+		@NotNull
+		private String stemcell;
+		@NotNull
+		private String cloudInstanceType;
+		@NotNull
+		private String boshPassword;
+	}
+	
+	@Data 
+	public static class OpenStack{
+		private String id;
+		@NotNull
+		private String authUrl;
+		@NotNull
+		private String tenant;
+		@NotNull
+		private String userName;
+		@NotNull
+		private String apiKey;
+		@NotNull
+		private String defaultSecurityGroup;
+		@NotNull
+		private String defaultKeyName;
+		@NotNull
+		private String cloudPrivateKey;
+	}
+	
+	@Data 
+	public static class OpenstackDefault{
+		@NotNull
+		private String id;
+		@NotNull
+		private String deploymentName;
+		@NotNull
+		private String directorName;
+		@NotNull
+		private String boshRelease;
+		@NotNull
+		private String boshCpiRelease;
+	}
+	
+	@Data 
+	public static class OpenstackNetwork{
+		@NotNull
+		private String id;
+		@NotNull
+		private String subnetId;
+		@NotNull
+		private String privateStaticIp;
+		@NotNull
+		private String publicStaticIp;
+		@NotNull
+		private String subnetRangeFrom;
+		@NotNull
+		private String subnetRangeTo;
+		@NotNull
+		private String subnetGateway;
+		@NotNull
+		private String subnetDns;
+		@NotNull
+		private String ntp;
+	}
+	
+	@Data 
+	public static class OpenstackResource{
+		@NotNull
+		private String id;
+		@NotNull
+		private String stemcell;
+		@NotNull
+		private String cloudInstanceType;
+		@NotNull
+		private String boshPassword;
+	}
+	
+	@Data
 	public static class Install{
-		@NotNull @NotEmpty
+		@NotNull
 		private String deployFileName;
 	}
 	
 	@Data
 	public static class Delete{
-		@NotNull @NotEmpty
+		@NotNull
 		private String id;
-		@NotNull @NotEmpty
+		@NotNull
 		private String iaas;
-	}
-	
-	@Data 
-	public static class OpenStack{
-		@NotNull @NotEmpty
-		private String id;		
-		private String privateStaticIp;
-		private String publicStaticIp;
-		private String directorName;
-		private String authUrl;
-		private String tenant;
-		private String userName;
-		private String apiKey;
-		private String defaultKeyName;
-		private String defaultSecurityGroups;
-		private String ntp;
-	}
-	
-	@Data 
-	public static class OsBosh{
-		private String id;
-		private String boshName;
-		private String boshUrl;
-		private String boshCpiUrl;
-		private String privateKeyPath;
-	}
-	
-	@Data 
-	public static class OsNetwork{
-		@NotNull @NotEmpty
-		private String id;
-		private String subnetRange;
-		private String subnetGateway;
-		private String subnetDns;
-		private String cloudNetId;
-	}
-	
-	@Data 
-	public static class OsResource{
-		@NotNull @NotEmpty
-		private String id;
-		private String stemcellUrl;
-		private String envPassword;
-		private String cloudInstanceType;;
 	}
 	
 	@Data
 	public static class Deployment{
-		@NotNull @NotEmpty
+		@NotNull
 		private String deploymentFile;
 	}
 }
