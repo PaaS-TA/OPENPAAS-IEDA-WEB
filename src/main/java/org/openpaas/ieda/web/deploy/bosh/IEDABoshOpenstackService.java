@@ -6,20 +6,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.persistence.EntityNotFoundException;
 
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
-import org.openpaas.ieda.common.ReplaceItem;
+import org.openpaas.ieda.web.common.ReplaceItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 

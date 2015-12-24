@@ -145,7 +145,9 @@ public class BootStrapDto{
 	@Data
 	public static class Install{
 		@NotNull
-		private String deployFileName;
+		private String iaas;
+		@NotNull
+		private String id;
 	}
 	
 	@Data

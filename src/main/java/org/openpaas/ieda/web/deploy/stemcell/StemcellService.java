@@ -1,11 +1,14 @@
 package org.openpaas.ieda.web.deploy.stemcell;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -15,6 +18,7 @@ import org.openpaas.ieda.api.Stemcell;
 import org.openpaas.ieda.api.StemcellInfo;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
+import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.openpaas.ieda.web.config.stemcell.IEDAStemcellContentRepository;
@@ -122,4 +126,37 @@ public class StemcellService {
 					
 		return returnList;
 	}
+	
+	public List<String> localStemcells(){
+		File file = new File(LocalDirectoryConfiguration.getStemcellDir());
+		File[] localFiles = file.listFiles();
+		String type= "lightAws";
+		List<String> localStemcells = null; 
+		String regx = "";
+		if( type.equals("lightAwsHvm") ){
+			regx = "\\A(light-bosh-stemcell-)\\d{4}(-aws-xen-hvm)";
+		}
+		else if( type.equals("lightAws") ){
+			regx = "\\A(light-bosh-stemcell-)\\d{4}(-aws)";
+		}
+		else if( type.equals("boshOpenstackUbuntu") ){
+			regx = "\\A(bosh-stemcell-)\\d{4}(-openstack-kvm-ubuntu)";
+		}
+		
+		for (File fileInfo : localFiles) {
+			if ( localStemcells == null )
+				localStemcells = new ArrayList<String>();
+			
+			Pattern pattern = Pattern.compile(regx);
+	        Matcher matcher = pattern.matcher(fileInfo.getName().toLowerCase());
+	        log.info("::: Stemcell Name ::: " + fileInfo.getName());
+	        if(matcher.find()){
+	        	log.info("::: Stemcell Match ::: " + matcher.find());
+	        	localStemcells.add(fileInfo.getName());
+	        }
+		}		
+		
+		return localStemcells;
+	}
+	
 }

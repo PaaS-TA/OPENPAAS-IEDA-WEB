@@ -1,44 +1,44 @@
-name: microbosh
+name: [deploymentName]
 releases:
   bosh:
-    url: file:///home/jhkim/openpass/release/bosh-230.tgz
+    url: file:///[boshRelease]
   bosh-aws-cpi:
-    url: file:///home/jhkim/openpass/release/bosh-aws-cpi-release-36.tgz
+    url: file:///[boshCpiRelease]
 resource_pools:
   vms:
     stemcell: 
       url: file://[stemcell]
     env:
       bosh:
-        password: [microboshPw] 
+        password: [boshPassword] 
     cloud_properties:
-      instance_type: [flavor]
+      instance_type: [cloudInstanceType]
       availability_zone: [availabilityZone]
 networks:
   private:
     subnets:
     - range: [subnetRange]
-      gateway: [gateway]
-      dns: [[dns]]
+      gateway: [subnetGateway]
+      dns: [[subnetDns]]
       cloud_properties: 
         subnet: [subnetId]
 jobs:
   bosh:
     networks:
       private:
-        static_ips: [[directorPrivateIp]]
+        static_ips: [[privateStaticIp]]
       public:
-        static_ips: [[directorPublicIp]]
+        static_ips: [[publicStaticIp]]
     properties:
       director: 
         name: [directorName]
       aws:
-        access_key_id: [awsKey]
-        secret_access_key: [secretAccessKey]
-        default_key_name: [defaultKeyName]
+        access_key_id: [accessKeyId]
+        secret_access_key: [secretAccessId]
+        default_key_name: [privateKeyName]
         default_security_groups: [[defaultSecurityGroups]]
         region: [region]
       ntp: [[ntp]]
 cloud_provider:
   ssh_tunnel:
-    private_key: [privateKey]
+    private_key: [privateKeyPath]

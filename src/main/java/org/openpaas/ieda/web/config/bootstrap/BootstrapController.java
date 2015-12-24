@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -34,9 +33,11 @@ public class BootstrapController {
 	@Autowired
 	private IEDABootstrapOpenstackService openstackService;
 	
-	
 	@Autowired
 	private IEDABootstrapService bootstrapService;
+	
+	@Autowired
+	private boostrapDeployAsyncService boostrapDeployAsyncService;
 	
 	@RequestMapping(value = "/config/bootstrap", method=RequestMethod.GET)
 	public String main() {
@@ -113,7 +114,7 @@ public class BootstrapController {
 	@MessageMapping("/bootstrapInstall")
 	@SendTo("/bootstrap/bootstrapInstall")
 	public ResponseEntity doInstallBootstrap(@RequestBody @Valid BootStrapDto.Install dto){
-		bootstrapService.installBootstrap(dto.getDeployFileName());
+		boostrapDeployAsyncService.deployAsync(dto);
 		return new ResponseEntity(HttpStatus.OK);
 	}
 	

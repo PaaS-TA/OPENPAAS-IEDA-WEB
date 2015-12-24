@@ -53,5 +53,5 @@ public class IEDABootstrapAwsConfig {
 	private String boshPassword;
 	
 	private String deploymentFile;
-
+	private String deployStatus;
 }

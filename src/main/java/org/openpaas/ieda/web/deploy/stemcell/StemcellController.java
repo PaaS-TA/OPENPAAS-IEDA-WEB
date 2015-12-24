@@ -88,4 +88,16 @@ public class StemcellController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	// 다운로드받은 로컬 스템셀 목록 조회
+	@RequestMapping(value = "/deploy/localStemcells", method = RequestMethod.GET)
+	public ResponseEntity localStemcells() {
+		List<String> contents = service.localStemcells();
+
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		result.put("total", contents.size());
+		result.put("records", contents);
+		log.info("::: STEMCELLS ::" + contents);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
 }

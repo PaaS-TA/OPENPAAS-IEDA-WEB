@@ -1,4 +1,4 @@
-package org.openpaas.ieda.common;
+package org.openpaas.ieda.web.common;
 
 import lombok.Data;
 

@@ -88,6 +88,24 @@ public class ReleaseController {
 		return new ResponseEntity( result, HttpStatus.OK);
 	}
 	
+	@RequestMapping( value="/release/localBoshList", method =RequestMethod.GET)
+	public ResponseEntity listLocalBoshRelease(){
+		List<String> contents = releaseService.listLocalBoshRelease();
+		return new ResponseEntity( contents, HttpStatus.OK);
+	}
+	
+	@RequestMapping( value="/release/localBoshAwsCpiList", method =RequestMethod.GET)
+	public ResponseEntity listLocalBoshAwsCpiRelease(){
+		List<String> contents = releaseService.listLocalBoshAwsCpiRelease();
+		return new ResponseEntity( contents, HttpStatus.OK);
+	}
+	
+	@RequestMapping( value="/release/localBoshOpenstackCpiList", method =RequestMethod.GET)
+	public ResponseEntity listLocalBoshOpenstackCpiRelease(){
+		List<String> contents = releaseService.listLocalBoshOpenstackCpiRelease();
+		return new ResponseEntity( contents, HttpStatus.OK);
+	}
+	
 	/**
 	 * 릴리즈 업로드
 	 * @param dto
@@ -126,4 +144,3 @@ public class ReleaseController {
 	}
 	
 }
-

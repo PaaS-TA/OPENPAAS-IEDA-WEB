@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -140,6 +142,66 @@ public class ReleaseService {
 			localFile.delete();
 		else
 			throw new IEDACommonException("notfound.localrelease.exception", "릴리즈 파일이 존재하지 않습니다.", HttpStatus.BAD_REQUEST); 
+	}
+
+	public List<String> listLocalBoshRelease() {
+		File file = new File(LocalDirectoryConfiguration.getReleaseDir());
+		File[] localFiles = file.listFiles();
+		
+		List<String> localReleaseList = null; 
+		
+		for (File fileInfo : localFiles) {
+			if ( localReleaseList == null )
+				localReleaseList = new ArrayList<String>();
+			
+			final String regx = "\\A(bosh-)\\d{2,3}.(tgz)\\z";
+			Pattern pattern = Pattern.compile(regx);
+	        Matcher matcher = pattern.matcher(fileInfo.getName().toLowerCase());
+	        if(matcher.find()){
+	        	localReleaseList.add(fileInfo.getName());
+	        }
+		}
+		return localReleaseList;
+	}
+	
+	public List<String> listLocalBoshAwsCpiRelease() {
+		File file = new File(LocalDirectoryConfiguration.getReleaseDir());
+		File[] localFiles = file.listFiles();
+		
+		List<String> localReleaseList = null; 
+		
+		for (File fileInfo : localFiles) {
+			if ( localReleaseList == null )
+				localReleaseList = new ArrayList<String>();
+			
+			final String regx = "\\A(bosh-aws-cpi-release-)\\d{2,4}.(tgz)\\z";
+			Pattern pattern = Pattern.compile(regx);
+	        Matcher matcher = pattern.matcher(fileInfo.getName().toLowerCase());
+	        if(matcher.find()){
+	        	localReleaseList.add(fileInfo.getName());
+	        }
+		}
+		return localReleaseList;
+	}
+	
+	public List<String> listLocalBoshOpenstackCpiRelease() {
+		File file = new File(LocalDirectoryConfiguration.getReleaseDir());
+		File[] localFiles = file.listFiles();
+		
+		List<String> localReleaseList = null; 
+		
+		for (File fileInfo : localFiles) {
+			if ( localReleaseList == null )
+				localReleaseList = new ArrayList<String>();
+			
+			final String regx = "\\A(bosh-openstack-cpi-release-)\\d{2,4}.(tgz)\\z";
+			Pattern pattern = Pattern.compile(regx);
+	        Matcher matcher = pattern.matcher(fileInfo.getName().toLowerCase());
+	        if(matcher.find()){
+	        	localReleaseList.add(fileInfo.getName());
+	        }
+		}
+		return localReleaseList;
 	}
 
 }

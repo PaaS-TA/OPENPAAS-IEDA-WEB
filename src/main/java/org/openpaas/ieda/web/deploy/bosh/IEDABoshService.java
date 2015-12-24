@@ -12,21 +12,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.api.DeploymentInfo;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
-import org.openpaas.ieda.common.ReplaceItem;
-import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
+import org.openpaas.ieda.web.common.ReplaceItem;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.openpaas.ieda.web.information.deploy.DeploymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -401,8 +397,8 @@ public class IEDABoshService {
 
 		BufferedReader bufferedReader = null;
 		try {
-			stubFile = new File(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName);
-			settingFile = new File(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName);
+			stubFile = new File(templateFile);
+			settingFile = new File(parameterFile);
 
 			if(stubFile.exists() && settingFile.exists()){
 				command = "spiff merge " + templateFile + " " + parameterFile;;

@@ -63,6 +63,7 @@ var fadeOutTime = 3000;
 
 var boshReleases;
 var boshCpiReleases;
+var stemcells;
 
 $(function() {	
  	$('#config_bootstrapGrid').w2grid({
@@ -77,12 +78,13 @@ $(function() {
 		columns:[
 		      {field: 'recid', 	caption: 'recid', hidden: true}
 			, {field: 'id', caption: 'ID', hidden: true}
-			, {field: 'boshName', caption: 'BOSH NAME', size: '10%'}
-			, {field: 'directorName', caption: 'DIRECTOR NAME', size: '10%'}
-			, {field: 'boshUrl', caption: 'BOSH URL', size: '20%'}
-			, {field: 'cloudNetId', caption: 'CLOUD NET ID', size: '20%'}
-			, {field: 'privateStaticIp', caption: 'PRIVATE STATIC IP', size: '20%'}
-			, {field: 'publicStaticIp', caption: 'PUBLIC STATIC IP', size: '20%'}
+			, {field: 'deploymentName', caption: 'DEPLOYMENT NAME', size: '10%'}
+			, {field: 'directorName', caption: 'DIRECTOR NAME', size: '16%'}
+			, {field: 'boshRelease', caption: 'BOSH RELEASE', size: '12%'}
+			, {field: 'boshCpiRelease', caption: 'BOSH CPI RELEASE', size: '22%'}
+			, {field: 'subnetId', caption: 'SUBNET ID', size: '14%'}
+			, {field: 'privateStaticIp', caption: 'PRIVATE STATIC IP', size: '12%'}
+			, {field: 'publicStaticIp', caption: 'PUBLIC STATIC IP', size: '12%'}
 			],
 		onClick:function(event) {
 			var grid = this;
@@ -723,18 +725,20 @@ function getLocalOpenstackBoshCpiReleaseList(){
 }
 
 function getStamcellList(){
+	console.log("::::: getStamcellList");
+
 	$.ajax({
 		type : "GET",
-		url : "/stemcells",
+		url : "/deploy/localStemcells",
 		contentType : "application/json",
 		async : true,
 		data : JSON.stringify(boshInfo), 
 		success : function(data, status) {
 			console.log("Stemcell List");
-			stemcells = new Array();
-			data.records.map(function (obj){
+			stemcells = data.records;
+			/* data.records.map(function (obj){
 			 	stemcells.push(obj.name+"/"+obj.version);
-			});
+			}); */
 		},
 		error : function( e, status ) {
 			w2alert("Stemcell List 를 가져오는데 실패하였습니다.", "Bosh 설치");
@@ -909,7 +913,7 @@ function validationAwsNetworkInfo(){
 }
 
 function awsResourcePopup(){
-	//getStemcellList();
+	console.log("resorce POPUP!!");
 	$("#resourceSettingInfoDiv").w2popup({
 		width : 670,
 		height : 430,
@@ -923,27 +927,16 @@ function awsResourcePopup(){
 	});
 }
 
-function setReourceData(){
-	if(resourceInfo != ""){
-		$(".w2ui-msg-body input[name='targetStemcell']").data('selected', {text:resourceInfo.targetStemcell});
-		
-		$(".w2ui-msg-body input[name='instanceType']").val(resourceInfo.instanceType);
-		$(".w2ui-msg-body input[name='region']").val(resourceInfo.region);
-		$(".w2ui-msg-body input[name='availabilityZone']").val(resourceInfo.availabilityZone);
-		$(".w2ui-msg-body input[name='microBoshPw']").val(resourceInfo.microBoshPw);
-		$(".w2ui-msg-body input[name='ntp']").val(resourceInfo.ntp);
-	}
-}
-
 function getStemcellList(){
+	console.log("SSSSTEMCELL!!!");
 	$.ajax({
 		type : "GET",
-		url : "/bootstrap/getLocalStemcellList",
+		url : "/deploy/localStemcells",
 		contentType : "application/json",
 		//dataType: "json",
 		async : true,
 		success : function(data, status) {
-			$('#w2ui-popup input[type=list]').w2field('list', { items: data , maxDropHeight:300, width:500});
+			$('#w2ui-popup input[type=list]').w2field('list', { items: data.records , maxDropHeight:300, width:500});
 			setReourceData();
 		},
 		error : function( e, status ) {
@@ -952,78 +945,79 @@ function getStemcellList(){
 	});
 }
 
+function setReourceData(){
+	if(resourceInfo != ""){
+		$(".w2ui-msg-body input[name='stemcell']").data('selected', {text:resourceInfo.stemcell});
+		
+		$(".w2ui-msg-body input[name='cloudInstanceType']").val(resourceInfo.cloudInstanceType);
+		$(".w2ui-msg-body input[name='boshPassword']").val(resourceInfo.boshPassword);
+	}
+}
+
 function saveResourceInfo(type){
 	if(bootstrapId == ""){ w2alert("BOOTSTRAP ID가 존재하지 않습니다."); return;}
 	
 	resourceInfo = {
 			id				: bootstrapId,
-			targetStemcell	: $(".w2ui-msg-body input[name='targetStemcell']").val(),
-			instanceType	: $(".w2ui-msg-body input[name='instanceType']").val(),
-			region			: $(".w2ui-msg-body input[name='region']").val(),
-			availabilityZone: $(".w2ui-msg-body input[name='availabilityZone']").val(),
-			microBoshPw		: $(".w2ui-msg-body input[name='microBoshPw']").val(),
-			ntp				: $(".w2ui-msg-body input[name='ntp']").val()
+			stemcell	: $(".w2ui-msg-body input[name='stemcell']").val(),
+			cloudInstanceType	: $(".w2ui-msg-body input[name='cloudInstanceType']").val(),
+			boshPassword			: $(".w2ui-msg-body input[name='boshPassword']").val()
 	}
 	
 	if( type == 'before') {
-		networkPopup();
+		awsNetworkPopup();
 		return;
 	}else {
-		if( checkEmpty( $(".w2ui-msg-body input[name='targetStemcell']").val() ) ){
-			w2alert("Target Stemcell 을 선택하세요", "" , function(){
-				$(".w2ui-msg-body input[name='targetStemcell']").focus();
-				return;
-			})
-		}else if( checkEmpty( $(".w2ui-msg-body input[name='instanceType']").val() ) ){
-			w2alert("Instance Type를 입력하세요", "" , function(){
-				$(".w2ui-msg-body input[name='instanceType']").focus();
-				return;
-			})
-		}else if( checkEmpty( $(".w2ui-msg-body input[name='region']").val() ) ){
-			w2alert("Region 을 입력하세요", "" , function(){
-				$(".w2ui-msg-body input[name='region']").focus();
-				return;
-			})
-		}else if( checkEmpty(  $(".w2ui-msg-body input[name='availabilityZone']").val() ) ){
-			w2alert("Availability Zone를 입력하세요", "" , function(){
-				$(".w2ui-msg-body input[name='availabilityZone']").focus();
-				return;
-			})
-		}else if( checkEmpty( $(".w2ui-msg-body input[name='microBoshPw']").val() ) ){
-			w2alert("Micro Bosh Password를 입력하세요", "" , function(){
-				$(".w2ui-msg-body input[name='microBoshPw']").focus();
-				return;
-			})
-		}else if( checkEmpty( $(".w2ui-msg-body input[name='ntp']").val() ) ){
-			w2alert("NTP 를 입력하세요", "" , function(){
-				$(".w2ui-msg-body input[name='ntp']").focus();
-				return;
-			})
-		}
-		
-		$.ajax({
-			type : "PUT",
-			url : "/bootstrap/bootSetAwsResource",
-			contentType : "application/json",
-			//dataType: "json",
-			async : true,
-			data : JSON.stringify(resourceInfo), 
-			success : function(data, status) {
-				if( data){
-					console.log("## DeployFileName :: " + data.deploymentFile)
-					deployFileName = data.deploymentFile;	
+		if(validationAwsResourceInfo()){
+			$.ajax({
+				type : "PUT",
+				url : "/bootstrap/awsResource",
+				contentType : "application/json",
+				//dataType: "json",
+				async : true,
+				data : JSON.stringify(resourceInfo), 
+				success : function(data, status) {
+					if( data){
+						deployFileName = data.deploymentFile;	
+					}
+					deployPopup();				
+				},
+				error : function( e, status ) {
+					w2alert("리소스 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
 				}
-				deployPopup();				
-			},
-			error : function( e, status ) {
-				w2alert("리소스 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
-			}
-		});
+			});
+		}
+		else{
+			w2alert("필드값을 확인해 주세요.");
+		}
 	}
 }
 
+function validationAwsResourceInfo(){
+	var checkValidation = true;
+	var emptyFields = new Array();
+		
+	if( checkEmpty( $(".w2ui-msg-body input[name='stemcell']").val() ) ){
+		emptyFields.push({name:"stemcell", label:"STEMCELL"});
+		checkValidation = (checkValidation) ? false:false; 
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='cloudInstanceType']").val() ) ){
+		emptyFields.push({name:"cloudInstanceType", label:"CLOUD INSTANCE TYPE"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	if( checkEmpty( $(".w2ui-msg-body input[name='boshPassword']").val() ) ){
+		emptyFields.push({name:"boshPassword", label:"BOSH PASSWORD"});
+		checkValidation = (checkValidation) ? false:false;
+	}
+	
+	errFieldMessage(emptyFields);
+	
+	return checkValidation;
+}
+
 function deployPopup(){
-	$("#deployManifestDiv").w2popup({
+	var deployDiv = (iaas == "AWS") ? $("#deployManifestDiv") : $("#osDeployManifestDiv");
+	deployDiv.w2popup({
 		width 	: 670,
 		height 	: 500,
 		modal	: true,
@@ -1039,16 +1033,15 @@ function deployPopup(){
 
 function getDeployInfo(){
 	console.log(deployFileName);
+	var url = (iaas == "AWS") ? "/bootstrap/getBootstrapDeployInfo": "/bootstrap/getBootstrapDeployInfo";
 	$.ajax({
 		type : "POST",
 		url : "/bootstrap/getBootstrapDeployInfo",
 		contentType : "application/json",
-		//dataType: "json",
 		async : true,
 		data : JSON.stringify({deploymentFile:deployFileName}),
 		success : function(data, status) {
 			if(status == "success"){
-				//deployInfo = data;
 				$(".w2ui-msg-body #deployInfo").text(data);
 			}
 			else if(status == "204"){
@@ -1075,12 +1068,20 @@ function confirmDeploy(type){
 		});
 	}
 	else{
-		deployPopup();
+		awsResourcePopup();
 	}
 }
 
 function installPopup(){
-	$("#installDiv").w2popup({
+	var installDiv = (iaas == 'AWS') ? $("#installDiv") : $("#osInstallDiv");
+	var message = "BOOTSTRAP(배포명:" + deployFileName +  ") ";
+	
+	var requestParameter = {
+			id : bootstrapId,
+			iaas: iaas
+	};
+	
+	installDiv.w2popup({
 		width : 670,
 		height : 490,
 		modal	: true,
@@ -1093,19 +1094,26 @@ function installPopup(){
 				installClient.connect({}, function(frame) {
 					console.log('Connected Frame : ' + frame);
 			        installClient.subscribe('/bootstrap/bootstrapInstall', function(data){
-				        console.log('Connected: Data : ' + data);
-			        	var installLogs = $(".w2ui-msg-body #installLogs");
-			        	installLogs.append(data.body + "\n").scrollTop( installLogs[0].scrollHeight );
+						var installLogs = $(".w2ui-msg-body #installLogs");
 			        	
-			        	if( data == "complete"){
-			        		installClient.close()
-			        		installClient.disconnect(function(){
-			        			console.log("disconnect");
-			        			installClient = "";
-			        		});//callback
+			        	var response = JSON.parse(data.body);
+			        	
+			        	if ( response.messages != null ) {
+					       	for ( var i=0; i < response.messages.length; i++) {
+					        	installLogs.append(response.messages[i] + "\n").scrollTop( installLogs[0].scrollHeight );
+					       	}
+					       	
+					       	if ( response.state.toLowerCase() != "started" ) {
+					            if ( response.state.toLowerCase() == "done" )	message = message + " 설치가 완료되었습니다."; 
+					    		if ( response.state.toLowerCase() == "error" ) message = message + " 설치 중 오류가 발생하였습니다.";
+					    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 설치 중 취소되었습니다.";
+					    			
+					    		installClient.disconnect();
+								w2alert(message, "BOOTSRAP 설치");
+					       	}
 			        	}
 			        });
-			        installClient.send('/send/bootstrapInstall', {}, JSON.stringify({deployFileName:deployFileName}));
+			        installClient.send('/send/bootstrapInstall', {}, JSON.stringify(requestParameter));
 			    });
 			}
 		},
@@ -1127,7 +1135,7 @@ function initSetting(){
 }
 
 function uploadStemcell(){
-	$("#targetStemcellUpload").click();
+	$("#stemcellUpload").click();
 }
 
 function popupComplete(){
@@ -1489,7 +1497,7 @@ function saveOsResourceInfo(type){
 			async : true,
 			data : JSON.stringify(resourceInfo),
 			success : function(data, status) {
-				deployFileName = data.deploymentFile;
+				deployFileName = data.content.deploymentFile;
 				osDeployPopup();
 			},
 			error : function( e, status ) {
@@ -1791,40 +1799,25 @@ function osDeployPopup(){
 			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 리소스 정보</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">스템셀 지정</label>
+					<label style="text-align: left; width: 200px; font-size: 11px;">스템셀</label>
 					<div>
-						<!-- <input name="targetStemcell" type="text" maxlength="100" style="float: left;width:330px;margin-top:1.5px;" /> -->
-						<div><input type="list" name="targetStemcell" style="float: left;width:330px;margin-top:1.5px;" tabindex="1"></div>
+						<div>
+							<input type="list" name="stemcell" style="float: left;width:330px;margin-top:1.5px;" tabindex="1">
+						</div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">인스턴스 유형</label>
 					<div>
-						<input name="instanceType" type="text"  style="float:left;width:330px;" tabindex="2" placeholder="m3.large"/>
+						<input name="cloudInstanceType" type="text"  style="float:left;width:330px;" tabindex="2" placeholder="m3.large"/>
+						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">Region</label>
+					<label style="text-align: left; width: 200px; font-size: 11px;">BOSH PASSWORD</label>
 					<div>
-						<input name="region" type="text"  style="float:left;width:330px;" tabindex="3" placeholder="us-east-1"/>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">Availability Zone</label>
-					<div>
-						<input name="availabilityZone" type="text"  style="float:left;width:330px;" tabindex="4" placeholder="us-east-1a"/>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">NTP</label>
-					<div>
-						<input name="ntp" type="text"  style="float:left;width:330px;" tabindex="5" placeholder="1.kr.pool.ntp.org,0.asia.pool.ntp.org"/>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">MicroBOSH Password</label>
-					<div>
-						<input name="microBoshPw" type="text"  style="float:left;width:330px;" tabindex="5" placeholder="$6$JA/VRhS7guR2t$kruB3wpqcgyi7Ql2IZI"/>
+						<input name="boshPassword" type="text"  style="float:left;width:330px;" tabindex="3" placeholder="us-east-1"/>
+						<div class="isMessage"></div>
 					</div>
 				</div>
 			</div>
@@ -1841,7 +1834,7 @@ function osDeployPopup(){
 	<div id="deployManifestDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:3%;">
+			<div style="height:60px;margin:0 15px;">
 	            <ul class="progressStep_6">
 		            <li class="pass">AWS 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1851,9 +1844,8 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 배포 Manifest 정보</div>
-			<div style="width:95%;height:72%;float: left;">
-				<textarea id="deployInfo" style="width:100%;height:90%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
+			<div style="width:95%;height:84%;float: left;display: inline-block;">
+				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1867,7 +1859,7 @@ function osDeployPopup(){
 	<div id="installDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;">
-			<div style="margin-left:3%;">
+			<div style="height:60px;margin:0 15px;">
 	            <ul class="progressStep_6">
 		            <li class="pass">AWS 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1877,9 +1869,8 @@ function osDeployPopup(){
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 설치 로그</div>
-			<div style="height:75%;">
-				<textarea id="installLogs" style="width:97%;height:100%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
+			<div style="height:84%;">
+				<textarea id="installLogs" style="width:97%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -2130,7 +2121,7 @@ function osDeployPopup(){
 	<div id="osDeployManifestDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:2%;">
+			<div style="height:60px;margin:0 15px;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">오픈스텍 설정</li>
 		            <li class="pass">기본 설정</li>
@@ -2140,9 +2131,8 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 배포 Manifest 정보</div>
-			<div style="width:95%;height:72%;float: left;">
-				<textarea id="deployInfo" style="width:100%;height:100%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
+			<div style="height:84%;">
+				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -2156,7 +2146,7 @@ function osDeployPopup(){
 	<div id="osInstallDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;">
-			<div style="margin-left:3%;">
+			<div style="height:60px;margin:0 15px;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">오픈스텍 설정</li>
 		            <li class="pass">기본 설정</li>
@@ -2166,9 +2156,8 @@ function osDeployPopup(){
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 설치 로그</div>
-			<div style="height:80%;">
-				<textarea id="installLogs" style="width:97%;height:88%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
+			<div style="height:84%;">
+				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">

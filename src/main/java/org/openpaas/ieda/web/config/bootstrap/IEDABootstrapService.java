@@ -17,7 +17,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
-import org.openpaas.ieda.common.ReplaceItem;
+import org.openpaas.ieda.web.common.ReplaceItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -208,37 +208,40 @@ public class IEDABootstrapService {
 	}
 	
 	public String setSpiffMerge(String iaas, Integer id, String stubFileName, String settingFileName) {
+		String deploymentFileName = iaas.toLowerCase() +"-microbosh-merge-"+id+".yml";		
+		String templateFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName;
+		String parameterFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName;
+		String deploymentPath= LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
+		
 		File stubFile = null;
 		File settingFile = null;
 		String command = "";
 		Runtime r = Runtime.getRuntime();
-		String deploymentFileName = "";
 
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
 		try {
-			stubFile = new File(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName);
-			settingFile = new File(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName);
+			stubFile = new File(templateFile);
+			settingFile = new File(parameterFile);
 			
 			deploymentFileName =  (iaas == "AWS") ? "aws-microbosh-merge-"+id+".yml"
 					:"openstack-microbosh-merge-"+id+".yml";
 			
 			if(stubFile.exists() && settingFile.exists()){
-				command = LocalDirectoryConfiguration.getScriptDir() + System.getProperty("file.separator") + "merge-deploy.sh ";
-				command += LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName + " ";
-				command += LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName + " ";
-				command += LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
-								
+				command = "spiff merge " + templateFile + " " + parameterFile;;
+				
 				Process process = r.exec(command);
-				process.getInputStream();
+
 				inputStream = process.getInputStream();
 				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 				String info = null;
-				String streamLogs = "";
+				String deloymentContent = "";
 				while ((info = bufferedReader.readLine()) != null){
-					streamLogs += info;
+					deloymentContent += info + "\n";
 					log.info("=== Deployment File Merge \n"+ info );
 				}
+				
+				IOUtils.write(deloymentContent, new FileOutputStream(deploymentPath), "UTF-8");
 			}
 			else{
 				throw new IEDACommonException("illigalArgument.bootstrap.exception",
