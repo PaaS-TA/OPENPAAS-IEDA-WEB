@@ -151,7 +151,7 @@ public class IEDABootstrapService {
 			items.add(new ReplaceItem("[subnetId]", awsConfig.getSubnetId()));
 			items.add(new ReplaceItem("[privateStaticIp]", awsConfig.getPrivateStaticIp()));
 			items.add(new ReplaceItem("[publicStaticIp]", awsConfig.getPublicStaticIp()));
-			items.add(new ReplaceItem("[subnetRange]", awsConfig.getSubnetRangeFrom() + " - " +  awsConfig.getSubnetRangeTo()));
+			items.add(new ReplaceItem("[subnetRange]", awsConfig.getSubnetRange()));
 			items.add(new ReplaceItem("[subnetGateway]", awsConfig.getSubnetGateway()));
 			items.add(new ReplaceItem("[subnetDns]", awsConfig.getSubnetDns()));
 			items.add(new ReplaceItem("[ntp]", awsConfig.getNtp()));
@@ -182,7 +182,7 @@ public class IEDABootstrapService {
 			items.add(new ReplaceItem("[subnetId]", openstackConfig.getSubnetId()));
 			items.add(new ReplaceItem("[privateStaticIp]", openstackConfig.getPrivateStaticIp()));
 			items.add(new ReplaceItem("[publicStaticIp]", openstackConfig.getPublicStaticIp()));
-			items.add(new ReplaceItem("[subnetRange]", openstackConfig.getSubnetRangeFrom() + " - " + openstackConfig.getSubnetRangeTo() ));
+			items.add(new ReplaceItem("[subnetRange]", openstackConfig.getSubnetRange() ));
 			items.add(new ReplaceItem("[subnetGateway]", openstackConfig.getSubnetGateway()));
 			items.add(new ReplaceItem("[subnetDns]", openstackConfig.getSubnetDns()));
 			items.add(new ReplaceItem("[ntp]", openstackConfig.getNtp()));

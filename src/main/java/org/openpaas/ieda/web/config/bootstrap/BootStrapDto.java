@@ -52,9 +52,7 @@ public class BootStrapDto{
 		@NotNull
 		private String publicStaticIp;
 		@NotNull
-		private String subnetRangeFrom;
-		@NotNull
-		private String subnetRangeTo;
+		private String subnetRange;
 		@NotNull
 		private String subnetGateway;
 		@NotNull
@@ -119,9 +117,7 @@ public class BootStrapDto{
 		@NotNull
 		private String publicStaticIp;
 		@NotNull
-		private String subnetRangeFrom;
-		@NotNull
-		private String subnetRangeTo;
+		private String subnetRange;
 		@NotNull
 		private String subnetGateway;
 		@NotNull

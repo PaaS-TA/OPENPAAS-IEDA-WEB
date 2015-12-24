@@ -1625,13 +1625,11 @@ $( window ).resize(function() {
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Static IP</label>
 					<div>
-						<span>
-						<input name="subnetStaticFrom" type="text"  style="float:left;width:150px;" required placeholder="예) 10.0.0.100"/>
-						</span>
-						<span style="width:50;">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-						<span>
-						<input name="subnetStaticTo" type="text"  style="float:left;width:150px;" required placeholder="예) 10.0.0.106"/>
-						</span>
+						<div style="display:inline-block;">
+							<span style="float:left;"><input name="subnetStaticFrom" id="subnetStaticFrom" type="text"  style="float:left;width:152px;" tabindex="4" placeholder="예) 10.0.0.100"/></span>
+							<span style="float:left;">&nbsp; &ndash; &nbsp;</span>
+							<span style="float:left;"><input name="subnetStaticTo" id="subnetStaticTo" type="text"  style="float:left;width:152px;" tabindex="5" placeholder="예) 10.0.0.106"/></span>
+						</div>
 					</div>
 				</div>
 				<div class="w2ui-field">
@@ -1713,7 +1711,7 @@ $( window ).resize(function() {
 	<div id="deployManifestDiv"  hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:2%;">
+			<div style="height:60px;margin:0 15px;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">AWS 정보</li>
 		            <li class="pass">BOSH 정보</li>
@@ -1723,9 +1721,8 @@ $( window ).resize(function() {
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title">▶ 배포 Manifest 정보</div>
-			<div style="width:97%;height:72%;float:inherit;">
-				<textarea id="deployInfo" style="width:100%;height:100%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
+			<div style="width:95%;height:84%;float: left;display: inline-block;">
+				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1739,7 +1736,7 @@ $( window ).resize(function() {
 	<div id="installDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:3%;">
+			<div style="height:60px;margin:0 15px;">
 	            <ul class="progressStep_6">
 		            <li class="pass">AWS 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1749,9 +1746,8 @@ $( window ).resize(function() {
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title">▶ 설치 로그</div>
-			<div style="width:95%;height:72%;float: left;">
-				<textarea id="installLogs" style="width:95%;height:90%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
+			<div style="width:95%;height:84%;float: left;display: inline-block;">
+				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1926,13 +1922,11 @@ $( window ).resize(function() {
 		            <label style="text-align: left;width:250px;font-size:11px;">Static IP</label>
 		            <div>
 		                <div>
-							<span>
-								<input name="subnetStaticFrom" type="text"  style="float:left;width:130px;" required placeholder="예) 10.0.0.6"/>
-							</span>
-							<span>
-								&nbsp; &ndash;&nbsp;
-								<input name="subnetStaticTo" type="text"  style="float:left;width:130px;" required placeholder="예) 10.0.0.20"/>
-							</span>
+							<div style="display:inline-block;">
+								<span style="float:left;"><input name="subnetStaticFrom" id="subnetStaticFrom" type="text"  style="float:left;width:152px;" tabindex="4" placeholder="예) 10.0.0.100"/></span>
+								<span style="float:left;">&nbsp; &ndash; &nbsp;</span>
+								<span style="float:left;"><input name="subnetStaticTo" id="subnetStaticTo" type="text"  style="float:left;width:152px;" tabindex="5" placeholder="예) 10.0.0.106"/></span>
+							</div>
 						</div>
 		            </div>
 		        </div>
@@ -2016,7 +2010,7 @@ $( window ).resize(function() {
 	<div id="osDeployManifestDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:3%;">
+			<div style="height:60px;margin:0 15px;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">오픈스택 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -2026,9 +2020,8 @@ $( window ).resize(function() {
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title">▶ 배포파일 정보</div>
-				<div style="width:95%;height:72%;float: left;">
-				<textarea id="deployInfo" style="width:100%;height:100%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
+			<div style="width:95%;height:84%;float: left;display: inline-block;">
+				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -2042,7 +2035,7 @@ $( window ).resize(function() {
 	<div id="osInstallDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:3%;">
+			<div style="height:60px;margin:0 15px;">
 	            <ul class="progressStep_6">
 		            <li class="pass">오픈스택 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -2053,8 +2046,8 @@ $( window ).resize(function() {
 	            </ul>
 	        </div>
 			<div rel="sub-title" class="cont_title">▶ 설치 로그</div>
-			<div style="width:95%;height:72%;float: left;">
-				<textarea id="installLogs" style="width:95%;height:90%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
+			<div style="width:95%;height:84%;float: left;display: inline-block;">
+				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">

@@ -1,7 +1,9 @@
 package org.openpaas.ieda.web.config.bootstrap;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
@@ -25,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class boostrapDeployAsyncService {
+public class BoostrapDeployAsyncService {
 
 
 	@Autowired
@@ -73,58 +75,37 @@ public class boostrapDeployAsyncService {
 		}
 		
 		String status = "";
-		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
+		Runtime r = Runtime.getRuntime();
+		File deploymentFile = null;
+		InputStream inputStream = null;
+		BufferedReader bufferedReader = null;
 		
-		BufferedReader br = null;
-		InputStreamReader isr = null;
-		FileInputStream fis = null;
-
 		try {
-			HttpClient httpClient = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
-			
-			PostMethod postMethod = new PostMethod(DirectorRestHelper.getDeployURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort()));
-			postMethod = (PostMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)postMethod);
-			postMethod.setRequestHeader("Content-Type", "text/yaml");
-			
-			String deployFile = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
-			
-			String content = "", temp = "";
-			
-			fis = new FileInputStream(deployFile);
-			isr = new InputStreamReader(fis, "UTF-8");
-			br = new BufferedReader(isr);
-			
-			while ( (temp=br.readLine()) != null) {
-				content += temp + "\n";
-			}
-			
-			postMethod.setRequestEntity(new StringRequestEntity(content, "text/yaml", "UTF-8"));
-			
-		
-			int statusCode = httpClient.executeMethod(postMethod);
-			if ( statusCode == HttpStatus.MOVED_PERMANENTLY.value()
-			  || statusCode == HttpStatus.MOVED_TEMPORARILY.value()	) {
-				
-				Header location = postMethod.getResponseHeader("Location");
-				String taskId = DirectorRestHelper.getTaskId(location.getValue());
-				
-				status = DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId);
-				
-			} else {
-				DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("배포 중 오류가 발생하였습니다.[" + statusCode + "]"));
-			}
 
+	
+			String deployFile = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
+			String command = "";
+			deploymentFile = new File(deployFile);
+			
+			if( deploymentFile.exists() ){
+				command += "bosh-init deploy " + deployFile;
+				Process process = r.exec(command);
+				
+				inputStream = process.getInputStream();
+				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+				String info = null;
+				String deloymentContent = "";
+				while ((info = bufferedReader.readLine()) != null){
+					deloymentContent += info + "\n";
+					log.info("=== Deployment File Merge \n"+ info );
+					messagingTemplate.convertAndSend("/bootstrap/bootstrapInstall", info);
+				}
+			}
 		} catch ( Exception e) {
 			status = "error";
 			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("배포 중 Exception이 발생하였습니다."));
 		} finally {
-			try {
-				if ( fis != null ) fis.close();
-				if ( isr != null ) isr.close();
-				if ( br != null ) br.close();
-			} catch ( Exception e ) {
-				e.printStackTrace();
-			}
+
 		}
 		
 		log.info("### Deploy Status = " + status);

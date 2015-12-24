@@ -91,8 +91,7 @@ public class IEDABootstrapOpenstackService {
 		config.setSubnetId(dto.getSubnetId());
 		config.setPrivateStaticIp(dto.getPrivateStaticIp());
 		config.setPublicStaticIp(dto.getPublicStaticIp());
-		config.setSubnetRangeFrom(dto.getSubnetRangeFrom());
-		config.setSubnetRangeTo(dto.getSubnetRangeTo());
+		config.setSubnetRange(dto.getSubnetRange());
 		config.setSubnetGateway(dto.getSubnetGateway());
 		config.setSubnetDns(dto.getSubnetDns());
 		config.setNtp(dto.getNtp());

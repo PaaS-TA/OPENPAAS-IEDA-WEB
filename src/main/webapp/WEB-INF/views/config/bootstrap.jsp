@@ -257,8 +257,7 @@ function settingAWSData(contents){
 			privateStaticIp	: contents.privateStaticIp,
 			publicStaticIp	: contents.publicStaticIp,
 			subnetId		: contents.subnetId,
-			subnetRangeFrom	: contents.subnetRangeFrom,
-			subnetRangeTo	: contents.subnetRangeTo,
+			subnetRange		: contents.subnetRange,
 			subnetGateway	: contents.subnetGateway,
 			subnetDns		: contents.subnetDns,
 			ntp				: contents.ntp
@@ -817,8 +816,7 @@ function awsNetworkPopup(){
 					$(".w2ui-msg-body input[name='subnetId']").val(networkInfo.subnetId);
 					$(".w2ui-msg-body input[name='privateStaticIp']").val(networkInfo.privateStaticIp);
 					$(".w2ui-msg-body input[name='publicStaticIp']").val(networkInfo.publicStaticIp);
-					$(".w2ui-msg-body input[name='subnetRangeFrom']").val(networkInfo.subnetRangeFrom);
-					$(".w2ui-msg-body input[name='subnetRangeTo']").val(networkInfo.subnetRangeTo);
+					$(".w2ui-msg-body input[name='subnetRange']").val(networkInfo.subnetRange);
 					$(".w2ui-msg-body input[name='subnetGateway']").val(networkInfo.subnetGateway);
 					$(".w2ui-msg-body input[name='subnetDns']").val(networkInfo.subnetDns);
 					$(".w2ui-msg-body input[name='ntp']").val(networkInfo.ntp);
@@ -837,8 +835,7 @@ function saveAwsNetworkInfo(type){
 			subnetId			: $(".w2ui-msg-body input[name='subnetId']").val(),
 			privateStaticIp		: $(".w2ui-msg-body input[name='privateStaticIp']").val(),
 			publicStaticIp		: $(".w2ui-msg-body input[name='publicStaticIp']").val(),
-			subnetRangeFrom		: $(".w2ui-msg-body input[name='subnetRangeFrom']").val(),
-			subnetRangeTo		: $(".w2ui-msg-body input[name='subnetRangeTo']").val(),
+			subnetRange			: $(".w2ui-msg-body input[name='subnetRange']").val(),
 			subnetGateway		: $(".w2ui-msg-body input[name='subnetGateway']").val(),
 			subnetDns			: $(".w2ui-msg-body input[name='subnetDns']").val(),
 			ntp					: $(".w2ui-msg-body input[name='ntp']").val()
@@ -886,12 +883,8 @@ function validationAwsNetworkInfo(){
 		emptyFields.push({name:"publicStaticIp", label:"PUBLIC STATIC IP"});
 		checkValidation = (checkValidation) ? false:false;
 	}
-	if( checkEmpty( $(".w2ui-msg-body input[name='subnetRangeFrom']").val() ) ){
-		emptyFields.push({name:"subnetRangeFrom", label:"SUBNET RANGE FROM"});
-		checkValidation = (checkValidation) ? false:false;
-	}
-	if( checkEmpty( $(".w2ui-msg-body input[name='subnetRangeTo']").val() ) ){
-		emptyFields.push({name:"subnetRangeTo", label:"SUBNET RANGE TO"});
+	if( checkEmpty( $(".w2ui-msg-body input[name='subnetRange']").val() ) ){
+		emptyFields.push({name:"subnetRange", label:"SUBNET RANGE"});
 		checkValidation = (checkValidation) ? false:false;
 	}
 	if( checkEmpty( $(".w2ui-msg-body input[name='subnetGateway']").val() ) ){
@@ -1068,7 +1061,8 @@ function confirmDeploy(type){
 		});
 	}
 	else{
-		awsResourcePopup();
+		 if( iaas=="AWS" ) awsResourcePopup();
+		 else osResourceInfoPopup();
 	}
 }
 
@@ -1096,7 +1090,8 @@ function installPopup(){
 			        installClient.subscribe('/bootstrap/bootstrapInstall', function(data){
 						var installLogs = $(".w2ui-msg-body #installLogs");
 			        	
-			        	var response = JSON.parse(data.body);
+						installLogs.append(data.body+ "\n").scrollTop( installLogs[0].scrollHeight );
+			        	/* var response = JSON.parse(data.body);
 			        	
 			        	if ( response.messages != null ) {
 					       	for ( var i=0; i < response.messages.length; i++) {
@@ -1111,7 +1106,7 @@ function installPopup(){
 					    		installClient.disconnect();
 								w2alert(message, "BOOTSRAP 설치");
 					       	}
-			        	}
+			        	} */
 			        });
 			        installClient.send('/send/bootstrapInstall', {}, JSON.stringify(requestParameter));
 			    });
@@ -1738,16 +1733,13 @@ function osDeployPopup(){
 					<label style="text-align: left; width: 200px; font-size: 11px;">PUBLIC STATIC IP</label>
 					<div>
 						<input name="publicStaticIp" type="text"  style="float:left;width:330px;" tabindex="3" placeholder="52.23.2.85"/>
+						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">SUBNET RANGE</label>
 					<div>
-						<div style="display:inline-block;">
-						<span style="float:left;"><input name="subnetRangeFrom" id="subnetRangeTo" type="text"  style="float:left;width:152px;" tabindex="4" placeholder="10.0.0.2"/></span>
-						<span style="float:left;">&nbsp; &ndash; &nbsp;</span>
-						<span style="float:left;"><input name="subnetRangeTo" id="subnetRangeFrom" type="text"  style="float:left;width:152px;" tabindex="5" placeholder="10.0.0.4"/></span>
-						</div>
+						<input name="subnetRange" type="text"  style="float:left;width:330px;" tabindex="3" placeholder="예) 52.23.2.85/24"/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1875,7 +1867,7 @@ function osDeployPopup(){
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 				<!-- 설치 실패 시 -->
-				<button class="btn" style="float: left;" onclick="confirmDeploy('before');">이전</button>
+				<button class="btn" style="float: left;" onclick="deployPopup();">이전</button>
 				<button class="btn" onclick="popupComplete();">취소</button>
 				<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
 		</div>		
@@ -2162,7 +2154,7 @@ function osDeployPopup(){
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 				<!-- 설치 실패 시 -->
-				<button class="btn" style="float: left;" onclick="confirmDeploy('before');">이전</button>
+				<button class="btn" style="float: left;" onclick="deployPopup();">이전</button>
 				<button class="btn" onclick="popupComplete();">취소</button>
 				<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
 		</div>		

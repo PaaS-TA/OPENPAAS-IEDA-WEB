@@ -86,82 +86,82 @@ public class DirectorConfigurationControllerTest {
 		result.andExpect(status().isOk());
 	}
 	
-	@Rollback
-	@Test
-	public void createDirector_checkMandatoryArgument() throws Exception {
-		//IEDADirectorConfigDto.Create directorDto = CreateDirectorConfigDto();
-		
-		IEDADirectorConfigDto.Create directorDto = new IEDADirectorConfigDto.Create();
-		directorDto.setUserId("admin");
-		directorDto.setUserPassword("admin");
-		directorDto.setDirectorUrl("52.21.37.184");
-		///directorDto.setDirectorPort(25555);
-		
-		ResultActions result = mockMvc.perform(post("/directors")
-				.contentType(MediaType.APPLICATION_JSON).content(
-						objectMapper.writeValueAsString(directorDto)));
-		result.andDo(print());
-		result.andExpect(status().isBadRequest());
-	}
-
-	@Rollback
-	@Test
-	public void createDirector_notfound() throws Exception {
-		IEDADirectorConfigDto.Create directorDto = new IEDADirectorConfigDto.Create();
-		directorDto.setUserId("admin");
-		directorDto.setUserPassword("admin");
-		directorDto.setDirectorUrl("52.21.37.186");
-		directorDto.setDirectorPort(25555);	
-		
-		ResultActions result = mockMvc.perform(post("/directors")
-							.contentType(MediaType.APPLICATION_JSON)
-							.content(objectMapper.writeValueAsString(directorDto)));
-		result.andDo(print());
-		result.andExpect(status().isBadRequest());
-	}
-
-	@Rollback
-	@Test
-	public void createDirector_duplicated() throws Exception {
-
-		IEDADirectorConfigDto.Create directorDto = new IEDADirectorConfigDto.Create();
-		directorDto.setUserId("admin");
-		directorDto.setUserPassword("admin");
-		directorDto.setDirectorUrl("52.21.37.184");
-		directorDto.setDirectorPort(25555);
-		
-		ResultActions result = mockMvc.perform(post("/directors")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(directorDto)));
-		result.andDo(print());
-		result.andExpect(status().isBadRequest());
-	}
-	
-	@Test
-	public void listDirector() throws Exception {
-		
-		ResultActions result = mockMvc.perform(get("/directors"));
-		
-		result.andDo(print());
-		result.andExpect(status().isOk());
-	}
-	
-	@Test
-	public void getDirector() throws Exception {
-		ResultActions result = mockMvc.perform(get("/directors/7"));
-		
-		result.andDo(print());
-		result.andExpect(status().isOk());
-	}
-	
-	@Test
-	public void updateDirector() throws Exception {
-		IEDADirectorConfigDto.Update directorDto = new IEDADirectorConfigDto.Update();
-
-	}
-	
-	@Test
-	public void deleteDirector() throws Exception {
-		
-	}
+//	@Rollback
+//	@Test
+//	public void createDirector_checkMandatoryArgument() throws Exception {
+//		//IEDADirectorConfigDto.Create directorDto = CreateDirectorConfigDto();
+//		
+//		IEDADirectorConfigDto.Create directorDto = new IEDADirectorConfigDto.Create();
+//		directorDto.setUserId("admin");
+//		directorDto.setUserPassword("admin");
+//		directorDto.setDirectorUrl("52.21.37.184");
+//		///directorDto.setDirectorPort(25555);
+//		
+//		ResultActions result = mockMvc.perform(post("/directors")
+//				.contentType(MediaType.APPLICATION_JSON).content(
+//						objectMapper.writeValueAsString(directorDto)));
+//		result.andDo(print());
+//		result.andExpect(status().isBadRequest());
+//	}
+//
+//	@Rollback
+//	@Test
+//	public void createDirector_notfound() throws Exception {
+//		IEDADirectorConfigDto.Create directorDto = new IEDADirectorConfigDto.Create();
+//		directorDto.setUserId("admin");
+//		directorDto.setUserPassword("admin");
+//		directorDto.setDirectorUrl("52.21.37.186");
+//		directorDto.setDirectorPort(25555);	
+//		
+//		ResultActions result = mockMvc.perform(post("/directors")
+//							.contentType(MediaType.APPLICATION_JSON)
+//							.content(objectMapper.writeValueAsString(directorDto)));
+//		result.andDo(print());
+//		result.andExpect(status().isBadRequest());
+//	}
+//
+//	@Rollback
+//	@Test
+//	public void createDirector_duplicated() throws Exception {
+//
+//		IEDADirectorConfigDto.Create directorDto = new IEDADirectorConfigDto.Create();
+//		directorDto.setUserId("admin");
+//		directorDto.setUserPassword("admin");
+//		directorDto.setDirectorUrl("52.21.37.184");
+//		directorDto.setDirectorPort(25555);
+//		
+//		ResultActions result = mockMvc.perform(post("/directors")
+//						.contentType(MediaType.APPLICATION_JSON)
+//						.content(objectMapper.writeValueAsString(directorDto)));
+//		result.andDo(print());
+//		result.andExpect(status().isBadRequest());
+//	}
+//	
+//	@Test
+//	public void listDirector() throws Exception {
+//		
+//		ResultActions result = mockMvc.perform(get("/directors"));
+//		
+//		result.andDo(print());
+//		result.andExpect(status().isOk());
+//	}
+//	
+//	@Test
+//	public void getDirector() throws Exception {
+//		ResultActions result = mockMvc.perform(get("/directors/7"));
+//		
+//		result.andDo(print());
+//		result.andExpect(status().isOk());
+//	}
+//	
+//	@Test
+//	public void updateDirector() throws Exception {
+//		IEDADirectorConfigDto.Update directorDto = new IEDADirectorConfigDto.Update();
+//
+//	}
+//	
+//	@Test
+//	public void deleteDirector() throws Exception {
+//		
+//	}
 }

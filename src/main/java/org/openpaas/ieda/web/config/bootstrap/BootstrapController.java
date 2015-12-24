@@ -37,7 +37,7 @@ public class BootstrapController {
 	private IEDABootstrapService bootstrapService;
 	
 	@Autowired
-	private boostrapDeployAsyncService boostrapDeployAsyncService;
+	private BoostrapDeployAsyncService boostrapDeployAsyncService;
 	
 	@RequestMapping(value = "/config/bootstrap", method=RequestMethod.GET)
 	public String main() {

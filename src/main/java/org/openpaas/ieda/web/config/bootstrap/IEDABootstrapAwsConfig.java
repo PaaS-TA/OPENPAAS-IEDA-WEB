@@ -41,8 +41,7 @@ public class IEDABootstrapAwsConfig {
 	private String subnetId;
 	private String privateStaticIp;
 	private String publicStaticIp;
-	private String subnetRangeFrom;
-	private String subnetRangeTo;
+	private String subnetRange;
 	private String subnetGateway;
 	private String subnetDns;
 	private String ntp;
