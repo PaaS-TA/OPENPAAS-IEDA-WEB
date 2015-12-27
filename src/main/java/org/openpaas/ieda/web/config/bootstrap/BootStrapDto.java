@@ -85,11 +85,11 @@ public class BootStrapDto{
 		@NotNull
 		private String apiKey;
 		@NotNull
-		private String defaultSecurityGroup;
+		private String defaultSecurityGroups;
 		@NotNull
-		private String defaultKeyName;
+		private String privateKeyName;
 		@NotNull
-		private String cloudPrivateKey;
+		private String privateKeyPath;
 	}
 	
 	@Data 

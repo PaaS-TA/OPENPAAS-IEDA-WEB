@@ -18,6 +18,7 @@ public class BootstrapListDto {
 	private String subnetId;
 	private String privateStaticIp;
 	private String publicStaticIp;
+	private String deployStatus;
 	
 	private Date createdDate;
 	private Date updatedDate;

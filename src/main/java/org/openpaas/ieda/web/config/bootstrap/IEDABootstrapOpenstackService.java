@@ -63,9 +63,9 @@ public class IEDABootstrapOpenstackService {
 		config.setTenant(dto.getTenant());
 		config.setUserName(dto.getUserName());
 		config.setApiKey(dto.getApiKey());
-		config.setDefaultSecurityGroup(dto.getDefaultSecurityGroup());
-		config.setPrivateKeyName(dto.getDefaultKeyName());
-		config.setPrivateKeyPath(dto.getCloudPrivateKey());
+		config.setDefaultSecurityGroups(dto.getDefaultSecurityGroups());
+		config.setPrivateKeyName(dto.getPrivateKeyName());
+		config.setPrivateKeyPath(dto.getPrivateKeyPath());
 		
 		Date now = new Date();
 		config.setUpdatedDate(now);

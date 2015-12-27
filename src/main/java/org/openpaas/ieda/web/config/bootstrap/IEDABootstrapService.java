@@ -63,6 +63,7 @@ public class IEDABootstrapService {
 				dto.setSubnetId(config.getSubnetId());;
 				dto.setPrivateStaticIp(config.getPrivateStaticIp());
 				dto.setPublicStaticIp(config.getPublicStaticIp());;
+				dto.setDeployStatus(config.getDeployStatus());
 				
 				listDtos.add(dto);
 			}
@@ -84,6 +85,7 @@ public class IEDABootstrapService {
 				dto.setSubnetId(config.getSubnetId());;
 				dto.setPrivateStaticIp(config.getPrivateStaticIp());
 				dto.setPublicStaticIp(config.getPublicStaticIp());;
+				dto.setDeployStatus(config.getDeployStatus());
 				
 				listDtos.add(dto);
 			}
@@ -169,7 +171,7 @@ public class IEDABootstrapService {
 			items.add(new ReplaceItem("[tenant]", openstackConfig.getTenant()));
 			items.add(new ReplaceItem("[userName]", openstackConfig.getUserName()));
 			items.add(new ReplaceItem("[apiKey]", openstackConfig.getApiKey()));
-			items.add(new ReplaceItem("[defaultSecurityGroup]", openstackConfig.getDefaultSecurityGroup()));
+			items.add(new ReplaceItem("[defaultSecurityGroup]", openstackConfig.getDefaultSecurityGroups()));
 			items.add(new ReplaceItem("[privateKeyName]", openstackConfig.getPrivateKeyName()));
 			items.add(new ReplaceItem("[privateKeyPath]", System.getProperty("user.home") + System.getProperty("file.separator")
 												+ ".ssh"+ System.getProperty("file.separator") +openstackConfig.getPrivateKeyPath()));

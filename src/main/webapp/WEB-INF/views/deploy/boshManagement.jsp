@@ -365,7 +365,7 @@ function awsPopup(){
 function getKeyPathFileList(){
 	$.ajax({
 		type : "GET",
-		url : "/bootstrap/getKeyPathFileList",
+		url : "/common/getKeyPathFileList",
 		contentType : "application/json",
 		//dataType: "json",
 		async : true,
@@ -509,7 +509,7 @@ function keyPathFileUpload(){
 	var formData = new FormData(form);
 	$.ajax({
 		type : "POST",
-		url : "/bootstrap/keyPathFileUpload",
+		url : "/common/keyPathFileUpload",
 		enctype : 'multipart/form-data',
 		dataType: "text",
 		async : true,

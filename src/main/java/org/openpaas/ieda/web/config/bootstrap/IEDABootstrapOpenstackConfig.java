@@ -27,7 +27,7 @@ public class IEDABootstrapOpenstackConfig {
 	private String tenant;
 	private String userName;
 	private String apiKey;
-	private String defaultSecurityGroup;
+	private String defaultSecurityGroups;
 	private String privateKeyName;
 	private String privateKeyPath;
 
