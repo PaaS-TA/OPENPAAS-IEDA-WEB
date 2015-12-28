@@ -127,7 +127,7 @@ public class StemcellService {
 		return returnList;
 	}
 	
-	public List<String> localStemcells(){
+	public List<String> localAwsStemcells(){
 		File file = new File(LocalDirectoryConfiguration.getStemcellDir());
 		File[] localFiles = file.listFiles();
 		String type= "lightAws";
@@ -142,6 +142,38 @@ public class StemcellService {
 		else if( type.equals("boshOpenstackUbuntu") ){
 			regx = "\\A(bosh-stemcell-)\\d{4}(-openstack-kvm-ubuntu)";
 		}
+		
+		for (File fileInfo : localFiles) {
+			if ( localStemcells == null )
+				localStemcells = new ArrayList<String>();
+			
+			Pattern pattern = Pattern.compile(regx);
+	        Matcher matcher = pattern.matcher(fileInfo.getName().toLowerCase());
+	        log.info("::: Stemcell Name ::: " + fileInfo.getName());
+	        if(matcher.find()){
+	        	log.info("::: Stemcell Match ::: " + matcher.find());
+	        	localStemcells.add(fileInfo.getName());
+	        }
+		}		
+		
+		return localStemcells;
+	}
+
+	public java.util.List<String> localOpenstackStemcells() {
+		File file = new File(LocalDirectoryConfiguration.getStemcellDir());
+		File[] localFiles = file.listFiles();
+		//String type= "boshOpenstackUbuntu";
+		List<String> localStemcells = null; 
+		String regx = "\\A(bosh-stemcell-)\\d{4}(-openstack-kvm-ubuntu)";
+//		if( type.equals("lightAwsHvm") ){
+//			regx = "\\A(light-bosh-stemcell-)\\d{4}(-aws-xen-hvm)";
+//		}
+//		else if( type.equals("lightAws") ){
+//			regx = "\\A(light-bosh-stemcell-)\\d{4}(-aws)";
+//		}
+//		else if( type.equals("boshOpenstackUbuntu") ){
+//			regx = "\\A(bosh-stemcell-)\\d{4}(-openstack-kvm-ubuntu)";
+//		}
 		
 		for (File fileInfo : localFiles) {
 			if ( localStemcells == null )

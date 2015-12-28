@@ -52,9 +52,10 @@ public class IEDABootstrapOpenstackService {
 
 	public IEDABootstrapOpenstackConfig saveOpenstackInfoSave(BootStrapDto.OpenStack dto) {
 		IEDABootstrapOpenstackConfig config;
-		
+		Date now = new Date();
 		if( StringUtils.isEmpty(dto.getId())){
 			config = new IEDABootstrapOpenstackConfig();
+			config.setCreatedDate(now);
 		} else { 
 			config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 		}
@@ -67,7 +68,7 @@ public class IEDABootstrapOpenstackService {
 		config.setPrivateKeyName(dto.getPrivateKeyName());
 		config.setPrivateKeyPath(dto.getPrivateKeyPath());
 		
-		Date now = new Date();
+		
 		config.setUpdatedDate(now);
 		return openstackRepository.save(config);
 	}

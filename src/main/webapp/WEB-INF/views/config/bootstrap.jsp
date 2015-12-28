@@ -311,8 +311,8 @@ function setOpenstackData(contents){
 	
 	resourceInfo = {
 			id					: bootstrapId,
-			stemcellUrl			: contents.stemcellUrl,
-			envPassword			: contents.envPassword,
+			stemcell			: contents.stemcell,
+			boshPassword		: contents.boshPassword,
 			cloudInstanceType	: contents.cloudInstanceType
 	}
 	
@@ -468,11 +468,11 @@ function getKeyPathFileList(){
 function getLocalBoshCpiList(){
 	$.ajax({
 		type : "GET",
-		url : "/localBoshOpenstackCpiReleases",
+		url : "/release/localBoshOpenstackCpiList",
 		contentType : "application/json",
 		async : true,
 		success : function(data, status) {
-			$('#w2ui-popup input[name=boshCpiRelease][type=list]').w2field('list', { items: data.records , maxDropHeight:200, width:250});
+			$('#w2ui-popup input[name=boshCpiRelease][type=list]').w2field('list', { items: data , maxDropHeight:200, width:250});
 			if(osBoshInfo.boshCpiRelease) $(".w2ui-msg-body input[name='boshCpiRelease']").data('selected', {text:osBoshInfo.boshCpiRelease});			
 		},
 		error : function( e, status ) {
@@ -484,11 +484,12 @@ function getLocalBoshCpiList(){
 function getLocalBoshList(){
 	$.ajax({
 		type : "GET",
-		url : "/localBoshReleases",
+		url : "/release/localBoshList",
 		contentType : "application/json",
 		async : true,
 		success : function(data, status) {
-			$('#w2ui-popup input[name=boshRelease][type=list]').w2field('list', { items: data.records , maxDropHeight:200, width:250});
+			boshReleases = data;
+			$('#w2ui-popup input[name=boshRelease][type=list]').w2field('list', { items: data , maxDropHeight:200, width:250});
 			if(osBoshInfo.boshRelease) $(".w2ui-msg-body input[name='boshRelease']").data('selected', {text:osBoshInfo.boshRelease});
 		},
 		error : function( e, status ) {
@@ -728,7 +729,7 @@ function getStamcellList(){
 
 	$.ajax({
 		type : "GET",
-		url : "/deploy/localStemcells",
+		url : "/deploy/localAwsStemcells",
 		contentType : "application/json",
 		async : true,
 		data : JSON.stringify(boshInfo), 
@@ -921,9 +922,10 @@ function awsResourcePopup(){
 }
 
 function getStemcellList(){
+	var url = (iaas == "AWS") ? "/deploy/localAwsStemcells":"/deploy/localOpenstackStemcells";
 	$.ajax({
 		type : "GET",
-		url : "/deploy/localStemcells",
+		url : url,
 		contentType : "application/json",
 		//dataType: "json",
 		async : true,
@@ -1352,7 +1354,7 @@ function validationOpenstackInfo(){
 function osNetworkInfoPopup(){
 	$("#osNetworkInfoDiv").w2popup({
 		width : 670,
-		height : 350,
+		height : 500,
 		onClose : initSetting,
 		modal	: true,
 		onOpen:function(event){
@@ -1423,8 +1425,8 @@ function osResourceInfoPopup(){
 function saveOsResourceInfo(type){
 	resourceInfo = {
 			id					: bootstrapId,
-			stemcellUrl			: $(".w2ui-msg-body input[name='stemcellUrl']").val(),
-			envPassword			: $(".w2ui-msg-body input[name='envPassword']").val(),
+			stemcell			: $(".w2ui-msg-body input[name='stemcell']").val(),
+			boshPassword			: $(".w2ui-msg-body input[name='boshPassword']").val(),
 			cloudInstanceType	: $(".w2ui-msg-body input[name='cloudInstanceType']").val()
 	}
 	
@@ -1441,8 +1443,8 @@ function saveOsResourceInfo(type){
 				async : true,
 				data : JSON.stringify(resourceInfo),
 				success : function(data, status) {
-					deployFileName = data.content.deploymentFile;
-					osDeployPopup();
+					deployFileName = data.deploymentFile;
+					deployPopup();
 				},
 				error : function( e, status ) {
 					w2alert("OPENSTACK Resource 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
@@ -2113,7 +2115,7 @@ function osDeployPopup(){
 	            </ul>
 	        </div>
 			<div style="height:84%;">
-				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
+				<textarea id="deployInfo" style="width:95%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -2137,7 +2139,7 @@ function osDeployPopup(){
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>
-			<div style="height:84%;">
+			<div style="height:82%;">
 				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
 		</div>

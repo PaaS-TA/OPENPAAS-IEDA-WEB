@@ -89,9 +89,21 @@ public class StemcellController {
 	}
 	
 	// 다운로드받은 로컬 스템셀 목록 조회
-	@RequestMapping(value = "/deploy/localStemcells", method = RequestMethod.GET)
-	public ResponseEntity localStemcells() {
-		List<String> contents = service.localStemcells();
+	@RequestMapping(value = "/deploy/localAwsStemcells", method = RequestMethod.GET)
+	public ResponseEntity localAwsStemcells() {
+		List<String> contents = service.localAwsStemcells();
+
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		result.put("total", contents.size());
+		result.put("records", contents);
+		log.info("::: STEMCELLS ::" + contents);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	// 다운로드받은 로컬 스템셀 목록 조회
+	@RequestMapping(value = "/deploy/localOpenstackStemcells", method = RequestMethod.GET)
+	public ResponseEntity localOpenstackStemcells() {
+		List<String> contents = service.localOpenstackStemcells();
 
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		result.put("total", contents.size());
