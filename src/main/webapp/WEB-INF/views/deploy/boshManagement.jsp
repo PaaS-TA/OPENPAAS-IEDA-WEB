@@ -321,7 +321,7 @@ function deleteBoshPop(record){
 				        	}
 				        	
 				        });
-						deleteClient.send('/send/boshDelete', {}, JSON.stringify(requestParameter));
+						deleteClient.send('/bosh/boshDelete', {}, JSON.stringify(requestParameter));
 				    });
 				}
 			},
@@ -1484,48 +1484,49 @@ $( window ).resize(function() {
 		            <li class="before">배포파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
+	            
 	        </div>
 			<div class="cont_title">▶ AWS정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Access Key ID</label>
 		            <div>
-		                <input name="accessKeyId" type="text"  style="float:left;width:330px;" required" placeholder="AWS Access Key를 입력하세요."/>
+		                <input name="accessKeyId" type="text"  style="float:left;width:330px;" tabindex="1" required placeholder="AWS Access Key를 입력하세요."/>
 		            </div>
 				</div>
 				
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Secret Access Key</label>
 		            <div>
-		                <input name="secretAccessKey" type="text"  style="float:left;width:330px;" required placeholder="AWS Secret Access Key를 입력하세요."/>
+		                <input name="secretAccessKey" type="text"  style="float:left;width:330px;" tabindex="2" required placeholder="AWS Secret Access Key를 입력하세요."/>
 		            </div>
 		        </div>
 
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Security Group</label>
 		            <div>
-		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:330px;" required placeholder="시큐리티 그룹을 입력하세요."/>
+		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:330px;" tabindex="3" required placeholder="시큐리티 그룹을 입력하세요."/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Region</label>
 		            <div>
-		                <input name="region" type="text"  style="float:left;width:330px;" required placeholder="설치할 Region을 입력하세요.(예: us-east-1)"/>
+		                <input name="region" type="text"  style="float:left;width:330px;" tabindex="4" required placeholder="설치할 Region을 입력하세요.(예: us-east-1)"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Private Key Name</label>
 		            <div>
-		                <input name="privateKeyName" type="text"  style="float:left;width:330px;" required placeholder="Key Pair 이름을 입력하세요."/>
+		                <input name="privateKeyName" type="text"  style="float:left;width:330px;" tabindex="5" required placeholder="Key Pair 이름을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Private Key File</label>
 	                <div >
-  						<span onclick="changeKeyPathType('file');" style="width:200px;"><label><input type="radio" name="keyPathType" value="file"/>&nbsp;파일 업로드</label></span>
+  						<span onclick="changeKeyPathType('file');" style="width:200px;"><label><input type="radio" name="keyPathType" tabindex="6" value="file"/>&nbsp;파일 업로드</label></span>
 						&nbsp;&nbsp;
-						<span onclick="changeKeyPathType('list');" style="width:200px;"><label><input type="radio" name="keyPathType" value="list"/>&nbsp;목록에서 선택</label></span>
+						<span onclick="changeKeyPathType('list');" style="width:200px;"><label><input type="radio" name="keyPathType" tabindex="7" value="list"/>&nbsp;목록에서 선택</label></span>
 					</div>
 		        </div>
 		        
@@ -1537,8 +1538,8 @@ $( window ).resize(function() {
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-		        <button class="btn" style="float: left;" onclick="popupComplete();">취소</button>
-		        <button class="btn" style="float: right;padding-right:15%" onclick="saveAwsInfo();">다음>></button>
+		        <button class="btn" style="float: left;" onclick="popupComplete();" tabindex="8">취소</button>
+		        <button class="btn" style="float: right;padding-right:15%" onclick="saveAwsInfo();" tabindex="9">다음>></button>
 		    </div>
 		</div>
 	</div>
@@ -1568,36 +1569,37 @@ $( window ).resize(function() {
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">배포명</label>
 		            <div>
-		                <input name="deploymentName" type="text"  style="float:left;width:330px;" required placeholder="배포명을 입력하세요."/>
+		                <input name="deploymentName" type="text"  style="float:left;width:330px;" tabindex="1" required placeholder="배포명을 입력하세요."/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">설치관리자 UUID</label>
 		            <div>
-		                <input name="directorUuid" type="text" style="float:left;width:330px;" required placeholder="설치관리자 UUID입력하세요." disabled/>
+		                <input name="directorUuid" type="text" style="float:left;width:330px;" tabindex="2" required placeholder="설치관리자 UUID입력하세요." disabled/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Elastic IP</label>
 		            <div>
-		                <input name="publicStaticIp" type="text"  style="float:left;width:330px;" required placeholder="설치관리자에 할당할 Elastic IP를 입력하세요."/>
+		                <input name="publicStaticIp" type="text"  style="float:left;width:330px;" tabindex="3" required placeholder="설치관리자에 할당할 Elastic IP를 입력하세요."/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">BOSH 릴리즈</label>
 		            <div>
-		                <input name="releaseVersion" type="list" style="float:left;width:330px;"/>
+		                <input name="releaseVersion" type="list" style="float:left;width:330px;" tabindex="4"/>
 		            </div>
 		        </div>
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveBoshInfo('before');">이전</button>
-				<button class="btn" onclick="popupComplete();">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveBoshInfo('after');">다음>></button>
+				<button class="btn" style="float: left;" onclick="saveBoshInfo('before');" tabindex="5">이전</button>
+				<button class="btn" onclick="popupComplete();" tabindex="6">취소</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveBoshInfo('after');" tabindex="7">다음>></button>
 			</div>
 		</div>
 	</div>
+	
 	
 	<!-- Network 설정 DIV -->
 	<div id="networkInfoDiv" style="width:100%;height:100%;" hidden="true">
@@ -1619,43 +1621,43 @@ $( window ).resize(function() {
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Subnet ID</label>
 					<div>
-						<input name="subnetId" type="text"  style="float:left;width:330px;" required placeholder="예) subnet-XXXXXX"/>
+						<input name="subnetId" type="text"  style="float:left;width:330px;" tabindex="1" required placeholder="예) subnet-XXXXXX"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Static IP</label>
 					<div>
 						<div style="display:inline-block;">
-							<span style="float:left;"><input name="subnetStaticFrom" id="subnetStaticFrom" type="text"  style="float:left;width:152px;" tabindex="4" placeholder="예) 10.0.0.100"/></span>
+							<span style="float:left;"><input name="subnetStaticFrom" id="subnetStaticFrom" type="text" style="float:left;width:152px;" tabindex="2" placeholder="예) 10.0.0.100"/></span>
 							<span style="float:left;">&nbsp; &ndash; &nbsp;</span>
-							<span style="float:left;"><input name="subnetStaticTo" id="subnetStaticTo" type="text"  style="float:left;width:152px;" tabindex="5" placeholder="예) 10.0.0.106"/></span>
+							<span style="float:left;"><input name="subnetStaticTo" id="subnetStaticTo" type="text" style="float:left;width:152px;" tabindex="3" placeholder="예) 10.0.0.106"/></span>
 						</div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Subnet Range(CIDR)</label>
 					<div>
-						<input name="subnetRange" type="text"  style="float:left;width:330px;" required placeholder="예) 10.0.0.0/24"/>
+						<input name="subnetRange" type="text"  style="float:left;width:330px;" tabindex="4" required placeholder="예) 10.0.0.0/24"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Gateway IP</label>
 					<div>
-						<input name="subnetGateway" type="text"  style="float:left;width:330px;" required placeholder="예) 10.0.0.1"/>
+						<input name="subnetGateway" type="text"  style="float:left;width:330px;" tabindex="5" required placeholder="예) 10.0.0.1"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">DNS</label>
 					<div>
-						<input name="subnetDns" type="text"  style="float:left;width:330px;" required placeholder="예) 8.8.8.8"/>
+						<input name="subnetDns" type="text"  style="float:left;width:330px;" tabindex="6" required placeholder="예) 8.8.8.8"/>
 					</div>
 				</div>
 			</div>
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveNetworkInfo('before');">이전</button>
-				<button class="btn" onclick="popupComplete();">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveNetworkInfo('after');">다음>></button>
+				<button class="btn" style="float: left;" onclick="saveNetworkInfo('before');" tabindex="7">이전</button>
+				<button class="btn" onclick="popupComplete();" tabindex="8">취소</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveNetworkInfo('after');" tabindex="9">다음>></button>
 			</div>
 		</div>
 	</div>
@@ -1680,20 +1682,20 @@ $( window ).resize(function() {
 					<label style="text-align: left; width: 200px; font-size: 11px;">Stemcell</label>
 					<div>
 						<div>
-							<input type="list" name="stemcells" style="float: left;width:330px;margin-top:1.5px;" placeholder="스템셀을 선택하세요.">
+							<input type="list" name="stemcells" style="float: left;width:330px;margin-top:1.5px;" tabindex="1" required placeholder="스템셀을 선택하세요.">
 						</div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Instance Type</label>
 					<div>
-						<input name="cloudInstanceType" type="text" style="float:left;width:330px;" placeholder="인스턴스 유형을 입력하세요."/>
+						<input name="cloudInstanceType" type="text" style="float:left;width:330px;" tabindex="2" required placeholder="인스턴스 유형을 입력하세요."/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">VM Password</label>
 					<div>
-						<input name="boshPassword" type="text" style="float:left;width:330px;" placeholder="VM인스턴스의 비밀번호를 입력하세요."/>
+						<input name="boshPassword" type="text" style="float:left;width:330px;" tabindex="3" required placeholder="VM인스턴스의 비밀번호를 입력하세요."/>
 					</div>
 				</div>
 				
@@ -1701,9 +1703,9 @@ $( window ).resize(function() {
 			</div>
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveAwsResourceInfo('before');">이전</button>
-				<button class="btn" onclick="popupComplete();">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveAwsResourceInfo('after');">다음>></button>
+				<button class="btn" style="float: left;" onclick="saveAwsResourceInfo('before');" tabindex="4" >이전</button>
+				<button class="btn" onclick="popupComplete();" tabindex="5" >취소</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveAwsResourceInfo('after');" tabindex="6" >다음>></button>
 			</div>
 		</div>
 	</div>
@@ -1778,56 +1780,56 @@ $( window ).resize(function() {
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">AUTH URL</label>
 		            <div>
-		                <input name="authUrl" type="text"  style="float:left;width:330px;" required placeholder="Identify API 인증 링크를 입력하세요."/>
+		                <input name="authUrl" type="text"  style="float:left;width:330px;" tabindex="1" required placeholder="Identify API 인증 링크를 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Tenant</label>
 		            <div>
-		                <input name="tenant" type="text"  style="float:left;width:330px;" required placeholder="Tenant명을 입력하세요."/>
+		                <input name="tenant" type="text"  style="float:left;width:330px;" tabindex="2" required placeholder="Tenant명을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">User Name</label>
 		            <div>
-		                <input name="userName" type="text"  style="float:left;width:330px;" required placeholder="계정명을 입력하세요."/>
+		                <input name="userName" type="text"  style="float:left;width:330px;" tabindex="3" required placeholder="계정명을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">API Key</label>
 		            <div>
-		                <input name="apiKey" type="text"  style="float:left;width:330px;" required placeholder="계정 비밀번호를 입력하세요."/>
+		                <input name="apiKey" type="text"  style="float:left;width:330px;" tabindex="4 required placeholder="계정 비밀번호를 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Security Group</label>
 		            <div>
-		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:330px;" required placeholder="시큐리티 그룹을 입력하세요."/>
+		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:330px;" tabindex="5" required placeholder="시큐리티 그룹을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Private Key Name</label>
 		            <div>
-		                <input name="privateKeyName" type="text"  style="float:left;width:330px;" required placeholder="Key Pair명을 입력하세요."/>
+		                <input name="privateKeyName" type="text"  style="float:left;width:330px;" tabindex="6" required placeholder="Key Pair명을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
 					<label style="text-align: left;width:40%;font-size:11px;">Private Key Path</label>
 					<div >
-						<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" tabindex="6"/>&nbsp;파일업로드</label></span>
+						<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" tabindex="7"/>&nbsp;파일업로드</label></span>
 						&nbsp;&nbsp;
-	  					<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" tabindex="5"/>&nbsp;리스트</label></span>
+	  					<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" tabindex="8"/>&nbsp;목록에서 선택</label></span>
 					</div>
 		        </div>
 		        
 		        <div class="w2ui-field">			         	
-	                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();"/>
+	                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();" />
 		            <label style="text-align: left;width:250px;font-size:11px;" class="control-label"></label>
 					<div id="keyPathDiv" ></div>
 		        </div>
@@ -1835,8 +1837,8 @@ $( window ).resize(function() {
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="popupComplete();">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOpenstackInfo();">다음>></button>
+				<button class="btn" style="float: left;" onclick="popupComplete();" tabindex="9" >취소</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOpenstackInfo();" tabindex="10" >다음>></button>
 		    </div>
 		</div>
 	</div>
@@ -1861,19 +1863,19 @@ $( window ).resize(function() {
 			        <div class="w2ui-field">
 			            <label style="text-align: left;width:250px;font-size:11px;">배포명</label>
 			            <div>
-			                <input name="deploymentName" type="text"  style="float:left;width:330px;" required placeholder="배포명을 입력하세요."/>
+			                <input name="deploymentName" type="text"  style="float:left;width:330px;" tabindex="1"  required placeholder="배포명을 입력하세요."/>
 			            </div>
 			        </div>
 			        <div class="w2ui-field">
 			            <label style="text-align: left;width:250px;font-size:11px;">설치관리자 UUID</label>
 			            <div>
-			                <input name="directorUuid" type="text"  style="float:left;width:330px;" required placeholder="설치관리자 UUID입력하세요." disabled/>
+			                <input name="directorUuid" type="text"  style="float:left;width:330px;" tabindex="2"  required placeholder="설치관리자 UUID입력하세요." disabled/>
 			            </div>
 			        </div>
 			        <div class="w2ui-field">
 			            <label style="text-align: left;width:250px;font-size:11px;">BOSH 릴리즈</label>
 			            <div>
-			                <input name="releaseVersion" type="text"  style="float:left;width:330px;" />
+			                <input name="releaseVersion" type="text"  style="float:left;width:330px;" tabindex="3"  />
 			            </div>
 			        </div>
 		        </form>
@@ -1904,28 +1906,28 @@ $( window ).resize(function() {
 			<div class="cont_title">▶ 네트워크정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    
-				<div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Floating IP</label>
-		            <div>
-		                <input name="publicStaticIp" type="text"  style="float:left;width:330px;" required placeholder="설치관리자에 할당할 Floating IP를 입력하세요."/>
-		            </div>
-		        </div>
-		        
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Subnet ID</label>
 		            <div>
-		                <input name="subnetId" type="text"  style="float:left;width:330px;" placeholder="Subnet ID를 입력하세요."/>
+		                <input name="subnetId" type="text"  style="float:left;width:330px;" tabindex="1" required placeholder="Subnet ID를 입력하세요."/>
 		            </div>
 		        </div>
+				<div class="w2ui-field">
+		            <label style="text-align: left;width:250px;font-size:11px;">Floating IP</label>
+		            <div>
+		                <input name="publicStaticIp" type="text"  style="float:left;width:330px;" tabindex="2" required placeholder="설치관리자에 할당할 Floating IP를 입력하세요."/>
+		            </div>
+		        </div>
+		        
 		    
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Static IP</label>
 		            <div>
 		                <div>
 							<div style="display:inline-block;">
-								<span style="float:left;"><input name="subnetStaticFrom" id="subnetStaticFrom" type="text"  style="float:left;width:152px;" tabindex="4" placeholder="예) 10.0.0.100"/></span>
+								<span style="float:left;"><input name="subnetStaticFrom" id="subnetStaticFrom" type="text"  style="float:left;width:152px;" tabindex="3" placeholder="예) 10.0.0.100"/></span>
 								<span style="float:left;">&nbsp; &ndash; &nbsp;</span>
-								<span style="float:left;"><input name="subnetStaticTo" id="subnetStaticTo" type="text"  style="float:left;width:152px;" tabindex="5" placeholder="예) 10.0.0.106"/></span>
+								<span style="float:left;"><input name="subnetStaticTo" id="subnetStaticTo" type="text"  style="float:left;width:152px;" tabindex="4" placeholder="예) 10.0.0.106"/></span>
 							</div>
 						</div>
 		            </div>
@@ -1934,30 +1936,30 @@ $( window ).resize(function() {
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Subnet Range(CIDR)</label>
 		            <div>
-		                <input name="subnetRange" type="text"  style="float:left;width:330px;" required placeholder="예) 10.0.0.0/24"/>
+		                <input name="subnetRange" type="text"  style="float:left;width:330px;" tabindex="5" required placeholder="예) 10.0.0.0/24"/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Gateway IP</label>
 		            <div>
-		                <input name="subnetGateway" type="text"  style="float:left;width:330px;" required placeholder="예) 10.0.0.1"/>
+		                <input name="subnetGateway" type="text"  style="float:left;width:330px;" tabindex="6" required placeholder="예) 10.0.0.1"/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">DNS</label>
 		            <div>
-		                <input name="subnetDns" type="text"  style="float:left;width:330px;" required placeholder="예) 8.8.8.8"/>
+		                <input name="subnetDns" type="text"  style="float:left;width:330px;" tabindex="7" required placeholder="예) 8.8.8.8"/>
 		            </div>
 		        </div>
 		        
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveOsNetworkInfo('before');">이전</button>
-				<button class="btn" onclick="popupComplete();">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOsNetworkInfo('after');">다음>></button>
+				<button class="btn" style="float: left;" onclick="saveOsNetworkInfo('before');" tabindex="8" >이전</button>
+				<button class="btn" onclick="popupComplete();" tabindex="9" >취소</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOsNetworkInfo('after');" tabindex="10" >다음>></button>
 		    </div>
 		</div>
 	</div>
@@ -1981,19 +1983,22 @@ $( window ).resize(function() {
 				 <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Stemcell</label>
 		            <div>
-						<div><input type="list" name="stemcells" style="float: left;width:330px;margin-top:1.5px;" placeholder="스템셀을 선택하세요."></div>
+						<div><input type="list" name="stemcells" style="float: left;width:330px;margin-top:1.5px;" tabindex="1" required placeholder="스템셀을 선택하세요."></div>
+						<div class="isMessage"></div>
 					</div>
 				</div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">Instance Type</label>
 		            <div>
-		                <input name="cloudInstanceType" type="text"  style="float:left;width:330px;" placeholder="인스턴스 유형을 입력하세요."/>
+		                <input name="cloudInstanceType" type="text"  style="float:left;width:330px;"  tabindex="2" required  placeholder="인스턴스 유형을 입력하세요."/>
+		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:250px;font-size:11px;">VM Password</label>
 		            <div>
-		                <input name="boshPassword" type="text"  style="float:left;width:330px;" placeholder="VM인스턴스의 비밀번호를 입력하세요."/>
+		                <input name="boshPassword" type="text"  style="float:left;width:330px;" tabindex="3" required  placeholder="VM인스턴스의 비밀번호를 입력하세요."/>
+		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 		    </div>

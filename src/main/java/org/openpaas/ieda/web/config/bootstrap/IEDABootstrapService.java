@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.common.ReplaceItem;
+import org.openpaas.ieda.web.config.bootstrap.BootStrapDto.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -94,33 +95,42 @@ public class IEDABootstrapService {
 	}
 
 	public String createSettingFile(Integer id, String iaas) {
-		// 파일 가져오기
-		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-microbosh-setting.yml");
-		URL stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-microbosh-stub.yml");
-		File settingFile;
-		File stubDeploy;
+		URL classPath = null;
+		URL stubPath = null;
+		String settingFileName = null;
+		File settingFile = null;
+		File stubFile = null;
 		
 		String content = "";
 		String stubContent = "";
-		String settingFileName = (iaas == "AWS") ? "aws-microbosh-setting-"+id+".yml" 
-									: "openstack-microbosh-setting-"+id+".yml";
 		String deplymentFileName = ""; 
+		
+		// 파일 가져오기
+		if("AWS".equals(iaas.toUpperCase())){
+			classPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-microbosh-setting.yml");
+			stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-microbosh-stub.yml");
+			settingFileName = "aws-microbosh-setting-"+id+".yml";
+		}
+		else if("OPENSTACK".equals(iaas.toUpperCase())){
+			classPath = this.getClass().getClassLoader().getResource("static/deploy_template/openstack-microbosh-setting.yml");
+			stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/openstack-microbosh-stub.yml");
+			settingFileName = "openstack-microbosh-setting-"+id+".yml";
+		}
 		
 		try {
 			settingFile = new File(classPath.toURI());//resource.getFile();
-			stubDeploy = new File(stubPath.toURI());
+			stubFile = new File(stubPath.toURI());
 			content = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
-			stubContent = IOUtils.toString(new FileInputStream(stubDeploy), "UTF-8");
+			stubContent = IOUtils.toString(new FileInputStream(stubFile), "UTF-8");
 			
 			List<ReplaceItem> ReplaceItems = makeReplaceItems(id, iaas);
 			for (ReplaceItem item : ReplaceItems) {
-				log.info(item.getTargetItem() +" / "+  item.getSourceItem());
 				content = content.replace(item.getTargetItem(), item.getSourceItem());
 			}
 
-			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir()  + System.getProperty("file.separator") + stubDeploy.getName()), "UTF-8");
+			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir()  + System.getProperty("file.separator") + stubFile.getName()), "UTF-8");
 			IOUtils.write(content, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName), "UTF-8");
-			deplymentFileName = setSpiffMerge(iaas, id, stubDeploy.getName(), settingFileName);
+			deplymentFileName = setSpiffMerge(iaas, id, stubFile.getName(), settingFileName);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (IOException e1) {
@@ -161,9 +171,6 @@ public class IEDABootstrapService {
 			items.add(new ReplaceItem("[stemcell]", LocalDirectoryConfiguration.getStemcellDir() + System.getProperty("file.separator") + awsConfig.getStemcell()));
 			items.add(new ReplaceItem("[cloudInstanceType]", awsConfig.getCloudInstanceType()));
 			items.add(new ReplaceItem("[boshPassword]", awsConfig.getBoshPassword()));
-//			
-//			items.add(new ReplaceItem("[privateKey]"
-//					, System.getProperty("user.home") + System.getProperty("file.separator") + ".ssh"+ System.getProperty("file.separator") +awsConfig.getPrivateKeyPath()));
 		}
 		else{
 			IEDABootstrapOpenstackConfig openstackConfig = openstackRepository.findOne(id);
@@ -268,89 +275,6 @@ public class IEDABootstrapService {
 		return deploymentFileName;
 	}
 	
-	//aws-microbosh-delete.sh
-	public void deleteDeploy(String fileName){
-		
-		InputStream inputStream = null;
-		BufferedReader bufferedReader = null;
-		Runtime r = Runtime.getRuntime();
-		try{
-			String command = LocalDirectoryConfiguration.getScriptDir() + System.getProperty("file.separator") + "aws-microbosh-delete.sh ";
-			command += LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + fileName + " ";
-					
-			Process process = r.exec(command);
-			process.getInputStream();
-			inputStream = process.getInputStream();
-			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-			String info = null;
-			String streamLogs = "";
-			while ((info = bufferedReader.readLine()) != null){
-				streamLogs += info;
-				log.info(info);
-				messagingTemplate.convertAndSend("/bootstrap/bootstrapDelete", info);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inputStream != null)
-					inputStream.close();
-			} catch (Exception e) {
-			}
-			try {
-				if (bufferedReader != null)
-					bufferedReader.close();
-			} catch (Exception e) {
-			}
-			messagingTemplate.convertAndSend("/bootstrap/bootstrapDelete", "complete");
-		}
-	}
-	
-	@Async
-	public void installBootstrap(String deployFileName){
-		InputStream inputStream = null;
-		BufferedReader bufferedReader = null;
-		Runtime r = Runtime.getRuntime();
-		String command = "";
-		try{
-			command += LocalDirectoryConfiguration.getScriptDir() + System.getProperty("file.separator")  + "aws-microbosh-deploy.sh ";
-			command += LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator")  + deployFileName ;
-					
-			Process process = r.exec(command);
-			log.info("### PROCESS ::: " + process.toString());
-			process.getInputStream();
-			inputStream = process.getInputStream();
-			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-			String info = null;
-			String streamLogs = "";
-			while ((info = bufferedReader.readLine()) != null){
-				streamLogs += info;
-				messagingTemplate.convertAndSend("/bootstrap/bootstrapInstall", info);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inputStream != null)
-					inputStream.close();
-			} catch (Exception e) {
-			}
-			try {
-				if (bufferedReader != null){
-					bufferedReader.close();
-					messagingTemplate.convertAndSend("/bootstrap/bootstrapInstall", "complete");
-				}
-			} catch (Exception e) {
-			}
-		}
-	}
-
-
 	public List<String> getKeyPathFileList() {
 		
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("KeyFile only","pem");
@@ -373,6 +297,22 @@ public class IEDABootstrapService {
 		}
 		
 		return localFiles;
+	}
+
+	public void deleteBootstrapInfoRecord(Delete dto) {
+		try {
+			if( "AWS".equals(dto.getIaas())){
+				IEDABootstrapAwsConfig config = awsRepository.findOne(Integer.parseInt(dto.getId()));
+				awsRepository.delete(Integer.parseInt(dto.getId())); 
+			}
+			else{
+				IEDABootstrapOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
+				openstackRepository.delete(Integer.parseInt(dto.getId())); 
+			}
+		} catch (Exception e) {
+			throw new IEDACommonException("illigalArgument.bootstrap.delete.exception",
+					"삭제중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
+		}
 	}
 
 }

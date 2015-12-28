@@ -34,22 +34,6 @@ public class IEDABootstrapOpenstackService {
 		return config;
 	}
 
-	public void deleteOpenstackInfo(int id) {
-		IEDABootstrapOpenstackConfig config = null; 
-		try{
-			config = openstackRepository.findOne(id);
-			openstackRepository.delete(id);
-			bootstrapService.deleteDeploy(config.getDeploymentFile());
-		} catch (EntityNotFoundException e) {
-			throw new IEDACommonException("illigalArgument.bootstrap.exception",
-					"삭제할 BOOTSTRAP이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			throw new IEDACommonException("illigalArgument.bootstrap.exception",
-					"BOOTSTRAP 삭제 중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
-		}
-		
-	}
-
 	public IEDABootstrapOpenstackConfig saveOpenstackInfoSave(BootStrapDto.OpenStack dto) {
 		IEDABootstrapOpenstackConfig config;
 		Date now = new Date();

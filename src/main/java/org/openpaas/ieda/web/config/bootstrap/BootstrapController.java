@@ -9,6 +9,8 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.apache.catalina.startup.Bootstrap;
+import org.openpaas.ieda.web.deploy.bosh.BoshParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +40,9 @@ public class BootstrapController {
 	
 	@Autowired
 	private BoostrapDeployAsyncService boostrapDeployAsyncService;
+	
+	@Autowired
+	private BootstrapDeleteDeployAsyncService bootstrapDeleteDeployAsyncService;
 	
 	@RequestMapping(value = "/config/bootstrap", method=RequestMethod.GET)
 	public String main() {
@@ -121,8 +126,13 @@ public class BootstrapController {
 	@MessageMapping("/bootstrapDelete")
 	@SendTo("/bootstrap/bootstrapDelete")
 	public ResponseEntity deleteBootstrap(@RequestBody @Valid BootStrapDto.Delete dto){
-		if("AWS".equals(dto.getIaas())) awsService.deleteAwsInfo(Integer.parseInt(dto.getId()));
-		else if("OPENSTACK".equals(dto.getIaas())) openstackService.deleteOpenstackInfo(Integer.parseInt(dto.getId()));
+		bootstrapDeleteDeployAsyncService.deleteDeployAsync(dto);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@RequestMapping( value="/bootstrap/delete", method=RequestMethod.PUT)
+	public ResponseEntity deleteJustOnlyBootstrapRecord(@RequestBody @Valid BootStrapDto.Delete dto){
+		bootstrapService.deleteBootstrapInfoRecord(dto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	

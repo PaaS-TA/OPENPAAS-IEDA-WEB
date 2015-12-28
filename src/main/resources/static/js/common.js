@@ -67,3 +67,81 @@ function setCommonCode(url, id) {
 function checkEmpty(value){
 	return (value == null || value == "") ? true: false;
 }
+
+//URL 체크
+function validateIP(input){
+	if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(input))  
+		return true;
+	else
+		return false;
+}
+
+//팝업 INPUT Validation
+function popupValidation(){
+	var emptyFields = new Array();
+	var checkValidation = true;
+	var textInputs 	= $(".w2ui-msg-body :input[type=text]:visible");
+	var listInputs 	= $(".w2ui-msg-body :input[type=list]:visible");
+	var urlInputs 	= $(".w2ui-msg-body :input[type=url]:visible");
+	
+	if( textInputs.length > 0 ){
+		textInputs.each(function(obj){
+			if( checkEmpty( $(this).val()) &&  $(this).attr('name') ){
+				console.log("#### : NAME :" + $(this).attr('name'));
+				emptyFields.push($(this ).attr("name"));
+				var label = $(this).parent().parent().find("label").text();
+				$(this).css({"border-color":"red"}).parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"});
+			}
+			else{
+				$(this).css({"border":"1px solid #bbb"}).parent().find(".isMessage").text("");
+			}
+		});
+	}
+	if( listInputs.length > 0 ){
+		listInputs.each(function(obj){
+			//console.log("#### : NAME :" +$(this).attr('name'));
+			if( checkEmpty( $(this).val()) &&  $(this).attr('name') ){
+				console.log("#### : NAME :" + $(this).attr('name'));
+				emptyFields.push($(this).attr("name"));
+				$(this).css({"border-color":"red"});
+			}
+			else{
+				$(this).css({"border":"1px solid #bbb"});
+			}
+		});
+	}
+	
+	if( urlInputs.length > 0 ){
+		urlInputs.each(function(obj){
+			//console.log("#### : NAME :" +$(this).attr('name'));
+			if( checkEmpty( $(this).val()) &&  $(this).attr('name') ){
+				console.log("#### : NAME :" + $(this).attr('name'));
+				emptyFields.push($(this ).attr("name"));
+				var label = $(this).parent().parent().find("label").text();
+				$(this).css({"border-color":"red"}).parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"});
+			}
+			else{
+				$(this).css({"border":"1px solid #bbb"}).parent().find(".isMessage").text("");
+			}
+		});
+	}
+	
+	console.log("EMPTY : " + emptyFields.length);
+	//ALert 메세지
+	if(emptyFields.length != 0 ){
+		emptyFields.forEach(function(obj){
+			console.log("## Input Name :: " + obj);
+		});
+		
+		checkValidation = false;
+		var label = $(".w2ui-msg-body input[name="+emptyFields[0]+"]").parent().parent().find("label").text();
+		w2alert(label + "을(를) 입력하세요.");
+	}
+	else{
+		checkValidation = true;
+	}
+	
+	console.log(":: valid ::" + checkValidation);
+	return checkValidation;
+}
+

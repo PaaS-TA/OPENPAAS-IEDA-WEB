@@ -1,33 +1,33 @@
-name: [boshName]
+name: [deploymentName]
 releases:
   bosh:
-    url: file:///[boshUrl]
+    url: file:///[boshRelease]
   bosh-openstack-cpi:
-    url: file:///[boshCpiUrl]
+    url: file:///[boshCpiRelease]
 resource_pools:
   vms:
     stemcell:
-      url: file:///[stemcellUrl]
+      url: file:///[stemcell]
     env:
       bosh:
-        password: [envPassword]
+        password: [boshPassword]
     cloud_properties:
       instance_type: [cloudInstanceType]
 networks:
   private:
     subnets:
-    - range: [privateSubnetRange]
+    - range: [subnetRange]
       gateway: [subnetGateway]
       dns: [[subnetDns]]
       cloud_properties: 
-        net_id: [cloudNetId]
+        net_id: [subnetId]
 jobs:
   bosh:
     networks:
       private:
         static_ips: [[privateStaticIp]]
       public:
-        static_ips: [[publicStaticIpd]]
+        static_ips: [[publicStaticIp]]
     properties:
       director:
         name: [directorName]
@@ -36,9 +36,9 @@ jobs:
         tenant: [tenant]
         username: [userName]
         api_key: [apiKey]
-        default_key_name: [defaultKeyName]
-        default_security_groups: [[defaultSecurityGroups]]
+        default_key_name: [privateKeyName]
+        default_security_groups: [[defaultSecurityGroup]]
       ntp: [[ntp]]
 cloud_provider:
   ssh_tunnel:
-    private_key: [cloudPrivateKey]
+    private_key: [privateKeyPath]

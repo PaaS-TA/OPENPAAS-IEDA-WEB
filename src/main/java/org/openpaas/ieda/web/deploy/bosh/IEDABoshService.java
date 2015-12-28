@@ -37,21 +37,13 @@ public class IEDABoshService {
 	private IEDABoshOpenstackRepository openstackRepository;
 	
 	@Autowired
-	private IEDABoshAwsService awsService;
-	
-	@Autowired
 	private DeploymentService deploymentService;
 	
-	@Autowired
-	private IEDADirectorConfigService directroConfigService;
-
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 
 	public List<BoshInfo> getBoshList(){
 		
-		//IEDADirectorConfig defaultDirector = directroConfigService.getDefaultDirector();
-
 		List<BoshInfo> boshList = new ArrayList();
 		List<IEDABoshAwsConfig> boshAwsList = awsRepository.findAll();
 		List<IEDABoshOpenstackConfig> boshOpenstackList = openstackRepository.findAll();
@@ -450,29 +442,6 @@ public class IEDABoshService {
 		}
 		return contents;
 	}
-
-
-/*	public void deleteBoshInfo(BoshParam.Delete dto) {
-		String deploymentFileName = "";
-		try{
-			//awsConfig = awsRepository.findOne(id);
-			if( "AWS".equals(dto.getIaas())){ 
-				IEDABoshAwsConfig config = awsRepository.findOne(Integer.parseInt(dto.getId()));
-				awsRepository.delete(Integer.parseInt(dto.getId()));
-				deploymentFileName = config.getDeploymentFile();
-			} else {
-				IEDABoshOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
-				openstackRepository.delete(Integer.parseInt(dto.getId()));
-				deploymentFileName = config.getDeploymentFile();
-			}
-			//if( StringUtils.isEmpty(deploymentFileName)) deleteDeploy(deploymentFileName);
-		} catch (Exception e) {
-			throw new IEDACommonException("illigalArgument.boshdelete.exception",
-					"삭제중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
-		}
-		
-	}
-*/
 	
 	public void deleteBoshInfoRecord(BoshParam.Delete dto) {
 		try{

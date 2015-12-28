@@ -29,8 +29,8 @@ jobs:
 - name: ha_proxy_z1
   networks:            
   - name: elastic
-    static_ips: [staticIps]                                                               # ha_proxy's public IP
+    static_ips: [staticIps]
   properties:
-    ha_proxy:                                                                               # ha_proxy's public key & private key
+    ha_proxy:
       ssl_pem: |
 [sslPem]
