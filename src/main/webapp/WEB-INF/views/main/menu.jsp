@@ -41,7 +41,7 @@ function goPage(page, title) {
 		<ul>
 		<li><a href="javascript:goPage('<c:url value="/config/bootstrap"/>', 'BOOTSTRAP 설치');">BOOTSTRAP 설치</a></li>
 		<li><a href="javascript:goPage('<c:url value="/deploy/bosh"/>', 'BOSH 설치');">BOSH 설치</a></li>		
-		<li>CF 설치</li>		
+		<li><a href="javascript:goPage('<c:url value="/deploy/cf"/>', 'BOSH 설치');">CF 설치</a></li>
 		<li>Diego 설치</li>
 		</ul>
 	</div>

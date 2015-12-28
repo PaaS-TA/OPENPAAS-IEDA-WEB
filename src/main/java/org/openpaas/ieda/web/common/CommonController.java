@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -28,4 +29,14 @@ public class CommonController {
 		
 		return new ResponseEntity<>(keyPathFileList, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value="/common/localList/{type}" , method=RequestMethod.GET)
+	public ResponseEntity getLOcalList (@PathVariable String type){
+		List<String> keyPathFileList = commonService.getLocalList(type);
+		
+		return new ResponseEntity<>(keyPathFileList, HttpStatus.OK);
+	}
+
+	
+	
 }

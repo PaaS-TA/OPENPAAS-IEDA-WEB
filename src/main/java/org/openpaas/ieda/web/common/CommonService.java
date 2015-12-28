@@ -11,7 +11,6 @@ import java.util.List;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
-import org.springframework.orm.hibernate3.LocalDataSourceConnectionProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -68,6 +67,11 @@ public class CommonService {
 		}
 		
 		return localFiles;
+	}
+
+	public List<String> getLocalList(String type) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

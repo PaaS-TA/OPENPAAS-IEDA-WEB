@@ -1,0 +1,36 @@
+name: [cfName]
+director_uuid: [directorUuid]
+release:
+  version: [releaseVersion]
+networks:
+- name: cf_private
+  subnets:
+  - range: [subnetRange]
+    gateway: [subnetGateway]
+    dns: [[subnetDns]]
+    reserved: [[subnetReserved]]
+    static: [[subnetStatic]]
+    cloud_properties:
+      subnet: [cloudSubnet]
+resource_pools:
+- name: small_z1
+  stemcell:
+    name: [stemcellName]
+    version: latest
+  env:
+    bosh:
+      password: [boshPassword]
+  cloud_properties:
+    availability_zone: [availabilityZone]
+    instance_type: [instancetype]
+properties:
+  domain: [domain]
+jobs:
+- name: ha_proxy_z1
+  networks:            
+  - name: elastic
+    static_ips: [staticIps]                                                               # ha_proxy's public IP
+  properties:
+    ha_proxy:                                                                               # ha_proxy's public key & private key
+      ssl_pem: |
+[sslPem]
