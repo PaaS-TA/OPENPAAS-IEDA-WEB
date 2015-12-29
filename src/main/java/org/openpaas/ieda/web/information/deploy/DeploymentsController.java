@@ -1,13 +1,10 @@
-/**
- * @Author Cheolho Moon
- */
 package org.openpaas.ieda.web.information.deploy;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.openpaas.ieda.api.DeploymentInfo;
+import org.openpaas.ieda.web.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-public class DeploymentsController {
+public class DeploymentsController extends BaseController {
 	
 	@Autowired
 	private DeploymentService deploymentService;

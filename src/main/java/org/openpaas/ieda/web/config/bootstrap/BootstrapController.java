@@ -1,6 +1,3 @@
-/**
- * @Author Cheolho Moon
- */
 package org.openpaas.ieda.web.config.bootstrap;
 
 import java.util.HashMap;
@@ -9,8 +6,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
-import org.apache.catalina.startup.Bootstrap;
-import org.openpaas.ieda.web.deploy.bosh.BoshParam;
+import org.openpaas.ieda.web.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-public class BootstrapController {
+public class BootstrapController extends BaseController {
 	@Autowired
 	private IEDABootstrapAwsService awsService;
 	

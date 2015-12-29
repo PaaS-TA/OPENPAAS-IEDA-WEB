@@ -37,7 +37,7 @@ $(function() {
 			var grid = this;
 			event.onComplete = function() {
  				var sel = grid.getSelection();
-				if ( sel == null || sel == "") {
+				if ( sel == null || sel == "" ) {
 					setDisable($('#doDeleteStemcell'), true);
 					return;
 				}
@@ -70,26 +70,31 @@ $(function() {
 			var grid = this;
 			event.onComplete = function() {
  				var sel = grid.getSelection();
-				if ( sel == null || sel == "") {
+				if ( sel == null || sel == "" || bDefaultDirector == false) {
 					setDisable($('#doUploadStemcell'), true);
 					return;
 				}
 				
 				setDisable($('#doUploadStemcell'), false);
 			}
+		},
+		onError: function(event) {
+			event.preventDefault();
+			this.unlock();
 		}
-		
 	});
  	
  	initView(bDefaultDirector);
  	
  	// 스템셀 삭제
  	$("#doDeleteStemcell").click(function(){
+ 		if($("#doDeleteStemcell").attr('disabled') == "disabled") return;
  		doDeleteStemcell();
     });
  	
  	// 스템셀 업로드
  	$("#doUploadStemcell").click(function(){
+ 		if($("#doUploadStemcell").attr('disabled') == "disabled") return;
  		doUploadStemcell();
     });
 
@@ -100,10 +105,15 @@ function initView(bDefaultDirector) {
 	if ( bDefaultDirector ) {
 		// 업로드된 스템셀 조회
 	 	doSearchUploadedStemcells();
-		
-		// 로컬에 다운로드된 스템셀 조회
-		doSearchLocalStemcells();
 	}
+	
+/* 	w2ui['us_localStemcellsGrid'].handler('error', function(target, eventData) {
+		console.log(JSON.parse(eventData.xhr.responseText).exception);
+		console.log("### ==> " + eventData);
+	}); */
+	
+	// 로컬에 다운로드된 스템셀 조회
+	doSearchLocalStemcells();
 
 	// 컨트롤 
 	setDisable($('#doDeleteStemcell'), true);

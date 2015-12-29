@@ -10,13 +10,17 @@ import javax.validation.Valid;
 
 import org.openpaas.ieda.api.ReleaseFile;
 import org.openpaas.ieda.api.ReleaseInfo;
+import org.openpaas.ieda.common.IEDACommonException;
+import org.openpaas.ieda.common.IEDAErrorResponse;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
+import org.openpaas.ieda.web.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-public class ReleaseController {
+public class ReleaseController extends BaseController {
 	
 	@Autowired
 	private ReleaseService releaseService;

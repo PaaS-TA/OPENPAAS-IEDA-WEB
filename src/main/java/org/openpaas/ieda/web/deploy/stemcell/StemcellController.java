@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import org.openpaas.ieda.api.StemcellInfo;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
+import org.openpaas.ieda.web.common.BaseController;
 import org.openpaas.ieda.web.config.stemcell.StemcellContent;
 import org.openpaas.ieda.web.config.stemcell.StemcellContentDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-public class StemcellController {
+public class StemcellController extends BaseController {
 
 	@Autowired
 	private StemcellService service;
@@ -60,11 +61,15 @@ public class StemcellController {
 	public ResponseEntity listLocalStemcells() {
 		List<StemcellContent> contents = service.listLocalStemcells();
 
-		HashMap<String, Object> d = new HashMap<String, Object>();
-		d.put("total", contents.size());
-		d.put("records", contents);
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		if ( contents != null ) {
+			result.put("total", contents.size());
+			result.put("records", contents);
+		} else {
+			result.put("total", 0);
+		}
 
-		return new ResponseEntity<>(d, HttpStatus.OK);
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
 	// 스템셀 업로드
@@ -111,5 +116,6 @@ public class StemcellController {
 		log.info("::: STEMCELLS ::" + contents);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
+	
 	
 }

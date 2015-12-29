@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.openpaas.ieda.api.DeploymentInfo;
 import org.openpaas.ieda.api.ReleaseInfo;
+import org.openpaas.ieda.web.common.BaseController;
 import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.openpaas.ieda.web.information.deploy.DeploymentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-public class BoshManagementController {
+public class BoshManagementController extends BaseController {
 	
 	@Autowired
 	private IEDABoshAwsRepository awsRepository;

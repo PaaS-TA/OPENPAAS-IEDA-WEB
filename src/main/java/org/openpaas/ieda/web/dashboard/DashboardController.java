@@ -5,13 +5,11 @@ package org.openpaas.ieda.web.dashboard;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.openpaas.ieda.api.Deployment;
 import org.openpaas.ieda.api.DeploymentInfo;
 import org.openpaas.ieda.api.ReleaseInfo;
-import org.openpaas.ieda.api.Stemcell;
 import org.openpaas.ieda.api.StemcellInfo;
+import org.openpaas.ieda.web.common.BaseController;
 import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.openpaas.ieda.web.deploy.stemcell.StemcellService;
 import org.openpaas.ieda.web.information.deploy.DeploymentService;
@@ -31,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Controller
-public class DashboardController {
+public class DashboardController extends BaseController {
 
 	@Autowired
 	private DeploymentService deploymentService;

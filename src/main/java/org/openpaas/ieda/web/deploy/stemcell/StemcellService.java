@@ -108,10 +108,12 @@ public class StemcellService {
 		
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
 		
-		// 디럭터의 CPI에 맞는 로컬 스템셀 목록만 출력
-		if ( defaultDirector.getDirectorCpi().toUpperCase().contains("AWS") ) filterString = "AWS";
-		if ( defaultDirector.getDirectorCpi().toUpperCase().contains("OPENSTACK") ) filterString = "OPENSTACK";
-
+		if ( defaultDirector != null ) {
+			// 디럭터의 CPI에 맞는 로컬 스템셀 목록만 출력
+			if ( defaultDirector.getDirectorCpi().toUpperCase().contains("AWS") ) filterString = "AWS";
+			if ( defaultDirector.getDirectorCpi().toUpperCase().contains("OPENSTACK") ) filterString = "OPENSTACK";
+		}
+		
 		List<StemcellContent> returnList = null;
 		List<String> localStemcellList = stemcellManagementService.getLocalStemcellList();
 

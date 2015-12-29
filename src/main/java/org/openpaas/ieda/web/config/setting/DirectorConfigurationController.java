@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.IEDAErrorResponse;
+import org.openpaas.ieda.web.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-public class DirectorConfigurationController {
+public class DirectorConfigurationController extends BaseController { 
 	
 	private static final int Object = 0;
 
@@ -168,14 +169,4 @@ public class DirectorConfigurationController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@ExceptionHandler(IEDACommonException.class)
-	public ResponseEntity handleIEDACommonException(IEDACommonException e) {
-		IEDAErrorResponse errorResponse = new IEDAErrorResponse();
-		
-		errorResponse.setCode(e.getCode());
-		errorResponse.setMessage(e.getMessage());
-		
-		return new ResponseEntity<>(errorResponse, e.getStatusCode());
-	}
-
 }

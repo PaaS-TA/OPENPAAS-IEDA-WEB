@@ -42,10 +42,6 @@ public class IEDADirectorConfigService {
 
 	public IEDADirectorConfig getDefaultDirector() {
 		
-		log.info("getDeploymentDir : " + LocalDirectoryConfiguration.getDeploymentDir());
-		log.info("getReleaseDir    : " + LocalDirectoryConfiguration.getReleaseDir());
-		log.info("getStemcellDir   : " + LocalDirectoryConfiguration.getStemcellDir());
-		
 		IEDADirectorConfig directorConfig = directorConfigRepository.findOneByDefaultYn("Y");
 
 		if ( directorConfig == null ) {

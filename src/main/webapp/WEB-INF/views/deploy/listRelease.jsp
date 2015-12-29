@@ -73,7 +73,7 @@ $(function() {
 			var grid = this;
 			event.onComplete = function() {
 				var sel = grid.getSelection();
-				if ( sel == null || sel == "") {
+				if ( sel == null || sel == "" || bDefaultDirector == false) {
 					setDisable($('#doUploadRelease'), true);
 					setDisable($('#doDeleteLocalRelease'), true);
 					return;
@@ -94,16 +94,19 @@ $(function() {
  	
  	//릴리즈 삭제
  	$("#doDeleteRelease").click(function(){
+ 		if($("#doDeleteRelease").attr('disabled') == "disabled") return;
  		doDeleteRelease();
     });
  	
  	//릴리즈 업로드
  	$("#doUploadRelease").click(function(){
+ 		if($("#doUploadRelease").attr('disabled') == "disabled") return;
  		LocalStemcellUploadOrDelete("upload");
     });
  	
  	//로컬 릴리즈 삭제
  	$("#doDeleteLocalRelease").click(function(){
+ 		if($("#doDeleteLocalRelease").attr('disabled') == "disabled") return;
  		LocalStemcellUploadOrDelete("delete");
     });
  	
@@ -115,9 +118,11 @@ function initView(bDefaultDirector) {
 		// 업로드된 릴리즈 조회
 	 	doSearchUploadedReleases();
 		
-		// 로컬에 다운로드된 릴리즈 조회
-		doSearchLocalReleases();
 	}
+	
+	// 로컬에 다운로드된 릴리즈 조회
+	doSearchLocalReleases();
+
 
 	// 컨트롤 
 	setDisable($('#doDeleteRelease'), true);

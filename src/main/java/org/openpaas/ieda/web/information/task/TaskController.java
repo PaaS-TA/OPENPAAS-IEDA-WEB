@@ -1,6 +1,3 @@
-/**
- * @Author Cheolho Moon
- */
 package org.openpaas.ieda.web.information.task;
 
 import java.text.SimpleDateFormat;
@@ -10,6 +7,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.openpaas.ieda.api.Task;
+import org.openpaas.ieda.web.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +21,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
- *
- */
 @Slf4j
 @Controller
-public class TaskController {
+public class TaskController extends BaseController {
 	
 	@Autowired
 	private TaskService taskService;

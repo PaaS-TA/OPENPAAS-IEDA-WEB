@@ -1,6 +1,3 @@
-/**
- * @Author Cheolho Moon
- */
 package org.openpaas.ieda.web.config.stemcell;
 
 import java.math.BigDecimal;
@@ -11,6 +8,7 @@ import javax.validation.Valid;
 
 import org.openpaas.ieda.common.IEDAErrorResponse;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
+import org.openpaas.ieda.web.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,14 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
- *
- */
-
 @Slf4j
 @Controller
-public class StemcellManagementController {
+public class StemcellManagementController extends BaseController {
 	
 	@Autowired
 	private StemcellManagementService service;
