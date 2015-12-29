@@ -46,6 +46,8 @@ var keyPathFileList = "";
 var releases;
 var stemcells;
 var deploymentFile ;
+var bDefaultDirector; 
+
 $(function(){
 	
 	// 기본 설치 관리자 정보 조회
@@ -93,7 +95,7 @@ $(function(){
 			event.onComplete = function() {
 				var sel = grid.getSelection();
 
-				if ( sel == null || sel == "") {
+				if ( sel == null || sel == "" || bDefaultDirector == false ) {
 					$('#modifyBtn').attr('disabled', true);
 					$('#deleteBtn').attr('disabled', true);
 					return;
@@ -107,7 +109,7 @@ $(function(){
 	});
 	
 	$("#installBtn").click(function(){
-		
+		if($("#installBtn").attr('disabled') == "disabled") return;
 		var directorName = $("#directorName").text().toUpperCase();
 		
 		getReleaseVersionList();
@@ -178,9 +180,13 @@ $(function(){
 		});
  	});
  	
+	initView();
  	
-	doSearch();
 });
+
+function initView() {
+	doSearch();
+}	
 
 //조회기능
 function doSearch() {
@@ -1122,8 +1128,16 @@ function popupComplete(){
 
 function doButtonStyle(){
 	//Button Style init
-	$('#modifyBtn').attr('disabled', true);
-	$('#deleteBtn').attr('disabled', true);
+	
+	if ( !bDefaultDirector ) {
+		$('#installBtn').attr('disabled', true);
+		$('#modifyBtn').attr('disabled', true);
+		$('#deleteBtn').attr('disabled', true);
+	} 
+	else {
+		$('#modifyBtn').attr('disabled', true);
+		$('#deleteBtn').attr('disabled', true);
+	}
 }
 
 function gridReload(){

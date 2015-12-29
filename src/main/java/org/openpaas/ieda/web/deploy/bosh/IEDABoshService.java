@@ -53,7 +53,7 @@ public class IEDABoshService {
 					"Bosh 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 		
-		List<DeploymentInfo> deployedList = deploymentService.listDeployment();
+		//List<DeploymentInfo> deployedList = deploymentService.listDeployment();
 
 		int recid = 0;
 		if( boshAwsList.size() > 0 ){

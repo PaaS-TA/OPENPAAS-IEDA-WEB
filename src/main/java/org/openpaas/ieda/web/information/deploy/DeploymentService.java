@@ -32,6 +32,11 @@ public class DeploymentService {
 	public List<DeploymentInfo> listDeployment(){
 		IEDADirectorConfig defaultDirector = directroConfigService.getDefaultDirector();
 		
+		if ( defaultDirector == null ) {
+			throw new IEDACommonException("notfound.director.exception",
+					"기본 설치관리자 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+		}
+		
 		List<DeploymentInfo> deploymentInfoList = null;
 		try {
 			HttpClient httpClient = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
