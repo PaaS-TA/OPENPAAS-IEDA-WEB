@@ -31,12 +31,7 @@
     -webkit-writing-mode: horizontal-tb;
     cursor: auto;
 }
-.w2ui-field div.isMessage{
-	display: inline-block;
-	padding-left:10px;
-	height:10px;
-	font-size: 10px;
-}
+
 </style>
 <script type="text/javascript" src="/js/sockjs-0.3.4.js"></script>
 <script type="text/javascript" src="/js/stomp.js"></script>

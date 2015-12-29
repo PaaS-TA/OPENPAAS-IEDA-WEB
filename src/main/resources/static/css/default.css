@@ -65,3 +65,10 @@ a:hover{text-decoration:none;}
 .pdb15{padding-bottom:15px !important}
 .pdb20{padding-bottom:20px !important}
 
+/* isMessage(validation) 2015.12.28 */
+.w2ui-field div.isMessage{
+	display: inline-block;
+	padding-left:10px;
+	height:10px;
+	font-size: 10px;
+}

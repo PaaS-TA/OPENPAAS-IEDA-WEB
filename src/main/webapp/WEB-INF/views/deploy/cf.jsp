@@ -3,33 +3,6 @@
 <link rel="stylesheet" type="text/css" href="/css/progress-step.css"/>
 <style type="text/css">
 .w2ui-popup .w2ui-msg-body{background-color: #FFF; }
-#browse {
-	position: relative;
-    display : inline-block;        
-    width : 72px;
-    height : 25px;
-    background : #147ad0;
-    color : #FFF;
-    left: 5px;
-    text-decoration : none;
-    line-height : 25px;
-    text-align : center;
-    margin-top: 3px;
-}
-
-#keyPathFileName{
-	background-color:#fff;
-	text-rendering: auto;
-    color: initial;
-    letter-spacing: normal;
-    word-spacing: normal;
-    text-transform: none;
-    text-indent: 0px;
-    text-shadow: none;
-    display: inline-block;
-    -webkit-writing-mode: horizontal-tb;
-    cursor: auto;
-}
 </style>
 <script type="text/javascript" src="/js/sockjs-0.3.4.js"></script>
 <script type="text/javascript" src="/js/stomp.js"></script>

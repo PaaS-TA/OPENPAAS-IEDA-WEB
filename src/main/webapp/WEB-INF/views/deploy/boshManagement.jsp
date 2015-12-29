@@ -428,79 +428,24 @@ function saveAwsInfo(){
 			privateKeyPath			: $(".w2ui-msg-body input[name='privateKeyPath']").val()
 	}
 	
-	var targetName = "";
-	if( checkEmpty(awsInfo.accessKeyId)) {
-		targetName = $(".w2ui-msg-body input[name='accessKeyId']");
-		w2alert("AWS Access Key를 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name='accessKeyId']").focus();
+	if(popupValidation()){
+		//ajax AwsInfo Save
+		$.ajax({
+			type : "PUT",
+			url : "/bosh/saveAwsInfo",
+			contentType : "application/json",
+			async : true,
+			data : JSON.stringify(awsInfo), 
+			success : function(data, status) {
+				boshId = data;
+				keyPathFileUpload();
+				
+			},
+			error : function( e, status ) {
+				w2alert("AWS 설정 등록에 실패 하였습니다.", "BOSH 설치");
+			}
 		});
-		
-		return;
 	}
-	
-	if( checkEmpty(awsInfo.secretAccessKey)) {
-		targetName = $(".w2ui-msg-body input[name='secretAccessKey']");
-		w2alert("AWS Secret Access Key를 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name='secretAccessKey']").focus();
-		});
-		
-		return;
-	}
-
-	if(  checkEmpty(awsInfo.defaultSecurityGroups)){
-		w2alert("시큐리티 그룹을 입력하세요.", "", function(){
-			 $(".w2ui-msg-body input[name='defaultSecurityGroups']").focus();
-		});
-		return;		
-	}
-	
-	if(  checkEmpty(awsInfo.region)){
-		w2alert("설치할 Region을 입력하세요.", "", function(){
-			 $(".w2ui-msg-body input[name='region']").focus();
-		});
-		return;		
-	}
-	
-	if( checkEmpty(awsInfo.privateKeyName)){
-		w2alert("Private Key명을 입력하세요.", "" , function(){
-			$(".w2ui-msg-body input[name='privateKeyName']").focus();
-		});
-		return;
-	}
-
-	
-	if(  checkEmpty(awsInfo.privateKeyPath)){
-		w2alert("Private Key파일를 업로드하거나 목록에서 선택하세요.", "", function(){
-			 $(".w2ui-msg-body input[name='privateKeyPath']").focus();
-		});
-		return;		
-	}
-			
-	if( $(".w2ui-msg-body input[name='keyPathFile']").val() != null){
-		var keyPathFile =  $(".w2ui-msg-body input[name='keyPathFile']").val().split('.').pop().toLowerCase();
-		
-		if($.inArray(keyPathFile, ['pem']) == -1) {
-			w2alert("Private Key 파일을 업로드 또는 목록에서 선택하세요.", "BOSH 설치");
-			return;
-		}
-	}
-	
-	//ajax AwsInfo Save
-	$.ajax({
-		type : "PUT",
-		url : "/bosh/saveAwsInfo",
-		contentType : "application/json",
-		async : true,
-		data : JSON.stringify(awsInfo), 
-		success : function(data, status) {
-			boshId = data;
-			keyPathFileUpload();
-			
-		},
-		error : function( e, status ) {
-			w2alert("AWS 설정 등록에 실패 하였습니다.", "BOSH 설치");
-		}
-	});
 }
 
 function keyPathFileUpload(){
@@ -646,41 +591,22 @@ function saveBoshInfo(type){
 	}
 	
 	if ( type == 'after' ) {
-		if( checkEmpty(boshInfo.deploymentName) ){
-			w2alert("배포명을 입력하세요." , "", function(){
-				$(".w2ui-msg-body input[name='deploymentName']").focus();
+		if(popupValidation()){
+			//Server send Bosh Info
+			$.ajax({
+				type : "PUT",
+				url : "/bosh/saveAwsBoshInfo",
+				contentType : "application/json",
+				async : true,
+				data : JSON.stringify(boshInfo), 
+				success : function(data, status) {
+					networkPopup();
+				},
+				error : function( e, status ) {
+					w2alert("기본정보 저장 실패하였습니다.", "Bosh 설치(AWS)");
+				}
 			});
-			return;
 		}
-		
-		if( checkEmpty(boshInfo.directorUuid)){
-			w2alert("설치관리자 UUID를 입력하세요.", "", function(){
-				$(".w2ui-msg-body input[name='directorUuid']").focus();
-			});
-			return;
-		}
-		
-		if( checkEmpty(boshInfo.releaseVersion) ){
-			w2alert("배포에 사용할 BOSH 릴리즈를 선택하세요.", "" , function(){
-				$(".w2ui-msg-body input[name='releaseVersion']").focus();
-			});
-			return;
-		}
-		
-		//Server send Bosh Info
-		$.ajax({
-			type : "PUT",
-			url : "/bosh/saveAwsBoshInfo",
-			contentType : "application/json",
-			async : true,
-			data : JSON.stringify(boshInfo), 
-			success : function(data, status) {
-				networkPopup();
-			},
-			error : function( e, status ) {
-				w2alert("기본정보 저장 실패하였습니다.", "Bosh 설치(AWS)");
-			}
-		});
 	}
 	else if(type == 'before'){
 		awsPopup(); 
@@ -722,73 +648,24 @@ function saveNetworkInfo(type){
 			subnetId			: $(".w2ui-msg-body input[name='subnetId']").val()
 	}
 	
-	console.log(networkInfo);
-	
 	if ( type == 'after' ) {
-		
-		if ( checkEmpty(networkInfo.publicStaticIp)) {
-			w2alert("Elastic IP를 입력하세요", "" , function(){
-				$(".w2ui-msg-body input[name='publicStaticIp']").focus();
+		if(popupValidation()){
+			//Server send Bosh Info
+			$.ajax({
+				type : "PUT",
+				url : "/bosh/saveAwsNetworkInfo",
+				contentType : "application/json",
+				//dataType: "json",
+				async : true,
+				data : JSON.stringify(networkInfo), 
+				success : function(data, status) {
+					resourcePopup();
+				},
+				error : function( e, status ) {
+					w2alert("Bosh Network 등록에 실패 하였습니다.", "Bosh 설치");
+				}
 			});
-			return;
 		}
-	
-		if( checkEmpty(networkInfo.subnetId)){
-			w2alert("Subnet ID를 입력하세요.", "" , function(){
-				$(".w2ui-msg-body input[name='subnetId']").focus();
-			});
-			return;
-		}
-
-		if( checkEmpty(networkInfo.subnetStaticFrom)) {
-			w2alert("Static IP 구간을 입력하세요.(From)", "" , function(){
-				$(".w2ui-msg-body input[name='subnetStaticFrom']").focus();
-			});
-			return;
-		}
-		
-		if( checkEmpty(networkInfo.subnetStaticTo)) {
-			w2alert("Static IP 구간을 입력하세요.(To)", "" , function(){
-				$(".w2ui-msg-body input[name='subnetStaticTo']").focus();
-			});
-			return;
-		}
-
-		if( checkEmpty(networkInfo.subnetRange)){
-			w2alert("Subnet Range를 입력하세요.", "" , function(){
-				$(".w2ui-msg-body input[name='subnetRange']").focus();
-			});
-			return;
-		}
-		if( checkEmpty(networkInfo.subnetGateway)){
-			w2alert("Gateway IP를 입력하세요.", "" , function(){
-				$(".w2ui-msg-body input[name='subnetGateway']").focus();
-			});
-			return;
-		}
-		
-		if( checkEmpty(networkInfo.subnetDns)){
-			w2alert("DNS정보를 입력하세요.", "" , function(){
-				$(".w2ui-msg-body input[name='subnetDns']").focus();
-			});
-			return;
-		}
-		
-		//Server send Bosh Info
-		$.ajax({
-			type : "PUT",
-			url : "/bosh/saveAwsNetworkInfo",
-			contentType : "application/json",
-			//dataType: "json",
-			async : true,
-			data : JSON.stringify(networkInfo), 
-			success : function(data, status) {
-				resourcePopup();
-			},
-			error : function( e, status ) {
-				w2alert("Bosh Network 등록에 실패 하였습니다.", "Bosh 설치");
-			}
-		});
 	}
 	else if(type == 'before'){
 		boshInfoPopup();
@@ -829,40 +706,23 @@ function saveAwsResourceInfo(type){
 	}
 	
 	if ( type == 'after' ) {
-	
-		if( checkEmpty(stemcellInfo)){
-			w2alert("배포에 사용할 스템셀을 선택하세요.");
-			return;
-		}
-		
-		if( checkEmpty(resourceInfo.cloudInstanceType )){
-			console.log()
-			w2alert("인스턴스 유형을 입력하세요.", "" , function(){
-				$(".w2ui-msg-body input[name='cloudInstanceType']").focus();
+		if(popupValidation()){
+			//Server send Bosh Info
+			$.ajax({
+				type : "PUT",
+				url : "/bosh/saveAwsResourceInfo",
+				contentType : "application/json",
+				async : true,
+				data : JSON.stringify(resourceInfo), 
+				success : function(data, status) {
+					deploymentFile = data.content.deploymentFile;
+					deployPopup();
+				},
+				error : function( e, status ) {
+					w2alert("Bosh Resource 등록에 실패 하였습니다.", "Bosh 설치");
+				}
 			});
-			return;
 		}
-		
-		if( checkEmpty(resourceInfo.boshPassword )){
-			w2alert("VM인스턴스의 비밀번호를 입력하세요.");
-			return;
-		}
-		
-		//Server send Bosh Info
-		$.ajax({
-			type : "PUT",
-			url : "/bosh/saveAwsResourceInfo",
-			contentType : "application/json",
-			async : true,
-			data : JSON.stringify(resourceInfo), 
-			success : function(data, status) {
-				deploymentFile = data.content.deploymentFile;
-				deployPopup();
-			},
-			error : function( e, status ) {
-				w2alert("Bosh Resource 등록에 실패 하였습니다.", "Bosh 설치");
-			}
-		});
 		
 	} else if(type == 'before'){
 		networkPopup();
@@ -1090,71 +950,21 @@ function saveOpenstackInfo(){
 			privateKeyPath			: $(".w2ui-msg-body input[name='privateKeyPath']").val()
 			
 	}
-		
-	if( checkEmpty($(".w2ui-msg-body input[name='authUrl']").val() )){
-		w2alert("Identity API인증 링크를 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name='authUrl']").focus();
+	if(popupValidation()){
+		$.ajax({
+			type : "PUT",
+			url : "/bosh/saveOpenstackInfo",
+			contentType : "application/json",
+			async : true,
+			data : JSON.stringify(openstackInfo), 
+			success : function(data, status) {
+				keyPathFileUpload();
+			},
+			error : function( e, status ) {
+				w2alert("오픈스택 정보 등록 실패하였습니다.", "BOSH 설치");
+			}
 		});
-		return;
 	}
-	
-	if( checkEmpty($(".w2ui-msg-body input[name='tenant']").val() )){
-		w2alert("Tenant을 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name='tenant']").focus();
-		});
-		return;
-	}
-
-	if( checkEmpty($(".w2ui-msg-body input[name='userName']").val() )){
-		w2alert("계정명을 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name='userName']").focus();
-		});
-		return;
-	}
-
-	if( checkEmpty($(".w2ui-msg-body input[name='apiKey']").val() )){
-		w2alert("계정 비밀번호를 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name='apiKey']").focus();
-		});
-		return;
-	}
-	
-	if( checkEmpty($(".w2ui-msg-body input[name='defaultSecurityGroups']").val() )){
-		w2alert("Security Group를 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name='defaultSecurityGroups']").focus();
-		});
-		return;
-	}
-
-	if( checkEmpty($(".w2ui-msg-body input[name='privateKeyName']").val() )){
-		w2alert("Key Pair명을 입력하세요.", "", function(){
-			$(".w2ui-msg-body input[name='privateKeyName']").focus();
-		});
-		return;
-	}
-			
-	if( $(".w2ui-msg-body input[name='keyPathFile']").val() != null){
-		var keyPathFile =  $(".w2ui-msg-body input[name='keyPathFile']").val().split('.').pop().toLowerCase();
-		
-		if($.inArray(keyPathFile, ['pem']) == -1) {
-			w2alert("Private Key 파일을 업로드 또는 목록에서 선택하세요.", "BOSH 설치");
-			return;
-		}
-	}
-	
-	$.ajax({
-		type : "PUT",
-		url : "/bosh/saveOpenstackInfo",
-		contentType : "application/json",
-		async : true,
-		data : JSON.stringify(openstackInfo), 
-		success : function(data, status) {
-			keyPathFileUpload();
-		},
-		error : function( e, status ) {
-			w2alert("오픈스택 정보 등록 실패하였습니다.", "BOSH 설치");
-		}
-	});
 }	
 	
 function saveOsBoshInfo(type){	
@@ -1164,44 +974,24 @@ function saveOsBoshInfo(type){
 			directorUuid 	: $(".w2ui-msg-body input[name='directorUuid']").val(),
 			releaseVersion	: $(".w2ui-msg-body input[name='releaseVersion']").val()
 	}
-	
 
 	if ( type == 'after') {
-		if( checkEmpty(boshInfo.deploymentName )){
-			w2alert("배포명을 입력하세요." , "" , function(){
-				$(".w2ui-msg-body input[name='deploymentName']").focus()
+		if(popupValidation()){
+			$.ajax({
+				type : "PUT",
+				url : "/bosh/saveOsBoshInfo",
+				contentType : "application/json",
+				async : true,
+				data : JSON.stringify(boshInfo), 
+				success : function(data, status) {
+					boshId = data.id;
+					osNetworkInfoPopup();
+				},
+				error : function( e, status ) {
+					w2alert("기본정보 등록 실패하였습니다.", "BOSH 설치");
+				}
 			});
-			return;
 		}
-		
-		if( checkEmpty(boshInfo.directorUuid )){
-			w2alert("설치관리자 UUID를 입력하세요.", "", function(){
-				$(".w2ui-msg-body input[name='directorUuid']").focus();
-			});
-			return;
-		}
-		
-		if( checkEmpty(boshInfo.releaseVersion )){
-			w2alert("BOSH 릴리즈를 선택하세요.", "", function(){
-				$(".w2ui-msg-body input[name='releaseVersion']").focus();
-			});
-			return;
-		}
-		
-		$.ajax({
-			type : "PUT",
-			url : "/bosh/saveOsBoshInfo",
-			contentType : "application/json",
-			async : true,
-			data : JSON.stringify(boshInfo), 
-			success : function(data, status) {
-				boshId = data.id;
-				osNetworkInfoPopup();
-			},
-			error : function( e, status ) {
-				w2alert("기본정보 등록 실패하였습니다.", "BOSH 설치");
-			}
-		});
 	}
 	else {
 		openstackPopup();
@@ -1243,67 +1033,21 @@ function saveOsNetworkInfo(type){
 	}
 	
 	if ( type == 'after' ) {
-		if ( checkEmpty(networkInfo.publicStaticIp)) {
-			w2alert("Floating IP를 입력하세요", "" , function(){
-				$(".w2ui-msg-body input[name='publicStaticIp']").focus();
+		if(popupValidation()){
+			$.ajax({
+				type : "PUT",
+				url : "/bosh/saveOsNetworkInfo",
+				contentType : "application/json",
+				async : true,
+				data : JSON.stringify(networkInfo), 
+				success : function(data, status) {
+					osResourceInfoPopup();
+				},
+				error : function( e, status ) {
+					w2alert("네트워크 정보 등록 실패하였습니다.", "BOSH 설치");
+				}
 			});
-			return;
 		}
-		
-		if( checkEmpty(networkInfo.subnetId)) {
-			w2alert("Subnet ID를 입력하세요.", "" , function() {
-				$(".w2ui-msg-body input[name='subnetId']").focus();
-			});
-			return;
-		}
-
-		if( checkEmpty(networkInfo.subnetStaticFrom)) {
-			w2alert("Static IP 구간을 입력하세요.(From)", "" , function() {
-				$(".w2ui-msg-body input[name='subnetStaticFrom']").focus();
-			});
-			return;
-		}
-		
-		if( checkEmpty(networkInfo.subnetStaticTo)) {
-			w2alert("Static IP 구간을 입력하세요.(To)", "" , function(){
-				$(".w2ui-msg-body input[name='subnetStaticTo']").focus();
-			});
-			return;
-		}
-
-		if( checkEmpty(networkInfo.subnetRange)){
-			w2alert("Subnet Range를 입력하세요.", "" , function(){
-				$(".w2ui-msg-body input[name='subnetRange']").focus();
-			});
-			return;
-		}
-		if( checkEmpty(networkInfo.subnetGateway)){
-			w2alert("Gateway IP를 입력하세요.", "" , function(){
-				$(".w2ui-msg-body input[name='subnetGateway']").focus();
-			});
-			return;
-		}
-		
-		if( checkEmpty(networkInfo.subnetDns)){
-			w2alert("DNS정보를 입력하세요.", "" , function(){
-				$(".w2ui-msg-body input[name='subnetDns']").focus();
-			});
-			return;
-		}
-		
-		$.ajax({
-			type : "PUT",
-			url : "/bosh/saveOsNetworkInfo",
-			contentType : "application/json",
-			async : true,
-			data : JSON.stringify(networkInfo), 
-			success : function(data, status) {
-				osResourceInfoPopup();
-			},
-			error : function( e, status ) {
-				w2alert("네트워크 정보 등록 실패하였습니다.", "BOSH 설치");
-			}
-		});
 	} else {
 		osBoshInfoPopup();
 	}
@@ -1341,40 +1085,22 @@ function saveOsResourceInfo(type){
 	}
 	
 	if ( type == 'after' ) {
-	
-		if( checkEmpty( stemcellInfo )){
-			w2alert("Stemcell을 선택하세요.");
-			return;
-		}
-		
-		if( checkEmpty(resourceInfo.cloudInstanceType )){
-			w2alert("인스턴스 유형을 입력하세요.", "", function(){
-				$(".w2ui-msg-body input[name='cloudInstanceType']").focus();
+		if( popupValidation()){
+			$.ajax({
+				type : "PUT",
+				url : "/bosh/saveOsResourceInfo",
+				contentType : "application/json",
+				async : true,
+				data : JSON.stringify(resourceInfo), 
+				success : function(data, status) {
+					deploymentFile = data.content.deploymentFile;
+					deployPopup();
+				},
+				error : function( e, status ) {
+					w2alert("리소스 정보 등록 실패하였습니다.", "BOSH 설치");
+				}
 			});
-			return;
 		}
-
-		if( checkEmpty(resourceInfo.boshPassword )){
-			w2alert("VM 인스턴스의 비밀번호를 입력하세요.", "", function(){
-				$(".w2ui-msg-body input[name='boshPassword']").focus();
-			});
-			return;
-		}
-
-		$.ajax({
-			type : "PUT",
-			url : "/bosh/saveOsResourceInfo",
-			contentType : "application/json",
-			async : true,
-			data : JSON.stringify(resourceInfo), 
-			success : function(data, status) {
-				deploymentFile = data.content.deploymentFile;
-				deployPopup();
-			},
-			error : function( e, status ) {
-				w2alert("리소스 정보 등록 실패하였습니다.", "BOSH 설치");
-			}
-		});
 	} else {
 		osNetworkInfoPopup();	
 	}
@@ -1489,40 +1215,40 @@ $( window ).resize(function() {
 			<div class="cont_title">▶ AWS정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Access Key ID</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Access Key ID</label>
 		            <div>
 		                <input name="accessKeyId" type="text"  style="float:left;width:330px;" tabindex="1" required placeholder="AWS Access Key를 입력하세요."/>
 		            </div>
 				</div>
 				
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Secret Access Key</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Secret Access Key</label>
 		            <div>
 		                <input name="secretAccessKey" type="text"  style="float:left;width:330px;" tabindex="2" required placeholder="AWS Secret Access Key를 입력하세요."/>
 		            </div>
 		        </div>
 
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Security Group</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Security Group</label>
 		            <div>
 		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:330px;" tabindex="3" required placeholder="시큐리티 그룹을 입력하세요."/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Region</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Region</label>
 		            <div>
 		                <input name="region" type="text"  style="float:left;width:330px;" tabindex="4" required placeholder="설치할 Region을 입력하세요.(예: us-east-1)"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Private Key Name</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Private Key Name</label>
 		            <div>
 		                <input name="privateKeyName" type="text"  style="float:left;width:330px;" tabindex="5" required placeholder="Key Pair 이름을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Private Key File</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Private Key File</label>
 	                <div >
   						<span onclick="changeKeyPathType('file');" style="width:200px;"><label><input type="radio" name="keyPathType" tabindex="6" value="file"/>&nbsp;파일 업로드</label></span>
 						&nbsp;&nbsp;
@@ -1532,7 +1258,7 @@ $( window ).resize(function() {
 		        
 		        <div class="w2ui-field">			         	
 	                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();"/>
-		            <label style="text-align: left;width:250px;font-size:11px;" class="control-label"></label>
+		            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
 					<div id="keyPathDiv" ></div>
 		        </div>
 		    </div>
@@ -1567,25 +1293,25 @@ $( window ).resize(function() {
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">배포명</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">배포명</label>
 		            <div>
 		                <input name="deploymentName" type="text"  style="float:left;width:330px;" tabindex="1" required placeholder="배포명을 입력하세요."/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">설치관리자 UUID</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">설치관리자 UUID</label>
 		            <div>
 		                <input name="directorUuid" type="text" style="float:left;width:330px;" tabindex="2" required placeholder="설치관리자 UUID입력하세요." disabled/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Elastic IP</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Elastic IP</label>
 		            <div>
 		                <input name="publicStaticIp" type="text"  style="float:left;width:330px;" tabindex="3" required placeholder="설치관리자에 할당할 Elastic IP를 입력하세요."/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">BOSH 릴리즈</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">BOSH 릴리즈</label>
 		            <div>
 		                <input name="releaseVersion" type="list" style="float:left;width:330px;" tabindex="4"/>
 		            </div>
@@ -1778,49 +1504,49 @@ $( window ).resize(function() {
 			<div class="cont_title">▶ 오픈스택정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">AUTH URL</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">AUTH URL</label>
 		            <div>
 		                <input name="authUrl" type="text"  style="float:left;width:330px;" tabindex="1" required placeholder="Identify API 인증 링크를 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Tenant</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Tenant</label>
 		            <div>
 		                <input name="tenant" type="text"  style="float:left;width:330px;" tabindex="2" required placeholder="Tenant명을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">User Name</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">User Name</label>
 		            <div>
 		                <input name="userName" type="text"  style="float:left;width:330px;" tabindex="3" required placeholder="계정명을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">API Key</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">API Key</label>
 		            <div>
 		                <input name="apiKey" type="text"  style="float:left;width:330px;" tabindex="4 required placeholder="계정 비밀번호를 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Security Group</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Security Group</label>
 		            <div>
 		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:330px;" tabindex="5" required placeholder="시큐리티 그룹을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Private Key Name</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Private Key Name</label>
 		            <div>
 		                <input name="privateKeyName" type="text"  style="float:left;width:330px;" tabindex="6" required placeholder="Key Pair명을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">Private Key Path</label>
+					font-size:11px;">Private Key Path</label>
 					<div >
 						<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" tabindex="7"/>&nbsp;파일업로드</label></span>
 						&nbsp;&nbsp;
@@ -1830,7 +1556,7 @@ $( window ).resize(function() {
 		        
 		        <div class="w2ui-field">			         	
 	                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();" />
-		            <label style="text-align: left;width:250px;font-size:11px;" class="control-label"></label>
+		            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
 					<div id="keyPathDiv" ></div>
 		        </div>
 		        
@@ -1861,21 +1587,24 @@ $( window ).resize(function() {
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<form id="osBoshForm">
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:250px;font-size:11px;">배포명</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">배포명</label>
 			            <div>
 			                <input name="deploymentName" type="text"  style="float:left;width:330px;" tabindex="1"  required placeholder="배포명을 입력하세요."/>
+			                <div class="isMessage"></div>
 			            </div>
 			        </div>
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:250px;font-size:11px;">설치관리자 UUID</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">설치관리자 UUID</label>
 			            <div>
 			                <input name="directorUuid" type="text"  style="float:left;width:330px;" tabindex="2"  required placeholder="설치관리자 UUID입력하세요." disabled/>
+			                <div class="isMessage"></div>
 			            </div>
 			        </div>
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:250px;font-size:11px;">BOSH 릴리즈</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">BOSH 릴리즈</label>
 			            <div>
-			                <input name="releaseVersion" type="text"  style="float:left;width:330px;" tabindex="3"  />
+			                <input name="releaseVersion" type="list"  style="float:left;width:330px;" tabindex="3"  required placeholder="설치관리자 UUID입력하세요." />
+			                <div class="isMessage"></div>
 			            </div>
 			        </div>
 		        </form>
@@ -1907,21 +1636,23 @@ $( window ).resize(function() {
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Subnet ID</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Subnet ID</label>
 		            <div>
 		                <input name="subnetId" type="text"  style="float:left;width:330px;" tabindex="1" required placeholder="Subnet ID를 입력하세요."/>
+		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 				<div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Floating IP</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Floating IP</label>
 		            <div>
 		                <input name="publicStaticIp" type="text"  style="float:left;width:330px;" tabindex="2" required placeholder="설치관리자에 할당할 Floating IP를 입력하세요."/>
+		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 		        
 		    
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Static IP</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Static IP</label>
 		            <div>
 		                <div>
 							<div style="display:inline-block;">
@@ -1934,23 +1665,26 @@ $( window ).resize(function() {
 		        </div>
 
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Subnet Range(CIDR)</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Subnet Range(CIDR)</label>
 		            <div>
 		                <input name="subnetRange" type="text"  style="float:left;width:330px;" tabindex="5" required placeholder="예) 10.0.0.0/24"/>
+		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Gateway IP</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Gateway IP</label>
 		            <div>
 		                <input name="subnetGateway" type="text"  style="float:left;width:330px;" tabindex="6" required placeholder="예) 10.0.0.1"/>
+		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">DNS</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">DNS</label>
 		            <div>
 		                <input name="subnetDns" type="text"  style="float:left;width:330px;" tabindex="7" required placeholder="예) 8.8.8.8"/>
+		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 		        
@@ -1981,21 +1715,21 @@ $( window ).resize(function() {
 			<div class="cont_title">▶ 리소스정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 				 <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Stemcell</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Stemcell</label>
 		            <div>
 						<div><input type="list" name="stemcells" style="float: left;width:330px;margin-top:1.5px;" tabindex="1" required placeholder="스템셀을 선택하세요."></div>
 						<div class="isMessage"></div>
 					</div>
 				</div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">Instance Type</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">Instance Type</label>
 		            <div>
 		                <input name="cloudInstanceType" type="text"  style="float:left;width:330px;"  tabindex="2" required  placeholder="인스턴스 유형을 입력하세요."/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:250px;font-size:11px;">VM Password</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">VM Password</label>
 		            <div>
 		                <input name="boshPassword" type="text"  style="float:left;width:330px;" tabindex="3" required  placeholder="VM인스턴스의 비밀번호를 입력하세요."/>
 		                <div class="isMessage"></div>
