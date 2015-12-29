@@ -7,6 +7,7 @@ function getDefaultDirector(url) {
 		url: url,
 		async : false,
 		error: function(request, status, error) {
+			console.log(request.responseText);
 			var errorResult = JSON.parse(request.responseText);
 			w2alert(errorResult.message, "알림");
 			isOk = false;

@@ -84,12 +84,12 @@ public class IEDADirectorConfigService {
 			info = mapper.readValue(get.getResponseBodyAsString(), Info.class);
 		} catch (ResourceAccessException e) {
 			e.printStackTrace();
-			throw new IEDACommonException("notfound.director.exception", "["
-					+ directorUrl + "] 디렉터를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+/*			throw new IEDACommonException("notfound.director.exception", "["
+					+ directorUrl + "] 디렉터를 찾을 수 없습니다.", HttpStatus.NOT_FOUND); */
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new IEDACommonException("notfound.director.exception",
-					"요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
+/*			throw new IEDACommonException("notfound.director.exception",
+					"요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);*/
 		}
 		
 		return info;

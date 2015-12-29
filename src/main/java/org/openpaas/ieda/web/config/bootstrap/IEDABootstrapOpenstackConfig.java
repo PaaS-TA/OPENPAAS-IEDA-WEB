@@ -53,4 +53,5 @@ public class IEDABootstrapOpenstackConfig {
 	
 	private String deploymentFile;
 	private String deployStatus;
+	private String deployLog;
 }

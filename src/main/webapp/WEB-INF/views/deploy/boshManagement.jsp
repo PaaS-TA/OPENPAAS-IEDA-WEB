@@ -303,7 +303,7 @@ function deleteBoshPop(record){
 			onOpen : function(event){
 				event.onComplete = function(){
 					var socket = new SockJS('/boshDelete');
-					deleteClient = Stomp.over(socket); 
+					var deleteClient = Stomp.over(socket); 
 					deleteClient.connect({}, function(frame) {
 						deleteClient.subscribe('/bosh/boshDelete', function(data){
 							
@@ -327,7 +327,7 @@ function deleteBoshPop(record){
 				        	}
 				        	
 				        });
-						deleteClient.send('/bosh/boshDelete', {}, JSON.stringify(requestParameter));
+						deleteClient.send('/send/boshDelete', {}, JSON.stringify(requestParameter));
 				    });
 				}
 			},

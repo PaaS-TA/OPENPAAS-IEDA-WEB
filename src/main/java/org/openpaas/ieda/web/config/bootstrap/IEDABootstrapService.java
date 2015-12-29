@@ -53,18 +53,28 @@ public class IEDABootstrapService {
 				BootstrapListDto dto = new BootstrapListDto();
 				dto.setRecid(recid++);
 				dto.setId(config.getId());
+				
+				dto.setDeployStatus(config.getDeployStatus());
+				dto.setDeploymentName(config.getDeploymentName());
+				dto.setDirectorName(config.getDirectorName());
 				dto.setIaas("AWS");
+				dto.setBoshRelease(config.getBoshRelease());
+				dto.setBoshCpiRelease(config.getBoshCpiRelease());
+				dto.setSubnetId(config.getSubnetId());
+				dto.setSubnetRange(config.getSubnetRange());
+				dto.setPublicStaticIp(config.getPublicStaticIp());
+				dto.setPrivateStaticIp(config.getPrivateStaticIp());
+				dto.setSubnetGateway(config.getSubnetGateway());
+				dto.setSubnetDns(config.getSubnetDns());
+				dto.setNtp(config.getNtp());
+				dto.setStemcell(config.getStemcell());
+				dto.setInstanceType(config.getCloudInstanceType());
+				dto.setBoshPassword(config.getBoshPassword());
+				dto.setDeploymentFile(config.getDeploymentFile());
+				dto.setDeployLog(config.getDeployLog());
+				
 				dto.setCreatedDate(config.getCreatedDate());
 				dto.setUpdatedDate(config.getUpdatedDate());
-				
-				dto.setDeploymentName(config.getDeploymentName());;
-				dto.setDirectorName(config.getDirectorName());;
-				dto.setBoshRelease(config.getBoshRelease());;
-				dto.setBoshCpiRelease(config.getBoshCpiRelease());;
-				dto.setSubnetId(config.getSubnetId());;
-				dto.setPrivateStaticIp(config.getPrivateStaticIp());
-				dto.setPublicStaticIp(config.getPublicStaticIp());;
-				dto.setDeployStatus(config.getDeployStatus());
 				
 				listDtos.add(dto);
 			}
@@ -75,18 +85,29 @@ public class IEDABootstrapService {
 				BootstrapListDto dto = new BootstrapListDto();
 				dto.setRecid(recid++);
 				dto.setId(config.getId());
+				
+				dto.setDeployStatus(config.getDeployStatus());
+				dto.setDeploymentName(config.getDeploymentName());
+				dto.setDirectorName(config.getDirectorName());
 				dto.setIaas("OPENSTACK");
+				dto.setBoshRelease(config.getBoshRelease());
+				dto.setBoshCpiRelease(config.getBoshCpiRelease());
+				dto.setSubnetId(config.getSubnetId());
+				dto.setSubnetRange(config.getSubnetRange());
+				dto.setPublicStaticIp(config.getPublicStaticIp());
+				dto.setPrivateStaticIp(config.getPrivateStaticIp());
+				dto.setSubnetGateway(config.getSubnetGateway());
+				dto.setSubnetDns(config.getSubnetDns());
+				dto.setNtp(config.getNtp());
+				dto.setStemcell(config.getStemcell());
+				dto.setInstanceType(config.getCloudInstanceType());
+				dto.setBoshPassword(config.getBoshPassword());
+				dto.setDeploymentFile(config.getDeploymentFile());
+				dto.setDeployLog(config.getDeployLog());
+				
 				dto.setCreatedDate(config.getCreatedDate());
 				dto.setUpdatedDate(config.getUpdatedDate());
-				
-				dto.setDeploymentName(config.getDeploymentName());;
-				dto.setDirectorName(config.getDirectorName());;
-				dto.setBoshRelease(config.getBoshRelease());;
-				dto.setBoshCpiRelease(config.getBoshCpiRelease());;
-				dto.setSubnetId(config.getSubnetId());;
-				dto.setPrivateStaticIp(config.getPrivateStaticIp());
-				dto.setPublicStaticIp(config.getPublicStaticIp());;
-				dto.setDeployStatus(config.getDeployStatus());
+
 				
 				listDtos.add(dto);
 			}
@@ -217,10 +238,10 @@ public class IEDABootstrapService {
 	}
 	
 	public String setSpiffMerge(String iaas, Integer id, String stubFileName, String settingFileName) {
-		String deploymentFileName = iaas.toLowerCase() +"-microbosh-merge-"+id+".yml";		
+		String deploymentFileName = iaas.toLowerCase() +"-microbosh-"+id+".yml";		
 		String templateFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName;
 		String parameterFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName;
-		String deploymentPath= LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
+		String targetFile= LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
 		
 		File stubFile = null;
 		File settingFile = null;
@@ -233,11 +254,8 @@ public class IEDABootstrapService {
 			stubFile = new File(templateFile);
 			settingFile = new File(parameterFile);
 			
-			deploymentFileName =  (iaas == "AWS") ? "aws-microbosh-merge-"+id+".yml"
-					:"openstack-microbosh-merge-"+id+".yml";
-			
 			if(stubFile.exists() && settingFile.exists()){
-				command = "spiff merge " + templateFile + " " + parameterFile;;
+				command = "spiff merge " + templateFile + " " + parameterFile;
 				
 				Process process = r.exec(command);
 
@@ -247,10 +265,9 @@ public class IEDABootstrapService {
 				String deloymentContent = "";
 				while ((info = bufferedReader.readLine()) != null){
 					deloymentContent += info + "\n";
-					log.info("=== Deployment File Merge \n"+ info );
 				}
 				
-				IOUtils.write(deloymentContent, new FileOutputStream(deploymentPath), "UTF-8");
+				IOUtils.write(deloymentContent, new FileOutputStream(targetFile), "UTF-8");
 			}
 			else{
 				throw new IEDACommonException("illigalArgument.bootstrap.exception",

@@ -122,27 +122,32 @@ public class BootstrapController extends BaseController {
 	@MessageMapping("/bootstrapDelete")
 	@SendTo("/bootstrap/bootstrapDelete")
 	public ResponseEntity deleteBootstrap(@RequestBody @Valid BootStrapDto.Delete dto){
+		log.info("### deleteBootstrap async");
 		bootstrapDeleteDeployAsyncService.deleteDeployAsync(dto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@RequestMapping( value="/bootstrap/delete", method=RequestMethod.PUT)
 	public ResponseEntity deleteJustOnlyBootstrapRecord(@RequestBody @Valid BootStrapDto.Delete dto){
+		log.info("### deleteBootstrap");
 		bootstrapService.deleteBootstrapInfoRecord(dto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/bootstrap/setOsBoshInfo", method=RequestMethod.PUT)
-	public ResponseEntity doOpenstackBoshInfoSave(@RequestBody @Valid BootStrapDto.OpenstackDefault dto){
-		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackDefaultInfoSave(dto);
-		return new ResponseEntity(config, HttpStatus.OK);
-	}
 		
 	@RequestMapping(value="/bootstrap/setOpenstackInfo", method=RequestMethod.PUT)
 	public ResponseEntity doOpenstackInfoSave(@RequestBody @Valid BootStrapDto.OpenStack dto){
 		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackInfoSave(dto);
 		return new ResponseEntity(config, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value="/bootstrap/setOsBoshInfo", method=RequestMethod.PUT)
+	public ResponseEntity doOpenstackBoshInfoSave(@RequestBody @Valid BootStrapDto.OpenstackDefault dto){
+		log.info("# OpenStack Default : " + dto.toString());
+		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackDefaultInfoSave(dto);
+		return new ResponseEntity(config, HttpStatus.OK);
+	}
+
 	
 	@RequestMapping(value="/bootstrap/setOsNetworkInfo", method=RequestMethod.PUT)
 	public ResponseEntity doOpenstackNetworkInfoSave(@RequestBody @Valid BootStrapDto.OpenstackNetwork dto){

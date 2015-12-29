@@ -6,9 +6,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
+import org.openpaas.ieda.api.Info;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
+import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -21,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class BoostrapDeployAsyncService {
 
-
 	@Autowired
 	private IEDABootstrapAwsRepository awsRepository;
 
@@ -31,6 +32,9 @@ public class BoostrapDeployAsyncService {
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 	
+	@Autowired
+	private IEDADirectorConfigService directorConfigService;
+	
 	final private String messageEndpoint = "/bootstrap/bootstrapInstall"; 
 	
 	public void deploy(BootStrapDto.Install dto) {
@@ -38,14 +42,21 @@ public class BoostrapDeployAsyncService {
 		IEDABootstrapAwsConfig aws = null;
 		IEDABootstrapOpenstackConfig openstack = null;
 		String deploymentFileName = null;
+		String publicIp = "";
 		
 		if( "AWS".equals(dto.getIaas())) { 
 			aws = awsRepository.findOne(Integer.parseInt(dto.getId()));
-			if ( aws != null ) deploymentFileName = aws.getDeploymentFile();
+			if ( aws != null ) {
+				publicIp = aws.getPublicStaticIp();
+				deploymentFileName = aws.getDeploymentFile();
+			}
 
 		} else {
 			openstack = openstackRepository.findOne(Integer.parseInt(dto.getId()));
-			if ( openstack != null ) deploymentFileName = openstack.getDeploymentFile();
+			if ( openstack != null ) {
+				publicIp = openstack.getPublicStaticIp();
+				deploymentFileName = openstack.getDeploymentFile();
+			}
 		}
 			
 		if ( deploymentFileName == null || deploymentFileName.isEmpty() ) {
@@ -53,17 +64,9 @@ public class BoostrapDeployAsyncService {
 					"배포파일 정보가 존재하지 않습니다..", HttpStatus.NOT_FOUND);
 		}
 		
-		if ( aws != null ) {
-			aws.setDeployStatus("deploying");
-			awsRepository.save(aws);
-		}
-		
-		if ( openstack != null ) {
-			openstack.setDeployStatus("deploying");
-			openstackRepository.save(openstack);
-		}
-		
-		String status = "";
+		String status = "started";
+		String accumulatedLog = "";
+		String resultMessage = "";
 		Runtime r = Runtime.getRuntime();
 		File deploymentFile = null;
 		InputStream inputStream = null;
@@ -75,38 +78,79 @@ public class BoostrapDeployAsyncService {
 			String command = "";
 			deploymentFile = new File(deployFile);
 			
-			if( deploymentFile.exists() ){
+			if( deploymentFile.exists() ) {
 				command += "bosh-init deploy " + deployFile;
 				Process process = r.exec(command);
+				
+				status = "deploying";
+				saveAWSDeployStatus(aws, status);
+				saveOpenstackDeployStatus(openstack, status);
 				
 				inputStream = process.getInputStream();
 				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 				String info = null;
-				String deloymentContent = "";
+				
 				while ((info = bufferedReader.readLine()) != null){
-					deloymentContent += info + "\n";
-					log.info("=== Deployment File Merge \n"+ info );
+					accumulatedLog += info + "\n";
 					DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "started", Arrays.asList(info));
 				}
 			}
+			else {
+				status = "error";
+				resultMessage = "설치할 배포 파일(" + deployFile + ")이 존재하지 않습니다.";
+			}
+			
+			
+			if ( aws != null ) aws.setDeployLog(accumulatedLog);
+			if ( openstack != null ) openstack.setDeployLog(accumulatedLog);
+			
+			if ( status.equals("error") ) {
+				saveAWSDeployStatus(aws, status);
+				saveOpenstackDeployStatus(openstack, status);
+				DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList(resultMessage));
+			} else {
+
+				// 타겟 테스트
+				DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "started", Arrays.asList("","BOOTSTRAP 디렉터 정보 : https://" + publicIp + ":25555"));
+				
+				DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "started", Arrays.asList("BOOTSTRAP 디렉터 타겟 접속 테스트..."));
+				
+				Info info = directorConfigService.getDirectorInfo(publicIp, 25555, "admin", "admin");
+				if ( info == null ) {
+					status = "error";
+					saveAWSDeployStatus(aws, status);
+					saveOpenstackDeployStatus(openstack, status);
+					DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("디렉터 타겟 접속 테스트 실패"));
+				} else {
+					DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "started", Arrays.asList("디렉터 타겟 접속 테스트 성공"));
+					status = "done";
+					saveAWSDeployStatus(aws, status);
+					saveOpenstackDeployStatus(openstack, status);
+					DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "done", Arrays.asList("BOOTSTRAP 설치가 완료되었습니다."));
+				}
+			}
+			
 		} catch ( Exception e) {
 			status = "error";
 			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("배포 중 Exception이 발생하였습니다."));
-		} finally {
-
-		}
-		
-		log.info("### Deploy Status = " + status);
-		
-		if ( aws != null ) {
-			aws.setDeployStatus(status);
-			awsRepository.save(aws);
-		}
-		if ( openstack != null ) {
-			openstack.setDeployStatus(status);
-			openstackRepository.save(openstack);
+			if ( aws != null ) aws.setDeployLog(accumulatedLog);
+			if ( openstack != null ) openstack.setDeployLog(accumulatedLog);
+			saveAWSDeployStatus(aws, status);
+			saveOpenstackDeployStatus(openstack, status);
 		}
 
+	}
+	
+	public IEDABootstrapAwsConfig saveAWSDeployStatus(IEDABootstrapAwsConfig aws, String status) {
+		if ( aws == null ) return null;
+		aws.setDeployStatus(status);
+		return awsRepository.save(aws);
+	}
+	
+	public IEDABootstrapOpenstackConfig saveOpenstackDeployStatus(IEDABootstrapOpenstackConfig openstack, String status) {
+		if ( openstack == null ) return null;
+		openstack.setDeployStatus(status);
+		return openstackRepository.save(openstack);
 	}
 
 	@Async

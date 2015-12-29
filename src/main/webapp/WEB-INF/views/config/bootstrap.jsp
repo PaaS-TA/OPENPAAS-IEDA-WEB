@@ -48,7 +48,6 @@ var deployInfo = "";
 var deployFileName = "";
 var installClient = "";
 var deleteClient = "";
-
 //private AWS variable
 var awsInfo = "";
 //private AWS variable
@@ -73,14 +72,42 @@ $(function() {
 		columns:[
 		      {field: 'recid', 	caption: 'recid', hidden: true}
 			, {field: 'id', caption: 'ID', hidden: true}
-			, {field: 'deploymentName', caption: '배포명', size: '100px'}
-			, {field: 'directorName', caption: '디렉터 명', size: '100px'}
+			, {field: 'deployStatus', caption: '배포상태', size: '80px', 
+				render: function(record) {
+		    			if ( record.deployStatus == 'done' )
+		    				return '<span class="btn btn-primary" style="width:60px">성공</span>';
+		    			else	if ( record.deployStatus == 'error' )
+		    				return '<span class="btn btn-danger" style="width:60px">오류</span>';
+		    			else	if ( record.deployStatus == 'cancelled' )
+		    				return '<span class="btn btn-danger" style="width:60px">취소</span>';
+		    			else	if ( record.deployStatus == 'deploying' )
+		    				return '<span class="btn btn-primary" style="width:60px">배포중</span>';
+		    			else	if ( record.deployStatus == 'deleteing' )
+		    				return '<span class="btn btn-primary" style="width:60px">삭제중</span>';
+						else
+		    				return 'N/A';
+		    	   }
+				}
+			, {field: 'deployLog', caption: '배포로그', size: '100px'}
+			, {field: 'deploymentName', caption: '배포명', size: '120px'}
+			, {field: 'directorName', caption: '디렉터명', size: '100px'}
 			, {field: 'iaas', caption: 'IaaS', size: '100px'}
 			, {field: 'boshRelease', caption: 'BOSH 릴리즈', size: '100px'}
-			, {field: 'boshCpiRelease', caption: 'BOSH CPI 릴리즈', size: '150px'}
+			, {field: 'boshCpiRelease', caption: 'BOSH CPI 릴리즈', size: '200px'}
 			, {field: 'subnetId', caption: '서브넷 ID', size: '100px'}
-			, {field: 'privateStaticIp', caption: 'PRIVATE STATIC IP', size: '100px'}
-			, {field: 'publicStaticIp', caption: 'PUBLIC STATIC IP', size: '100px'}
+			, {field: 'subnetRange', caption: '서브넷 범위', size: '100px'}
+			, {field: 'publicStaticIp', caption: '디렉터 공인 IP', size: '100px'}
+			, {field: 'privateStaticIp', caption: '디렉터 내부 IP', size: '100px'}
+			, {field: 'subnetGateway', caption: '게이트웨이', size: '100px'}
+			, {field: 'subnetDns', caption: 'DNS', size: '100px'}
+			, {field: 'ntp', caption: 'NTP', size: '100px'}
+			, {field: 'stemcell', caption: '스템셀', size: '320px'}
+			, {field: 'instanceType', caption: '인스턴스 유형', size: '100px'}
+			, {field: 'boshPassword', caption: '비밀번호', size: '100px'}
+			, {field: 'deploymentFile', caption: '배포파일', size: '150px'}
+			, {field: 'createdDate', caption: '생성일자', size: '100px'}
+			, {field: 'updatedDate', caption: '수정일자', size: '100px'}
+			
 			],
 		onClick:function(event) {
 			var grid = this;
@@ -319,7 +346,7 @@ function setOpenstackData(contents){
 //BOOTSTRAP 삭제 실행
 function deletePop(record){
 	
-	var requestParameter = {iaas:record.iaas, id:record.id};
+	var requestParameter = { id:record.id,iaas:record.iaas};
 	
 	if ( record.deployStatus == null || record.deployStatus == '' ) {
 		// 단순 레코드 삭제
@@ -339,56 +366,55 @@ function deletePop(record){
 		});
 		
 	} else {
-		var message = "";
+		
+		var message = "BOOTSTRAP";
 		var body = '<textarea id="deleteLogs" style="width:95%;height:90%;overflow-y:visible;resize:none;background-color: #FFF; margin:2%" readonly="readonly"></textarea>';
 		
 		w2popup.open({
-			width : 610,
-			height : 500,
-			title : "<b>BOOTSTRAP 삭제</b>",
-			body  : body,
+			width   : 610,
+			height  : 500,
+			title   : "<b>BOOTSTRAP 삭제</b>",
+			body    : body,
 			buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="popupComplete();;">닫기</button>',
+			modal   : true,
 			showMax : true,
-			onOpen : function(event){
+			onOpen  : function(event){
 				event.onComplete = function(){
 					var socket = new SockJS('/bootstrapDelete');
-					deleteClient = Stomp.over(socket); 
-					deleteClient.connect({}, function(frame) {
+					deleteClient = Stomp.over(socket);
+ 					deleteClient.connect({}, function(frame) {
 						deleteClient.subscribe('/bootstrap/bootstrapDelete', function(data){
 							
 				        	var deleteLogs = $(".w2ui-msg-body #deleteLogs");
-				        	
 				        	var response = JSON.parse(data.body);
 				        	
 				        	if ( response.messages != null ) {
 						       	for ( var i=0; i < response.messages.length; i++) {
 						       		deleteLogs.append(response.messages[i] + "\n").scrollTop( deleteLogs[0].scrollHeight );
 						       	}
-						       	
+
 						       	if ( response.state.toLowerCase() != "started" ) {
 						            if ( response.state.toLowerCase() == "done" )	message = message + " 삭제가 완료되었습니다."; 
 						    		if ( response.state.toLowerCase() == "error" ) message = message + " 삭제 중 오류가 발생하였습니다.";
 						    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 삭제 중 취소되었습니다.";
-						    			
+						    		
 						    		deleteClient.disconnect();
-									w2alert(message, "BOSH 삭제");
+									w2alert(message, "BOOTSTRAP 삭제");
 						       	}
 				        	}
-				        	
 				        });
-						deleteClient.send('/bootstrap/bootstrapDelete', {}, JSON.stringify(requestParameter));
+						deleteClient.send('/send/bootstrapDelete', {}, JSON.stringify(requestParameter));
 				    });
 				}
 			},
 			onClose : function (event){
 				event.onComplete= function(){
-					$("textarea").text("");
 					w2ui['config_bootstrapGrid'].reset();
-					deleteClient.disconnect();
+					//deleteClient.disconnect();
 					deleteClient = "";
 					doSearch();
 				}
-			}
+			} 
 		});
 	}		
 }
@@ -445,7 +471,7 @@ function awsPopup(){
 	$("#awsDiv").w2popup({
 		width : 670,
 		height : 580,
-		onClose : initSetting,
+		onClose : popupClose,
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
@@ -603,7 +629,7 @@ function awsDefaultPopup(){
 		width : 670,
 		height : 420,
 		modal	: true,
-		onClose : initSetting,
+		onClose : popupClose,
 		onOpen : function(event){
 			event.onComplete = function(){
 				$('#w2ui-popup input[type=list][name=boshRelease]').w2field('list', { items: boshReleases , maxDropHeight:300, width:400});
@@ -749,7 +775,7 @@ function awsNetworkPopup(){
 		width : 670,
 		height : 600,
 		modal	: true,
-		onClose : initSetting,
+		onClose : popupClose,
 		onOpen : function(event){
 			event.onComplete = function(){
 				if( networkInfo != ""){
@@ -889,7 +915,7 @@ function deployPopup(){
 		height 	: 500,
 		modal	: true,
 		showMax : true,
-		onClose : initSetting,
+		onClose : popupClose,
 		onOpen : function(event){
 			event.onComplete = function(){
 				getDeployInfo();
@@ -926,7 +952,7 @@ function confirmDeploy(type){
 	//Confirm 설치하시겠습니까?
 	if(type == 'after'){		
 		w2confirm({
-			msg			: "설치하시겠습니까?",
+			msg			: "BOOTSTRAP을 설치하시겠습니까?",
 			title		: w2utils.lang('BOOTSTRAP 설치'),
 			yes_text	: "예",
 			no_text		: "아니오",
@@ -943,7 +969,7 @@ function confirmDeploy(type){
 var bootstrapInstallSocket = null;
 function installPopup(){
 	var installDiv = (iaas == 'AWS') ? $("#installDiv") : $("#osInstallDiv");
-	var message = "BOOTSTRAP(배포명:" + deployFileName +  ") ";
+	var message = "BOOTSTRAP ";
 	
 	var requestParameter = {
 			id : bootstrapId,
@@ -954,7 +980,7 @@ function installPopup(){
 		width : 670,
 		height : 490,
 		modal	: true,
-		showMax : true,
+		showMax : true,		
 		onOpen : function(event){
 			event.onComplete = function(){
 				if(bootstrapInstallSocket != null) bootstrapInstallSocket = null;
@@ -966,9 +992,10 @@ function installPopup(){
 					console.log('Connected Frame : ' + frame);
 			        installClient.subscribe('/bootstrap/bootstrapInstall', function(data){
 						var installLogs = $(".w2ui-msg-body #installLogs");
-			        	
-						installLogs.append(data.body+ "\n").scrollTop( installLogs[0].scrollHeight );
+						
 			        	var response = JSON.parse(data.body);
+			        	
+			        	console.log(response.messages);
 			        	
 			        	if ( response.messages != null ) {
 					       	for ( var i=0; i < response.messages.length; i++) {
@@ -979,9 +1006,11 @@ function installPopup(){
 					            if ( response.state.toLowerCase() == "done" )	message = message + " 설치가 완료되었습니다."; 
 					    		if ( response.state.toLowerCase() == "error" ) message = message + " 설치 중 오류가 발생하였습니다.";
 					    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 설치 중 취소되었습니다.";
+					    		
+					    		$('.w2ui-msg-buttons #deployPopupBtn').prop("disabled", false);
 					    			
 					    		installClient.disconnect();
-								w2alert(message, "BOOTSRAP 설치");
+								w2alert(message, "BOOTSTRAP 설치");
 					       	}
 			        	}
 			        });
@@ -989,7 +1018,14 @@ function installPopup(){
 			    });
 			}
 		},
-		onClose : initSetting
+		onClose : function(event){
+			event.onComplete = function(){
+				w2ui['config_bootstrapGrid'].reset();
+				//installClient.disconnect();
+				installClient = "";
+				doSearch();
+			}
+		}
 	});
 }
 
@@ -1006,17 +1042,29 @@ function initSetting(){
 	deleteClient = "";
 }
 
-function uploadStemcell(){
-	$("#stemcellUpload").click();
+function popupClose() {
+	//params init
+	initSetting();
+	//grid Reload
+	gridReload();
 }
 
 function popupComplete(){
-	//params init
-	initSetting();
-	//popup.close
-	w2popup.close();
-	//grid Reload
-	gridReload();
+	
+	w2confirm({
+		title 	: $(".w2ui-msg-title b").text(),
+		msg		: $(".w2ui-msg-title b").text() + " 화면을 닫으시겠습니까?<BR>(닫은 후에도 완료되지 않는 설치 또는 삭제 작업은 계속 진행됩니다.)",
+		yes_text: "확인",
+		yes_callBack : function(envent){
+			//params init
+			initSetting();
+			//popup.close
+			w2popup.close();
+			//grid Reload
+			gridReload();
+		},
+		no_text : "취소"
+	});
 }
 
 function setPrivateKeyPath(value){
@@ -1033,11 +1081,69 @@ function setPrivateKeyPathFileName(fileInput){
 /**
  * OPENSTACK script
  */
+
+// Openstack Info Popup
+function openstackPopup(){
+	$("#openstackInfoDiv").w2popup({
+		width : 670,
+		height : 600,
+		onClose : popupClose,
+		modal	: true,
+		onOpen:function(event){
+			event.onComplete = function(){				
+				if(openstackInfo != ""){
+					$(".w2ui-msg-body input[name='authUrl']").val(openstackInfo.authUrl);
+					$(".w2ui-msg-body input[name='tenant']").val(openstackInfo.tenant);
+					$(".w2ui-msg-body input[name='userName']").val(openstackInfo.userName);
+					$(".w2ui-msg-body input[name='apiKey']").val(openstackInfo.apiKey);
+					$(".w2ui-msg-body input[name='defaultSecurityGroups']").val(openstackInfo.defaultSecurityGroups);
+					$(".w2ui-msg-body input[name='privateKeyName']").val(openstackInfo.privateKeyName);
+					//keyList
+					$(".w2ui-msg-body input[name='privateKeyPath']").val(openstackInfo.privateKeyPath);
+				}
+				getKeyPathFileList();
+			}
+		}
+	});	
+}
+
+function saveOpenstackInfo(){
+	openstackInfo = {
+			id						: bootstrapId,
+			authUrl					: $(".w2ui-msg-body input[name='authUrl']").val(),
+			tenant					: $(".w2ui-msg-body input[name='tenant']").val(),
+			userName				: $(".w2ui-msg-body input[name='userName']").val(),
+			apiKey					: $(".w2ui-msg-body input[name='apiKey']").val(),
+			defaultSecurityGroups	: $(".w2ui-msg-body input[name='defaultSecurityGroups']").val(),
+			privateKeyName			: $(".w2ui-msg-body input[name='privateKeyName']").val(),
+			privateKeyPath			: $(".w2ui-msg-body input[name='privateKeyPath']").val(),
+	}
+	
+	if(popupValidation()){		
+		//SAVE
+		$.ajax({
+			type : "PUT",
+			url : "/bootstrap/setOpenstackInfo",
+			contentType : "application/json",
+			async : true,
+			data : JSON.stringify(openstackInfo),
+			success : function(data, status) {
+				bootstrapId = data.id;
+				osBoshInfoPop();
+			},
+			error : function( e, status ) {
+				console.log(e + "status ::: " + status);
+				w2alert("OPENSTACK 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
+			}
+		});
+	}
+}
+
 function osBoshInfoPop(){
 	$("#osBoshInfoDiv").w2popup({
 		width : 670,
 		height : 430,
-		onClose : initSetting,
+		onClose : popupClose,
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
@@ -1090,69 +1196,13 @@ function saveOsBoshInfo(type){
 	}
 }
 
-// Openstack Info Popup
-function openstackPopup(){
-	$("#openstackInfoDiv").w2popup({
-		width : 670,
-		height : 600,
-		onClose : initSetting,
-		modal	: true,
-		onOpen:function(event){
-			event.onComplete = function(){				
-				if(openstackInfo != ""){
-					$(".w2ui-msg-body input[name='authUrl']").val(openstackInfo.authUrl);
-					$(".w2ui-msg-body input[name='tenant']").val(openstackInfo.tenant);
-					$(".w2ui-msg-body input[name='userName']").val(openstackInfo.userName);
-					$(".w2ui-msg-body input[name='apiKey']").val(openstackInfo.apiKey);
-					$(".w2ui-msg-body input[name='defaultSecurityGroups']").val(openstackInfo.defaultSecurityGroups);
-					$(".w2ui-msg-body input[name='privateKeyName']").val(openstackInfo.privateKeyName);
-					//keyList
-					$(".w2ui-msg-body input[name='privateKeyPath']").val(openstackInfo.privateKeyPath);
-				}
-				getKeyPathFileList();
-			}
-		}
-	});	
-}
-
-function saveOpenstackInfo(){
-	openstackInfo = {
-			id						: bootstrapId,
-			authUrl					: $(".w2ui-msg-body input[name='authUrl']").val(),
-			tenant					: $(".w2ui-msg-body input[name='tenant']").val(),
-			userName				: $(".w2ui-msg-body input[name='userName']").val(),
-			apiKey					: $(".w2ui-msg-body input[name='apiKey']").val(),
-			defaultSecurityGroups	: $(".w2ui-msg-body input[name='defaultSecurityGroups']").val(),
-			privateKeyName			: $(".w2ui-msg-body input[name='privateKeyName']").val(),
-			privateKeyPath			: $(".w2ui-msg-body input[name='privateKeyPath']").val(),
-	}
-	
-	if(popupValidation()){		
-		//SAVE
-		$.ajax({
-			type : "PUT",
-			url : "/bootstrap/setOpenstackInfo",
-			contentType : "application/json",
-			async : true,
-			data : JSON.stringify(openstackInfo),
-			success : function(data, status) {
-				//bootstrapId = data;
-				osBoshInfoPop();
-			},
-			error : function( e, status ) {
-				console.log(e + "status ::: " + status);
-				w2alert("OPENSTACK 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
-			}
-		});
-	}
-}
 
 // Openstack Network Info Popup
 function osNetworkInfoPopup(){
 	$("#osNetworkInfoDiv").w2popup({
 		width : 670,
 		height : 600,
-		onClose : initSetting,
+		onClose : popupClose,
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
@@ -1210,7 +1260,7 @@ function osResourceInfoPopup(){
 	$("#osResourceInfoDiv").w2popup({
 		width : 670,
 		height : 400,
-		onClose : initSetting,
+		onClose : popupClose,
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
@@ -1629,62 +1679,13 @@ function osDeployPopup(){
 <!-- End AWS Popup -->
 
 <!-- Start OPENSTACK POPUP  -->
-	<div id="osBoshInfoDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
-		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
-			<div style="margin-left:2%;">
-	            <ul class="progressStep_6" >
-		            <li class="pass">오픈스텍 설정</li>
-		            <li class="active">기본 설정</li>
-		            <li class="before">네트워크 정보</li>
-		            <li class="before">리소스 정보</li>		            
-		            <li class="before">배포 파일 정보</li>
-		            <li class="before">설치</li>
-	            </ul>
-	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 기본 정보</div>
-		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">배포명</label>
-					<div>
-						<input name="deploymentName" type="text"  style="float:left;width:60%;" tabindex="1" required placeholder="배포명을 입력하세요."/>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">디렉터 명</label>
-					<div>
-						<input name="directorName" type="text"  style="float:left;width:60%;" tabindex="2" required placeholder="디렉터 명을 입력하세요."/>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">BOSH 릴리즈</label>
-					<div>
-						<input name="boshRelease" type="list"  style="float:left;width:60%;" tabindex="3" required placeholder="BOSH 릴리즈를 선택하세요."/>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">BOSH CPI 릴리즈</label>
-					<div>
-						<input name="boshCpiRelease" type="list"  style="float:left;width:60%;" tabindex="4" required placeholder="BOSH CPI 릴리즈를 선택하세요."/>
-					</div>
-				</div>
-		    </div>
-			<br/>
-		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-		    	<button class="btn" style="float: left;" onclick="saveOsBoshInfo('before');">이전</button>
-		        <button class="btn" onclick="popupComplete();">취소</button>
-		        <button class="btn" style="float: right;padding-right:15%" onclick="saveOsBoshInfo('after');" tabindex="9">다음>></button>
-		    </div>
-		</div>
-	</div>
-	
 	<div id="openstackInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
 			<div style="margin-left:2%;">
 	            <ul class="progressStep_6" >
-		            <li class="active">오픈스텍 설정</li>
-		            <li class="before">기본 설정</li>
+		            <li class="active">오픈스텍 정보</li>
+		            <li class="before">기본 정보</li>
 		            <li class="before">네트워크 정보</li>
 		            <li class="before">리소스 정보</li>		            
 		            <li class="before">배포 파일 정보</li>
@@ -1739,9 +1740,9 @@ function osDeployPopup(){
 				<div class="w2ui-field">
 		            <label style="text-align: left;width:40%;font-size:11px;">Private Key File</label>
 	                <div >
-  						<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" tabindex="6"/>&nbsp;파일업로드</label></span>
+  						<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" tabindex="7"/>&nbsp;파일업로드</label></span>
 						&nbsp;&nbsp;
-						<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" tabindex="5"/>&nbsp;목록에서 선택</label></span>
+						<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" tabindex="8"/>&nbsp;목록에서 선택</label></span>
 					</div>
 		        </div>
 		        <div class="w2ui-field">			         	
@@ -1752,19 +1753,68 @@ function osDeployPopup(){
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="popupComplete();">취소</button>
+				<!-- <button class="btn" style="float: left;" onclick="popupComplete();">취소</button> -->
 				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOpenstackInfo();">다음>></button>
 		    </div>
 		</div>
 	</div>
+	
+	<div id="osBoshInfoDiv" style="width:100%;height:100%;" hidden="true">
+		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
+			<div style="margin-left:2%;">
+	            <ul class="progressStep_6" >
+		            <li class="pass">오픈스텍 정보</li>
+		            <li class="active">기본 정보</li>
+		            <li class="before">네트워크 정보</li>
+		            <li class="before">리소스 정보</li>		            
+		            <li class="before">배포 파일 정보</li>
+		            <li class="before">설치</li>
+	            </ul>
+	        </div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 기본 정보</div>
+		    <div class="w2ui-page page-0" style="padding-left:5%;">
+		    	<div class="w2ui-field">
+					<label style="text-align: left; width: 40%; font-size: 11px;">배포명</label>
+					<div>
+						<input name="deploymentName" type="text"  style="float:left;width:60%;" tabindex="1" required placeholder="배포명을 입력하세요."/>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align: left; width: 40%; font-size: 11px;">디렉터 명</label>
+					<div>
+						<input name="directorName" type="text"  style="float:left;width:60%;" tabindex="2" required placeholder="디렉터 명을 입력하세요."/>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align: left; width: 40%; font-size: 11px;">BOSH 릴리즈</label>
+					<div>
+						<input name="boshRelease" type="list"  style="float:left;width:60%;" tabindex="3" required placeholder="BOSH 릴리즈를 선택하세요."/>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align: left; width: 40%; font-size: 11px;">BOSH CPI 릴리즈</label>
+					<div>
+						<input name="boshCpiRelease" type="list"  style="float:left;width:60%;" tabindex="4" required placeholder="BOSH CPI 릴리즈를 선택하세요."/>
+					</div>
+				</div>
+		    </div>
+			<br/>
+		    <div class="w2ui-buttons" rel="buttons" hidden="true">
+		    	<button class="btn" style="float: left;" onclick="saveOsBoshInfo('before');">이전</button>
+		        <!-- <button class="btn" onclick="popupComplete();">취소</button> -->
+		        <button class="btn" style="float: right;padding-right:15%" onclick="saveOsBoshInfo('after');" tabindex="9">다음>></button>
+		    </div>
+		</div>
+	</div>	
 	
 	<div id="osNetworkInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
 			<div style="margin-left:2%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">오픈스텍 설정</li>
-		            <li class="pass">기본 설정</li>
+		            <li class="pass">오픈스텍 정보</li>
+		            <li class="pass">기본 정보</li>
 		            <li class="active">네트워크 정보</li>
 		            <li class="before">리소스 정보</li>		            
 		            <li class="before">배포 파일 정보</li>
@@ -1773,24 +1823,17 @@ function osDeployPopup(){
 	        </div>
 			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 네트워크 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">Subnet ID</label>
-					<div>
-						<input name="subnetId" type="text"  style="float:left;width:330px;" tabindex="1" required placeholder="Subnet ID를 입력하세요."/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left; width: 200px; font-size: 11px;">Private IP</label>
-					<div>
-						<input name="privateStaticIp" type="text"  style="float:left;width:330px;" tabindex="2" required placeholder="설치관리자에 할당할 Private IP를 입력하세요."/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Floating IP</label>
 					<div>
-						<input name="publicStaticIp" type="text"  style="float:left;width:330px;" tabindex="3" required placeholder="설치관리자에 할당할 Floating IP를 입력하세요."/>
+						<input name="publicStaticIp" type="text"  style="float:left;width:330px;" tabindex="1" required placeholder="설치관리자에 할당할 Floating IP를 입력하세요."/>
+						<div class="isMessage"></div>
+					</div>
+				</div>
+		    	<div class="w2ui-field">
+					<label style="text-align: left; width: 200px; font-size: 11px;">Subnet ID</label>
+					<div>
+						<input name="subnetId" type="text"  style="float:left;width:330px;" tabindex="2" required placeholder="Subnet ID를 입력하세요."/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1802,32 +1845,39 @@ function osDeployPopup(){
 					</div>
 				</div>
 				<div class="w2ui-field">
+					<label style="text-align: left; width: 200px; font-size: 11px;">Private IP</label>
+					<div>
+						<input name="privateStaticIp" type="text"  style="float:left;width:330px;" tabindex="4" required placeholder="설치관리자에 할당할 Private IP를 입력하세요."/>
+						<div class="isMessage"></div>
+					</div>
+				</div>
+				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Gateway IP</label>
 					<div>
-						<input name="subnetGateway" type="text"  style="float:left;width:330px;" tabindex="4" required placeholder="예) 10.0.0.1"/>
+						<input name="subnetGateway" type="text"  style="float:left;width:330px;" tabindex="5" required placeholder="예) 10.0.0.1"/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">DNS</label>
 					<div>
-						<input name="subnetDns" type="text"  style="float:left;width:330px;" tabindex="5"  required placeholder="예) 8.8.8.8"/>
+						<input name="subnetDns" type="text"  style="float:left;width:330px;" tabindex="6"  required placeholder="예) 8.8.8.8"/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">NTP</label>
 					<div>
-						<input name="ntp" type="text"  style="float:left;width:330px;" tabindex="6" required placeholder="예) 10.0.0.2"/>
+						<input name="ntp" type="text"  style="float:left;width:330px;" tabindex="7" required placeholder="예) 10.0.0.2"/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-		        <button class="btn" style="float: left;" onclick="saveOsNetworkInfo('before');" tabindex="7">이전</button>
-				<button class="btn" onclick="popupComplete();" tabindex="8">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOsNetworkInfo('after');" tabindex="9">다음>></button>
+		        <button class="btn" style="float: left;" onclick="saveOsNetworkInfo('before');" tabindex="8">이전</button>
+				<!-- <button class="btn" onclick="popupComplete();" tabindex="9">취소</button> -->
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOsNetworkInfo('after');" tabindex="10">다음>></button>
 		    </div>
 		</div>
 	</div>
@@ -1837,8 +1887,8 @@ function osDeployPopup(){
 		<div rel="body" style="width:100%;padding:15px 5px 0 5px;">
 			<div style="margin-left:2%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">오픈스텍 설정</li>
-		            <li class="pass">기본 설정</li>
+		            <li class="pass">오픈스텍 정보</li>
+		            <li class="pass">기본 정보</li>
 		            <li class="pass">네트워크 정보</li>
 		            <li class="active">리소스 정보</li>		            
 		            <li class="before">배포 파일 정보</li>
@@ -1873,7 +1923,7 @@ function osDeployPopup(){
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
 		        <button class="btn" style="float: left;" onclick="saveOsResourceInfo('before');" tabindex="4">이전</button>
-				<button class="btn" onclick="popupComplete();" tabindex="5">취소</button>
+				<!-- <button class="btn" onclick="popupClose();" tabindex="5">취소</button> -->
 				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOsResourceInfo('after');" tabindex="6">다음>></button>
 		    </div>
 		</div>
@@ -1885,8 +1935,8 @@ function osDeployPopup(){
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="height:60px;margin:0 15px;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">오픈스텍 설정</li>
-		            <li class="pass">기본 설정</li>
+		            <li class="pass">오픈스텍 정보</li>
+		            <li class="pass">기본 정보</li>
 		            <li class="pass">네트워크 정보</li>
 		            <li class="pass">리소스 정보</li>		            
 		            <li class="active">배포 파일 정보</li>
@@ -1899,7 +1949,7 @@ function osDeployPopup(){
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 			<button class="btn" style="float: left;" onclick="confirmDeploy('before');">이전</button>
-			<button class="btn" onclick="popupComplete();">취소</button>
+			<!-- <button class="btn" onclick="popupComplete();">취소</button> -->
 			<button class="btn" style="float: right; padding-right: 15%" onclick="confirmDeploy('after');">다음>></button>
 		</div>
 	</div>
@@ -1910,8 +1960,8 @@ function osDeployPopup(){
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="height:60px;margin:0 15px;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">오픈스텍 설정</li>
-		            <li class="pass">기본 설정</li>
+		            <li class="pass">오픈스텍 정보</li>
+		            <li class="pass">기본 정보</li>
 		            <li class="pass">네트워크 정보</li>
 		            <li class="pass">리소스 정보</li>		            
 		            <li class="pass">배포 파일 정보</li>
@@ -1924,7 +1974,7 @@ function osDeployPopup(){
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 				<!-- 설치 실패 시 -->
-				<button class="btn" style="float: left;" onclick="deployPopup();">이전</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
+				<button class="btn" id="deployPopupBtn" style="float: left;" onclick="deployPopup();" disabled>이전</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">닫기</button>
 		</div>		
 	</div>	

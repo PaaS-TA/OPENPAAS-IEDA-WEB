@@ -36,10 +36,9 @@ public class BootstrapDeleteDeployAsyncService {
 		IEDABootstrapAwsConfig aws = null;
 		IEDABootstrapOpenstackConfig openstack = null;
 		
-		String deploymentName = "";
-		String status = "";
-		
-		File deploymentFile = null;
+		String deploymentFile = "";
+
+		File file = null;
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
 		
@@ -47,59 +46,80 @@ public class BootstrapDeleteDeployAsyncService {
 		
 		if( "AWS".equals(dto.getIaas())) { 
 			aws = awsRepository.findOne(Integer.parseInt(dto.getId()));
-			if ( aws != null ) deploymentName = aws.getDeploymentName();
+			if ( aws != null ) deploymentFile = aws.getDeploymentFile();
 
 		} else {
 			openstack = openstackRepository.findOne(Integer.parseInt(dto.getId()));
-			if ( openstack != null ) deploymentName = openstack.getDeploymentName();
+			if ( openstack != null ) deploymentFile = openstack.getDeploymentFile();
 		}
 			
-		if ( deploymentName == null || deploymentName.isEmpty() ) {
+		if ( deploymentFile == null || deploymentFile.isEmpty() ) {
 			throw new IEDACommonException("illigalArgument.bootstrap.delete.exception",
 					"배포정보가 존재하지 않습니다..", HttpStatus.NOT_FOUND);
 		}
+
+		String status = "";
+		String accumulatedLog = "";
+		String resultMessage = "";
 		
 		try {
-			String deployFile = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentName;
+			String deployedFilePath = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile;
 			String command = "";
-			deploymentFile = new File(deployFile);
+			file = new File(deployedFilePath);
 			
-			if( deploymentFile.exists() ){
-				command += "bosh-init delete " + deployFile;
+			log.info("# deployedFilePath :" +  deployedFilePath);
+			
+			if( file.exists() ){
+				command += "bosh-init delete " + deployedFilePath;
 				Process process = r.exec(command);
+				
+				status = "Deleting";
+				saveAWSDeployStatus(aws, status);
+				saveOpenstackDeployStatus(openstack, status);
 				
 				inputStream = process.getInputStream();
 				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 				String info = null;
-				String deleteContent = "";
 				while ((info = bufferedReader.readLine()) != null){
-					deleteContent += info + "\n";
-					
-					log.info("=== Deployment File Merge \n"+ info );
+					accumulatedLog += info + "\n";
 					DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "started", Arrays.asList(info));
 				}
-				// TODO: do check if task success or fail
 			}
+			else {
+				status = "error";
+				resultMessage = "배포 파일(" + deployedFilePath + ")이 존재하지 않습니다.";
+			}
+			
+			if ( status.equals("error") || accumulatedLog.contains("fail") || accumulatedLog.contains("error") || accumulatedLog.contains("No deployment")) {
+				status = "error";
+				if ( resultMessage.isEmpty() ) resultMessage = "BOOTSTRAP 삭제 중 오류가 발생하였습니다.";
+			} else {
+				status = "done";
+				resultMessage = "BOOTSTRAP 삭제가 완료되었습니다.";
+			}
+			
+			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, status, Arrays.asList(resultMessage));
+			
 		} catch ( Exception e) {
 			status = "error";
-			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("배포 중 Exception이 발생하였습니다."));
-		} finally {
-			
-			
+			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, status, Arrays.asList("배포 중 Exception이 발생하였습니다."));
 		}
 		
-		log.info("### Deploy Status = " + status);
-		if ( aws != null ) {
-			aws.setDeployStatus(status);
-			aws.setDeploymentFile("");
-			awsRepository.save(aws);
-		}
-		if ( openstack != null ) {
-			openstack.setDeployStatus(status);
-			openstack.setDeploymentFile("");
-			openstackRepository.save(openstack);
-		}
-
+		// 오류가 발생한 경우라도 레코드는 삭제하자.
+		if ( aws != null ) awsRepository.delete(aws);
+		if ( openstack != null ) openstackRepository.delete(openstack);
+	}
+	
+	public IEDABootstrapAwsConfig saveAWSDeployStatus(IEDABootstrapAwsConfig aws, String status) {
+		if ( aws == null ) return null;
+		aws.setDeployStatus(status);
+		return awsRepository.save(aws);
+	}
+	
+	public IEDABootstrapOpenstackConfig saveOpenstackDeployStatus(IEDABootstrapOpenstackConfig openstack, String status) {
+		if ( openstack == null ) return null;
+		openstack.setDeployStatus(status);
+		return openstackRepository.save(openstack);
 	}
 
 	@Async
