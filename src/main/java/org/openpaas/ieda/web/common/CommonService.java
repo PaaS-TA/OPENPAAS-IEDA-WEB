@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -74,4 +75,24 @@ public class CommonService {
 		return null;
 	}
 
+	public String lineAddSpace(String exc, int cnt ){
+		String returnString = "";
+		String[] lines = exc.split(System.getProperty("line.separator"));
+		String empty = "";
+		for(int i=0;i<cnt;i++){
+			empty += " ";
+		}
+		if(lines.length >0 ){
+			for(int i =0; i < lines.length;i++){
+				if(i == lines.length){
+					returnString += empty + lines[i].replace("\n", "");
+				}
+				else{
+					returnString += empty + lines[i]+"\n";
+				}
+			}
+		}
+		return returnString;
+	}
+	
 }

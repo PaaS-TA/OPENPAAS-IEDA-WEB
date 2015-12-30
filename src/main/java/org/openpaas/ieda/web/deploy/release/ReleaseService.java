@@ -204,4 +204,61 @@ public class ReleaseService {
 		return localReleaseList;
 	}
 
+	public List<ReleaseInfo> getReleasesFilter(String filterName) {
+
+		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
+		
+		List<ReleaseInfo> releaseInfoList = null;
+		try {
+			
+			HttpClient client = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
+			GetMethod get = new GetMethod(DirectorRestHelper.getReleaseListURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort()));
+			get = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)get);
+
+			client.executeMethod(get);
+			
+			if ( get.getResponseBodyAsString() != null && !get.getResponseBodyAsString().isEmpty()) {
+				
+				ObjectMapper mapper = new ObjectMapper();
+				Release[] releases = mapper.readValue(get.getResponseBodyAsString(), Release[].class);
+				
+				int idx = 0;
+				List<Release> releaseList = Arrays.asList(releases);
+				for ( Release release : releaseList ) {
+					
+					List<ReleaseVersion> versionList = release.getReleaseVersions();
+					for (ReleaseVersion releaseVersion : versionList) {
+						if(release.getName().matches(".*"+filterName+".*")){
+							ReleaseInfo releaseInfo = new ReleaseInfo();
+							releaseInfo.setRecid(idx++);
+							releaseInfo.setName(release.getName());
+							releaseInfo.setVersion(releaseVersion.getVersion());
+	//						releaseInfo.setCurrentDeployed(releaseVersion.getCurrentlyDeployed().toString());
+	//						releaseInfo.setJobNames(releaseVersion.getJobNames().toString());
+							
+							if ( releaseInfoList == null ) 
+								releaseInfoList = new ArrayList<ReleaseInfo>();
+							
+							releaseInfoList.add(releaseInfo);
+						}
+					}
+				}
+				
+				if ( releaseInfoList != null ) {
+					// 스템셀 버전 역순으로 정렬
+					Comparator<ReleaseInfo> byReleaseVersion = Collections.reverseOrder(Comparator.comparing(ReleaseInfo::getVersion));
+					releaseInfoList = releaseInfoList.stream()
+							.sorted(byReleaseVersion)
+							.collect(Collectors.toList());
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new IEDACommonException("notfound.releases.exception", "릴리즈 정보 조회 중 오류가 발생하였습니다.", HttpStatus.BAD_REQUEST);
+		}
+		
+		return releaseInfoList; 
+	}
+
 }

@@ -16,6 +16,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 								, "/stemcell"
 								, "/bootstrap"
 								, "/bosh"
+								, "/cf"
 								);
 		config.setApplicationDestinationPrefixes("/app", "/send");
 	}
@@ -32,6 +33,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 							, "/bootstrapDelete"
 							, "/boshInstall"
 							, "/boshDelete"
+							, "/cfInstall"
+							, "/cfDelete"
 							, "/task"
 							).withSockJS();
 	}

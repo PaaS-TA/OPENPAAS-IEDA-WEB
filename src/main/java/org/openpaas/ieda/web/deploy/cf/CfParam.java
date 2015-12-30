@@ -7,22 +7,67 @@ import lombok.Data;
 public class CfParam {
 
 	@Data
-	public static class Cf{
+	public static class Aws{
 		private String id;
+		// 1.1 Deployment 정보
 		@NotNull
 		private String deploymentName;
 		@NotNull
 		private String directorUuid;
 		@NotNull
+		private String releaseName;
+		@NotNull
 		private String releaseVersion;
+		
+		// 1.2 기본정보
 		@NotNull
 		private String domain;
 		@NotNull
-		private String sslPem;
+		private String description;
+		@NotNull
+		private String domainOrganization;
+		
+		// 1.3 프록시 정보
+		@NotNull
+		private String proxyStaticIps;
+		@NotNull
+		private String sslPemPub; //Big
+		@NotNull
+		private String sslPemRsa; //Big
 	}
 	
 	@Data
-	public static class Network{
+	public static class AwsUaa{
+		@NotNull
+		private String id;
+		@NotNull
+		private String loginSecret;
+		@NotNull
+		private String signingKey;
+		@NotNull
+		private String verificationKey;
+	}
+	
+	@Data
+	public static class AwsConsul{
+		@NotNull
+		private String id;
+		@NotNull
+		private String agentCert;
+		@NotNull
+		private String agentKey;
+		@NotNull
+		private String caCert;
+		@NotNull
+		private String encryptKeys;
+		@NotNull
+		private String serverCert;
+		@NotNull
+		private String serverKey;
+	}
+	
+	@Data
+	public static class AwsNetwork{
 		@NotNull
 		private String id;
 		@NotNull
@@ -32,31 +77,138 @@ public class CfParam {
 		@NotNull
 		private String subnetDns;
 		@NotNull
-		private String subnetReserved;
+		private String subnetReservedFrom;
 		@NotNull
-		private String subnetStatic;
+		private String subnetReservedTo;
 		@NotNull
-		private String cloudSubnet;
+		private String subnetStaticFrom;
+		@NotNull
+		private String subnetStaticTo;
+		@NotNull
+		private String subnetId;
+		@NotNull
+		private String cloudSecurityGroups;
 	}
 	
 	@Data
-	public static class Resource{
+	public static class AwsResource{
 		@NotNull
 		private String id;
+		// 5. 리소스 정보
 		@NotNull
 		private String stemcellName;
 		@NotNull
 		private String stemcellVersion;
 		@NotNull
 		private String boshPassword;
+		// Deploy 정보
+		private String deploymentFile;
+		private String deployStatus;
+		private String deployLog;
+	}
+	
+	@Data
+	public static class Openstack{
+		private String id;
+		// 1.1 Deployment 정보
 		@NotNull
-		private String availabilityZone;
+		private String deploymentName;
 		@NotNull
-		private String instanceType;
+		private String directorUuid;
+		@NotNull
+		private String releaseName;
+		@NotNull
+		private String releaseVersion;
+		
+		// 1.2 기본정보
+		@NotNull
+		private String domain;
+		@NotNull
+		private String description;
+		@NotNull
+		private String domainOrganization;
+		
+		// 1.3 프록시 정보
+		@NotNull
+		private String proxyStaticIps;
+		@NotNull
+		private String sslPemPub; //Big
+		@NotNull
+		private String sslPemRsa; //Big
+	}
+
+	@Data
+	public static class OpenstackUaa{
+		@NotNull
+		private String id;
+		@NotNull
+		private String loginSecret;
+		@NotNull
+		private String signingKey;
+		@NotNull
+		private String verificationKey;
+	}
+	
+	@Data
+	public static class OpenstackConsul{
+		@NotNull
+		private String id;
+		@NotNull
+		private String agentCert;
+		@NotNull
+		private String agentKey;
+		@NotNull
+		private String caCert;
+		@NotNull
+		private String encryptKeys;
+		@NotNull
+		private String serverCert;
+		@NotNull
+		private String serverKey;
+	}
+	
+	@Data
+	public static class OpenstackNetwork{
+		@NotNull
+		private String id;
+		@NotNull
+		private String subnetRange;
+		@NotNull
+		private String subnetGateway;
+		@NotNull
+		private String subnetDns;
+		@NotNull
+		private String subnetReservedFrom;
+		@NotNull
+		private String subnetReservedTo;
+		@NotNull
+		private String subnetStaticFrom;
+		@NotNull
+		private String subnetStaticTo;
+		@NotNull
+		private String cloudNetId;
+		@NotNull
+		private String cloudSecurityGroups;
+	}
+	
+	@Data
+	public static class OpenstackResource{
+		@NotNull
+		private String id;
+		// 5. 리소스 정보
+		@NotNull
+		private String stemcellName;
+		@NotNull
+		private String stemcellVersion;
+		@NotNull
+		private String boshPassword;
+		// Deploy 정보
 		@NotNull
 		private String deploymentFile;
 		@NotNull
 		private String deployStatus;
+		@NotNull
+		private String deployLog;
 	}
 	
 	@Data

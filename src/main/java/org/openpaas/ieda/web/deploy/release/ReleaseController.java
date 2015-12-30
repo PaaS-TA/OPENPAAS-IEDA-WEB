@@ -5,13 +5,12 @@ package org.openpaas.ieda.web.deploy.release;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.openpaas.ieda.api.ReleaseFile;
 import org.openpaas.ieda.api.ReleaseInfo;
-import org.openpaas.ieda.common.IEDACommonException;
-import org.openpaas.ieda.common.IEDAErrorResponse;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +19,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
- *
- */
 
 @Slf4j
 @Controller
@@ -108,6 +103,15 @@ public class ReleaseController extends BaseController {
 	public ResponseEntity listLocalBoshOpenstackCpiRelease(){
 		List<String> contents = releaseService.listLocalBoshOpenstackCpiRelease();
 		return new ResponseEntity( contents, HttpStatus.OK);
+	}
+	
+	@RequestMapping( value="/release/getReleaseList/{filterName}", method =RequestMethod.GET)
+	public ResponseEntity listLocalcfReleaseList(@PathVariable  String filterName){
+		List<ReleaseInfo> contents = releaseService.getReleasesFilter(filterName);
+		Map<String, Object> result = new HashMap<>();
+		result.put("records", contents);
+		result.put("total", (contents == null) ? 0:contents.size());
+		return new ResponseEntity( result, HttpStatus.OK);
 	}
 	
 	/**

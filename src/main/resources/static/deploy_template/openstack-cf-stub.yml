@@ -1,24 +1,34 @@
 ---
 name: (( merge ))
+
 director_uuid: (( merge ))
+
 releases: (( merge ))
 
 networks:
+- name: op_public
+  type: vip
+  cloud_properties: {}
+#   subnets:
+#   - gateway: 172.16.100.1
+#     dns: (( merge ))
+#     reserved: (( merge ))
+#     static: (( merge ))
+#  cloud_properties:
+#    net_id: 17241b92-b38b-440a-8514-547941dd999f
+#    security_groups:
+#    - bosh-security
 - name: op_private
   type: manual
   subnets:
   - range: (( merge ))
+    gateway: (( merge ))
     dns: (( merge ))
-    gateway: (( merge ))    
     reserved: (( merge ))
     static: (( merge ))
     cloud_properties:
-      subnet: (( merge ))
+      net_id:  (( merge ))
       security_groups: (( merge ))
-      
-- name: op_public
-  type: vip
-  cloud_properties: {}
 
 compilation:
   cloud_properties:
@@ -54,14 +64,13 @@ jobs:
 - name: ha_proxy
   instances: 1
   networks:
+  - name: op_public
+    static_ips: (( merge ))
   - name: op_private
     default: [dns, gateway]
     static_ips: (( static_ips(1) ))
-  - name: op_public
-    static_ips: (( merge ))
   properties:
-    ha_proxy:
-      ssl_pem: (( merge ))
+    ha_proxy: (( merge ))
     metron_agent:
       zone: z1
       deployment: (( .name ))
@@ -79,7 +88,7 @@ jobs:
   - name: consul_agent
     release: (( .releases.[0].name ))
   update: {}
-  
+
 - name: nats
   instances: 1
   networks:
@@ -90,7 +99,7 @@ jobs:
       zone: z1
       deployment: (( .name ))
     networks:
-       apps: op_private
+      apps: op_private
   resource_pool: medium
   templates:
   - name: nats
@@ -105,12 +114,12 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(3) )) 
+    static_ips: (( static_ips(3) ))
   persistent_disk: 10024
   properties:
     metron_agent:
       zone: z1
-      deployment: (( .name )) 
+      deployment: (( .name ))
     networks:
       apps: op_private
   resource_pool: medium
@@ -128,11 +137,11 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(4) )) 
+    static_ips: (( static_ips(4) ))
   properties:
     metron_agent:
       zone: z1
-      deployment: (( .name )) 
+      deployment: (( .name ))
     networks:
       apps: op_private
   resource_pool: small
@@ -147,7 +156,7 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(5) )) 
+    static_ips: (( static_ips(5) ))
   persistent_disk: 102400
   properties:
     metron_agent:
@@ -163,16 +172,16 @@ jobs:
     release: (( .releases.[0].name ))
   update: {}
 
-- name: postgres 
-  instances: 1  
+- name: postgres
+  instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(5) )) 
+    static_ips: (( static_ips(6) ))
   persistent_disk: 4096
   properties:
     metron_agent:
       zone: z1
-      deployment: (( .name )) 
+      deployment: (( .name ))
     networks:
       apps: op_private
   resource_pool: medium
@@ -184,10 +193,10 @@ jobs:
   update: {}
 
 - name: uaa
-  instances: 1  
+  instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(6) )) 
+    static_ips: (( static_ips(7) ))
   properties:
     consul:
       agent:
@@ -195,7 +204,7 @@ jobs:
           uaa: {}
     metron_agent:
       zone: z1
-      deployment: (( .name )) 
+      deployment: (( .name ))
     networks:
       apps: op_private
     route_registrar:
@@ -227,10 +236,10 @@ jobs:
   update: {}
 
 - name: api
-  instances: 1  
+  instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(7) )) 
+    static_ips: (( static_ips(8) ))
   persistent_disk: 8192
   properties:
     consul:
@@ -281,12 +290,12 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(8) )) 
+    static_ips: (( static_ips(9) ))
   persistent_disk: 4096
   properties:
     metron_agent:
       zone: z1
-      deployment: (( .name )) 
+      deployment: (( .name ))
     networks:
       apps: op_private
   resource_pool: medium
@@ -301,7 +310,7 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(9) )) 
+    static_ips: (( static_ips(10) ))
   persistent_disk: 0
   properties:
     metron_agent:
@@ -330,10 +339,11 @@ jobs:
   instances: 0
   networks:
   - name: op_private
+    static_ips: (( static_ips(11) ))
   properties:
     metron_agent:
       zone: z1
-      deployment: (( .name )) 
+      deployment: (( .name ))
     networks:
       apps: op_private
     route_registrar:
@@ -358,6 +368,7 @@ jobs:
   instances: 0
   networks:
   - name: op_private
+    static_ips: (( static_ips(12) ))
   properties:
     dea_next:
       zone: z1
@@ -402,7 +413,7 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(10) )) 
+    static_ips: (( static_ips(13) ))
   properties:
     doppler:
       zone: z1
@@ -425,7 +436,7 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(11) )) 
+    static_ips: (( static_ips(14) ))
   properties:
     metron_agent:
       zone: z1
@@ -458,7 +469,7 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(12) )) 
+    static_ips: (( static_ips(15) ))
   properties:
     consul:
       agent:
@@ -483,7 +494,6 @@ properties:
   acceptance_tests: null
   app_domains: [(( domain ))]
   app_ssh: null
-
   cc:
     allow_app_ssh_access: true
     allowed_cors_domains: []
@@ -538,7 +548,7 @@ properties:
     default_staging_security_groups:
     - public_networks
     - dns
-    default_to_diego_backend: true
+    default_to_diego_backend: false
     development_mode: false
     directories: null
     disable_custom_buildpacks: false
@@ -604,7 +614,7 @@ properties:
     newrelic:
       capture_params: false
       developer_mode: false
-      environment_name: (( .name )) 
+      environment_name: (( .name ))
       license_key: null
       monitor_mode: false
       transaction_tracer:
@@ -692,7 +702,7 @@ properties:
         restart_if_above_mb: null
         restart_if_consistently_above_mb: null
     user_buildpacks: []
-    users_can_select_backend: false
+    users_can_select_backend: true
   ccdb:
     address: (( jobs.postgres.networks.op_private.static_ips.[0] ))
     databases:
@@ -720,7 +730,7 @@ properties:
     server_key: (( merge ))
   databases:
     additional_config: null
-    address: (( jobs.postgres.networks.op_private.static_ips.[0] )) 
+    address: (( jobs.postgres.networks.op_private.static_ips.[0] ))
     collect_statement_statistics: null
     databases:
     - citext: true
@@ -752,7 +762,7 @@ properties:
     instance_bandwidth_limit: null
     instance_disk_inode_limit: 200000
     kernel_network_tuning_enabled: false
-    logging_level: debug
+    logging_level: (( merge || "debug" ))
     memory_mb: 8192
     memory_overcommit_factor: null
     mtu: null
@@ -763,7 +773,7 @@ properties:
     staging_memory_limit_mb: 1024
   description: (( merge ))
   disk_quota_enabled: false
-  domain: (( merge )) 
+  domain: (( merge ))
   doppler:
     blacklisted_syslog_ranges: null
     debug: false
@@ -853,7 +863,7 @@ properties:
     trace: false
     user: nats
   nfs_server:
-    address: null
+    address: (( jobs.nfs.networks.op_private.static_ips.[0] ))
     allow_from_entries:
     - (( .networks.op_private.subnets.[0].range ))
     share: null
@@ -929,7 +939,7 @@ properties:
         override: true
         redirect-uri: (( "https://login." domain ))
         scope: openid,oauth.approvals
-        secret: (( merge || "admin" ))
+        secret: (( merge ))
       notifications:
         authorities: cloud_controller.admin,scim.read
         authorized-grant-types: client_credentials
@@ -958,7 +968,7 @@ properties:
       groups: null
       userids_enabled: true
       users:
-       - (( "admin|" .properties.uaa.clients.login.secret "|scim.write,scim.read,openid,cloud_controller.admin,clients.read,clients.write,doppler.firehose,routing.router_groups.read" ))
+      - (( "admin|" .properties.uaa.clients.login.secret "|scim.write,scim.read,openid,cloud_controller.admin,clients.read,clients.write,doppler.firehose,routing.router_groups.read" ))
     spring_profiles: null
     url: (( "https://uaa." domain ))
     user: null
@@ -979,58 +989,58 @@ properties:
 resource_pools:
 - name: small
   network: op_private
-  env:
-    bosh:
-      password: (( merge || "c1oudc0w" ))
   stemcell:
     name: (( merge ))
     version: (( merge || "latest" ))
+  env:
+    bosh:
+      password: (( merge || "c1oudc0w" ))
   cloud_properties:
-    instance_type: m1.small
+    instance_type: (( merge || "m1.small" ))
 
 - name: medium
   network: op_private
-  env:
-    bosh:
-      password: (( resource_pools.small.env.bosh.password ))
   stemcell:
     name: (( resource_pools.small.stemcell.name ))
     version: (( resource_pools.small.stemcell.version ))
+  env:
+    bosh:
+      password: (( resource_pools.small.env.bosh.password ))
   cloud_properties:
-    instance_type: (( merge || "t2.medium" ))
-    
+    instance_type: (( merge || "m1.medium" ))
+
 - name: large
   network: op_private
-  env:
-    bosh:
-      password: (( resource_pools.small.env.bosh.password ))
   stemcell:
     name: (( resource_pools.small.stemcell.name ))
     version: (( resource_pools.small.stemcell.version ))
+  env:
+    bosh:
+      password: (( resource_pools.small.env.bosh.password ))
   cloud_properties:
-    instance_type: (( merge || "t2.large" ))
+    instance_type: (( merge || "m1.large" ))
 
 - name: runner
   network: op_private
-  env:
-    bosh:
-      password: (( resource_pools.small.env.bosh.password ))
   stemcell:
     name: (( resource_pools.small.stemcell.name ))
     version: (( resource_pools.small.stemcell.version ))
+  env:
+    bosh:
+      password: (( resource_pools.small.env.bosh.password ))
   cloud_properties:
-    instance_type: (( merge || "t2.large" ))
-    
+    instance_type: (( merge || "m1.large" ))
+
 - name: router
   network: op_private
-  env:
-    bosh:
-      password: (( resource_pools.small.env.bosh.password ))
   stemcell:
     name: (( resource_pools.small.stemcell.name ))
     version: (( resource_pools.small.stemcell.version ))
+  env:
+    bosh:
+      password: (( resource_pools.small.env.bosh.password ))
   cloud_properties:
-    instance_type: (( merge || "t2.medium" ))
+    instance_type: (( merge || "m1.medium" ))
 
 update:
   canaries: 1

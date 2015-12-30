@@ -69,6 +69,7 @@ function checkEmpty(value){
 	return (value == null || value == "") ? true: false;
 }
 
+
 //URL 체크
 function validateIP(input){
 	if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(input))  
@@ -77,72 +78,101 @@ function validateIP(input){
 		return false;
 }
 
-//팝업 INPUT Validation
+//Popup ValidationCheck
 function popupValidation(){
-	var emptyFields = new Array();
+	var elements = $(".w2ui-box1 .w2ui-msg-body .w2ui-field input:visible, textarea:visible");
 	var checkValidation = true;
-	var textInputs 	= $(".w2ui-msg-body :input[type=text]:visible");
-	var listInputs 	= $(".w2ui-msg-body :input[type=list]:visible");
-	var urlInputs 	= $(".w2ui-msg-body :input[type=url]:visible");
+	var emptyFieldLabels = null;
 	
-	if( textInputs.length > 0 ){
-		textInputs.each(function(obj){
-			if( checkEmpty( $(this).val()) &&  $(this).attr('name') ){
-				console.log("#### : NAME :" + $(this).attr('name'));
-				emptyFields.push($(this ).attr("name"));
-				var label = $(this).parent().parent().find("label").text();
-				$(this).css({"border-color":"red"}).parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"});
+	if( elements.length > 0){
+		emptyFieldLabels = new Array();
+		elements.each(function(obj){
+			var tagType = $(this).get(0).tagName;
+			var inputType = $(this).attr('type');
+			var elementName = $(this).attr('name');
+			var elementValue = $(this).val();
+			var label = "";
+			//빈값일 경우
+			if( elementName && !elementValue ){
+				
+				if( tagType.toLowerCase() == "input" ){
+					
+					if( inputType == 'text'){
+						//예외
+						if($(this).attr('name') == "subnetStaticFrom" || $(this).attr('name') == "subnetStaticTo"){
+							label = "Static Ip";
+							$(this).css({"border-color":"red"})
+								.parent().parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"});
+						}
+						else if($(this).attr('name') == "subnetReservedFrom" || $(this).attr('name') == "subnetReservedTo" ){
+							label = "Reserved Range";
+							$(this).css({"border-color":"red"})
+								.parent().parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"});
+						}
+						else{
+							//일반
+							label = $(this).parent().parent().find("label").text();
+							$(this).css({"border-color":"red"})
+								.parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"});
+						}
+					}
+					else if( inputType == 'url'){
+						label = $(this).parent().parent().find("label").text();
+						$(this).css({"border-color":"red"}).parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"});
+					}
+					else if( inputType == 'list'){
+						if($(this).attr('name') == "keyPathList"){//예외
+							label = "Private Key File";
+						}
+						else{
+							label = $(this).parent().parent().find("label").text();
+						}
+					}
+					
+					$(this).css({"border-color":"red"});
+				}
+				else if( tagType.toLowerCase() == "textarea" ){
+					label = $(this).parent().parent().find('label').text();
+					$(this).css({"border-color":"red"}); //.parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"});
+				}
+				
+				if(label) emptyFieldLabels.push(label);
 			}
-			else{
-				$(this).css({"border":"1px solid #bbb"}).parent().find(".isMessage").text("");
+			//값이 있을 경우
+			else if( elementName && elementValue  ){
+				if( tagType.toLowerCase() == "input" ){
+					if( inputType.toLowerCase() == "text"){
+						$(this).css({"border":"1px solid #bbb"}).parent().find(".isMessage").text("");
+					}
+					else if( inputType.toLowerCase() == "list"){
+						$(this).css({"border":"1px solid #bbb"});//.parent().find(".isMessage").text("");
+					}
+					else if( inputType.toLowerCase() == "url"){
+						if(validateIP(elementValue)){
+							$(this).css({"border":"1px solid #bbb"}).parent().find(".isMessage").text("");
+						}
+						else{
+							label = $(this).parent().parent().find("label").text();
+							$(this).css({"border-color":"red"}).parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"});
+							emptyFieldLabels.push(label);
+						}
+					}
+				}
+				else if( tagType.toLowerCase() == "textarea" ){
+					$(this).css({"border":"1px solid #bbb"});//.parent().find(".isMessage").text("");
+				}
 			}
 		});
 	}
-	if( listInputs.length > 0 ){
-		listInputs.each(function(obj){
-			//console.log("#### : NAME :" +$(this).attr('name'));
-			if( checkEmpty( $(this).val()) &&  $(this).attr('name') ){
-				console.log("#### : NAME :" + $(this).attr('name'));
-				emptyFields.push($(this).attr("name"));
-				$(this).css({"border-color":"red"});
-			}
-			else{
-				$(this).css({"border":"1px solid #bbb"});
-			}
-		});
-	}
-	
-	if( urlInputs.length > 0 ){
-		urlInputs.each(function(obj){
-			//console.log("#### : NAME :" +$(this).attr('name'));
-			if( checkEmpty( $(this).val()) &&  $(this).attr('name') ){
-				console.log("#### : NAME :" + $(this).attr('name'));
-				emptyFields.push($(this ).attr("name"));
-				var label = $(this).parent().parent().find("label").text();
-				$(this).css({"border-color":"red"}).parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"});
-			}
-			else{
-				$(this).css({"border":"1px solid #bbb"}).parent().find(".isMessage").text("");
-			}
-		});
-	}
-	
-	console.log("EMPTY : " + emptyFields.length);
-	//ALert 메세지
-	if(emptyFields.length != 0 ){
-		emptyFields.forEach(function(obj){
-			console.log("## Input Name :: " + obj);
-		});
-		
+
+	if(emptyFieldLabels.length > 0){
 		checkValidation = false;
-		var label = $(".w2ui-msg-body input[name="+emptyFields[0]+"]").parent().parent().find("label").text();
-		w2alert(label + "을(를) 입력하세요.");
+		w2alert(emptyFieldLabels[0] + "을(를) 필드값을 확인하세요.");
 	}
 	else{
 		checkValidation = true;
 	}
 	
-	console.log(":: valid ::" + checkValidation);
 	return checkValidation;
 }
 

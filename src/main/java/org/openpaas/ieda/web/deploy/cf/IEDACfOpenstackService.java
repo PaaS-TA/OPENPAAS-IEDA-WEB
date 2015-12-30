@@ -2,20 +2,32 @@ package org.openpaas.ieda.web.deploy.cf;
 
 import java.util.Date;
 
-import org.openpaas.ieda.web.deploy.cf.CfParam.Cf;
-import org.openpaas.ieda.web.deploy.cf.CfParam.Network;
-import org.openpaas.ieda.web.deploy.cf.CfParam.Resource;
+import org.openpaas.ieda.common.IEDACommonException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 @Service
 public class IEDACfOpenstackService {
-	
+
 	@Autowired
 	IEDACfOpenstackRepository openstackRepository;
 
-	public IEDACfOpenstackConfig saveOpenstackCfInfo(Cf dto) {
+	public IEDACfOpenstackConfig getOpenstackCfInfo(int id) {
+		IEDACfOpenstackConfig config = null;
+		try{
+			config = openstackRepository.findOne(id);
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			throw new IEDACommonException("illigalArgument.cf.openstack.exception",
+					"해당하는 OPENSTACK CF가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+		}
+		return config;
+	}
+	
+	public IEDACfOpenstackConfig saveOpenstackCfInfo(CfParam.Openstack dto) {
 		IEDACfOpenstackConfig config;
 		Date now = new Date();
 		if( StringUtils.isEmpty(dto.getId()) ){
@@ -24,41 +36,82 @@ public class IEDACfOpenstackService {
 		}else{
 			config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 		}
-		
+		// 1.1 Deployment 정보
 		config.setDeploymentName(dto.getDeploymentName());
 		config.setDirectorUuid(dto.getDirectorUuid());
+		config.setReleaseName(dto.getReleaseName());
+		config.setReleaseVersion(dto.getReleaseVersion());
+		// 1.2 기본정보
 		config.setDomain(dto.getDomain());
+		config.setDescription(dto.getDescription());
+		config.setDomainOrganization(dto.getDomainOrganization());
+		// 1.3 프록시 정보
+		config.setProxyStaticIps(dto.getProxyStaticIps());
+		config.setSslPemPub(dto.getSslPemPub());
+		config.setSslPemPub(dto.getSslPemPub());
+		
 		config.setUpdatedDate(now);
 		
 		return openstackRepository.save(config);
 	}
 	
-	public IEDACfOpenstackConfig saveOpenstackNetworkInfo(Network dto){
+	public IEDACfOpenstackConfig saveOpenstackUaaCfInfo(CfParam.OpenstackUaa dto) {
+		IEDACfOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
+		config.setLoginSecret(dto.getLoginSecret());
+		config.setSigningKey(dto.getSigningKey());
+		config.setVerificationKey(dto.getVerificationKey());
+		Date now = new Date();
+		config.setUpdatedDate(now);
+		return openstackRepository.save(config);
+	}
+	
+	public IEDACfOpenstackConfig saveOpenstackConsulCfInfo(CfParam.OpenstackConsul dto) {
+		IEDACfOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
+		config.setAgentCert(dto.getAgentCert());
+		config.setAgentKey(dto.getAgentKey());
+		config.setCaCert(dto.getCaCert());
+		config.setEncryptKeys(dto.getEncryptKeys());
+		config.setServerCert(dto.getServerCert());
+		config.setServerKey(dto.getServerKey());
+		
+		Date now = new Date();
+		config.setUpdatedDate(now);
+		return openstackRepository.save(config);
+	}
+	
+	public IEDACfOpenstackConfig saveOpenstackNetworkInfo(CfParam.OpenstackNetwork dto){
 		IEDACfOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 		
 		config.setSubnetRange(dto.getSubnetRange());
 		config.setSubnetGateway(dto.getSubnetGateway());
 		config.setSubnetDns(dto.getSubnetDns());
-		config.setSubnetReserved(dto.getSubnetDns());;
-		config.setSubnetStatic(dto.getSubnetStatic());
-		config.setCloudSubnet(dto.getCloudSubnet());
+		
+		config.setSubnetReservedFrom(dto.getSubnetReservedFrom());;
+		config.setSubnetReservedTo(dto.getSubnetReservedTo());;
+		config.setSubnetStaticFrom(dto.getSubnetStaticFrom());
+		config.setSubnetStaticTo(dto.getSubnetStaticTo());
+		
+		config.setCloudNetId(dto.getCloudNetId());
+		config.setCloudSecurityGroups(dto.getCloudSecurityGroups());
 		
 		Date now = new Date();
 		config.setUpdatedDate(now);
 		return openstackRepository.save(config);
 	}
 	
-	public IEDACfOpenstackConfig saveOpenstackResourceInfo( Resource dto){
+	public IEDACfOpenstackConfig saveOpenstackResourceInfo(CfParam.OpenstackResource dto){
 		IEDACfOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setStemcellName(dto.getStemcellName());
 		config.setStemcellVersion(dto.getStemcellVersion());
-		config.setAvailabilityZone(dto.getAvailabilityZone());
-		config.setInstanceType(dto.getInstanceType());
 		config.setBoshPassword(dto.getBoshPassword());
 		
 		Date now = new Date();
 		config.setUpdatedDate(now);
-		return openstackRepository.save(config);
+		openstackRepository.save(config);
+		
+		//File Setting & merge
+		
+		return config;
 	}
 
 }

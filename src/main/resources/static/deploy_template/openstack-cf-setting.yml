@@ -3,6 +3,7 @@ director_uuid: [directorUuid]
 releases:
 - name: [releaseName]
   version: [releaseVersion]
+
 networks:
   op_private:
     subnets:
@@ -10,11 +11,11 @@ networks:
       gateway: [subnetGateway]
       dns: [[subnetDns]]
       reserved: [[subnetReserved]]
-      static: [[subnetStatic]]
+      static: [[subnetStaticFrom]]
       cloud_properties:
-        subnet: [subnetId]
+        net_id: [cloudNetId]
         security_groups: [[cloudSecurityGroups]]
-
+ 
 jobs:
 - name: ha_proxy
   networks:
@@ -23,60 +24,59 @@ jobs:
   properties:
     ha_proxy:
       ssl_pem: |
-[sslPemPub]
-[sslPemRsa]
+        [sslPemPub]
+        [sslPemRsa]
 
 properties:
   domain: [domain]
-  description: [description]
+  description: [description]  
   system_domain_organization: [domainOrganization]
-
+  
   consul:
     agent_cert: |
-[agentCert]
+      [agentCert]
     agent_key: |
-[agentKey]
+      [agentKey]
     ca_cert: |
-[caCert]
+      [caCert]
     encrypt_keys: [[encryptKeys]]
     server_cert: |
-[serverCert]
+      [serverCert]
     server_key: |
-[serverKey]
-
+      [serverKey]
   uaa:
     clients:
       login:
         secret: [loginSecret]
     jwt:
       signing_key: |
-[signingKey]
+        [signingKey]
       verification_key: |
-[verificationKey]
+        [verificationKey]
 
 resource_pools:
 - name: small
-  cloud_properties:  
-    instance_type: m1.small
-  env:
-    bosh:
-      password: [boshPassword]
   stemcell:
     name: [stemcellName]
     version: [stemcellVersion]
-
-- name: medium
-  cloud_properties:  
+  env:
+    bosh:
+      password: [boshPassword]
+  cloud_properties:
     instance_type: m1.small
+    
+- name: medium
+  cloud_properties:
+    instance_type: m1.medium
 
 - name: large
-  cloud_properties:  
-    instance_type: m1.small
-    
+  cloud_properties:
+    instance_type: m1.large
+
 - name: runner
-  cloud_properties:  
-    instance_type: m1.small
-    
+  cloud_properties:
+    instance_type: m1.large
+
 - name: router
-  cloud_properties:  
-    instance_type: m1.small
+  cloud_properties:
+    instance_type: m1.medium
