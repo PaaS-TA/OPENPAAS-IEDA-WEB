@@ -38,12 +38,6 @@ public class BootstrapDeleteDeployAsyncService {
 		
 		String deploymentFile = "";
 
-		File file = null;
-		InputStream inputStream = null;
-		BufferedReader bufferedReader = null;
-		
-		Runtime r = Runtime.getRuntime();
-		
 		if( "AWS".equals(dto.getIaas())) { 
 			aws = awsRepository.findOne(Integer.parseInt(dto.getId()));
 			if ( aws != null ) deploymentFile = aws.getDeploymentFile();
@@ -62,18 +56,20 @@ public class BootstrapDeleteDeployAsyncService {
 		String accumulatedLog = "";
 		String resultMessage = "";
 		
+		InputStream inputStream = null;
+		BufferedReader bufferedReader = null;
+
 		try {
-			String deployedFilePath = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile;
-			String command = "";
-			file = new File(deployedFilePath);
-			
-			log.info("# deployedFilePath :" +  deployedFilePath);
+			String deployFile = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile;
+			File file = new File(deployFile);
 			
 			if( file.exists() ){
-				command += "bosh-init delete " + deployedFilePath;
-				Process process = r.exec(command);
 				
-				status = "Deleting";
+				ProcessBuilder builder = new ProcessBuilder("bosh-init", "delete", deployFile);
+				builder.redirectErrorStream(true);
+				Process process = builder.start();
+				
+				status = "deleting";
 				saveAWSDeployStatus(aws, status);
 				saveOpenstackDeployStatus(openstack, status);
 				
@@ -87,7 +83,7 @@ public class BootstrapDeleteDeployAsyncService {
 			}
 			else {
 				status = "error";
-				resultMessage = "배포 파일(" + deployedFilePath + ")이 존재하지 않습니다.";
+				resultMessage = "배포 파일(" + deployFile + ")이 존재하지 않습니다.";
 			}
 			
 			if ( status.equals("error") || accumulatedLog.contains("fail") || accumulatedLog.contains("error") || accumulatedLog.contains("No deployment")) {
@@ -106,8 +102,8 @@ public class BootstrapDeleteDeployAsyncService {
 		}
 		
 		// 오류가 발생한 경우라도 레코드는 삭제하자.
-		if ( aws != null ) awsRepository.delete(aws);
-		if ( openstack != null ) openstackRepository.delete(openstack);
+/*		if ( aws != null ) awsRepository.delete(aws);
+		if ( openstack != null ) openstackRepository.delete(openstack);*/
 	}
 	
 	public IEDABootstrapAwsConfig saveAWSDeployStatus(IEDABootstrapAwsConfig aws, String status) {

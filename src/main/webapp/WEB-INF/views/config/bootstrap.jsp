@@ -88,7 +88,16 @@ $(function() {
 		    				return 'N/A';
 		    	   }
 				}
-			, {field: 'deployLog', caption: '배포로그', size: '100px'}
+			, {field: 'deployLog', caption: '배포로그', size: '100px',
+				render: function(record) {
+		    			if ( record.deployStatus == '' ) {
+		    				return 'N/A';
+						}
+		    			else {
+		       				return '<span id="" class="btn btn-primary" style="width:60px" onClick="w2alert(' + record.deployLog + ');">로그보기</span>';
+						}
+					}
+				}
 			, {field: 'deploymentName', caption: '배포명', size: '120px'}
 			, {field: 'directorName', caption: '디렉터명', size: '100px'}
 			, {field: 'iaas', caption: 'IaaS', size: '100px'}
@@ -1033,11 +1042,15 @@ function installPopup(){
 function initSetting(){
 	iaas = "";
 	bootstrapId= "";
+	
 	awsInfo = "";
+	openstackInfo = "";
+	osBoshInfo = "";
 	networkInfo = "";
 	resourceInfo = "";
 	deployInfo = "";
 	deployFileName = "";
+	
 	installClient = "";
 	deleteClient = "";
 }
@@ -1442,7 +1455,6 @@ function osDeployPopup(){
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-		        <button class="btn" style="float: left;" onclick="w2popup.close();" tabindex="9">취소</button>
 		        <button class="btn" style="float: right;padding-right:15%" onclick="saveAwsInfo();" tabindex="10">다음>></button>
 		    </div>
 		</div>
@@ -1498,8 +1510,7 @@ function osDeployPopup(){
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
 		    	<button class="btn" style="float: left;" onclick="saveAwsDefaultInfo('before');" tabindex="5">이전</button>
-		        <button class="btn" onclick="w2popup.close();" tabindex="6">취소</button>
-		        <button class="btn" style="float: right;padding-right:15%" onclick="saveAwsDefaultInfo('after');" tabindex="7">다음>></button>
+		        <button class="btn" style="float: right;padding-right:15%" onclick="saveAwsDefaultInfo('after');" tabindex="6">다음>></button>
 		    </div>
 		</div>
 	</div>
@@ -1573,8 +1584,7 @@ function osDeployPopup(){
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
 				<button class="btn" style="float: left;" onclick="saveAwsNetworkInfo('before');" tabindex="7">이전</button>
-				<button class="btn" onclick="popupComplete();" tabindex="8">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveAwsNetworkInfo('after');" tabindex="9">다음>></button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveAwsNetworkInfo('after');" tabindex="8">다음>></button>
 			</div>
 		</div>
 	</div>
@@ -1621,8 +1631,7 @@ function osDeployPopup(){
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
 				<button class="btn" style="float: left;" onclick="saveResourceInfo('before');" tabindex="4">이전</button>
-				<button class="btn" onclick="popupComplete();" tabindex="5">취소</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveResourceInfo('after');" tabindex="6">다음>></button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveResourceInfo('after');" tabindex="5">다음>></button>
 			</div>
 		</div>
 	</div>
@@ -1647,7 +1656,6 @@ function osDeployPopup(){
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 			<button class="btn" style="float: left;" onclick="confirmDeploy('before');">이전</button>
-			<button class="btn" onclick="popupComplete();">취소</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="confirmDeploy('after');">다음>></button>
 		</div>
 	</div>
@@ -1671,9 +1679,8 @@ function osDeployPopup(){
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<!-- 설치 실패 시 -->
-				<button class="btn" style="float: left;" onclick="deployPopup();">이전</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
+				<button class="btn" id="deployPopupBtn" style="float: left;" onclick="deployPopup();" disabled>이전</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">닫기</button>
 		</div>		
 	</div>	
 <!-- End AWS Popup -->
