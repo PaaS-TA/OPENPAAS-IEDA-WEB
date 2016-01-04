@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.api.DeploymentInfo;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
+import org.openpaas.ieda.web.common.Encryption;
 import org.openpaas.ieda.web.common.ReplaceItem;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.openpaas.ieda.web.information.deploy.DeploymentService;
@@ -335,7 +336,7 @@ public class IEDABoshService {
 			items.add(new ReplaceItem("[stemcellName]", awsConfig.getStemcellName()));
 			items.add(new ReplaceItem("[stemcellVersion]", awsConfig.getStemcellVersion()));
 			items.add(new ReplaceItem("[cloudInstanceType]", awsConfig.getCloudInstanceType()));
-			items.add(new ReplaceItem("[boshPassword]", awsConfig.getBoshPassword()));
+			items.add(new ReplaceItem("[boshPassword]", Encryption.encryption(awsConfig.getBoshPassword())));
 		}
 		else{
 			IEDABoshOpenstackConfig openstackConfig = openstackRepository.findOne(id);
@@ -366,7 +367,7 @@ public class IEDABoshService {
 			items.add(new ReplaceItem("[stemcellName]", openstackConfig.getStemcellName()));
 			items.add(new ReplaceItem("[stemcellVersion]", openstackConfig.getStemcellVersion()));
 			items.add(new ReplaceItem("[cloudInstanceType]", openstackConfig.getCloudInstanceType()));
-			items.add(new ReplaceItem("[boshPassword]", openstackConfig.getBoshPassword()));
+			items.add(new ReplaceItem("[boshPassword]", Encryption.encryption(openstackConfig.getBoshPassword())));
 			
 			
 		}

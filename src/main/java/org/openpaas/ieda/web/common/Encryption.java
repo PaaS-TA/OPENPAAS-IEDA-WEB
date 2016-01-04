@@ -4,9 +4,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Encryption {
-	public static String encryption(String password) throws NoSuchAlgorithmException {
+	public static String encryption(String password) {
 		String encrypted = "";
-		MessageDigest md = MessageDigest.getInstance("SHA-512");
+		MessageDigest md = null;
+		
+		try {
+			md = MessageDigest.getInstance("SHA-512");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
 
         md.update(password.getBytes());
         byte[] mb = md.digest();
