@@ -15,15 +15,15 @@ import java.util.List;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
-import org.openpaas.ieda.web.common.Encryption;
 import org.openpaas.ieda.web.common.ReplaceItem;
+import org.openpaas.ieda.web.common.Sha512Crypt;
 import org.openpaas.ieda.web.config.bootstrap.BootStrapDto.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -192,7 +192,7 @@ public class IEDABootstrapService {
 			
 			items.add(new ReplaceItem("[stemcell]", LocalDirectoryConfiguration.getStemcellDir() + System.getProperty("file.separator") + awsConfig.getStemcell()));
 			items.add(new ReplaceItem("[cloudInstanceType]", awsConfig.getCloudInstanceType()));
-			items.add(new ReplaceItem("[boshPassword]", Encryption.encryption(awsConfig.getBoshPassword())));
+			items.add(new ReplaceItem("[boshPassword]", Sha512Crypt.Sha512_crypt(awsConfig.getBoshPassword(), RandomStringUtils.randomAlphabetic(10), 0)));
 		}
 		else{
 			IEDABootstrapOpenstackConfig openstackConfig = openstackRepository.findOne(id);
@@ -220,8 +220,7 @@ public class IEDABootstrapService {
 			
 			items.add(new ReplaceItem("[stemcell]", LocalDirectoryConfiguration.getStemcellDir() + System.getProperty("file.separator") + openstackConfig.getStemcell()));
 			items.add(new ReplaceItem("[cloudInstanceType]", openstackConfig.getCloudInstanceType()));
-			items.add(new ReplaceItem("[boshPassword]", Encryption.encryption(openstackConfig.getBoshPassword())));
-			
+			items.add(new ReplaceItem("[boshPassword]", Sha512Crypt.Sha512_crypt(openstackConfig.getBoshPassword(), RandomStringUtils.randomAlphabetic(10), 0)));
 		}
 		return items;
 	}
