@@ -46,6 +46,8 @@ public class IEDACfAwsService {
 		config.setDirectorUuid(dto.getDirectorUuid());
 		config.setReleaseName(dto.getReleaseName());
 		config.setReleaseVersion(dto.getReleaseVersion());
+		config.setAppSshFingerprint(dto.getAppSshFingerprint());
+		
 		// 1.2 기본정보
 		config.setDomain(dto.getDomain());
 		config.setDescription(dto.getDescription());

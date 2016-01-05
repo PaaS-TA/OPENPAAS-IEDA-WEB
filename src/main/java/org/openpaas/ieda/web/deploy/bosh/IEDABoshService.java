@@ -17,6 +17,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.openpaas.ieda.api.DeploymentInfo;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
+import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.common.ReplaceItem;
 import org.openpaas.ieda.web.common.Sha512Crypt;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
@@ -130,102 +131,6 @@ public class IEDABoshService {
 		return boshList;
 	}
 
-
-	public Boolean setSpiffMerge(String tempFilePath, String stubFilePath, String deplyFilePath){
-		File stubFile = null;
-		File tempFile = null;
-		String command = "";
-		Runtime r = Runtime.getRuntime();
-
-		InputStream inputStream = null;
-		BufferedReader bufferedReader = null;
-		Boolean status = Boolean.FALSE;
-		try {
-			tempFile = new File(tempFilePath);
-			stubFile = new File(stubFilePath);
-
-			if(stubFile.exists() && tempFile.exists()){
-				command = LocalDirectoryConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "merge-deploy.sh ";
-				command += stubFilePath + " ";
-				command += tempFilePath + " ";
-				command += deplyFilePath;
-
-				Process process = r.exec(command);
-				process.getInputStream();
-				inputStream = process.getInputStream();
-				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-				String info = null;
-				String streamLogs = "";
-				while ((info = bufferedReader.readLine()) != null){
-					streamLogs += info;
-					log.info("=== Deployment File Merge \n"+ info );
-				}
-				status = Boolean.TRUE;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inputStream != null)
-					inputStream.close();
-			} catch (Exception e) {
-			}
-			try {
-				if (bufferedReader != null)
-					bufferedReader.close();
-			} catch (Exception e) {
-			}
-		}
-		return status;
-	}
-
-/*	
-	public void deleteDeploy(String deploymentFile) {
-
-		InputStream inputStream = null;
-		BufferedReader bufferedReader = null;
-		Runtime r = Runtime.getRuntime();
-		try{
-			String command = LocalDirectoryConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "bosh-delete.sh ";
-			command += LocalDirectoryConfiguration.getDeploymentDir()+ System.getProperty("file.separator") +deploymentFile + " ";
-
-			Process process = r.exec(command);
-			log.info("### PROCESS ::: " + process.toString());
-			process.getInputStream();
-			inputStream = process.getInputStream();
-			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-			String info = null;
-			String streamLogs = "";
-			while ((info = bufferedReader.readLine()) != null){
-				streamLogs += info;
-				log.info("=== Delete Deploy File \n"+ info );
-				messagingTemplate.convertAndSend("/bosh/boshDelete", info);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inputStream != null)
-					inputStream.close();
-			} catch (Exception e) {
-			}
-			try {
-				if (bufferedReader != null)
-					bufferedReader.close();
-			} catch (Exception e) {
-			}
-			messagingTemplate.convertAndSend("/bosh/boshDelete", "complete");
-		}
-
-	}
-*/
-
 	public void boshInstall(String deployFileName) {
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
@@ -295,7 +200,7 @@ public class IEDABoshService {
 
 			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName()), "UTF-8");
 			IOUtils.write(content, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName), "UTF-8");
-			deplymentFileName = setSpiffMerge(iaas, id, stubDeploy.getName(), settingFileName);
+			deplymentFileName = CommonUtils.setSpiffMerge(iaas, id, "fullbosh" ,stubDeploy.getName(), settingFileName);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (IOException e1) {
@@ -375,76 +280,6 @@ public class IEDABoshService {
 		return items;
 	}
 
-	public String setSpiffMerge(String iaas, Integer id, String stubFileName, String settingFileName) {
-		
-		String deploymentFileName = iaas.toLowerCase() +"-fullbosh-merge-"+id+".yml";		
-		String templateFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName;
-		String parameterFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName;
-		String deploymentPath= LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
-
-		File stubFile = null;
-		File settingFile = null;
-		String command = "";
-		Runtime r = Runtime.getRuntime();
-
-		InputStream inputStream = null;
-
-		BufferedReader bufferedReader = null;
-		try {
-			stubFile = new File(templateFile);
-			settingFile = new File(parameterFile);
-
-			if(stubFile.exists() && settingFile.exists()){
-				command = "spiff merge " + templateFile + " " + parameterFile;;
-				
-				Process process = r.exec(command);
-
-				inputStream = process.getInputStream();
-				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-				String info = null;
-				String deloymentContent = "";
-				while ((info = bufferedReader.readLine()) != null){
-					deloymentContent += info + "\n";
-					log.info("=== Deployment File Merge \n"+ info );
-				}
-				
-				IOUtils.write(deloymentContent, new FileOutputStream(deploymentPath), "UTF-8");
-			}
-			else{
-				throw new IEDACommonException("illigalArgument.bosh.exception",
-						"Merge할 File이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inputStream != null)
-					inputStream.close();
-			} catch (Exception e) {
-			}
-			try {
-				if (bufferedReader != null)
-					bufferedReader.close();
-			} catch (Exception e) {
-			}
-		}
-		return deploymentFileName;
-	}
-	
-	public String getDeploymentInfos(String deploymentFile){
-		String contents = "";
-		File settingFile = null;
-		try {
-			settingFile = new File(LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile);
-			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return contents;
-	}
-	
 	public void deleteBoshInfoRecord(BoshParam.Delete dto) {
 		try{
 			if( "AWS".equals(dto.getIaas())){ 

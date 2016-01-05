@@ -8,12 +8,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class IEDACfOpenstackService {
 
 	@Autowired
-	IEDACfOpenstackRepository openstackRepository;
+	private IEDACfOpenstackRepository openstackRepository;
 
+	@Autowired
+	private IEDACfService cfService;
+	
 	public IEDACfOpenstackConfig getOpenstackCfInfo(int id) {
 		IEDACfOpenstackConfig config = null;
 		try{
@@ -41,6 +47,7 @@ public class IEDACfOpenstackService {
 		config.setDirectorUuid(dto.getDirectorUuid());
 		config.setReleaseName(dto.getReleaseName());
 		config.setReleaseVersion(dto.getReleaseVersion());
+		config.setAppSshFingerprint(dto.getAppSshFingerprint());
 		// 1.2 기본정보
 		config.setDomain(dto.getDomain());
 		config.setDescription(dto.getDescription());
@@ -48,7 +55,7 @@ public class IEDACfOpenstackService {
 		// 1.3 프록시 정보
 		config.setProxyStaticIps(dto.getProxyStaticIps());
 		config.setSslPemPub(dto.getSslPemPub());
-		config.setSslPemPub(dto.getSslPemPub());
+		config.setSslPemRsa(dto.getSslPemRsa());
 		
 		config.setUpdatedDate(now);
 		
@@ -105,13 +112,12 @@ public class IEDACfOpenstackService {
 		config.setStemcellVersion(dto.getStemcellVersion());
 		config.setBoshPassword(dto.getBoshPassword());
 		
+		String deplymentFileName = cfService.createSettingFile(Integer.parseInt(dto.getId()), "OPENSTACK");
+		config.setDeploymentFile(deplymentFileName);
 		Date now = new Date();
 		config.setUpdatedDate(now);
-		openstackRepository.save(config);
 		
-		//File Setting & merge
-		
-		return config;
+		return openstackRepository.save(config);
 	}
 
 }

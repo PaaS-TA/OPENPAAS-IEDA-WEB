@@ -11,7 +11,7 @@ networks:
       gateway: [subnetGateway]
       dns: [[subnetDns]]
       reserved: [[subnetReserved]]
-      static: [[subnetStaticFrom]]
+      static: [[subnetStatic]]
       cloud_properties:
         net_id: [cloudNetId]
         security_groups: [[cloudSecurityGroups]]
@@ -24,35 +24,37 @@ jobs:
   properties:
     ha_proxy:
       ssl_pem: |
-        [sslPemPub]
-        [sslPemRsa]
+[sslPemPub]
+[sslPemRsa]
 
 properties:
   domain: [domain]
   description: [description]  
   system_domain_organization: [domainOrganization]
+  app_ssh: 
+    host_key_fingerprint: [appSshFingerprint]
   
   consul:
     agent_cert: |
-      [agentCert]
+[agentCert]
     agent_key: |
-      [agentKey]
+[agentKey]
     ca_cert: |
-      [caCert]
+[caCert]
     encrypt_keys: [[encryptKeys]]
     server_cert: |
-      [serverCert]
+[serverCert]
     server_key: |
-      [serverKey]
+[serverKey]
   uaa:
     clients:
       login:
         secret: [loginSecret]
     jwt:
       signing_key: |
-        [signingKey]
+[signingKey]
       verification_key: |
-        [verificationKey]
+[verificationKey]
 
 resource_pools:
 - name: small

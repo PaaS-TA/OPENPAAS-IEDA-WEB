@@ -18,6 +18,7 @@ public class CfParam {
 		private String releaseName;
 		@NotNull
 		private String releaseVersion;
+		private String appSshFingerprint;
 		
 		// 1.2 기본정보
 		@NotNull
@@ -119,6 +120,7 @@ public class CfParam {
 		private String releaseName;
 		@NotNull
 		private String releaseVersion;
+		private String appSshFingerprint;
 		
 		// 1.2 기본정보
 		@NotNull
@@ -203,11 +205,8 @@ public class CfParam {
 		@NotNull
 		private String boshPassword;
 		// Deploy 정보
-		@NotNull
 		private String deploymentFile;
-		@NotNull
 		private String deployStatus;
-		@NotNull
 		private String deployLog;
 	}
 	

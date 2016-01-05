@@ -934,14 +934,12 @@ function deployPopup(){
 }
 
 function getDeployInfo(){
-	console.log(deployFileName);
-	var url = (iaas == "AWS") ? "/bootstrap/getBootstrapDeployInfo": "/bootstrap/getBootstrapDeployInfo";
 	$.ajax({
 		type : "POST",
-		url : "/bootstrap/getBootstrapDeployInfo",
+		url : "/common/getDeployInfo",
 		contentType : "application/json",
 		async : true,
-		data : JSON.stringify({deploymentFile:deployFileName}),
+		data : deployFileName,
 		success : function(data, status) {
 			if(status == "success"){
 				$(".w2ui-msg-body #deployInfo").text(data);

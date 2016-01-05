@@ -12,6 +12,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
+import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.common.ReplaceItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -93,52 +94,6 @@ public class IEDABoshAwsService {
 		return boshAwsRepository.save(config);
 	}
 	
-	public IEDABoshAwsConfig createTempFile(IEDABoshAwsConfig config, List<ReplaceItem> replaceItems){
-		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-fullbosh-setting.yml");
-		URL stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-fullbosh-stub.yml");
-		
-		File tempDeploy;
-		File stubDeploy;
-		
-		String content = "";
-		String stubContent = "";
-		String tempFile = "";
-		String stubFile = "";
-		String deployFileName = "aws-fullbosh-deploy-"+config.getId()+".yml";
-		String deployFile = ""; 
-		
-		try {
-			tempDeploy = new File(classPath.toURI());
-			stubDeploy = new File(stubPath.toURI());
-			
-			tempFile = LocalDirectoryConfiguration.getTempDir() +  System.getProperty("file.separator") + "aws-fullbosh-setting-"+config.getId()+".yml";
-			stubFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName();
-			deployFile = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") +deployFileName;
-			
-			content = IOUtils.toString(new FileInputStream(tempDeploy), "UTF-8");
-			stubContent = IOUtils.toString(new FileInputStream(stubDeploy), "UTF-8");
-			
-			for (ReplaceItem item : replaceItems) {
-				log.info(item.getTargetItem() +" / "+  item.getSourceItem());
-				content = content.replace(item.getTargetItem(), item.getSourceItem());
-			}
-
-			IOUtils.write(stubContent, new FileOutputStream(stubFile), "UTF-8");
-			IOUtils.write(content, new FileOutputStream(tempFile), "UTF-8");
-			
-			if( boshService.setSpiffMerge(tempFile, stubFile, deployFile) ){
-				config.setDeploymentFile(deployFileName);
-				boshAwsRepository.save(config);
-			}
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		
-		return config;
-	}
-
 	public IEDABoshAwsConfig getAwsInfo(int id) {
 		IEDABoshAwsConfig config =  null;
 		try{

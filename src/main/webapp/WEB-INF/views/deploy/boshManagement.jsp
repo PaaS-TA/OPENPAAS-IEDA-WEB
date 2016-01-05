@@ -174,7 +174,7 @@ $(function(){
 			msg		: message,
 			yes_text: "확인",
 			yes_callBack : function(event){
-				deleteBoshPop(record);
+				deletePopup(record);
 			},
 			no_text : "취소"
 		});
@@ -268,7 +268,7 @@ function getBoshOpenstackData(record){
 }
 
 //DELETE
-function deleteBoshPop(record){
+function deletePopup(record){
 	
 	var requestParameter = {iaas:record.iaas, id:record.id};
 	
@@ -276,7 +276,7 @@ function deleteBoshPop(record){
 		// 단순 레코드 삭제
 		var url = "/bosh/delete";
 		$.ajax({
-			type : "PUT",
+			type : "DELETE",
 			url : url,
 			data : JSON.stringify(requestParameter),
 			contentType : "application/json",
@@ -736,7 +736,7 @@ function saveAwsResourceInfo(type){
 }
 
 function deployPopup(){
-	var deployDiv = (iaas == "AWS") ? $("#deployManifestDiv") : $("#osDeployManifestDiv");
+	var deployDiv = (iaas == "AWS") ? $("#awsDeployDiv") : $("#openstackDeployDiv");
 	deployDiv.w2popup({
 		width 	: 670,
 		height 	: 470,
@@ -752,15 +752,12 @@ function deployPopup(){
 }
 
 function getDeployInfo(){
-	console.log("IAAS :: " + iaas );
-	var url = (iaas == "AWS") ? "/bosh/getAwsBoshDeployInfo": "/bosh/getOpenstackBoshDeployInfo";
-	console.log(" URL ::: " + url );
 	$.ajax({
 		type : "POST",
-		url : url,
+		url : "/common/getDeployInfo",
 		contentType : "application/json",
 		async : true, 
-		data : JSON.stringify({deploymentFile:deploymentFile}),
+		data : deploymentFile,
 		success : function(data, status) {
 			if(status == "success"){
 				$(".w2ui-msg-body #deployInfo").text(data);
@@ -795,9 +792,10 @@ function boshDeploy(type){
 	});
 }
 
+//배포파일 설치 팝업
 function installPopup(){
 	
-	var installDiv = (iaas == 'AWS') ? $("#installDiv") : $("#osInstallDiv");
+	var installDiv = (iaas == 'AWS') ? $("#awsInstallDiv") : $("#openstackInstallDiv");
 	var message = "BOSH(배포명:" + boshInfo.deploymentName +  ") ";
 	
 	var requestParameter = {
@@ -844,8 +842,7 @@ function installPopup(){
 			        installClient.send('/send/boshInstall', {}, JSON.stringify(requestParameter));
 			    });
 			}
-		},
-		onClose : initSetting
+		}
 	});
 }
 
@@ -1450,7 +1447,7 @@ $( window ).resize(function() {
 		</div>
 	</div>
 	
-	<div id="deployManifestDiv"  hidden="true">
+	<div id="awsDeployDiv"  hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="height:60px;margin:0 15px;">
@@ -1475,7 +1472,7 @@ $( window ).resize(function() {
 	</div>
 	
 	<!-- AWS 설치화면 -->
-	<div id="installDiv" style="width:100%;height:100%;" hidden="true">
+	<div id="awsInstallDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="height:60px;margin:0 15px;">
@@ -1760,7 +1757,7 @@ $( window ).resize(function() {
 	</div>
 	
 	<!-- 배포파일 정보 -->
-	<div id="osDeployManifestDiv" style="width:100%;height:100%;" hidden="true">
+	<div id="openstackDeployDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="height:60px;margin:0 15px;">
@@ -1779,13 +1776,12 @@ $( window ).resize(function() {
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 			<button class="btn" style="float: left;" onclick="osResourceInfoPopup();">이전</button>
-			<button class="btn" onclick="popupComplete();">취소</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="boshDeploy('after');">다음>></button>
 		</div>
 	</div>
 	
 	<!-- 오픈스택 설치화면 -->
-	<div id="osInstallDiv" style="width:100%;height:100%;" hidden="true">
+	<div id="openstackInstallDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="height:60px;margin:0 15px;">
@@ -1798,7 +1794,6 @@ $( window ).resize(function() {
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title">▶ 설치 로그</div>
 			<div style="width:95%;height:84%;float: left;display: inline-block;">
 				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
@@ -1806,5 +1801,5 @@ $( window ).resize(function() {
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 			<button class="btn" style="float: left;" onclick="deployPopup()">이전</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
-		</div>		
+		</div>
 	</div>	

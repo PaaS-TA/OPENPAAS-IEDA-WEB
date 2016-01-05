@@ -30,7 +30,9 @@ properties:
   domain: [domain]
   description: [description]
   system_domain_organization: [domainOrganization]
-
+  app_ssh: 
+    host_key_fingerprint: [appSshFingerprint]
+    
   consul:
     agent_cert: |
 [agentCert]

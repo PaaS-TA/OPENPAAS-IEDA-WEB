@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
+import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.common.ReplaceItem;
 import org.openpaas.ieda.web.common.Sha512Crypt;
 import org.openpaas.ieda.web.config.bootstrap.BootStrapDto.Delete;
@@ -152,7 +153,7 @@ public class IEDABootstrapService {
 
 			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir()  + System.getProperty("file.separator") + stubFile.getName()), "UTF-8");
 			IOUtils.write(content, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName), "UTF-8");
-			deplymentFileName = setSpiffMerge(iaas, id, stubFile.getName(), settingFileName);
+			deplymentFileName = CommonUtils.setSpiffMerge(iaas, id, "microbosh", stubFile.getName(), settingFileName);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (IOException e1) {
@@ -225,73 +226,6 @@ public class IEDABootstrapService {
 		return items;
 	}
 
-	public String getBootStrapSettingInfo(String deploymentFile) {
-		String contents = "";
-		File settingFile = null;
-		try {
-			settingFile = new File(LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile);
-			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return contents;
-	}
-	
-	public String setSpiffMerge(String iaas, Integer id, String stubFileName, String settingFileName) {
-		String deploymentFileName = iaas.toLowerCase() +"-microbosh-"+id+".yml";		
-		String templateFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName;
-		String parameterFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName;
-		String targetFile= LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
-		
-		File stubFile = null;
-		File settingFile = null;
-		String command = "";
-		Runtime r = Runtime.getRuntime();
-
-		InputStream inputStream = null;
-		BufferedReader bufferedReader = null;
-		try {
-			stubFile = new File(templateFile);
-			settingFile = new File(parameterFile);
-			
-			if(stubFile.exists() && settingFile.exists()){
-				command = "spiff merge " + templateFile + " " + parameterFile;
-				
-				Process process = r.exec(command);
-
-				inputStream = process.getInputStream();
-				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-				String info = null;
-				String deloymentContent = "";
-				while ((info = bufferedReader.readLine()) != null){
-					deloymentContent += info + "\n";
-				}
-				
-				IOUtils.write(deloymentContent, new FileOutputStream(targetFile), "UTF-8");
-			}
-			else{
-				throw new IEDACommonException("illigalArgument.bootstrap.exception",
-						"Merge할 File이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inputStream != null)
-					inputStream.close();
-			} catch (Exception e) {
-			}
-			try {
-				if (bufferedReader != null)
-					bufferedReader.close();
-			} catch (Exception e) {
-			}
-		}
-		return deploymentFileName;
-	}
-	
 	public List<String> getKeyPathFileList() {
 		
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("KeyFile only","pem");

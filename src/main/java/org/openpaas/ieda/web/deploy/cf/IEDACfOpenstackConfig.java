@@ -28,6 +28,7 @@ public class IEDACfOpenstackConfig {
 	private String directorUuid;
 	private String releaseName;
 	private String releaseVersion;
+	private String appSshFingerprint;
 
 	// 1.2 기본정보
 	private String domain;

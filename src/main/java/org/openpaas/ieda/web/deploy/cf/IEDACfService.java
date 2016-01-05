@@ -16,10 +16,8 @@ import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.common.CommonService;
+import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.common.ReplaceItem;
-import org.openpaas.ieda.web.deploy.bosh.IEDABoshAwsConfig;
-import org.openpaas.ieda.web.deploy.bosh.IEDABoshOpenstackConfig;
-import org.openpaas.ieda.web.deploy.cf.CfParam.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -36,7 +34,7 @@ public class IEDACfService {
 	private IEDACfAwsRepository awsRepository;
 	@Autowired
 	private IEDACfOpenstackRepository openstackRepository;
-
+	
 	public List<CfListDto> listCfs() {
 		List<CfListDto> cfList = null;
 
@@ -125,7 +123,7 @@ public class IEDACfService {
 
 			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName()), "UTF-8");
 			IOUtils.write(content, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName), "UTF-8");
-			deplymentFileName = setSpiffMerge(iaas, id, stubDeploy.getName(), settingFileName);
+			deplymentFileName = CommonUtils.setSpiffMerge(iaas, id, "cf", stubDeploy.getName(), settingFileName);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (IOException e1) {
@@ -147,7 +145,8 @@ public class IEDACfService {
 			items.add(new ReplaceItem("[directorUuid]", awsConfig.getDirectorUuid()));
 			items.add(new ReplaceItem("[releaseName]", awsConfig.getReleaseName()));
 			items.add(new ReplaceItem("[releaseVersion]", awsConfig.getReleaseVersion()));
-
+			items.add(new ReplaceItem("[appSshFingerprint]", awsConfig.getAppSshFingerprint()));
+			
 			// 1.2 기본정보
 			items.add(new ReplaceItem("[domain]", awsConfig.getDomain()));
 			items.add(new ReplaceItem("[description]", awsConfig.getDescription()));
@@ -155,21 +154,21 @@ public class IEDACfService {
 
 			// 1.3 프록시 정보
 			items.add(new ReplaceItem("[proxyStaticIps]", awsConfig.getProxyStaticIps()));
-			items.add(new ReplaceItem("[sslPemPub]", commonService.lineAddSpace(awsConfig.getSslPemPub(),8)));
-			items.add(new ReplaceItem("[sslPemRsa]", commonService.lineAddSpace(awsConfig.getSslPemRsa(),8)));
+			items.add(new ReplaceItem("[sslPemPub]", CommonUtils.lineAddSpace(awsConfig.getSslPemPub(),8)));
+			items.add(new ReplaceItem("[sslPemRsa]", CommonUtils.lineAddSpace(awsConfig.getSslPemRsa(),8)));
 
 			// 2. UAA 정보
 			items.add(new ReplaceItem("[loginSecret]", awsConfig.getLoginSecret()));
-			items.add(new ReplaceItem("[signingKey]", commonService.lineAddSpace(awsConfig.getSigningKey(),8)));
-			items.add(new ReplaceItem("[verificationKey]", commonService.lineAddSpace(awsConfig.getVerificationKey(),8)));
+			items.add(new ReplaceItem("[signingKey]", CommonUtils.lineAddSpace(awsConfig.getSigningKey(),8)));
+			items.add(new ReplaceItem("[verificationKey]", CommonUtils.lineAddSpace(awsConfig.getVerificationKey(),8)));
 
 			// 3. Consul 정보
-			items.add(new ReplaceItem("[agentCert]", commonService.lineAddSpace(awsConfig.getAgentCert(),6)));
-			items.add(new ReplaceItem("[agentKey]", commonService.lineAddSpace(awsConfig.getAgentKey(),6)));
-			items.add(new ReplaceItem("[caCert]", commonService.lineAddSpace(awsConfig.getCaCert(),6)));
+			items.add(new ReplaceItem("[agentCert]", CommonUtils.lineAddSpace(awsConfig.getAgentCert(),6)));
+			items.add(new ReplaceItem("[agentKey]", CommonUtils.lineAddSpace(awsConfig.getAgentKey(),6)));
+			items.add(new ReplaceItem("[caCert]", CommonUtils.lineAddSpace(awsConfig.getCaCert(),6)));
 			items.add(new ReplaceItem("[encryptKeys]", awsConfig.getEncryptKeys()));
-			items.add(new ReplaceItem("[serverCert]", commonService.lineAddSpace(awsConfig.getServerCert(),6)));
-			items.add(new ReplaceItem("[serverKey]", commonService.lineAddSpace(awsConfig.getServerKey(),6)));
+			items.add(new ReplaceItem("[serverCert]", CommonUtils.lineAddSpace(awsConfig.getServerCert(),6)));
+			items.add(new ReplaceItem("[serverKey]", CommonUtils.lineAddSpace(awsConfig.getServerKey(),6)));
 
 			// 4. 네트워크 정보
 			items.add(new ReplaceItem("[subnetRange]", awsConfig.getSubnetRange()));
@@ -198,24 +197,25 @@ public class IEDACfService {
 			items.add(new ReplaceItem("[domain]", openstackConfig.getDomain()));
 			items.add(new ReplaceItem("[description]", openstackConfig.getDescription()));
 			items.add(new ReplaceItem("[domainOrganization]", openstackConfig.getDomainOrganization()));
-
+			items.add(new ReplaceItem("[appSshFingerprint]", openstackConfig.getAppSshFingerprint()));
+			
 			// 1.3 프록시 정보
 			items.add(new ReplaceItem("[proxyStaticIps]", openstackConfig.getProxyStaticIps()));
-			items.add(new ReplaceItem("[sslPemPub]", commonService.lineAddSpace(openstackConfig.getSslPemPub(),8)));
-			items.add(new ReplaceItem("[sslPemRsa]", commonService.lineAddSpace(openstackConfig.getSslPemRsa(),8)));
+			items.add(new ReplaceItem("[sslPemPub]", CommonUtils.lineAddSpace(openstackConfig.getSslPemPub(),8)));
+			items.add(new ReplaceItem("[sslPemRsa]", CommonUtils.lineAddSpace(openstackConfig.getSslPemRsa(),8)));
 
 			// 2. UAA 정보
 			items.add(new ReplaceItem("[loginSecret]", openstackConfig.getLoginSecret()));
-			items.add(new ReplaceItem("[signingKey]", commonService.lineAddSpace(openstackConfig.getSigningKey(),8)));
-			items.add(new ReplaceItem("[verificationKey]", commonService.lineAddSpace(openstackConfig.getVerificationKey(),8)));
+			items.add(new ReplaceItem("[signingKey]", CommonUtils.lineAddSpace(openstackConfig.getSigningKey(),8)));
+			items.add(new ReplaceItem("[verificationKey]", CommonUtils.lineAddSpace(openstackConfig.getVerificationKey(),8)));
 
 			// 3. Consul 정보
-			items.add(new ReplaceItem("[agentCert]", commonService.lineAddSpace(openstackConfig.getAgentCert(),6)));
-			items.add(new ReplaceItem("[agentKey]", commonService.lineAddSpace(openstackConfig.getAgentKey(),6)));
-			items.add(new ReplaceItem("[caCert]", commonService.lineAddSpace(openstackConfig.getCaCert(),6)));
+			items.add(new ReplaceItem("[agentCert]", CommonUtils.lineAddSpace(openstackConfig.getAgentCert(),6)));
+			items.add(new ReplaceItem("[agentKey]", CommonUtils.lineAddSpace(openstackConfig.getAgentKey(),6)));
+			items.add(new ReplaceItem("[caCert]", CommonUtils.lineAddSpace(openstackConfig.getCaCert(),6)));
 			items.add(new ReplaceItem("[encryptKeys]", openstackConfig.getEncryptKeys()));
-			items.add(new ReplaceItem("[serverCert]", commonService.lineAddSpace(openstackConfig.getServerCert(),6)));
-			items.add(new ReplaceItem("[serverKey]", commonService.lineAddSpace(openstackConfig.getServerKey(),6)));
+			items.add(new ReplaceItem("[serverCert]", CommonUtils.lineAddSpace(openstackConfig.getServerCert(),6)));
+			items.add(new ReplaceItem("[serverKey]", CommonUtils.lineAddSpace(openstackConfig.getServerKey(),6)));
 
 			// 4. 네트워크 정보
 			items.add(new ReplaceItem("[subnetRange]", openstackConfig.getSubnetRange()));
@@ -225,83 +225,13 @@ public class IEDACfService {
 			items.add(new ReplaceItem("[subnetStatic]", openstackConfig.getSubnetStaticFrom() + " - " + openstackConfig.getSubnetStaticTo()));
 			items.add(new ReplaceItem("[cloudNetId]", openstackConfig.getCloudNetId()));			
 			items.add(new ReplaceItem("[cloudSecurityGroups]", openstackConfig.getCloudSecurityGroups()));
-
+			
 			// 5. 리소스 정보
 			items.add(new ReplaceItem("[stemcellName]", openstackConfig.getStemcellName()));
 			items.add(new ReplaceItem("[stemcellVersion]", openstackConfig.getStemcellVersion()));
 			items.add(new ReplaceItem("[boshPassword]", openstackConfig.getBoshPassword()));
 		}
 		return items;
-	}
-
-	public String setSpiffMerge(String iaas, Integer id, String stubFileName, String settingFileName) {
-
-		String deploymentFileName = iaas.toLowerCase() +"-cf-"+id+".yml";		
-		String templateFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubFileName;
-		String parameterFile = LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName;
-		String deploymentPath= LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
-
-		File stubFile = null;
-		File settingFile = null;
-		String command = "";
-		Runtime r = Runtime.getRuntime();
-
-		InputStream inputStream = null;
-
-		BufferedReader bufferedReader = null;
-		try {
-			stubFile = new File(templateFile);
-			settingFile = new File(parameterFile);
-
-			if(stubFile.exists() && settingFile.exists()){
-				command = "spiff merge " + templateFile + " " + parameterFile;;
-
-				Process process = r.exec(command);
-
-				inputStream = process.getInputStream();
-				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-				String info = null;
-				String deloymentContent = "";
-				while ((info = bufferedReader.readLine()) != null){
-					deloymentContent += info + "\n";
-					log.info("=== Deployment File Merge \n"+ info );
-				}
-
-				IOUtils.write(deloymentContent, new FileOutputStream(deploymentPath), "UTF-8");
-			}
-			else{
-				throw new IEDACommonException("illigalArgument.bosh.exception",
-						"Merge할 File이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inputStream != null)
-					inputStream.close();
-			} catch (Exception e) {
-			}
-			try {
-				if (bufferedReader != null)
-					bufferedReader.close();
-			} catch (Exception e) {
-			}
-		}
-		return deploymentFileName;
-	}
-
-	public String getDeploymentInfos(String deploymentFile) {
-		String contents = "";
-		File settingFile = null;
-		try {
-			settingFile = new File(LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile);
-			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return contents;
 	}
 
 	public void deleteCfInfoRecord(CfParam.Delete dto) {

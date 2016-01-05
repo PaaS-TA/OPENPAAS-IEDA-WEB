@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.web.common.BaseController;
+import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.openpaas.ieda.web.information.deploy.DeploymentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,28 +129,6 @@ public class BoshManagementController extends BaseController {
 		
 		return new ResponseEntity<>(result, status);
 	}
-	
-	@RequestMapping(value="/bosh/getAwsBoshDeployInfo", method=RequestMethod.POST)
-	public ResponseEntity getBoshAwsDeployInfo(@RequestBody @Valid BoshParam.Deployment dto){
-		HttpStatus status = HttpStatus.OK;
-		String content = "";
-		content = boshService.getDeploymentInfos(dto.getDeploymentFile());
-		if(StringUtils.isEmpty(content) ) {
-			status = HttpStatus.NO_CONTENT;
-		}		
-		return new ResponseEntity<>(content, status);
-	}
-	
-	@RequestMapping(value="/bosh/getOpenstackBoshDeployInfo", method=RequestMethod.POST)
-	public ResponseEntity getBoshOpenstackDeployInfo(@RequestBody @Valid BoshParam.Deployment dto){
-		HttpStatus status = HttpStatus.OK;
-		String content = "";
-		content = boshService.getDeploymentInfos(dto.getDeploymentFile());
-		if(StringUtils.isEmpty(content) ) {
-			status = HttpStatus.NO_CONTENT;
-		}		
-		return new ResponseEntity<>(content, status);
-	}
 
 	@RequestMapping(value="/bosh/saveOpenstackInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveOpenstackInfo(@RequestBody @Valid BoshParam.Openstack dto){
@@ -198,7 +177,7 @@ public class BoshManagementController extends BaseController {
 		return new ResponseEntity(HttpStatus.OK);
 	}
 	
-	@RequestMapping( value="/bosh/delete", method=RequestMethod.PUT)
+	@RequestMapping( value="/bosh/delete", method=RequestMethod.DELETE)
 	public ResponseEntity deleteJustOnlyBoshRecord(@RequestBody @Valid BoshParam.Delete dto){
 		boshService.deleteBoshInfoRecord(dto);
 		return new ResponseEntity<>(HttpStatus.OK);

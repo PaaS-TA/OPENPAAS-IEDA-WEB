@@ -493,7 +493,10 @@ jobs:
 properties:
   acceptance_tests: null
   app_domains: [(( domain ))]
-  app_ssh: null
+  app_ssh: 
+    host_key_fingerprint: (( merge || null ))
+    oauth_client_id: ssh-proxy
+    
   cc:
     allow_app_ssh_access: true
     allowed_cors_domains: []

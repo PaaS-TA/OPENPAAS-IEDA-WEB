@@ -2,15 +2,16 @@ package org.openpaas.ieda.web.common;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Scanner;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -70,29 +71,15 @@ public class CommonService {
 		return localFiles;
 	}
 
-	public List<String> getLocalList(String type) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String lineAddSpace(String exc, int cnt ){
-		String returnString = "";
-		String[] lines = exc.split(System.getProperty("line.separator"));
-		String empty = "";
-		for(int i=0;i<cnt;i++){
-			empty += " ";
+	public String getDeploymentInfo(String deploymentFile) {
+		String contents = "";
+		File settingFile = null;
+		try {
+			settingFile = new File(LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile);
+			contents = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		if(lines.length >0 ){
-			for(int i =0; i < lines.length;i++){
-				if(i == lines.length){
-					returnString += empty + lines[i].replace("\n", "");
-				}
-				else{
-					returnString += empty + lines[i]+"\n";
-				}
-			}
-		}
-		return returnString;
+		return contents;
 	}
-	
 }

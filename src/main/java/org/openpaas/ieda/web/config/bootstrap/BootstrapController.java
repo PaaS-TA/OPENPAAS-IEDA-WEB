@@ -105,13 +105,6 @@ public class BootstrapController extends BaseController {
 		return new ResponseEntity(config, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/bootstrap/getBootstrapDeployInfo", method=RequestMethod.POST)
-	public ResponseEntity getBootStrapSettingInfo(@RequestBody @Valid BootStrapDto.Deployment dto){
-		String content = bootstrapService.getBootStrapSettingInfo(dto.getDeploymentFile());
-		HttpStatus status = (content != null) ? HttpStatus.OK: HttpStatus.NO_CONTENT;
-		return new ResponseEntity(content, status);
-	}
-
 	@MessageMapping("/bootstrapInstall")
 	@SendTo("/bootstrap/bootstrapInstall")
 	public ResponseEntity doInstallBootstrap(@RequestBody @Valid BootStrapDto.Install dto){
@@ -127,7 +120,7 @@ public class BootstrapController extends BaseController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@RequestMapping( value="/bootstrap/delete", method=RequestMethod.PUT)
+	@RequestMapping( value="/bootstrap/delete", method=RequestMethod.DELETE)
 	public ResponseEntity deleteJustOnlyBootstrapRecord(@RequestBody @Valid BootStrapDto.Delete dto){
 		log.info("### deleteBootstrap");
 		bootstrapService.deleteBootstrapInfoRecord(dto);

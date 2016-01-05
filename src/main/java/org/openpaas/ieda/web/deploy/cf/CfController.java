@@ -9,7 +9,7 @@ import javax.validation.Valid;
 
 import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.web.common.BaseController;
-import org.openpaas.ieda.web.deploy.bosh.BoshParam;
+import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -171,21 +171,13 @@ public class CfController extends BaseController{
 	public ResponseEntity saveOpenstackResourceCfInfo(@RequestBody @Valid CfParam.OpenstackResource dto){
 		
 		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackResourceInfo(dto);
-		
-		return new ResponseEntity<>(config, HttpStatus.OK);
-	}
-	
-	
-	@RequestMapping(value="/cf/getDeployInfo", method=RequestMethod.POST)
-	public ResponseEntity getCfDeployInfo(@RequestBody @Valid CfParam.Deployment dto){
 		HttpStatus status = HttpStatus.OK;
-		String content = cfService.getDeploymentInfos(dto.getDeploymentFile());
-		if(StringUtils.isEmpty(content) ) {
-			status = HttpStatus.NO_CONTENT;
-		}		
-		return new ResponseEntity<>(content, status);
+		Map<String, Object> result = new HashMap<>();
+		result.put("content", config);
+		if( result.get("content") == null) status = HttpStatus.NO_CONTENT;
+		return new ResponseEntity<>(result, status);
 	}
-
+	
 	@RequestMapping( value="/cf/releases", method =RequestMethod.GET)
 	public ResponseEntity listRelease(){
 		List<ReleaseInfo> contents = releaseService.listRelease();
@@ -218,7 +210,7 @@ public class CfController extends BaseController{
 		return new ResponseEntity(HttpStatus.OK);
 	}
 	
-	@RequestMapping( value="/cf/delete", method=RequestMethod.PUT)
+	@RequestMapping( value="/cf/delete", method=RequestMethod.DELETE)
 	public ResponseEntity deleteJustOnlyCfRecord(@RequestBody @Valid CfParam.Delete dto){
 		cfService.deleteCfInfoRecord(dto);
 		return new ResponseEntity<>(HttpStatus.OK);

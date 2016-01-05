@@ -241,7 +241,7 @@ ul.progressStep_7 li{
 
 ul.progressStep_7 li:before {
     content: '';
-    border-left: 16px solid #fff;
+    border-left: 17px solid #fff;
     border-top: 24px solid transparent;
     border-bottom: 24px solid transparent;
     position: absolute;
@@ -251,7 +251,7 @@ ul.progressStep_7 li:before {
 }
 ul.progressStep_7 li:after {
     content: '';
-    border-left: 15px solid #333;
+    border-left: 17px solid #333;
     border-top: 24px solid transparent;
     border-bottom: 24px solid transparent;
     position: absolute;
