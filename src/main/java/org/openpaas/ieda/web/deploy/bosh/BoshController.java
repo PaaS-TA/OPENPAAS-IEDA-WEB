@@ -9,7 +9,6 @@ import javax.validation.Valid;
 
 import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.web.common.BaseController;
-import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.openpaas.ieda.web.information.deploy.DeploymentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-public class BoshManagementController extends BaseController {
+public class BoshController extends BaseController {
 	
 	@Autowired
 	private IEDABoshAwsRepository awsRepository;

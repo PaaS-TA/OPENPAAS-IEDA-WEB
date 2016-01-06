@@ -9,7 +9,6 @@ import javax.validation.Valid;
 
 import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.web.common.BaseController;
-import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,7 +53,6 @@ public class CfController extends BaseController{
 	}
 	
 	
-	
 	@RequestMapping(value="/deploy/cfList", method=RequestMethod.GET)
 	public ResponseEntity listCfs() {
 		List<CfListDto> content = cfService.listCfs();
@@ -80,7 +77,7 @@ public class CfController extends BaseController{
 	}
 
 	@RequestMapping(value="/cf/saveAws", method=RequestMethod.PUT)
-	public ResponseEntity saveAwsCfInfo(@RequestBody @Valid CfParam.Aws dto){
+	public ResponseEntity saveAwsCfInfo(@RequestBody @Valid CfParam.Default dto){
 		
 		IEDACfAwsConfig config = cfAwsService.saveAwsCfInfo(dto);
 		
@@ -88,7 +85,7 @@ public class CfController extends BaseController{
 	}
 	
 	@RequestMapping(value="/cf/saveAwsUaa", method=RequestMethod.PUT)
-	public ResponseEntity saveAwsUaaCfInfo(@RequestBody @Valid CfParam.AwsUaa dto){
+	public ResponseEntity saveAwsUaaCfInfo(@RequestBody @Valid CfParam.Uaa dto){
 		
 		IEDACfAwsConfig config = cfAwsService.saveAwsUaaCfInfo(dto);
 		
@@ -96,7 +93,7 @@ public class CfController extends BaseController{
 	}
 	
 	@RequestMapping(value="/cf/saveAwsConsul", method=RequestMethod.PUT)
-	public ResponseEntity saveAwsConsulCfInfo(@RequestBody @Valid CfParam.AwsConsul dto){
+	public ResponseEntity saveAwsConsulCfInfo(@RequestBody @Valid CfParam.Consul dto){
 		
 		IEDACfAwsConfig config = cfAwsService.saveAwsConsulCfInfo(dto);
 		
@@ -112,7 +109,7 @@ public class CfController extends BaseController{
 	}
 	
 	@RequestMapping(value="/cf/saveAwsResource", method=RequestMethod.PUT)
-	public ResponseEntity saveAwsResourceCfInfo(@RequestBody @Valid CfParam.AwsResource dto){
+	public ResponseEntity saveAwsResourceCfInfo(@RequestBody @Valid CfParam.Resource dto){
 		
 		IEDACfAwsConfig config = cfAwsService.saveAwsResourceInfo(dto);
 		HttpStatus status = HttpStatus.OK;
@@ -136,7 +133,7 @@ public class CfController extends BaseController{
 	
 	
 	@RequestMapping(value="/cf/saveOpenstack", method=RequestMethod.PUT)
-	public ResponseEntity saveOpenstackCfInfo(@RequestBody @Valid CfParam.Openstack dto){
+	public ResponseEntity saveOpenstackCfInfo(@RequestBody @Valid CfParam.Default dto){
 		
 		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackCfInfo(dto);
 		
@@ -144,7 +141,7 @@ public class CfController extends BaseController{
 	}
 	
 	@RequestMapping(value="/cf/saveOpenstackUaa", method=RequestMethod.PUT)
-	public ResponseEntity saveOpenstackUaaCfInfo(@RequestBody @Valid CfParam.OpenstackUaa dto){
+	public ResponseEntity saveOpenstackUaaCfInfo(@RequestBody @Valid CfParam.Uaa dto){
 		
 		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackUaaCfInfo(dto);
 		
@@ -152,7 +149,7 @@ public class CfController extends BaseController{
 	}
 	
 	@RequestMapping(value="/cf/saveOpenstackConsul", method=RequestMethod.PUT)
-	public ResponseEntity saveOpenstackConsulCfInfo(@RequestBody @Valid CfParam.OpenstackConsul dto){
+	public ResponseEntity saveOpenstackConsulCfInfo(@RequestBody @Valid CfParam.Consul dto){
 		
 		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackConsulCfInfo(dto);
 		
@@ -168,7 +165,7 @@ public class CfController extends BaseController{
 	}
 	
 	@RequestMapping(value="/cf/saveOpenstackResource", method=RequestMethod.PUT)
-	public ResponseEntity saveOpenstackResourceCfInfo(@RequestBody @Valid CfParam.OpenstackResource dto){
+	public ResponseEntity saveOpenstackResourceCfInfo(@RequestBody @Valid CfParam.Resource dto){
 		
 		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackResourceInfo(dto);
 		HttpStatus status = HttpStatus.OK;
@@ -178,32 +175,8 @@ public class CfController extends BaseController{
 		return new ResponseEntity<>(result, status);
 	}
 	
-	@RequestMapping( value="/cf/releases", method =RequestMethod.GET)
-	public ResponseEntity listRelease(){
-		List<ReleaseInfo> contents = releaseService.listRelease();
-		List<ReleaseInfo> releases = new ArrayList<>();
-		if(contents != null ){
-			for(ReleaseInfo releaseInfo: contents){
-				if("bosh".equals(releaseInfo.getName())){
-					log.info("@@@@@ " + releaseInfo.getName()+ "/" + releaseInfo.getVersion());
-					releases.add(releaseInfo);
-				}
-			}
-		}
-		
-		HashMap<String, Object> result = new HashMap<String, Object>();
-		
-		if ( contents != null ) {
-			result.put("total", releases.size());
-			result.put("records", releases);
-		} else
-			result.put("total", 0);
-		
-		return new ResponseEntity( result, HttpStatus.OK);
-	}
-	
 	@MessageMapping("/cfInstall")
-	@SendTo("/cd/cfInstall")
+	@SendTo("/cf/cfInstall")
 	public ResponseEntity doBoshInstall(@RequestBody @Valid CfParam.Install dto){
 		
 		cfDeployAsyncService.deployAsync(dto);

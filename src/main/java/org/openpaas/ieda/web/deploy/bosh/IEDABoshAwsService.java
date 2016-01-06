@@ -17,6 +17,7 @@ import org.openpaas.ieda.web.common.ReplaceItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +34,7 @@ public class IEDABoshAwsService {
 	public IEDABoshAwsConfig saveBoshAwsInfo(BoshParam.AWS dto){
 		IEDABoshAwsConfig config = null ;
 		Date now = new Date();
-		if(dto.getId() == null || "".equals(dto.getId())){
+		if( StringUtils.isEmpty(dto.getId()) ){
 			config = new IEDABoshAwsConfig();
 		}
 		else {

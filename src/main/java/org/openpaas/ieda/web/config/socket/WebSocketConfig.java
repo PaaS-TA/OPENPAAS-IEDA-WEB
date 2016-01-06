@@ -17,6 +17,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 								, "/bootstrap"
 								, "/bosh"
 								, "/cf"
+								, "/diego"
 								);
 		config.setApplicationDestinationPrefixes("/app", "/send");
 	}
@@ -35,6 +36,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 							, "/boshDelete"
 							, "/cfInstall"
 							, "/cfDelete"
+							, "/diegoInstall"
+							, "/diegoDelete"
 							, "/task"
 							).withSockJS();
 	}

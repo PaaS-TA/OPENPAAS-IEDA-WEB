@@ -5,7 +5,7 @@
 <script type="text/javascript">
 var uploadClient = null;
 var deleteClient = null;
-var appendLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:430px;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
+var appendLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:95%;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
 var appendLogPopupButton = '<button id="closeBtn" class="btn closeBtn" onclick="popupClose(); disabled">확인</button>'
 
 $(function() {
@@ -202,7 +202,8 @@ function appendLogPopup(type, requestParameter){
 		buttons : appendLogPopupButton,
 		width 	: 800,
 		height	: 550,		
-		modal	: true,		
+		modal	: true,
+		showMax : true,
 		onOpen  : function(){
 			if(type =="upload") doUploadConnect(requestParameter);
 			else doDeleteConnect(requestParameter);

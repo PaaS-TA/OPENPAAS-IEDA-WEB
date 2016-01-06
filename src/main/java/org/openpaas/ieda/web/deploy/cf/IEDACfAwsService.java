@@ -32,7 +32,7 @@ public class IEDACfAwsService {
 		return config;
 	}
 	
-	public IEDACfAwsConfig saveAwsCfInfo(CfParam.Aws dto) {
+	public IEDACfAwsConfig saveAwsCfInfo(CfParam.Default dto) {
 		IEDACfAwsConfig config;
 		Date now = new Date();
 		if( StringUtils.isEmpty(dto.getId()) ){
@@ -62,7 +62,7 @@ public class IEDACfAwsService {
 		return awsRepository.save(config);
 	}
 	
-	public IEDACfAwsConfig saveAwsUaaCfInfo(CfParam.AwsUaa dto) {
+	public IEDACfAwsConfig saveAwsUaaCfInfo(CfParam.Uaa dto) {
 		IEDACfAwsConfig config = awsRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setLoginSecret(dto.getLoginSecret());
 		config.setSigningKey(dto.getSigningKey());
@@ -72,7 +72,7 @@ public class IEDACfAwsService {
 		return awsRepository.save(config);
 	}
 	
-	public IEDACfAwsConfig saveAwsConsulCfInfo(CfParam.AwsConsul dto) {
+	public IEDACfAwsConfig saveAwsConsulCfInfo(CfParam.Consul dto) {
 		IEDACfAwsConfig config = awsRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setAgentCert(dto.getAgentCert());
 		config.setAgentKey(dto.getAgentKey());
@@ -106,7 +106,7 @@ public class IEDACfAwsService {
 		return awsRepository.save(config);
 	}
 	
-	public IEDACfAwsConfig saveAwsResourceInfo(CfParam.AwsResource dto){
+	public IEDACfAwsConfig saveAwsResourceInfo(CfParam.Resource dto){
 		IEDACfAwsConfig config = awsRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setStemcellName(dto.getStemcellName());
 		config.setStemcellVersion(dto.getStemcellVersion());

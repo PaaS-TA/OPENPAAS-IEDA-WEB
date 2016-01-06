@@ -1,12 +1,9 @@
 package org.openpaas.ieda.web.deploy.cf;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,8 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 public class IEDACfService {
 
 	@Autowired
-	private CommonService commonService;
-	@Autowired
 	private IEDACfAwsRepository awsRepository;
 	@Autowired
 	private IEDACfOpenstackRepository openstackRepository;
@@ -52,18 +47,34 @@ public class IEDACfService {
 					dto.setIaas("AWS");
 					dto.setCreateDate(config.getCreatedDate());
 					dto.setUpdateDate(config.getUpdatedDate());
-
-					dto.setDeployStatus(config.getDeployStatus());
+					
 					dto.setDeploymentName(config.getDeploymentName());
-
-					dto.setReleaseVersion(config.getReleaseVersion());
-					dto.setStemcellName(config.getStemcellName());
-					dto.setStemcellVersion(config.getStemcellVersion());
-
 					dto.setDirectorUuid(config.getDirectorUuid());
+					dto.setReleaseName(config.getReleaseName());
+					dto.setReleaseVersion(config.getReleaseVersion());
+					dto.setAppSshFingerprint(config.getAppSshFingerprint());
+
+					dto.setDomain(config.getDomain());
+					dto.setDescription(config.getDescription());
+					dto.setDomainOrganization(config.getDomainOrganization());
+					
+					dto.setProxyStaticIps(config.getProxyStaticIps());
+					
 					dto.setSubnetRange(config.getSubnetRange());
 					dto.setSubnetGateway(config.getSubnetGateway());
 					dto.setSubnetDns(config.getSubnetDns());
+					dto.setSubnetReservedFrom(config.getSubnetReservedFrom());
+					dto.setSubnetReservedTo(config.getSubnetReservedTo());
+					dto.setSubnetStaticFrom(config.getSubnetStaticFrom());
+					dto.setSubnetStaticTo(config.getSubnetStaticTo());
+					dto.setSubnetId(config.getSubnetId());
+					
+					dto.setStemcellName(config.getStemcellName());
+					dto.setStemcellVersion(config.getStemcellVersion());
+					dto.setBoshPassword(config.getBoshPassword());
+					
+					dto.setDeployStatus(config.getDeployStatus());
+					dto.setDeployStatus(config.getDeployStatus());
 					cfList.add(dto);
 				}
 			}
@@ -76,18 +87,34 @@ public class IEDACfService {
 					dto.setIaas("OPENSTACK");
 					dto.setCreateDate(config.getCreatedDate());
 					dto.setUpdateDate(config.getUpdatedDate());
-
-					dto.setDeployStatus(config.getDeployStatus());
+					
 					dto.setDeploymentName(config.getDeploymentName());
-
-					dto.setReleaseVersion(config.getReleaseVersion());
-					dto.setStemcellName(config.getStemcellName());
-					dto.setStemcellVersion(config.getStemcellVersion());
-
 					dto.setDirectorUuid(config.getDirectorUuid());
+					dto.setReleaseName(config.getReleaseName());
+					dto.setReleaseVersion(config.getReleaseVersion());
+					dto.setAppSshFingerprint(config.getAppSshFingerprint());
+
+					dto.setDomain(config.getDomain());
+					dto.setDescription(config.getDescription());
+					dto.setDomainOrganization(config.getDomainOrganization());
+					
+					dto.setProxyStaticIps(config.getProxyStaticIps());
+					
 					dto.setSubnetRange(config.getSubnetRange());
 					dto.setSubnetGateway(config.getSubnetGateway());
 					dto.setSubnetDns(config.getSubnetDns());
+					dto.setSubnetReservedFrom(config.getSubnetReservedFrom());
+					dto.setSubnetReservedTo(config.getSubnetReservedTo());
+					dto.setSubnetStaticFrom(config.getSubnetStaticFrom());
+					dto.setSubnetStaticTo(config.getSubnetStaticTo());
+					dto.setSubnetId(config.getCloudNetId());
+					
+					dto.setStemcellName(config.getStemcellName());
+					dto.setStemcellVersion(config.getStemcellVersion());
+					dto.setBoshPassword(config.getBoshPassword());
+					
+					dto.setDeployStatus(config.getDeployStatus());
+					dto.setDeployStatus(config.getDeployStatus());
 					cfList.add(dto);
 				}
 			}
@@ -97,7 +124,7 @@ public class IEDACfService {
 
 	public String createSettingFile(Integer id, String iaas) {
 		// 파일 가져오기
-		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/"+iaas.toLowerCase()+"-cf-setting.yml");
+		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/"+iaas.toLowerCase()+"-cf-param.yml");
 		URL stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/"+iaas.toLowerCase()+"-cf-stub.yml");
 
 		File settingFile;
@@ -137,7 +164,7 @@ public class IEDACfService {
 
 		List<ReplaceItem> items = new ArrayList<ReplaceItem>();
 
-		if(iaas == "AWS"){
+		if("AWS".equals(iaas.toUpperCase()) ){
 			IEDACfAwsConfig awsConfig = awsRepository.findOne(id);
 
 			// 1.1 Deployment 정보

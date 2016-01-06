@@ -6,7 +6,7 @@
 
 var uploadClient = null;
 var deleteClient = null;
-var appendLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:430px;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
+var appendLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:95%;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
 var appendLogPopupButton = '<button class="btn closeBtn" onclick="popupClose();">닫기</button>'
 
 $(function() {
@@ -257,6 +257,7 @@ function appendLogPopup(type, requestParameter){
 		width 	: 800,
 		height	: 550,
 		modal	: true,
+		showMax : true,
 		onOpen  : function(){
 			if(type =="upload") doUploadConnect(requestParameter);
 			else doDeleteConnect(requestParameter);

@@ -31,29 +31,29 @@ function goPage(page, title) {
 	<div class="leftMenu li">
 		<ul>
 		<li><a href="javascript:goPage('<c:url value="/config/listDirector"/>', '설치관리자 설정');">설치관리자 설정</a></li>
-		<li><a href="javascript:goPage('<c:url value="/config/stemcellManagement"/>', 'Public 스템셀 다운로드');">스템셀 다운로드</a></li>
+		<li><a href="javascript:goPage('<c:url value="/config/stemcellManagement"/>', 'Public 스템셀 다운로드');">스템셀 관리</a></li>
 		</ul>
 	</div>
 	
 	<!-- 서비스 설치 관리 -->
-	<div class="leftMenu_02"><div class="leftMenu_ti">OpenPaaS 설치</div></div>
+	<div class="leftMenu_02"><div class="leftMenu_ti">플랫폼 설치</div></div>
 	<div class="leftMenu li">
 		<ul>
 		<li><a href="javascript:goPage('<c:url value="/config/bootstrap"/>', 'BOOTSTRAP 설치');">BOOTSTRAP 설치</a></li>
 		<li><a href="javascript:goPage('<c:url value="/deploy/bosh"/>', 'BOSH 설치');">BOSH 설치</a></li>		
 		<li><a href="javascript:goPage('<c:url value="/deploy/cf"/>', 'BOSH 설치');">CF 설치</a></li>
-		<li>Diego 설치</li>
+		<li><a href="javascript:goPage('<c:url value="/deploy/diego"/>', 'BOSH 설치');">Diego 설치</a></li>
 		</ul>
 	</div>
 	
 	<!-- 정보조회 -->
-	<div class="leftMenu_03"><div class="leftMenu_ti">정보조회 및 관리</div></div>
+	<div class="leftMenu_03"><div class="leftMenu_ti">정보조회</div></div>
 	<div class="leftMenu li">
 		<ul>
 		<li><a href="javascript:goPage('<c:url value="/deploy/listStemcell"/>', '스템셀 업로드');">스템셀 업로드</a></li>		
 		<li><a href="javascript:goPage('<c:url value="/deploy/listRelease"/>', '릴리즈 업로드');">릴리즈 업로드</a></li>
-		<li><a href="javascript:goPage('<c:url value="/information/listDeployment"/>', '배포목록');">배포목록</a></li>
-		<li><a href="javascript:goPage('<c:url value="/information/listTaskHistory"/>', 'Task정보');">Task정보</a></li>
+		<li><a href="javascript:goPage('<c:url value="/information/listDeployment"/>', '배포목록');">배포 정보</a></li>
+		<li><a href="javascript:goPage('<c:url value="/information/listTaskHistory"/>', 'Task정보');">Task 정보</a></li>
 		</ul>
 	</div>
 </div>

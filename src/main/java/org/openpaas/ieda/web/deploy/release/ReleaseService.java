@@ -26,6 +26,7 @@ import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -52,7 +53,7 @@ public class ReleaseService {
 
 			client.executeMethod(get);
 			
-			if ( get.getResponseBodyAsString() != null && !get.getResponseBodyAsString().isEmpty()) {
+			if ( !StringUtils.isEmpty(get.getResponseBodyAsString())) {
 				
 				ObjectMapper mapper = new ObjectMapper();
 				Release[] releases = mapper.readValue(get.getResponseBodyAsString(), Release[].class);
@@ -217,7 +218,7 @@ public class ReleaseService {
 
 			client.executeMethod(get);
 			
-			if ( get.getResponseBodyAsString() != null && !get.getResponseBodyAsString().isEmpty()) {
+			if ( !StringUtils.isEmpty(get.getResponseBodyAsString()) ) {
 				
 				ObjectMapper mapper = new ObjectMapper();
 				Release[] releases = mapper.readValue(get.getResponseBodyAsString(), Release[].class);

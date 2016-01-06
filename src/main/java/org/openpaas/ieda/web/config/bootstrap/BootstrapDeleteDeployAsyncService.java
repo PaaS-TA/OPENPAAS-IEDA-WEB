@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,7 +48,7 @@ public class BootstrapDeleteDeployAsyncService {
 			if ( openstack != null ) deploymentFile = openstack.getDeploymentFile();
 		}
 			
-		if ( deploymentFile == null || deploymentFile.isEmpty() ) {
+		if ( StringUtils.isEmpty(deploymentFile) ) {
 			throw new IEDACommonException("illigalArgument.bootstrap.delete.exception",
 					"배포정보가 존재하지 않습니다..", HttpStatus.NOT_FOUND);
 		}

@@ -14,13 +14,11 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
-import org.openpaas.ieda.api.DeploymentInfo;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.common.ReplaceItem;
 import org.openpaas.ieda.web.common.Sha512Crypt;
-import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.openpaas.ieda.web.information.deploy.DeploymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -174,15 +172,15 @@ public class IEDABoshService {
 
 	public String createSettingFile(Integer id, String iaas) {
 		// 파일 가져오기
-		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/"+iaas.toLowerCase()+"-fullbosh-setting.yml");
-		URL stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/"+iaas.toLowerCase()+"-fullbosh-stub.yml");
+		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/"+iaas.toLowerCase()+"-bosh-param.yml");
+		URL stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/"+iaas.toLowerCase()+"-bosh-stub.yml");
 		
 		File settingFile;
 		File stubDeploy;
 
 		String content = "";
 		String stubContent = "";
-		String settingFileName = iaas.toLowerCase()+"-fullbosh-setting-"+id+".yml";
+		String settingFileName = iaas.toLowerCase()+"-bosh-param-"+id+".yml";
 		
 		String deplymentFileName = ""; 
 		
@@ -200,7 +198,7 @@ public class IEDABoshService {
 
 			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName()), "UTF-8");
 			IOUtils.write(content, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName), "UTF-8");
-			deplymentFileName = CommonUtils.setSpiffMerge(iaas, id, "fullbosh" ,stubDeploy.getName(), settingFileName);
+			deplymentFileName = CommonUtils.setSpiffMerge(iaas, id, "bosh" ,stubDeploy.getName(), settingFileName);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (IOException e1) {
@@ -214,7 +212,7 @@ public class IEDABoshService {
 
 		List<ReplaceItem> items = new ArrayList<ReplaceItem>();
 
-		if(iaas == "AWS"){
+		if("AWS".equals(iaas.toUpperCase()) ){
 			IEDABoshAwsConfig awsConfig = awsRepository.findOne(id);
 			
 			// AWS

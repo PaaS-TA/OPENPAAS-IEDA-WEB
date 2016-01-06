@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.deploy.cf;
+package org.openpaas.ieda.web.deploy.diego;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -9,11 +9,8 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
-import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +20,17 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
-public class CfDeleteDeployAsyncService {
+public class DiegoDeleteDeployAsyncService {
 	
 	@Autowired
-	private IEDACfAwsRepository awsRepository;
+	private IEDADiegoAwsRepository awsRepository;
 
 	@Autowired
-	private IEDACfOpenstackRepository openstackRepository;
+	private IEDADiegoOpenstackRepository openstackRepository;
 
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
@@ -38,25 +38,26 @@ public class CfDeleteDeployAsyncService {
 	@Autowired
 	private IEDADirectorConfigService directorConfigService;
 	
-	final private String messageEndpoint = "/cf/cfDelete"; 
+	final private String messageEndpoint = "/diego/diegoDelete"; 
 	
-	public void deleteDeploy(CfParam.Delete dto) {
+	public void deleteDeploy(DiegoParam.Delete dto) {
 		
-		IEDACfAwsConfig aws = null;
-		IEDACfOpenstackConfig openstack = null;
+		IEDADiegoAwsConfig aws = null;
+		IEDADiegoOpenstackConfig openstack = null;
 		String deploymentName = null;
 		
-		if( "AWS".equals(dto.getIaas())) { 
+		if( "AWS".equals(dto.getIaas().toUpperCase())) { 
 			aws = awsRepository.findOne(Integer.parseInt(dto.getId()));
 			if ( aws != null ) deploymentName = aws.getDeploymentName();
 
-		} else {
+		} 
+		else {
 			openstack = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 			if ( openstack != null ) deploymentName = openstack.getDeploymentName();
 		}
 			
 		if ( StringUtils.isEmpty(deploymentName) ) {
-			throw new IEDACommonException("illigalArgument.cfdelete.exception",
+			throw new IEDACommonException("illigalArgument.diegodelete.exception",
 					"배포정보가 존재하지 않습니다..", HttpStatus.NOT_FOUND);
 		}
 		
@@ -103,7 +104,8 @@ public class CfDeleteDeployAsyncService {
 	}
 
 	@Async
-	public void deleteDeployAsync(CfParam.Delete dto) {
+	public void deleteDeployAsync(DiegoParam.Delete dto) {
 		deleteDeploy(dto);
 	}	
+
 }

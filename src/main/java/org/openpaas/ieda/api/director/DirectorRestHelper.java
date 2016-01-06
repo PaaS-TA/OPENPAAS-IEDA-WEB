@@ -18,6 +18,7 @@ import org.openpaas.ieda.api.TaskOutput;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -185,7 +186,7 @@ public class DirectorRestHelper {
 						Thread.sleep(THREAD_SLEEP_TIME);
 						continue;
 					}
-					if (contentRange != null && !contentRange.getValue().equals("")) {
+					if ( !StringUtils.isEmpty(contentRange) ) {
 						String[] splited = contentRange.getValue().split("/");
 						offset = Integer.parseInt(splited[1]);
 					}

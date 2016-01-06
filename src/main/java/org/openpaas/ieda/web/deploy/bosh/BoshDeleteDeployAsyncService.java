@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class BoshDeleteDeployAsyncService {
@@ -54,7 +55,7 @@ public class BoshDeleteDeployAsyncService {
 			if ( openstack != null ) deploymentName = openstack.getDeploymentName();
 		}
 			
-		if ( deploymentName == null || deploymentName.isEmpty() ) {
+		if ( StringUtils.isEmpty(deploymentName) ) {
 			throw new IEDACommonException("illigalArgument.boshdelete.exception",
 					"배포정보가 존재하지 않습니다..", HttpStatus.NOT_FOUND);
 		}

@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.deploy.cf;
+package org.openpaas.ieda.web.deploy.diego;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -15,6 +15,11 @@ import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
+import org.openpaas.ieda.web.deploy.diego.DiegoParam;
+import org.openpaas.ieda.web.deploy.diego.IEDADiegoAwsConfig;
+import org.openpaas.ieda.web.deploy.diego.IEDADiegoAwsRepository;
+import org.openpaas.ieda.web.deploy.diego.IEDADiegoOpenstackConfig;
+import org.openpaas.ieda.web.deploy.diego.IEDADiegoOpenstackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -26,13 +31,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class CfDeployAsyncService {
-	
-	@Autowired
-	private IEDACfAwsRepository awsRepository;
+public class DiegoDeployAsyncService {
 
 	@Autowired
-	private IEDACfOpenstackRepository openstackRepository;
+	private IEDADiegoAwsRepository awsRepository;
+
+	@Autowired
+	private IEDADiegoOpenstackRepository openstackRepository;
 	
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
@@ -40,25 +45,26 @@ public class CfDeployAsyncService {
 	@Autowired
 	private IEDADirectorConfigService directorConfigService;
 	
-	final private String messageEndpoint = "/cf/cfInstall"; 
+	final private String messageEndpoint = "/diego/diegoInstall"; 
 	
-	public void deploy(CfParam.Install dto) {
+	public void deploy(DiegoParam.Install dto) {
 		
-		IEDACfAwsConfig aws = null;
-		IEDACfOpenstackConfig openstack = null;
+		IEDADiegoAwsConfig aws = null;
+		IEDADiegoOpenstackConfig openstack = null;
 		String deploymentFileName = null;
 		
 		if( "AWS".equals(dto.getIaas().toUpperCase())) { 
 			aws = awsRepository.findOne(Integer.parseInt(dto.getId()));
 			if ( aws != null ) deploymentFileName = aws.getDeploymentFile();
 
-		} else {
+		} 
+		else {
 			openstack = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 			if ( openstack != null ) deploymentFileName = openstack.getDeploymentFile();
 		}
 			
-		if ( StringUtils.isEmpty(deploymentFileName) ) {
-			throw new IEDACommonException("illigalArgument.cfdelete.exception",
+		if (  StringUtils.isEmpty(deploymentFileName) ) {
+			throw new IEDACommonException("illigalArgument.diegodelete.exception",
 					"배포파일 정보가 존재하지 않습니다..", HttpStatus.NOT_FOUND);
 		}
 		
@@ -141,7 +147,8 @@ public class CfDeployAsyncService {
 	}
 
 	@Async
-	public void deployAsync(CfParam.Install dto) {
+	public void deployAsync(DiegoParam.Install dto) {
 		deploy(dto);
-	}	
+	}
+
 }

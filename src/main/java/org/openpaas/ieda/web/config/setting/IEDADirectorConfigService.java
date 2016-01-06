@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.yaml.snakeyaml.Yaml;
 
@@ -113,7 +114,7 @@ public class IEDADirectorConfigService {
 		
 		log.info("User Info ::: " + info.toString() + "\n isUser ::: " + ( info == null || info.getUser() == null || info.getUser().equals("") ) );
 		
-		if ( info == null || info.getUser() == null || info.getUser().equals("") ) {
+		if ( info == null || StringUtils.isEmpty(info.getUser())) {
 			throw new IEDACommonException("unauthenticated.director.exception",
 					"디렉터에 로그인 실패하였습니다.", HttpStatus.BAD_REQUEST);
 		}
@@ -169,7 +170,7 @@ public class IEDADirectorConfigService {
 				, updateDto.getUserId()
 				, updateDto.getUserPassword());
 		
-		if ( info == null || info.getUser() == null || info.getUser().equals("") )
+		if ( info == null || StringUtils.isEmpty(info.getUser()) )
 			throw new IEDACommonException("unauthenticated.director.exception",
 					"디렉터에 로그인 실패하였습니다.", HttpStatus.BAD_REQUEST);
 
@@ -232,7 +233,7 @@ public class IEDADirectorConfigService {
 		
 		// 디렉터 연결 여부 확인
 		Info info = getDirectorInfo(directorConfig.getDirectorUrl(), directorConfig.getDirectorPort(), directorConfig.getUserId(), directorConfig.getUserPassword());
-		if ( info == null || info.getUser() == null || info.getUser().equals("") ) {
+		if ( info == null || StringUtils.isEmpty(info.getUser()) ) {
 			throw new IEDACommonException("unauthenticated.director.exception",
 					"해당 디렉터에 로그인 실패하였습니다.", HttpStatus.BAD_REQUEST);
 		}

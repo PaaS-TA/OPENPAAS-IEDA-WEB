@@ -1,3 +1,6 @@
+<!--
+Diego
+-->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -6,20 +9,28 @@
 .w2ui-popup .w2ui-msg-body {
 	background-color: #FFF;
 }
+.w2ui-popup div.w2ui-field{
+	display: inline-block;
+	text-align: left;
+	width: 100%;
+}
 </style>
 <script type="text/javascript" src="/js/sockjs-0.3.4.js"></script>
 <script type="text/javascript" src="/js/stomp.js"></script>
 <script type="text/javascript">
 	//private var
 	var iaas = "";
-	var cfId = "";
-	var awsInfo = "";
-	var openstackInfo = "";
-	var uaaInfo = "";
-	var consulInfo = "";
+	var diegoId = "";
+	var defaultInfo = "";
+	var diegoInfo = "";
 	var networkInfo = "";
 	var resourceInfo = "";
-	var releases = "";
+	
+	var diegoReleases = "";
+	var cfReleases = "";
+	var gardenLinuxReleases = "";
+	var etcdReleases = "";
+	
 	var stemcells = "";
 	var deploymentFile = "";
 
@@ -29,9 +40,9 @@
 		// 기본 설치 관리자 정보 조회
 		var bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");
 
-		$('#config_cfGrid').w2grid({
-			name: 'config_cfGrid',
-			header: '<b>CF 목록</b>',
+		$('#config_diegoGrid').w2grid({
+			name: 'config_diegoGrid',
+			header: '<b>DIEGO 목록</b>',
 			method: 'GET',
 	 		multiSelect: false,
 			show: {	
@@ -57,18 +68,60 @@
 					}
 				, {field: 'deploymentName', caption: '배포명', size: '100px'}
 				, {field: 'iaas', caption: 'IaaS', size: '100px'}
-				, {field: 'releaseVersion', caption: '릴리즈', size: '100px'}
+				, {field: 'directorUuid', caption: '설치관리자 UUID', size: '220px'}
+				, {field: 'diegoRelease', caption: 'Diego 릴리즈', size: '100px'
+					, render :function(record){
+						if( !checkEmpty(record.diegoReleaseName) && !checkEmpty(record.diegoReleaseVersion) ){
+							return record.diegoReleaseName +"/"+ record.diegoReleaseVersion;
+						}
+					}}
+				, {field: 'cfRelease', caption: 'CF 릴리즈', size: '100px'
+					, render :function(record){
+						if( !checkEmpty(record.cfReleaseName) && !checkEmpty(record.cfReleaseVersion) ){
+							return record.cfReleaseName +"/"+ record.cfReleaseVersion;
+						}
+					}}
+				, {field: 'gardenLinuxRelease', caption: 'Garden Linux 릴리즈', size: '130px'
+					, render :function(record){
+						if( !checkEmpty(record.gardenLinuxReleaseName) && !checkEmpty(record.gardenLinuxReleaseVersion) ){
+							return record.gardenLinuxReleaseName +"/"+ record.gardenLinuxReleaseVersion;
+						}
+					}}
+				, {field: 'etcdRelease', caption: 'ETCD 릴리즈', size: '100px'
+					, render :function(record){
+						if( !checkEmpty(record.etcdReleaseName) && !checkEmpty(record.etcdReleaseVersion) ){
+							return record.etcdReleaseName +"/"+ record.etcdReleaseVersion;
+						}
+					}}
+				, {field: 'domain', caption: '도메인', size: '100px'}
+				, {field: 'deployment', caption: 'CF 배포명', size: '100px'}
+				, {field: 'etcdMachines', caption: 'ETCD 서버 IPS', size: '100px'}
+				, {field: 'natsMachines', caption: 'NATS 서버 IPS', size: '100px'}
+				, {field: 'consulServersLan', caption: 'CONSUL 서버 IPS', size: '120px'}
+				, {field: 'subnetStatic', caption: 'VM할당 IP대역', size: '120px'
+					, render :function(record){
+						if( !checkEmpty(record.subnetStaticFrom) && !checkEmpty(record.subnetStaticTo) ){
+							return record.subnetStaticFrom + " - " + record.subnetStaticTo;
+						}
+					}}
+				, {field: 'subnetReserved', caption: 'Reserved IP대역', size: '120px'
+					, render :function(record){
+						if( !checkEmpty(record.subnetReservedFrom) && !checkEmpty(record.subnetReservedTo) ){
+							return record.subnetReservedFrom + " - " + record.subnetReservedTo;
+						}
+					}}
+				, {field: 'subnetRange', caption: '서브넷 범위', size: '100px'}
+				, {field: 'subnetGateway', caption: '게이트웨이', size: '100px'}
+				, {field: 'subnetDns', caption: 'DNS', size: '100px'}
+				, {field: 'subnetId', caption: '서브넷 ID', size: '100px'}
+				, {field: 'diegoServers', caption: 'Diego Server IP', size: '100px'}
 				, {field: 'stemcell', caption: '스템셀', size: '240px'
 					, render:function(record){
-							if( record.stemcellName && record.stemcellVersion ){
+							if( !checkEmpty(record.stemcellName) && !checkEmpty(record.stemcellVersion) ){
 								return record.stemcellName +"/"+ record.stemcellVersion;
 							}
 						}
 					}
-				, {field: 'directorUuid', caption: '설치관리자 UUID', size: '220px'}
-				, {field: 'subnetRange', caption: '서브넷 범위', size: '100px'}
-				, {field: 'subnetGateway', caption: '게이트웨이', size: '100px'}
-				, {field: 'subnetDns', caption: 'DNS', size: '100px'}
 				],
 			onClick:function(event) {
 				var grid = this;
@@ -92,6 +145,8 @@
 			var directorName = $("#directorName").text().toUpperCase();
 			
 			if (directorName.indexOf("AWS") > 0) {
+				//iaas = "OPENSTACk";
+				//openstackPopup();
 				iaas = "AWS";
 				awsPopup();
 			} else if (directorName.indexOf("OPENSTACK") > 0) {
@@ -103,51 +158,55 @@
 			}
 		});
 
-		//Cf 수정
+		//Diego 수정
 		$("#modifyBtn").click(function() {
 			if ($("#modifyBtn").attr('disabled') == "disabled")
 				return;
 			
+			//리스트 조회 시점
+			getDiegoRelease();
 			getCfRelease();
+			getGardenLinuxRelease();
+			getEtcdRelease();
 			getStamcellList();
 			
 			w2confirm({
-				title : "CF 설치",
-				msg : "CF설치 정보를 수정하시겠습니까?",
+				title : "DIEGO 설치",
+				msg : "DIEGO설치 정보를 수정하시겠습니까?",
 				yes_text : "확인",
 				yes_callBack : function(event) {
-					var selected = w2ui['config_cfGrid'].getSelection();
+					var selected = w2ui['config_diegoGrid'].getSelection();
 
 					if (selected.length == 0) {
-						w2alert("선택된 정보가 없습니다.", "CF 설치");
+						w2alert("선택된 정보가 없습니다.", "DIEGO 설치");
 						return;
 					} else {
-						var record = w2ui['config_cfGrid'].get(selected);
-						getCfData(record);
+						var record = w2ui['config_diegoGrid'].get(selected);
+						getDiegoData(record);
 					}
 				},
 				no_text : "취소"
 			});
 		});
 
-		//Cf 삭제
+		//Diego 삭제
 		$("#deleteBtn").click(
 				function() {
 					if ($("#deleteBtn").attr('disabled') == "disabled")
 						return;
 
-					var selected = w2ui['config_cfGrid'].getSelection();
-					var record = w2ui['config_cfGrid'].get(selected);
+					var selected = w2ui['config_diegoGrid'].getSelection();
+					var record = w2ui['config_diegoGrid'].get(selected);
 
 					var message = "";
 
 					if (record.deploymentName)
-						message = "CF (배포명 : " + record.deploymentName + ")를 삭제하시겠습니까?";
+						message = "DIEGO (배포명 : " + record.deploymentName + ")를 삭제하시겠습니까?";
 					else
-						message = "선택된 CF를 삭제하시겠습니까?";
+						message = "선택된 DIEGO를 삭제하시겠습니까?";
 
 					w2confirm({
-						title : "CF 삭제",
+						title : "DIEGO 삭제",
 						msg : message,
 						yes_text : "확인",
 						yes_callBack : function(event) {
@@ -156,10 +215,12 @@
 						no_text : "취소"
 					});
 		});
-		
+		//리스트 조회 시점
+		getDiegoRelease();
 		getCfRelease();
+		getGardenLinuxRelease();
+		getEtcdRelease();
 		getStamcellList();
-		
 		doSearch();
 	});
 
@@ -167,7 +228,7 @@
 
 	//조회기능
 	function doSearch() {
-		w2ui['config_cfGrid'].load("<c:url value='/deploy/cfList'/>",
+		w2ui['config_diegoGrid'].load("<c:url value='/deploy/diegoList'/>",
 				function() {
 					doButtonStyle();
 				});
@@ -179,7 +240,7 @@
 		w2confirm({
 			width : 500,
 			height : 180,
-			title : '<b>CF 설치</b>',
+			title : '<b>DIEGO 설치</b>',
 			msg : $("#bootSelectBody").html(),
 			modal : true,
 			yes_text : "확인",
@@ -190,7 +251,7 @@
 					if (iaas == "AWS")
 						awsPopup();
 					else
-						openstackPopup();
+						osDiegoInfoPopup();
 				} else {
 					w2alert("설치할 Infrastructure 을 선택하세요");
 				}
@@ -199,9 +260,9 @@
 	}
 
 	//수정 기능 - 데이터 조회
-	function getCfData(record) {
+	function getDiegoData(record) {
 		console.log("@@@" + record.iaas.toLowerCase());
-		var url = "/cf/" + record.iaas.toLowerCase() + "/" + record.id;
+		var url = "/diego/" + record.iaas.toLowerCase() + "/" + record.id;
 		$.ajax({
 			type : "GET",
 			url : url,
@@ -219,7 +280,7 @@
 			},
 			error : function(request, status, error) {
 				var errorResult = JSON.parse(request.responseText);
-				w2alert(errorResult.message, "CF 수정");
+				w2alert(errorResult.message, "DIEGO 수정");
 			}
 		});
 	}
@@ -231,7 +292,7 @@
 		
 		if ( record.deployStatus == null || record.deployStatus == '' ) {
 			// 단순 레코드 삭제
-			var url = "/cf/delete";
+			var url = "/diego/delete";
 			$.ajax({
 				type : "DELETE",
 				url : url,
@@ -242,7 +303,7 @@
 				},
 				error : function(request, status, error) {
 					var errorResult = JSON.parse(request.responseText);
-					w2alert(errorResult.message, "CF 삭제");
+					w2alert(errorResult.message, "DIEGO 삭제");
 				}
 			});
 			
@@ -253,16 +314,16 @@
 			w2popup.open({
 				width : 610,
 				height : 500,
-				title : "<b>CF 삭제</b>",
+				title : "<b>DIEGO 삭제</b>",
 				body  : body,
 				buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="popupComplete();;">닫기</button>',
 				showMax : true,
 				onOpen : function(event){
 					event.onComplete = function(){
-						var socket = new SockJS('/cfDelete');
+						var socket = new SockJS('/diegoDelete');
 						deleteClient = Stomp.over(socket); 
 						deleteClient.connect({}, function(frame) {
-							deleteClient.subscribe('/cf/cfDelete', function(data){
+							deleteClient.subscribe('/diego/diegoDelete', function(data){
 								
 					        	var deleteLogs = $(".w2ui-msg-body #deleteLogs");
 					        	
@@ -279,19 +340,19 @@
 							    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 삭제 중 취소되었습니다.";
 							    			
 							    		deleteClient.disconnect();
-										w2alert(message, "CF 삭제");
+										w2alert(message, "DIEGO 삭제");
 							       	}
 					        	}
 					        	
 					        });
-							deleteClient.send('/send/cfDelete', {}, JSON.stringify(requestParameter));
+							deleteClient.send('/send/diegoDelete', {}, JSON.stringify(requestParameter));
 					    });
 					}
 				},
 				onClose : function (event){
 					event.onComplete= function(){
 						$("textarea").text("");
-						w2ui['config_cfGrid'].reset();
+						w2ui['config_diegoGrid'].reset();
 						deleteClient.disconnect();
 						deleteClient = "";
 						doSearch();
@@ -307,44 +368,57 @@
 	 
 	// AWS AwsPopup Data Setting
 	function setAwsData(contents) {
-		cfId = contents.id;
+		diegoId = contents.id;
 		iaas = "AWS";
-		awsInfo = {
+		defaultInfo = {
 			iaas : "AWS",
-			deploymentName 		: contents.deploymentName,
-			directorUuid 		: contents.directorUuid,
-			releaseName 		: contents.releaseName,
-			releaseVersion 		: contents.releaseVersion,
-			appSshFingerprint	: contents.appSshFingerprint,
+			deploymentName 				: contents.deploymentName,
+			directorUuid 				: contents.directorUuid,
+			diegoReleaseName 			: contents.diegoReleaseName,
+			diegoReleaseVersion 		: contents.diegoReleaseVersion,
+			cfReleaseName 				: contents.cfReleaseName,
+			cfReleaseVersion 			: contents.cfReleaseVersion,
+			gardenLinuxReleaseName 		: contents.gardenLinuxReleaseName,
+			gardenLinuxReleaseVersion 	: contents.gardenLinuxReleaseVersion,
+			etcdReleaseName 			: contents.etcdReleaseName,
+			etcdReleaseVersion 			: contents.etcdReleaseVersion,
 			
-			domain 				: contents.domain,
-			description 		: contents.description,
-			domainOrganization 	: contents.domainOrganization,			
-			proxyStaticIps 		: contents.proxyStaticIps,
+			domain 						: contents.domain,
+			description 				: contents.description,
+			secret 						: contents.secret,			
+			etcdMachines 				: contents.etcdMachines,
+			natsMachines 				: contents.natsMachines,
+			consulServersLan 			: contents.consulServersLan,
+			consulAgentCert 			: contents.consulAgentCert,
+			consulAgentKey 				: contents.consulAgentKey,
+			consulCaCert 				: contents.consulCaCert,
+			consulEncryptKeys 			: contents.consulEncryptKeys,
+			consulServerCert 			: contents.consulServerCert,
+			consulServerKey 			: contents.consulServerKey,
 			
-			sslPemPub 			: contents.sslPemPub,
-			sslPemRsa 			: contents.sslPemRsa,
 		}
 		
-		uaaInfo = {
+		diegoInfo = {
 				id 					: contents.id,
-				loginSecret			: contents.loginSecret,
-				signingKey			: contents.signingKey,
-				verificationKey		: contents.verificationKey
+				iaas				: contents.iaas,
+				diegoCaCert			: contents.diegoCaCert,
+				diegoClientCert		: contents.diegoClientCert,
+				diegoClientKey		: contents.diegoClientKey,
+				diegoEncryptionKeys	: contents.diegoEncryptionKeys,
+				diegoServerCert		: contents.diegoServerCert,
+				diegoServerKey		: contents.diegoServerKey,
+				etcdClientCert		: contents.etcdClientCert,
+				etcdClientKey		: contents.etcdClientKey,
+				etcdPeerCaCert		: contents.etcdPeerCaCert,
+				etcdPeerCert		: contents.etcdPeerCert,
+				etcdPeerKey			: contents.etcdPeerKey,
+				etcdServerCert		: contents.etcdServerCert,
+				etcdServerKey		: contents.etcdServerKey
+				
 		}
 		
-		consulInfo = {
-				id 					: contents.id,
-				agentCert			: contents.agentCert,
-				agentKey			: contents.agentKey,
-				caCert				: contents.caCert,
-				encryptKeys			: contents.encryptKeys,
-				serverCert			: contents.serverCert,
-				serverKey			: contents.serverKey
-		}
-	
 		networkInfo = {
-			id : cfId,
+			id 					: contents.id,
 			subnetRange 		: contents.subnetRange,
 			subnetGateway 		: contents.subnetGateway,
 			subnetDns 			: contents.subnetDns,
@@ -354,6 +428,10 @@
 			subnetStaticTo 		: contents.subnetStaticTo,
 			subnetId 			: contents.subnetId,
 			cloudSecurityGroups : contents.cloudSecurityGroups,
+			diegoHostKey 		: contents.diegoHostKey,
+			diegoServers 		: contents.diegoServers,
+			diegoUaaSecret 		: contents.diegoUaaSecret
+			
 		}
 	
 		resourceInfo = {
@@ -371,32 +449,52 @@
 	 
 	// Aws 팝업
 	function awsPopup() {
-		$("#awsInfoDiv").w2popup({
+		$("#awsDefaultInfoDiv").w2popup({
 			width : 800,
 			height : 800,
-			title : "CF 설치 (AWS)",
+			title : "DIEGO 설치 (AWS)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					$(".w2ui-msg-body input[name='releases']").w2field('list', {items : releases,maxDropHeight : 200,width : 250});
+					$(".w2ui-msg-body input[name='diegoReleases']").w2field('list', {items : diegoReleases,maxDropHeight : 200,width : 250});
+					$(".w2ui-msg-body input[name='cfReleases']").w2field('list', {items : cfReleases,maxDropHeight : 200,width : 250});
+					$(".w2ui-msg-body input[name='gardenLinuxReleases']").w2field('list', {items : gardenLinuxReleases,maxDropHeight : 200,width : 250});
+					$(".w2ui-msg-body input[name='etcdReleases']").w2field('list', {items : etcdReleases,maxDropHeight : 200,width : 250});
 					
-					if (awsInfo != null) {
-						$(".w2ui-msg-body input[name='deploymentName']").val(awsInfo.deploymentName);
-						$(".w2ui-msg-body input[name='directorUuid']").val(awsInfo.directorUuid);
-						$(".w2ui-msg-body input[name='appSshFingerprint']").val(awsInfo.appSshFingerprint);
+					if (defaultInfo != null) {
+						$(".w2ui-msg-body input[name='deploymentName']").val(defaultInfo.deploymentName);
+						$(".w2ui-msg-body input[name='directorUuid']").val(defaultInfo.directorUuid);
 						
-						$(".w2ui-msg-body input[name='domain']").val(awsInfo.domain);
-						$(".w2ui-msg-body input[name='description']").val(awsInfo.description);
-						$(".w2ui-msg-body input[name='domainOrganization']").val(awsInfo.domainOrganization);
-
-						$(".w2ui-msg-body input[name='proxyStaticIps']").val(awsInfo.proxyStaticIps);
-						$(".w2ui-msg-body textarea[name='sslPemPub']").val(awsInfo.sslPemPub);
-						$(".w2ui-msg-body textarea[name='sslPemRsa']").val(awsInfo.sslPemRsa);
+						$(".w2ui-msg-body input[name='domain']").val(defaultInfo.domain);
+						$(".w2ui-msg-body input[name='deployment']").val(defaultInfo.deployment);
+						$(".w2ui-msg-body input[name='secret']").val(defaultInfo.secret);
+						$(".w2ui-msg-body input[name='etcdMachines']").val(defaultInfo.etcdMachines);
+						$(".w2ui-msg-body input[name='natsMachines']").val(defaultInfo.natsMachines);
+						$(".w2ui-msg-body input[name='consulServersLan']").val(defaultInfo.consulServersLan);
+						$(".w2ui-msg-body input[name='consulAgentCert']").val(defaultInfo.consulAgentCert);
+						$(".w2ui-msg-body input[name='consulAgentKey']").val(defaultInfo.consulAgentKey);
+						$(".w2ui-msg-body input[name='consulCaCert']").val(defaultInfo.consulCaCert);
+						$(".w2ui-msg-body input[name='consulEncryptKeys']").val(defaultInfo.consulEncryptKeys);
+						$(".w2ui-msg-body input[name='consulServerCert']").val(defaultInfo.consulServerCert);
+						$(".w2ui-msg-body input[name='consulServerKey']").val(defaultInfo.consulServerKey);
 						
-						if(releases.length > 0 && !checkEmpty(awsInfo.releaseName) && !checkEmpty(awsInfo.releaseVersion) ){
-							$(".w2ui-msg-body input[name='releases']").data('selected',{text : awsInfo.releaseName + "/"+ awsInfo.releaseVersion});
+						if(diegoReleases.length > 0 && !checkEmpty(defaultInfo.diegoReleaseName) && !checkEmpty(defaultInfo.diegoReleaseVersion) ){
+							$(".w2ui-msg-body input[name='diegoReleases']").data('selected',{text : defaultInfo.diegoReleasesName + "/"+ defaultInfo.diegoReleasesVersion});
 						}
+						
+						if(cfReleases.length > 0 && !checkEmpty(defaultInfo.cfReleaseName) && !checkEmpty(defaultInfo.cfReleaseVersion) ){
+							$(".w2ui-msg-body input[name='cfReleases']").data('selected',{text : defaultInfo.cfReleasesName + "/"+ defaultInfo.cfReleasesVersion});
+						}
+						
+						if(gardenLinuxReleases.length > 0 && !checkEmpty(defaultInfo.gardenLinuxReleaseName) && !checkEmpty(defaultInfo.gardenLinuxReleaseVersion) ){
+							$(".w2ui-msg-body input[name='gardenLinuxReleases']").data('selected',{text : defaultInfo.gardenLinuxReleasesName + "/"+ defaultInfo.gardenLinuxReleasesVersion});
+						}
+						
+						if(etcdReleases.length > 0 && !checkEmpty(defaultInfo.etcdReleaseName) && !checkEmpty(defaultInfo.etcdReleaseVersion) ){
+							$(".w2ui-msg-body input[name='etcdReleases']").data('selected',{text : defaultInfo.etcdReleasesName + "/"+ defaultInfo.etcdReleasesVersion});
+						}
+						
 					}
 					
 				}
@@ -414,37 +512,47 @@
 		// AWSInfo Save
 		var releases = $(".w2ui-msg-body input[name='releases']").val();
 		
-		awsInfo = {
-					id 					: (cfId) ? cfId : "",
-					iaas 				: "AWS",
-					deploymentName 		: $(".w2ui-msg-body input[name='deploymentName']").val(),
-					directorUuid 		: $(".w2ui-msg-body input[name='directorUuid']").val(),
-					releaseName 		: releases.split("/")[0],
-					releaseVersion 		: releases.split("/")[1],
-					appSshFingerprint   : $(".w2ui-msg-body input[name='appSshFingerprint']").val(),
-		
-					domain 				: $(".w2ui-msg-body input[name='domain']").val(),
-					description 		: $(".w2ui-msg-body input[name='description']").val(),
-					domainOrganization 	: $(".w2ui-msg-body input[name='domainOrganization']").val(),
-		
-					proxyStaticIps 		: $(".w2ui-msg-body input[name='proxyStaticIps']").val(),
-					sslPemPub 			: $(".w2ui-msg-body textarea[name='sslPemPub']").val(),
-					sslPemRsa 			: $(".w2ui-msg-body textarea[name='sslPemRsa']").val()
+		defaultInfo = {
+					id 							: (diegoId) ? diegoId : "",
+					iaas 						: "AWS",
+					deploymentName 				: $(".w2ui-msg-body input[name='deploymentName']").val(),
+					directorUuid 				: $(".w2ui-msg-body input[name='directorUuid']").val(),
+					diegoReleaseName 			: diegoRelease.split("/")[0],
+					diegoReleaseVersion			: diegoRelease.split("/")[1],
+					cfReleaseName 				: cfRelease.split("/")[0],
+					cfReleaseVersion			: cfRelease.split("/")[1],
+					gardenLinuxReleaseName 		: gardenRelease.split("/")[0],
+					gardenLinuxReleaseVersion	: gardenRelease.split("/")[1],
+					etcdReleaseName 			: etcdRelease.split("/")[0],
+					etcdReleaseVersion			: etcdRelease.split("/")[1],
+					
+					domain 						: $(".w2ui-msg-body input[name='domain']").val(),
+					deployment 					: $(".w2ui-msg-body input[name='deployment']").val(),
+					secret 						: $(".w2ui-msg-body input[name='secret']").val(),
+					etcdMachines 				: $(".w2ui-msg-body input[name='etcdMachines']").val(),
+					natsMachines 				: $(".w2ui-msg-body input[name='natsMachines']").val(),
+					consulServersLan 			: $(".w2ui-msg-body input[name='consulServersLan']").val(),
+					consulAgentCert 			: $(".w2ui-msg-body input[name='consulAgentCert']").val(),
+					consulAgentKey 				: $(".w2ui-msg-body input[name='consulAgentKey']").val(),
+					consulCaCert 				: $(".w2ui-msg-body input[name='consulCaCert']").val(),
+					consulEncryptKeys 			: $(".w2ui-msg-body input[name='consulEncryptKeys']").val(),
+					consulServerCert 			: $(".w2ui-msg-body input[name='consulServerCert']").val(),
+					consulServerKey 			: $(".w2ui-msg-body input[name='consulServerKey']").val()
 		}
 		
 		if (popupValidation()) {
 			//ajax AwsInfo Save
 			$.ajax({
 				type : "PUT",
-				url : "/cf/saveAws",
+				url : "/diego/saveAws",
 				contentType : "application/json",
-				data : JSON.stringify(awsInfo),
+				data : JSON.stringify(defaultInfo),
 				success : function(data, status) {
-					cfId = data.id;
+					diegoId = data.id;
 					awsUaaPopup();
 				},
 				error : function(e, status) {
-					w2alert("AWS 설정 등록에 실패 하였습니다.", "CF 설치");
+					w2alert("AWS 설정 등록에 실패 하였습니다.", "DIEGO 설치");
 				}
 			});
 		}
@@ -455,7 +563,7 @@
 		$("#awsUaaInfoDiv").w2popup({
 			width : 800,
 			height : 500,
-			title : "CF 설치 (AWS)",
+			title : "DIEGO 설치 (AWS)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
@@ -478,7 +586,7 @@
 	// AWS UAA save AwsUaa Info
 	function saveAwsUaaInfo(type){
 		uaaInfo = {
-				id : cfId,
+				id : diegoId,
 				loginSecret : $(".w2ui-msg-body input[name='loginSecret']").val(),
 				signingKey	: $(".w2ui-msg-body textarea[name='signingKey']").val(),
 				verificationKey : $(".w2ui-msg-body textarea[name='verificationKey']").val()
@@ -489,14 +597,14 @@
 				//ajax AwsInfo Save
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveAwsUaa",
+					url : "/diego/saveAwsUaa",
 					contentType : "application/json",
 					data : JSON.stringify(uaaInfo),
 					success : function(data, status) {
 						awsConsulPopup();
 					},
 					error : function(e, status) {
-						w2alert("AWS UAA 등록에 실패 하였습니다.", "CF 설치");
+						w2alert("AWS UAA 등록에 실패 하였습니다.", "DIEGO 설치");
 					}
 				});
 			}
@@ -511,7 +619,7 @@
 		$("#awsConsulInfoDiv").w2popup({
 			width : 800,
 			height : 700,
-			title : "CF 설치 (AWS)",
+			title : "DIEGO 설치 (AWS)",
 			modal : false,
 			showMax : false,
 			onOpen : function(event) {
@@ -537,7 +645,7 @@
 	// AWS CONSUL save AwsConsul
 	function saveAwsConsulInfo(type){
 		consulInfo = {
-				id 					: cfId,
+				id 					: diegoId,
 				agentCert			: $(".w2ui-msg-body textarea[name='agentCert']").val(),
 				agentKey			: $(".w2ui-msg-body textarea[name='agentKey']").val(),
 				caCert				: $(".w2ui-msg-body textarea[name='caCert']").val(),
@@ -551,14 +659,14 @@
 				//ajax AwsInfo Save
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveAwsConsul",
+					url : "/diego/saveAwsConsul",
 					contentType : "application/json",
 					data : JSON.stringify(consulInfo),
 					success : function(data, status) {
 						awsNetworkPopup();
 					},
 					error : function(e, status) {
-						w2alert("AWS CONSUL 등록에 실패 하였습니다.", "CF 설치");
+						w2alert("AWS CONSUL 등록에 실패 하였습니다.", "DIEGO 설치");
 					}
 				});
 			}
@@ -574,7 +682,7 @@
 		$("#awsNetworkInfoDiv").w2popup({
 			width : 800,
 			height : 600,
-			title : "CF 설치 (AWS)",
+			title : "DIEGO 설치 (AWS)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
@@ -602,7 +710,7 @@
 	// AWS NETWORK save Aws Network
 	function saveAwsNetworkInfo(type) {
 		networkInfo = {
-				id 					: cfId,
+				id 					: diegoId,
 				subnetRange			: $(".w2ui-msg-body input[name='subnetRange']").val(),
 				subnetGateway		: $(".w2ui-msg-body input[name='subnetGateway']").val(),
 				subnetDns			: $(".w2ui-msg-body input[name='subnetDns']").val(),
@@ -616,10 +724,10 @@
 
 		if (type == 'after') {
 			if (popupValidation()) {
-				//Server send Cf Info
+				//Server send Diego Info
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveAwsNetwork",
+					url : "/diego/saveAwsNetwork",
 					contentType : "application/json",
 					async : true,
 					data : JSON.stringify(networkInfo),
@@ -627,7 +735,7 @@
 						awsResourcePopup();
 					},
 					error : function(e, status) {
-						w2alert("Cf Network 등록에 실패 하였습니다.", "Cf 설치");
+						w2alert("Diego Network 등록에 실패 하였습니다.", "Diego 설치");
 					}
 				});
 			}
@@ -641,7 +749,7 @@
 		$("#awsResourceInfoDiv").w2popup({
 			width : 800,
 			height : 350,
-			title : "CF 설치 (AWS)",
+			title : "DIEGO 설치 (AWS)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
@@ -674,7 +782,7 @@
 
 		var stemcellInfos = $(".w2ui-msg-body input[name='stemcells']").val().split("/");
 		resourceInfo = {
-				id 					: cfId,
+				id 					: diegoId,
 				stemcellName 		: stemcellInfos[0],
 				stemcellVersion 	: stemcellInfos[1],
 				boshPassword 		: $(".w2ui-msg-body input[name='boshPassword']").val()
@@ -682,10 +790,10 @@
 
 		if (type == 'after') {
 			if(popupValidation()){		
-				//Server send Cf Info
+				//Server send Diego Info
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveAwsResource",
+					url : "/diego/saveAwsResource",
 					contentType : "application/json",
 					async : true,
 					data : JSON.stringify(resourceInfo),
@@ -694,7 +802,7 @@
 						deployPopup();
 					},
 					error : function(e, status) {
-						w2alert("Cf Resource 등록에 실패 하였습니다.", "Cf 설치");
+						w2alert("Diego Resource 등록에 실패 하였습니다.", "Diego 설치");
 					}
 				});
 			}
@@ -710,9 +818,9 @@
 	***************************************/
 	//OPENSTACK OpenstackPopup Data Setting
 	function setOpenstackData(contents) {
-		cfId = contents.id;
+		diegoId = contents.id;
 		iaas = "OPENSTACK";
-		openstackInfo = {
+		defaultInfo = {
 			iaas : "OPENSTACK",
 			deploymentName 		: contents.deploymentName,
 			directorUuid 		: contents.directorUuid,
@@ -746,7 +854,7 @@
 		}
 	
 		networkInfo = {
-			id : cfId,
+			id : diegoId,
 			subnetRange 		: contents.subnetRange,
 			subnetGateway 		: contents.subnetGateway,
 			subnetDns 			: contents.subnetDns,
@@ -773,30 +881,30 @@
 	 
 	// Openstack 팝업
 	function openstackPopup() {
-		$("#openstackInfoDiv").w2popup({
+		$("#openstackDefaultInfoDiv").w2popup({
 			width : 800,
 			height : 800,
-			title : "CF 설치 (OPENSTACK)",
+			title : "DIEGO 설치 (OPENSTACK)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
 					$(".w2ui-msg-body input[name='releases']").w2field('list', {items : releases,maxDropHeight : 200,width : 250});
-					if (openstackInfo != null) {
-						$(".w2ui-msg-body input[name='deploymentName']").val(openstackInfo.deploymentName);
-						$(".w2ui-msg-body input[name='directorUuid']").val(openstackInfo.directorUuid);
-						$(".w2ui-msg-body input[name='appSshFingerprint']").val(openstackInfo.appSshFingerprint);
+					if (defaultInfo != null) {
+						$(".w2ui-msg-body input[name='deploymentName']").val(defaultInfo.deploymentName);
+						$(".w2ui-msg-body input[name='directorUuid']").val(defaultInfo.directorUuid);
+						$(".w2ui-msg-body input[name='appSshFingerprint']").val(defaultInfo.appSshFingerprint);
 						
-						$(".w2ui-msg-body input[name='domain']").val(openstackInfo.domain);
-						$(".w2ui-msg-body input[name='description']").val(openstackInfo.description);
-						$(".w2ui-msg-body input[name='domainOrganization']").val(openstackInfo.domainOrganization);
+						$(".w2ui-msg-body input[name='domain']").val(defaultInfo.domain);
+						$(".w2ui-msg-body input[name='description']").val(defaultInfo.description);
+						$(".w2ui-msg-body input[name='domainOrganization']").val(defaultInfo.domainOrganization);
 	
-						$(".w2ui-msg-body input[name='proxyStaticIps']").val(openstackInfo.proxyStaticIps);
-						$(".w2ui-msg-body textarea[name='sslPemPub']").val(openstackInfo.sslPemPub);
-						$(".w2ui-msg-body textarea[name='sslPemRsa']").val(openstackInfo.sslPemRsa);
+						$(".w2ui-msg-body input[name='proxyStaticIps']").val(defaultInfo.proxyStaticIps);
+						$(".w2ui-msg-body textarea[name='sslPemPub']").val(defaultInfo.sslPemPub);
+						$(".w2ui-msg-body textarea[name='sslPemRsa']").val(defaultInfo.sslPemRsa);
 						
-						if(releases.length > 0 && !checkEmpty(openstackInfo.releaseName) && !checkEmpty(openstackInfo.releaseVersion) ){
-							$(".w2ui-msg-body input[name='releases']").data('selected',{text : openstackInfo.releaseName + "/"+ openstackInfo.releaseVersion});
+						if(releases.length > 0 && !checkEmpty(defaultInfo.releaseName) && !checkEmpty(defaultInfo.releaseVersion) ){
+							$(".w2ui-msg-body input[name='releases']").data('selected',{text : defaultInfo.releaseName + "/"+ defaultInfo.releaseVersion});
 						}
 					}
 					
@@ -815,8 +923,8 @@
 		// OPENSTACKInfo Save
 		var releases = $(".w2ui-msg-body input[name='releases']").val();
 		
-		openstackInfo = {
-					id 					: (cfId) ? cfId : "",
+		defaultInfo = {
+					id 					: (diegoId) ? diegoId : "",
 					iaas 				: "OPENSTACK",
 					deploymentName 		: $(".w2ui-msg-body input[name='deploymentName']").val(),
 					directorUuid 		: $(".w2ui-msg-body input[name='directorUuid']").val(),
@@ -837,15 +945,15 @@
 			//ajax OpenstackInfo Save
 			$.ajax({
 				type : "PUT",
-				url : "/cf/saveOpenstack",
+				url : "/diego/saveOpenstack",
 				contentType : "application/json",
-				data : JSON.stringify(openstackInfo),
+				data : JSON.stringify(defaultInfo),
 				success : function(data, status) {
-					cfId = data.id;
+					diegoId = data.id;
 					openstackUaaPopup();
 				},
 				error : function(e, status) {
-					w2alert("OPENSTACK 설정 등록에 실패 하였습니다.", "CF 설치");
+					w2alert("OPENSTACK 설정 등록에 실패 하였습니다.", "DIEGO 설치");
 				}
 			});
 		}
@@ -856,7 +964,7 @@
 		$("#openstackUaaInfoDiv").w2popup({
 			width : 800,
 			height : 500,
-			title : "CF 설치 (OPENSTACK)",
+			title : "DIEGO 설치 (OPENSTACK)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
@@ -879,7 +987,7 @@
 	// OPENSTACK UAA save OpenstackUaa Info
 	function saveOpenstackUaaInfo(type){
 		uaaInfo = {
-				id : cfId,
+				id : diegoId,
 				loginSecret : $(".w2ui-msg-body input[name='loginSecret']").val(),
 				signingKey	: $(".w2ui-msg-body textarea[name='signingKey']").val(),
 				verificationKey : $(".w2ui-msg-body textarea[name='verificationKey']").val()
@@ -890,14 +998,14 @@
 				//ajax OpenstackInfo Save
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveOpenstackUaa",
+					url : "/diego/saveOpenstackUaa",
 					contentType : "application/json",
 					data : JSON.stringify(uaaInfo),
 					success : function(data, status) {
 						openstackConsulPopup();
 					},
 					error : function(e, status) {
-						w2alert("OPENSTACK UAA 등록에 실패 하였습니다.", "CF 설치");
+						w2alert("OPENSTACK UAA 등록에 실패 하였습니다.", "DIEGO 설치");
 					}
 				});
 			}
@@ -912,7 +1020,7 @@
 		$("#openstackConsulInfoDiv").w2popup({
 			width : 800,
 			height : 700,
-			title : "CF 설치 (OPENSTACK)",
+			title : "DIEGO 설치 (OPENSTACK)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
@@ -938,7 +1046,7 @@
 	// OPENSTACK CONSUL save OpenstackConsul
 	function saveOpenstackConsulInfo(type){
 		consulInfo = {
-				id 					: cfId,
+				id 					: diegoId,
 				agentCert			: $(".w2ui-msg-body textarea[name='agentCert']").val(),
 				agentKey			: $(".w2ui-msg-body textarea[name='agentKey']").val(),
 				caCert				: $(".w2ui-msg-body textarea[name='caCert']").val(),
@@ -952,14 +1060,14 @@
 				//ajax OpenstackInfo Save
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveOpenstackConsul",
+					url : "/diego/saveOpenstackConsul",
 					contentType : "application/json",
 					data : JSON.stringify(consulInfo),
 					success : function(data, status) {
 						openstackNetworkPopup();
 					},
 					error : function(e, status) {
-						w2alert("OPENSTACK CONSUL 등록에 실패 하였습니다.", "CF 설치");
+						w2alert("OPENSTACK CONSUL 등록에 실패 하였습니다.", "DIEGO 설치");
 					}
 				});
 			}
@@ -975,7 +1083,7 @@
 		$("#openstackNetworkInfoDiv").w2popup({
 			width : 800,
 			height : 600,
-			title : "CF 설치 (OPENSTACK)",
+			title : "DIEGO 설치 (OPENSTACK)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
@@ -1003,7 +1111,7 @@
 	// OPENSTACK NETWORK save Openstack Network
 	function saveOpenstackNetworkInfo(type) {
 		networkInfo = {
-				id 					: cfId,
+				id 					: diegoId,
 				subnetRange			: $(".w2ui-msg-body input[name='subnetRange']").val(),
 				subnetGateway		: $(".w2ui-msg-body input[name='subnetGateway']").val(),
 				subnetDns			: $(".w2ui-msg-body input[name='subnetDns']").val(),
@@ -1017,10 +1125,10 @@
 	
 		if (type == 'after') {
 			if (popupValidation()) {
-				//Server send Cf Info
+				//Server send Diego Info
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveOpenstackNetwork",
+					url : "/diego/saveOpenstackNetwork",
 					contentType : "application/json",
 					async : true,
 					data : JSON.stringify(networkInfo),
@@ -1028,7 +1136,7 @@
 						openstackResourcePopup();
 					},
 					error : function(e, status) {
-						w2alert("Cf Network 등록에 실패 하였습니다.", "Cf 설치");
+						w2alert("Diego Network 등록에 실패 하였습니다.", "Diego 설치");
 					}
 				});
 			}
@@ -1042,7 +1150,7 @@
 		$("#openstackResourceInfoDiv").w2popup({
 			width : 800,
 			height : 350,
-			title : "CF 설치 (OPENSTACK)",
+			title : "DIEGO 설치 (OPENSTACK)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
@@ -1070,7 +1178,7 @@
 	
 		var stemcellInfos = $(".w2ui-msg-body input[name='stemcells']").val().split("/");
 		resourceInfo = {
-				id 					: cfId,
+				id 					: diegoId,
 				stemcellName 		: stemcellInfos[0],
 				stemcellVersion 	: stemcellInfos[1],
 				boshPassword 		: $(".w2ui-msg-body input[name='boshPassword']").val()
@@ -1078,10 +1186,10 @@
 	
 		if (type == 'after') {
 			if(popupValidation()){		
-				//Server send Cf Info
+				//Server send Diego Info
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveOpenstackResource",
+					url : "/diego/saveOpenstackResource",
 					contentType : "application/json",
 					async : true,
 					data : JSON.stringify(resourceInfo),
@@ -1091,7 +1199,7 @@
 						deployPopup();
 					},
 					error : function(e, status) {
-						w2alert("Cf Resource 등록에 실패 하였습니다.", "Cf 설치");
+						w2alert("Diego Resource 등록에 실패 하였습니다.", "Diego 설치");
 					}
 				});
 			}
@@ -1103,7 +1211,7 @@
 	/*******************************  OPENSTACK END  ****************************************/
 	
 	// DEPLOY Confirm
-	function cfDeploy(type) {
+	function diegoDeploy(type) {
 		//Deploy 단에서 저장할 데이터가 있는지 확인 필요
 		//Confirm 설치하시겠습니까?
 		if (type == 'before' && iaas == "AWS") {
@@ -1116,7 +1224,7 @@
 
 		w2confirm({
 			msg : "설치하시겠습니까?",
-			title : w2utils.lang('CF 설치'),
+			title : w2utils.lang('DIEGO 설치'),
 			yes_text : "예",
 			no_text : "아니오",
 			yes_callBack : installPopup
@@ -1152,11 +1260,11 @@
 				if (status == "success") {
 					$(".w2ui-msg-body #deployInfo").text(data);
 				} else if (status == "204") {
-					w2alert("배포파일이 존재하지 않습니다.", "CF 설치");
+					w2alert("배포파일이 존재하지 않습니다.", "DIEGO 설치");
 				}
 			},
 			error : function(e, status) {
-				w2alert("Temp 파일을 가져오는 중 오류가 발생하였습니다. ", "CF 설치");
+				w2alert("Temp 파일을 가져오는 중 오류가 발생하였습니다. ", "DIEGO 설치");
 			}
 		});
 	}
@@ -1165,11 +1273,11 @@
 	function installPopup(){
 		
 		var installDiv = (iaas == 'AWS') ? $("#awsInstallDiv") : $("#openstackInstallDiv");
-		var deploymentName = (iaas == 'AWS') ? awsInfo.deploymentName : openstackInfo.deploymentName;
-		var message = "CF(배포명:" + deploymentName +  ") ";
+		var deploymentName = (iaas == 'AWS') ? defaultInfo.deploymentName : defaultInfo.deploymentName;
+		var message = "DIEGO(배포명:" + deploymentName +  ") ";
 		
 		var requestParameter = {
-				id : cfId,
+				id : diegoId,
 				iaas: iaas
 		};
 		
@@ -1181,11 +1289,11 @@
 			onOpen : function(event){
 				event.onComplete = function(){
 					//deployFileName
-					var socket = new SockJS('/cfInstall');
+					var socket = new SockJS('/diegoInstall');
 					installClient = Stomp.over(socket); 
 					installClient.connect({}, function(frame) {
 						console.log('Connected Frame : ' + frame);
-				        installClient.subscribe('/cf/cfInstall', function(data){
+				        installClient.subscribe('/diego/diegoInstall', function(data){
 				        	
 				        	var installLogs = $(".w2ui-msg-body #installLogs");
 				        	
@@ -1202,18 +1310,38 @@
 						    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 설치 중 취소되었습니다.";
 						    			
 						    		installClient.disconnect();
-									w2alert(message, "CF 설치");
+									w2alert(message, "DIEGO 설치");
 						       	}
 				        	}
 
 				        });
-				        installClient.send('/send/cfInstall', {}, JSON.stringify(requestParameter));
+				        installClient.send('/send/diegoInstall', {}, JSON.stringify(requestParameter));
 				    });
 				}
 			}
 		});
 	}
 
+	//DIEGO 릴리즈 조회
+	function getDiegoRelease() {
+		$.ajax({
+			type : "GET",
+			url : "/release/getReleaseList/diego",
+			contentType : "application/json",
+			async : true,
+			success : function(data, status) {
+				console.log("DIEGO Releases List");
+				diegoReleases = new Array();
+				data.records.map(function(obj) {
+					diegoReleases.push(obj.name + "/" + obj.version);
+				});
+			},
+			error : function(e, status) {
+				w2alert("Diego Release List 를 가져오는데 실패하였습니다.", "DIEGO 설치");
+			}
+		});
+	}
+	
 	//CF 릴리즈 조회
 	function getCfRelease() {
 		$.ajax({
@@ -1222,25 +1350,64 @@
 			contentType : "application/json",
 			async : true,
 			success : function(data, status) {
-				console.log("CF Releases List");
-				releases = new Array();
+				console.log("Cf Releases List");
+				cfReleases = new Array();
 				data.records.map(function(obj) {
-					releases.push(obj.name + "/" + obj.version);
+					cfReleases.push(obj.name + "/" + obj.version);
 				});
 			},
 			error : function(e, status) {
-				w2alert("Cf Release List 를 가져오는데 실패하였습니다.", "CF 설치");
+				w2alert("Diego Release List 를 가져오는데 실패하였습니다.", "DIEGO 설치");
+			}
+		});
+	}
+	
+	//gardenLinux 릴리즈 조회
+	function getGardenLinuxRelease() {
+		$.ajax({
+			type : "GET",
+			url : "/release/getReleaseList/garden-linux",
+			contentType : "application/json",
+			async : true,
+			success : function(data, status) {
+				console.log("VirtualLinux Releases List");
+				gardenLinuxReleases = new Array();
+				data.records.map(function(obj) {
+					gardenLinuxReleases.push(obj.name + "/" + obj.version);
+				});
+			},
+			error : function(e, status) {
+				w2alert("Garden Linux Release List 를 가져오는데 실패하였습니다.", "DIEGO 설치");
+			}
+		});
+	}
+	//ETCD 릴리즈 조회
+	function getEtcdRelease() {
+		$.ajax({
+			type : "GET",
+			url : "/release/getReleaseList/etcd",
+			contentType : "application/json",
+			async : true,
+			success : function(data, status) {
+				console.log("ETCD Releases List");
+				etcdReleases = new Array();
+				data.records.map(function(obj) {
+					etcdReleases.push(obj.name + "/" + obj.version);
+				});
+			},
+			error : function(e, status) {
+				w2alert("ETCD Release List 를 가져오는데 실패하였습니다.", "DIEGO 설치");
 			}
 		});
 	}
 	
 	// RELEASE release value setgting
 	function setReleaseData(){
-		if( iaas.toUpperCase() == "AWS" && !checkEmpty(awsInfo.releaseName) && !checkEmpty(awsInfo.releaseVersion) ){
-			$(".w2ui-msg-body input[name='releases']").data('selected',{text : awsInfo.releaseName + "/"+ awsInfo.releaseVersion});
+		if( iaas.toUpperCase() == "AWS" && !checkEmpty(defaultInfo.releaseName) && !checkEmpty(defaultInfo.releaseVersion) ){
+			$(".w2ui-msg-body input[name='releases']").data('selected',{text : defaultInfo.releaseName + "/"+ defaultInfo.releaseVersion});
 		}
-		else if( iaas.toUpperCase() == "OPENSTACK" &&  !checkEmpty(openstackInfo.releaseName) &&  !checkEmpty(openstackInfo.releaseVersion) ){
-			$(".w2ui-msg-body input[name='releases']").data('selected',{text : openstackInfo.releaseName + "/"+ openstackInfo.releaseVersion});
+		else if( iaas.toUpperCase() == "OPENSTACK" &&  !checkEmpty(defaultInfo.releaseName) &&  !checkEmpty(defaultInfo.releaseVersion) ){
+			$(".w2ui-msg-body input[name='releases']").data('selected',{text : defaultInfo.releaseName + "/"+ defaultInfo.releaseVersion});
 		}
 	}
 	
@@ -1258,7 +1425,7 @@
 				});
 			},
 			error : function(e, status) {
-				w2alert("Stemcell List 를 가져오는데 실패하였습니다.", "CF 설치");
+				w2alert("Stemcell List 를 가져오는데 실패하였습니다.", "DIEGO 설치");
 			}
 		});
 	}
@@ -1266,9 +1433,8 @@
 	//전역변수 초기화
 	function initSetting() {
 		iaas = "";
-		cfId = "";
-		awsInfo = "";
-		openstackInfo = "";
+		diegoId = "";
+		defaultInfo = "";
 		uaaInfo = "";
 		consulInfo = "";
 		networkInfo = "";
@@ -1306,15 +1472,19 @@
 	// 그리드 재조회
 	function gridReload() {
 		//console.log("delete complete!");
-		w2ui['config_cfGrid'].clear();
+		w2ui['config_diegoGrid'].clear();
 		doSearch();
+		//리스트조회 시점
+		getDiegoRelease();
 		getCfRelease();
+		getGardenLinuxRelease();
+		getEtcdRelease();
 		getStamcellList();
 	}
 
 	//다른페이지 이동시 호출
 	function clearMainPage() {
-		$().w2destroy('config_cfGrid');
+		$().w2destroy('config_diegoGrid');
 	}
 
 	//화면 리사이즈시 호출
@@ -1332,7 +1502,7 @@
 
 <div id="main">
 	<div class="page_site">
-		설치관리자 환경설정 > <strong>Cf 설치</strong>
+		설치관리자 환경설정 > <strong>Diego 설치</strong>
 	</div>
 
 	<!-- 설치 관리자 -->
@@ -1353,9 +1523,9 @@
 		</tr>
 	</table>
 
-	<!-- Cf 목록-->
+	<!-- Diego 목록-->
 	<div class="pdt20">
-		<div class="title fl">CF 목록</div>
+		<div class="title fl">DIEGO 목록</div>
 		<div class="fr">
 			<!-- Btn -->
 			<span id="installBtn" class="btn btn-primary" style="width: 120px">설&nbsp;&nbsp;치</span>
@@ -1364,7 +1534,7 @@
 			<!-- //Btn -->
 		</div>
 	</div>
-	<div id="config_cfGrid" style="width: 100%; height: 500px"></div>
+	<div id="config_diegoGrid" style="width: 100%; height: 500px"></div>
 </div>
 
 <!-- IaaS 설정 DIV -->
@@ -1388,8 +1558,8 @@
 <!-- Start AWS Popup  -->
 
 	<!-- AWS  설정 DIV -->
-	<div id="awsInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+	<div id="awsDefaultInfoDiv" style="width: 100%; height: 100%;" hidden="true">
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
@@ -1404,38 +1574,62 @@
 			</div>
 			<div style="margin:15px 1.5%;">▶ AWS정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
-				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;" data-toggle="tooltip" data-placement="right" title="배포 명 !!!!">배포 명</label>
+				<div class="w2ui-field" >
+					<label style="text-align: left; width: 100%; font-size: 11px;">&bull;&nbsp;기본정보</label>
+				</div>
+				<div class="w2ui-field" >
+					<label style="text-align: left; width: 40%; font-size: 11px;">배포 명</label>
 					<div>
 						<input name="deploymentName" type="text" style="float: left; width: 60%;" required placeholder="배포 명을 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>
-	
-				<div class="w2ui-field">
+				<div class="w2ui-field" >
 					<label style="text-align: left; width: 40%; font-size: 11px;">설치관리자 UUID</label>
 					<div>
-						<input name="directorUuid" type="text" style="float: left; width: 60%;" required placeholder="설치관리자 UUID<를 입력하세요." />
+						<input name="directorUuid" type="text" style="float: left; width: 60%;" required placeholder="설치관리자 UUID를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>
-				<div class="w2ui-field">
+				<div class="w2ui-field" >
+					<label style="text-align: left; width: 40%; font-size: 11px;">DIEGO 릴리즈</label>
+					<div>
+						<input name="diegoReleases" type="list" style="float: left; width: 60%;" required placeholder="DIEGO 릴리즈를 선택하세요." />
+					</div>
+				</div>
+				
+				<div class="w2ui-field" >
 					<label style="text-align: left; width: 40%; font-size: 11px;">CF 릴리즈</label>
 					<div>
-						<input name="releases" type="list" style="float: left; width: 60%;" required placeholder="CF 릴리즈를 선택하세요." />
+						<input name="cfReleases" type="list" style="float: left; width: 60%;" required placeholder="CF 릴리즈를 선택하세요." />
 					</div>
+				</div>
+				<div class="w2ui-field" >
+					<label style="text-align: left; width: 40%; font-size: 11px;">Garden-Linux 릴리즈</label>
+					<div>
+						<input name="gardenLinuxReleases" type="list" style="float: left; width: 60%;" required placeholder="Garden-Linux 릴리즈를 선택하세요." />
+					</div>
+				</div>
+				<div class="w2ui-field" >
+					<label style="text-align: left; width: 40%; font-size: 11px;">ETCD 릴리즈</label>
+					<div>
+						<input name="etcdReleases" type="list" style="float: left; width: 60%;" required placeholder="ETCD 릴리즈를 선택하세요." />
+					</div>
+				</div>
+				<div class="w2ui-field" style="text-align: left; width: 100%;">
+					<label style="text-align: left; width: 100%; font-size: 11px;">&bull;&nbsp;CF 정보</label>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">APP SSH Fingerprint</label>
 					<div>
-						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)cfdoamin.com" />
+						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)diegodoamin.com" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">도메인</label>
 					<div>
-						<input name="domain" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)cfdoamin.com" />
+						<input name="domain" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)diegodoamin.com" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1455,7 +1649,7 @@
 				</div>
 				
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">CF 프록시 서버 공인 IP</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">DIEGO 프록시 서버 공인 IP</label>
 					<div>
 						<input name="proxyStaticIps" type="text" style="float: left; width: 60%;" required placeholder="프록시 서버 공인 IP를 입력하세요." />
 						<div class="isMessage"></div>
@@ -1486,7 +1680,7 @@
 	
 	<!-- AWS UAA 설정 DIV -->
 	<div id="awsUaaInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
@@ -1536,7 +1730,7 @@
 	
 	<!-- AWS CONSUL 설정 DIV -->
 	<div id="awsConsulInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
@@ -1602,7 +1796,7 @@
 	</div>
 	<!-- AWS Network 설정 DIV -->
 	<div id="awsNetworkInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
@@ -1648,7 +1842,7 @@
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">시큐리티 그룹명</label>
 					<div>
-						<input name="cloudSecurityGroups" type="text" style="float: left; width: 60%;" required placeholder="예) cf-security" />
+						<input name="cloudSecurityGroups" type="text" style="float: left; width: 60%;" required placeholder="예) diego-security" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1694,7 +1888,7 @@
 	
 	<!-- Aws Resource  설정 DIV -->
 	<div id="awsResourceInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
@@ -1734,7 +1928,7 @@
 	
 	<!-- AWS 배포파일 정보 -->
 	<div id="awsDeployDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
@@ -1753,13 +1947,13 @@
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 			<button class="btn" style="float: left;" onclick="awsResourcePopup();">이전</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="cfDeploy('after');">다음>></button>
+			<button class="btn" style="float: right; padding-right: 15%" onclick="diegoDeploy('after');">다음>></button>
 		</div>
 	</div>
 	
 	<!-- AWS 설치화면 -->
 	<div id="awsInstallDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
@@ -1783,10 +1977,10 @@
 	</div>
 	<!-- End AWS Popup -->
 
-	<!-- Start Cf OPENSTACK POP -->
+	<!-- Start Diego OPENSTACK POP -->
 	<!-- 오픈스택 정보 -->
-	<div id="openstackInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+	<div id="openstackDefaultInfoDiv" style="width: 100%; height: 100%;" hidden="true">
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
@@ -1817,22 +2011,22 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">CF 릴리즈</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">DIEGO 릴리즈</label>
 					<div>
-						<input name="releases" type="list" style="float: left; width: 60%;" required placeholder="CF 릴리즈를 선택하세요." />
+						<input name="releases" type="list" style="float: left; width: 60%;" required placeholder="DIEGO 릴리즈를 선택하세요." />
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">APP SSH Fingerprint</label>
 					<div>
-						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)cfdoamin.com" />
+						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)diegodoamin.com" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">도메인</label>
 					<div>
-						<input name="domain" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)cfdoamin.com" />
+						<input name="domain" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)diegodoamin.com" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1852,7 +2046,7 @@
 				</div>
 				
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">CF 프록시 서버 공인 IP</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">DIEGO 프록시 서버 공인 IP</label>
 					<div>
 						<input name="proxyStaticIps" type="text" style="float: left; width: 60%;" required placeholder="프록시 서버 공인 IP를 입력하세요." />
 						<div class="isMessage"></div>
@@ -1883,7 +2077,7 @@
 
 	<!-- 오픈스텍 UAA 정보 -->
 	<div id="openstackUaaInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body"	style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
@@ -1933,7 +2127,7 @@
 
 	<!-- 오픈스텍 CONSUL 설정 DIV -->
 	<div id="openstackConsulInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
@@ -2000,7 +2194,7 @@
 	
 	<!-- 네트워크 정보 -->
 	<div id="openstackNetworkInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
@@ -2046,7 +2240,7 @@
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">시큐리티 그룹명</label>
 					<div>
-						<input name="cloudSecurityGroups" type="text" style="float: left; width: 60%;" required placeholder="예) cf-security" />
+						<input name="cloudSecurityGroups" type="text" style="float: left; width: 60%;" required placeholder="예) diego-security" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -2093,7 +2287,7 @@
 	<div id="openstackResourceInfoDiv" style="width: 100%; height: 100%;"
 		hidden="true">
 		<div rel="title">
-			<b>CF 설치</b>
+			<b>DIEGO 설치</b>
 		</div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
@@ -2134,7 +2328,7 @@
 
 	<!-- 배포파일 정보 -->
 	<div id="openstackDeployDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
@@ -2153,13 +2347,13 @@
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 			<button class="btn" style="float: left;" onclick="openstackResourcePopup();">이전</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="cfDeploy('after');">다음>></button>
+			<button class="btn" style="float: right; padding-right: 15%" onclick="diegoDeploy('after');">다음>></button>
 		</div>
 	</div>
 	
 	<!-- 오픈스택 설치화면 -->
 	<div id="openstackInstallDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">

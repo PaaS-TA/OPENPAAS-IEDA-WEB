@@ -33,7 +33,7 @@ public class IEDACfOpenstackService {
 		return config;
 	}
 	
-	public IEDACfOpenstackConfig saveOpenstackCfInfo(CfParam.Openstack dto) {
+	public IEDACfOpenstackConfig saveOpenstackCfInfo(CfParam.Default dto) {
 		IEDACfOpenstackConfig config;
 		Date now = new Date();
 		if( StringUtils.isEmpty(dto.getId()) ){
@@ -62,7 +62,7 @@ public class IEDACfOpenstackService {
 		return openstackRepository.save(config);
 	}
 	
-	public IEDACfOpenstackConfig saveOpenstackUaaCfInfo(CfParam.OpenstackUaa dto) {
+	public IEDACfOpenstackConfig saveOpenstackUaaCfInfo(CfParam.Uaa dto) {
 		IEDACfOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setLoginSecret(dto.getLoginSecret());
 		config.setSigningKey(dto.getSigningKey());
@@ -72,7 +72,7 @@ public class IEDACfOpenstackService {
 		return openstackRepository.save(config);
 	}
 	
-	public IEDACfOpenstackConfig saveOpenstackConsulCfInfo(CfParam.OpenstackConsul dto) {
+	public IEDACfOpenstackConfig saveOpenstackConsulCfInfo(CfParam.Consul dto) {
 		IEDACfOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setAgentCert(dto.getAgentCert());
 		config.setAgentKey(dto.getAgentKey());
@@ -106,7 +106,7 @@ public class IEDACfOpenstackService {
 		return openstackRepository.save(config);
 	}
 	
-	public IEDACfOpenstackConfig saveOpenstackResourceInfo(CfParam.OpenstackResource dto){
+	public IEDACfOpenstackConfig saveOpenstackResourceInfo(CfParam.Resource dto){
 		IEDACfOpenstackConfig config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 		config.setStemcellName(dto.getStemcellName());
 		config.setStemcellVersion(dto.getStemcellVersion());

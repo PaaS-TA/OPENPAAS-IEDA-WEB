@@ -208,15 +208,14 @@ function selectIaas(){
 		yes_text 		: "확인",
 		no_text 		: "취소",
 		yes_callBack 	: function(){
-			structureType = $(".w2ui-msg-body input:radio[name='structureType']:checked").val();
-			if(structureType){
-				iaas = structureType;
+			iaas = $(".w2ui-msg-body input:radio[name='structureType']:checked").val();
+			if(iaas){
 				getReleaseVersionList();
 				
 				if( structureType == "AWS")
 					awsPopup();
 				else
-					osBoshInfoPopup();				
+					openstackPopup();				
 			}
 			else{
 				w2alert("설치할 Infrastructure 을 선택하세요");
@@ -574,10 +573,13 @@ function  boshInfoPopup(){
 			event.onComplete = function(){
 				
 				$(".w2ui-msg-body input[name='releaseVersion']").w2field('list', { items: releases , maxDropHeight:200, width:250});
+				if( checkEmpty($("#directorUuid").text()) ){
+					$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
+				}
 				
 				if(boshInfo != ""){
 					$(".w2ui-msg-body input[name='deploymentName']").val(boshInfo.deploymentName);
-					$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
+					$(".w2ui-msg-body input[name='directorUuid']").val(boshInfo.directorUuid);
 					$(".w2ui-msg-body input[name='releaseVersion']").data('selected', {text:boshInfo.releaseVersion});
 				} else {
 					$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());

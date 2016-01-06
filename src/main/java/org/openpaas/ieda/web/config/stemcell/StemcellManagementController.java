@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,7 +79,7 @@ public class StemcellManagementController extends BaseController {
 		log.info("doDelete stemecllFileName : " + requestMap.get("stemcellFileName"));
 		
 		String stemcellFileName = requestMap.get("stemcellFileName");
-		if ( stemcellFileName == null && stemcellFileName.isEmpty() ) {
+		if ( StringUtils.isEmpty(stemcellFileName) ) {
 			IEDAErrorResponse errorResponse = new IEDAErrorResponse();
 			errorResponse.setMessage("잘못된 요청입니다.");
 			errorResponse.setCode("bad.request");

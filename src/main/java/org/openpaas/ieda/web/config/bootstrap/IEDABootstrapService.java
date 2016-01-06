@@ -130,14 +130,14 @@ public class IEDABootstrapService {
 		
 		// 파일 가져오기
 		if("AWS".equals(iaas.toUpperCase())){
-			classPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-microbosh-setting.yml");
+			classPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-microbosh-param.yml");
 			stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-microbosh-stub.yml");
-			settingFileName = "aws-microbosh-setting-"+id+".yml";
+			settingFileName = "aws-microbosh-param-"+id+".yml";
 		}
 		else if("OPENSTACK".equals(iaas.toUpperCase())){
-			classPath = this.getClass().getClassLoader().getResource("static/deploy_template/openstack-microbosh-setting.yml");
+			classPath = this.getClass().getClassLoader().getResource("static/deploy_template/openstack-microbosh-param.yml");
 			stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/openstack-microbosh-stub.yml");
-			settingFileName = "openstack-microbosh-setting-"+id+".yml";
+			settingFileName = "openstack-microbosh-param-"+id+".yml";
 		}
 		
 		try {
@@ -167,7 +167,7 @@ public class IEDABootstrapService {
 		
 		List<ReplaceItem> items = new ArrayList<ReplaceItem>();
 		
-		if(iaas == "AWS"){
+		if("AWS".equals(iaas.toUpperCase()) ){
 			IEDABootstrapAwsConfig  awsConfig = awsRepository.findOne(id);
 			items.add(new ReplaceItem("[accessKeyId]", awsConfig.getAccessKeyId()));
 			items.add(new ReplaceItem("[secretAccessId]", awsConfig.getSecretAccessId()));
