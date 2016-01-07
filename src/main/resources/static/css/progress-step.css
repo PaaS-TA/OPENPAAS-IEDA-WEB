@@ -298,3 +298,89 @@ ul.progressStep_7 li.before:after {
     color:#333;
     border-left-color: #e2e5e9;
 }
+
+
+/******************  progressStep_8  ******************/
+
+ul.progressStep_8 {
+    list-style-type: none;
+    font-family: arial;
+    font-size: 11px;
+    clear: both;
+    line-height: 1em;
+    margin: 0 -1px;
+    text-align: center;
+    width:100%;
+}
+
+ul.progressStep_8 li{
+    float: left;
+    padding: 18px 12px;    /***  [내부영역 Padding] 내부 글자 크기에 따라 조절**/
+    color: #fff;
+    position: relative;
+    border-top: 1px solid #666;
+    border-bottom: 1px solid #666;
+    width: 11%;				/***  [Step비율] 갯수에 따라 조정 **/
+    height:48px;			/***  [Step 높이] ***/
+    margin: 0 1.1px;
+}
+
+ul.progressStep_8 li:before {
+    content: '';
+    border-left: 17px solid #fff;
+    border-top: 24px solid transparent;
+    border-bottom: 24px solid transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+}
+ul.progressStep_8 li:after {
+    content: '';
+    border-left: 17px solid #333;
+    border-top: 24px solid transparent;
+    border-bottom: 24px solid transparent;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    z-index: 20;
+}
+
+/* class: pass */
+ul.progressStep_8 li.pass {
+    border-top: 0px;
+    border-bottom: 0px;
+    background: #94d0fb;
+}
+
+ul.progressStep_8 li.pass:after {
+    border-top: 24px solid transparent;
+    border-bottom: 24px solid transparent;
+    border-left-color: #94d0fb;
+}
+/* class: active */
+ul.progressStep_8 li.active {
+    border-top: 0px;
+    border-bottom: 0px;
+    background: #147ad0;
+}
+
+ul.progressStep_8 li.active:after {
+    border-top: 24px solid transparent;
+    border-bottom: 24px solid transparent;
+    border-left-color: #147ad0;
+}
+/* class: before */
+ul.progressStep_8 li.before {
+    border-top: 0px;
+    border-bottom: 0px;
+    color:#333;
+    background: #e2e5e9;
+}
+
+ul.progressStep_8 li.before:after {
+    border-top: 24px solid transparent;
+    border-bottom: 24px solid transparent;
+    color:#333;
+    border-left-color: #e2e5e9;
+}

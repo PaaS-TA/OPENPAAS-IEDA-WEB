@@ -32,7 +32,14 @@ public class DiegoParam {
 		private String etcdReleaseName;
 		@NotNull
 		private String etcdReleaseVersion;
-		//1.2 CF 정보
+	}
+	
+	@Data
+	public static class Cf{
+		@NotNull
+		private String id;
+		private String iaas;
+		
 		@NotNull
 		private String domain;
 		@NotNull
@@ -77,7 +84,13 @@ public class DiegoParam {
 		private String diegoServerCert;
 		@NotNull
 		private String diegoServerKey;
-		//2.2 ETCD 정보	
+	}
+	
+	@Data
+	public static class Etcd {
+		@NotNull
+		private String id;
+		private String iaas;
 		@NotNull
 		private String etcdClientCert;
 		@NotNull

@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,7 +72,9 @@ public class IEDABoshService {
 				boshInfo.setIaas("AWS");
 				boshInfo.setDirectorUuid(aws.getDirectorUuid());
 				boshInfo.setReleaseVersion(aws.getReleaseVersion());
-				boshInfo.setStemcell(aws.getStemcellName() + "/" + aws.getStemcellVersion());
+				if(!StringUtils.isEmpty(aws.getStemcellName()) && !StringUtils.isEmpty(aws.getStemcellVersion())){
+					boshInfo.setStemcell(aws.getStemcellName() + "/" + aws.getStemcellVersion());
+				}
 				boshInfo.setPublicIp(aws.getPublicStaticIp());
 				boshInfo.setSubnetRange(aws.getSubnetRange());
 				boshInfo.setGateway(aws.getSubnetGateway());
@@ -106,7 +109,9 @@ public class IEDABoshService {
 				boshInfo.setIaas("OPENSTACK");
 				boshInfo.setDirectorUuid(openstack.getDirectorUuid());
 				boshInfo.setReleaseVersion(openstack.getReleaseVersion());
-				boshInfo.setStemcell(openstack.getStemcellName() + "/" + openstack.getStemcellVersion());
+				if(!StringUtils.isEmpty(openstack.getStemcellName()) && !StringUtils.isEmpty(openstack.getStemcellVersion())){
+					boshInfo.setStemcell(openstack.getStemcellName() + "/" + openstack.getStemcellVersion());
+				}
 				boshInfo.setPublicIp(openstack.getPublicStaticIp());
 				boshInfo.setSubnetRange(openstack.getSubnetRange());
 				boshInfo.setGateway(openstack.getSubnetGateway());

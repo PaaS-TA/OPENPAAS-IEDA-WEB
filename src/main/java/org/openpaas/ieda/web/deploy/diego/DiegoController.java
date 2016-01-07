@@ -33,13 +33,13 @@ public class DiegoController {
 
 	@Autowired
 	private IEDADiegoOpenstackService openstackService;
-	
+
 	@Autowired
 	private DiegoDeployAsyncService diegoDeployAsyncService;
-	
+
 	@Autowired
 	private DiegoDeleteDeployAsyncService diegoDeleteDeployAsyncService;
-	
+
 
 	@RequestMapping(value = "/deploy/diego", method=RequestMethod.GET)
 	public String main() {
@@ -82,9 +82,18 @@ public class DiegoController {
 
 	//AWS 기본정보 저장
 	@RequestMapping(value="/diego/saveAws", method=RequestMethod.PUT)
-	public ResponseEntity saveAwsDiegoInfo(@RequestBody @Valid DiegoParam.Default dto){
+	public ResponseEntity saveAwsInfo(@RequestBody @Valid DiegoParam.Default dto){
 
 		IEDADiegoAwsConfig config = awsService.saveDefaultInfo(dto);
+
+		return new ResponseEntity<>(config, HttpStatus.OK);
+	}
+
+	//AWS 기본정보 저장
+	@RequestMapping(value="/diego/saveAwsCf", method=RequestMethod.PUT)
+	public ResponseEntity saveAwsCfInfo(@RequestBody @Valid DiegoParam.Cf dto){
+
+		IEDADiegoAwsConfig config = awsService.saveCfInfo(dto);
 
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
@@ -94,6 +103,15 @@ public class DiegoController {
 	public ResponseEntity saveAwsDiegoInfo(@RequestBody @Valid DiegoParam.Diego dto){
 
 		IEDADiegoAwsConfig config = awsService.saveDiegoInfo(dto);
+
+		return new ResponseEntity<>(config, HttpStatus.OK);
+	}
+
+	//AWS ETCD 정보 저장
+	@RequestMapping(value="/diego/saveAwsEtcd", method=RequestMethod.PUT)
+	public ResponseEntity saveAwsEtcdInfo(@RequestBody @Valid DiegoParam.Etcd dto){
+
+		IEDADiegoAwsConfig config = awsService.saveEtcdInfo(dto);
 
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
@@ -126,11 +144,29 @@ public class DiegoController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 
+	//AWS 기본정보 저장
+	@RequestMapping(value="/diego/saveOpenstackCf", method=RequestMethod.PUT)
+	public ResponseEntity saveOpenstackCfInfo(@RequestBody @Valid DiegoParam.Cf dto){
+
+		IEDADiegoOpenstackConfig config = openstackService.saveCfInfo(dto);
+
+		return new ResponseEntity<>(config, HttpStatus.OK);
+	}
+
 	//OPENSTACK Diego 정보 저장
 	@RequestMapping(value="/diego/saveOpenstackDiego", method=RequestMethod.PUT)
 	public ResponseEntity saveOpenstackDiegoInfo(@RequestBody @Valid DiegoParam.Diego dto){
 
 		IEDADiegoOpenstackConfig config = openstackService.saveDiegoInfo(dto);
+
+		return new ResponseEntity<>(config, HttpStatus.OK);
+	}
+
+	//OPENSTACK ETCD 정보 저장
+	@RequestMapping(value="/diego/saveOpenstackEtcd", method=RequestMethod.PUT)
+	public ResponseEntity saveOpenstackEtcdInfo(@RequestBody @Valid DiegoParam.Etcd dto){
+
+		IEDADiegoOpenstackConfig config = openstackService.saveEtcdInfo(dto);
 
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
@@ -156,25 +192,25 @@ public class DiegoController {
 	@MessageMapping("/diegoInstall")
 	@SendTo("/diego/diegoInstall")
 	public ResponseEntity doBoshInstall(@RequestBody @Valid DiegoParam.Install dto){
-		
+
 		diegoDeployAsyncService.deployAsync(dto);
 		return new ResponseEntity(HttpStatus.OK);
 	}
-	
+
 	@RequestMapping( value="/diego/delete", method=RequestMethod.DELETE)
 	public ResponseEntity deleteJustOnlyDiegoRecord(@RequestBody @Valid DiegoParam.Delete dto){
 		diegoService.deleteDiegoInfoRecord(dto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
+
 	@MessageMapping("/diegoDelete")
 	@SendTo("/diego/diegoDelete")
 	public ResponseEntity deleteBosh(@RequestBody @Valid DiegoParam.Delete dto){
-		
+
 		diegoDeleteDeployAsyncService.deleteDeployAsync(dto);
-		
+
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
-	
+
+
 }

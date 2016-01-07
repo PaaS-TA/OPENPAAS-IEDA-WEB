@@ -57,7 +57,7 @@ public class BoshController extends BaseController {
 	
 	@RequestMapping(value="/deploy/bosh")
 	public String List(){
-		return "/deploy/boshManagement";
+		return "/deploy/bosh";
 	}
 	
 	@RequestMapping(value="/deploy/boshList", method=RequestMethod.GET)

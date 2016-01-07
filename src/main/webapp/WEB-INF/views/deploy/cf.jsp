@@ -108,9 +108,6 @@
 			if ($("#modifyBtn").attr('disabled') == "disabled")
 				return;
 			
-			getCfRelease();
-			getStamcellList();
-			
 			w2confirm({
 				title : "CF 설치",
 				msg : "CF설치 정보를 수정하시겠습니까?",
@@ -156,9 +153,6 @@
 						no_text : "취소"
 					});
 		});
-		
-		getCfRelease();
-		getStamcellList();
 		
 		doSearch();
 	});
@@ -209,10 +203,11 @@
 			success : function(data, status) {
 				if (data != null && data != "") {
 					initSetting();
-					if (record.iaas.toLowerCase() == "aws"){
+					iaas = record.iaas.toUpperCase();
+					if (iaas == "AWS"){
 						setAwsData(data.contents);
 					}
-					else if (record.iaas.toLowerCase() == "openstack"){
+					else if (iaas == "OPENSTACK"){
 						setOpenstackData(data.contents);
 					}
 				}
@@ -379,8 +374,6 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					$(".w2ui-msg-body input[name='releases']").w2field('list', {items : releases,maxDropHeight : 200,width : 250});
-					
 					if (awsInfo != null) {
 						$(".w2ui-msg-body input[name='deploymentName']").val(awsInfo.deploymentName);
 						$(".w2ui-msg-body input[name='directorUuid']").val(awsInfo.directorUuid);
@@ -393,12 +386,9 @@
 						$(".w2ui-msg-body input[name='proxyStaticIps']").val(awsInfo.proxyStaticIps);
 						$(".w2ui-msg-body textarea[name='sslPemPub']").val(awsInfo.sslPemPub);
 						$(".w2ui-msg-body textarea[name='sslPemRsa']").val(awsInfo.sslPemRsa);
-						
-						if(releases.length > 0 && !checkEmpty(awsInfo.releaseName) && !checkEmpty(awsInfo.releaseVersion) ){
-							$(".w2ui-msg-body input[name='releases']").data('selected',{text : awsInfo.releaseName + "/"+ awsInfo.releaseVersion});
-						}
 					}
-					
+					w2popup.lock("릴리즈를 조회 중입니다.", true);
+					getCfRelease();
 				}
 			},
 			onClose : function(event) {
@@ -412,15 +402,15 @@
 	// AWS POPUP NEXT BUTTON EVENT
 	function saveAwsInfo() {
 		// AWSInfo Save
-		var releases = $(".w2ui-msg-body input[name='releases']").val();
+		var release = $(".w2ui-msg-body input[name='releases']").val();
 		
 		awsInfo = {
 					id 					: (cfId) ? cfId : "",
 					iaas 				: "AWS",
 					deploymentName 		: $(".w2ui-msg-body input[name='deploymentName']").val(),
 					directorUuid 		: $(".w2ui-msg-body input[name='directorUuid']").val(),
-					releaseName 		: releases.split("/")[0],
-					releaseVersion 		: releases.split("/")[1],
+					releaseName 		: release.split("/")[0],
+					releaseVersion 		: release.split("/")[1],
 					appSshFingerprint   : $(".w2ui-msg-body input[name='appSshFingerprint']").val(),
 		
 					domain 				: $(".w2ui-msg-body input[name='domain']").val(),
@@ -646,19 +636,11 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					//if(stemcells.length > 0 ){
-					$(".w2ui-msg-body input[name='stemcells']").w2field('list', {items:stemcells, maxDropHeight : 200,width : 250});
-					/* }
- 					else{
- 						getStamcellList();
- 					} */
 					if (resourceInfo != null) {
 						$(".w2ui-msg-body input[name='boshPassword']").val(resourceInfo.boshPassword);
-						if(!checkEmpty(resourceInfo.stemcellName) &&  !checkEmpty(resourceInfo.stemcellVersion) ){
-							console.log("stemcell ::: " + resourceInfo.stemcellName + "/"+ resourceInfo.stemcellVersion);
-							$(".w2ui-msg-body input[name='stemcells']").data('selected',{text : resourceInfo.stemcellName + "/"+ resourceInfo.stemcellVersion});
-						}
-					} 
+					}
+					w2popup.lock("스템셀을 조회 중입니다.", true);
+					getStamcellList();
 				}
 			},
 			onClose : function(event) {
@@ -781,7 +763,6 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					$(".w2ui-msg-body input[name='releases']").w2field('list', {items : releases,maxDropHeight : 200,width : 250});
 					if (openstackInfo != null) {
 						$(".w2ui-msg-body input[name='deploymentName']").val(openstackInfo.deploymentName);
 						$(".w2ui-msg-body input[name='directorUuid']").val(openstackInfo.directorUuid);
@@ -794,12 +775,9 @@
 						$(".w2ui-msg-body input[name='proxyStaticIps']").val(openstackInfo.proxyStaticIps);
 						$(".w2ui-msg-body textarea[name='sslPemPub']").val(openstackInfo.sslPemPub);
 						$(".w2ui-msg-body textarea[name='sslPemRsa']").val(openstackInfo.sslPemRsa);
-						
-						if(releases.length > 0 && !checkEmpty(openstackInfo.releaseName) && !checkEmpty(openstackInfo.releaseVersion) ){
-							$(".w2ui-msg-body input[name='releases']").data('selected',{text : openstackInfo.releaseName + "/"+ openstackInfo.releaseVersion});
-						}
 					}
-					
+					w2popup.lock("릴리즈를 조회 중입니다.", true);
+					getCfRelease();
 				}
 			},
 			onClose : function(event) {
@@ -813,15 +791,15 @@
 	// OPENSTACK POPUP NEXT BUTTON EVENT
 	function saveOpenstackInfo() {
 		// OPENSTACKInfo Save
-		var releases = $(".w2ui-msg-body input[name='releases']").val();
+		var release = $(".w2ui-msg-body input[name='releases']").val();
 		
 		openstackInfo = {
 					id 					: (cfId) ? cfId : "",
 					iaas 				: "OPENSTACK",
 					deploymentName 		: $(".w2ui-msg-body input[name='deploymentName']").val(),
 					directorUuid 		: $(".w2ui-msg-body input[name='directorUuid']").val(),
-					releaseName 		: releases.split("/")[0],
-					releaseVersion 		: releases.split("/")[1],
+					releaseName 		: release.split("/")[0],
+					releaseVersion 		: release.split("/")[1],
 					appSshFingerprint   : $(".w2ui-msg-body input[name='appSshFingerprint']").val(),
 		
 					domain 				: $(".w2ui-msg-body input[name='domain']").val(),
@@ -1047,14 +1025,11 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					$(".w2ui-msg-body input[name='stemcells']").w2field('list', {items:stemcells, maxDropHeight : 200,width : 250});
-					
 					if (resourceInfo != null) {
 						$(".w2ui-msg-body input[name='boshPassword']").val(resourceInfo.boshPassword);
-						if(!checkEmpty(resourceInfo.stemcellName) &&  !checkEmpty(resourceInfo.stemcellVersion) ){
-							$(".w2ui-msg-body input[name='stemcells']").data('selected',{text : resourceInfo.stemcellName + "/"+ resourceInfo.stemcellVersion});
-						}
-					} 
+					}
+					w2popup.lock("스템셀을 조회 중입니다.", true);
+					getStamcellList();
 				}
 			},
 			onClose : function(event) {
@@ -1224,14 +1199,24 @@
 			success : function(data, status) {
 				console.log("CF Releases List");
 				releases = new Array();
-				data.records.map(function(obj) {
-					releases.push(obj.name + "/" + obj.version);
-				});
+				if( data.records != null){
+					data.records.map(function(obj) {
+						releases.push(obj.name + "/" + obj.version);
+					});
+				}
+				setReleaseList();
 			},
 			error : function(e, status) {
+				w2popup.unlock();
 				w2alert("Cf Release List 를 가져오는데 실패하였습니다.", "CF 설치");
 			}
 		});
+	}
+	
+	//Release List W2Field 적용
+	function setReleaseList(){
+		$(".w2ui-msg-body input[name='releases']").w2field('list', {items : releases,maxDropHeight : 200,width : 250});
+		setReleaseData();
 	}
 	
 	// RELEASE release value setgting
@@ -1242,6 +1227,7 @@
 		else if( iaas.toUpperCase() == "OPENSTACK" &&  !checkEmpty(openstackInfo.releaseName) &&  !checkEmpty(openstackInfo.releaseVersion) ){
 			$(".w2ui-msg-body input[name='releases']").data('selected',{text : openstackInfo.releaseName + "/"+ openstackInfo.releaseVersion});
 		}
+		w2popup.unlock();
 	}
 	
 	// 스템셀 조회
@@ -1253,14 +1239,32 @@
 			success : function(data, status) {
 				console.log("Stemcell List");
 				stemcells = new Array();
-				data.records.map(function(obj) {
-					stemcells.push(obj.name + "/" + obj.version);
-				});
+				if(data.records != null ){
+					data.records.map(function(obj) {
+						stemcells.push(obj.name + "/" + obj.version);
+					});
+				}
+				setStemcellList();
 			},
 			error : function(e, status) {
+				w2popup.unlock();
 				w2alert("Stemcell List 를 가져오는데 실패하였습니다.", "CF 설치");
 			}
 		});
+	}
+	
+	//Release List W2Field 적용
+	function setStemcellList(){
+		$(".w2ui-msg-body input[name='stemcells']").w2field('list', {items : stemcells,maxDropHeight : 200,width : 250});
+		setStemcellData();
+	}
+	
+	// RELEASE release value setgting
+	function setStemcellData(){
+		if( !checkEmpty(resourceInfo.stemcellName) && !checkEmpty(resourceInfo.stemcellVersion) ){
+			$(".w2ui-msg-body input[name='stemcells']").data('selected',{text : resourceInfo.stemcellName + "/"+ resourceInfo.stemcellVersion});
+		}
+		w2popup.unlock();
 	}
 	
 	//전역변수 초기화
@@ -1308,8 +1312,6 @@
 		//console.log("delete complete!");
 		w2ui['config_cfGrid'].clear();
 		doSearch();
-		getCfRelease();
-		getStamcellList();
 	}
 
 	//다른페이지 이동시 호출
@@ -1393,7 +1395,7 @@
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="active">AWS 정보</li>
+					<li class="active">기본 정보</li>
 					<li class="before">UAA 정보</li>
 					<li class="before">CONSUL 정보</li>
 					<li class="before">네트워크 정보</li>
@@ -1402,10 +1404,13 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">▶ AWS정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 기본정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
+				<div class="w2ui-field" style="display: inline-block;">
+					<label style="text-align: left; width: 100%; font-size: 13px;" >기본정보</label>
+				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;" data-toggle="tooltip" data-placement="right" title="배포 명 !!!!">배포 명</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;" >배포 명</label>
 					<div>
 						<input name="deploymentName" type="text" style="float: left; width: 60%;" required placeholder="배포 명을 입력하세요." />
 						<div class="isMessage"></div>
@@ -1428,9 +1433,14 @@
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">APP SSH Fingerprint</label>
 					<div>
-						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)cfdoamin.com" />
+						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="Diego ssh_proxy 로그인을 위한 핑거프린트를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
+				</div>
+				
+				<br/>
+				<div class="w2ui-field" style="display: inline-block;">
+					<label style="text-align: left; width: 100%; font-size: 13px;" >CF 정보</label>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">도메인</label>
@@ -1454,14 +1464,17 @@
 					</div>
 				</div>
 				
+				<br/>
+				<div class="w2ui-field" style="display: inline-block;">
+					<label style="text-align: left; width: 100%; font-size: 13px;" >Proxy 정보</label>
+				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">CF 프록시 서버 공인 IP</label>
 					<div>
 						<input name="proxyStaticIps" type="text" style="float: left; width: 60%;" required placeholder="프록시 서버 공인 IP를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
-				</div>
-	
+				</div>	
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">프록시 서버 공개키</label>
 					<div>
@@ -1490,7 +1503,7 @@
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="pass">AWS 정보</li>
+					<li class="pass">기본 정보</li>
 					<li class="active">UAA 정보</li>
 					<li class="before">CONSUL 정보</li>
 					<li class="before">네트워크 정보</li>
@@ -1499,7 +1512,7 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">▶ UAA 정보 설정</div>
+			<div style="margin:15px 1.5%;">■ UAA 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">로그인 비밀번호</label>
@@ -1540,7 +1553,7 @@
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="pass">AWS 정보</li>
+					<li class="pass">기본 정보</li>
 					<li class="pass">UAA 정보</li>
 					<li class="active">CONSUL 정보</li>
 					<li class="before">네트워크 정보</li>
@@ -1549,7 +1562,7 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">▶ CONSUL 정보 설정</div>
+			<div style="margin:15px 1.5%;">■ CONSUL 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">암호화 키</label>
@@ -1606,7 +1619,7 @@
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="pass">AWS 정보</li>
+					<li class="pass">기본 정보</li>
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="active">네트워크 정보</li>
@@ -1615,7 +1628,7 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">▶ 네트워크정보 설정</div>
+			<div style="margin:15px 1.5%;">■ 네트워크정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Subnet Range(CIDR)</label>
@@ -1698,7 +1711,7 @@
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="pass">AWS 정보</li>
+					<li class="pass">기본 정보</li>
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="pass">네트워크 정보</li>
@@ -1707,7 +1720,7 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">▶ 리소스정보 설정</div>
+			<div style="margin:15px 1.5%;">■ 리소스정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Stemcell</label>
@@ -1738,7 +1751,7 @@
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="pass">AWS 정보</li>
+					<li class="pass">기본 정보</li>
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="pass">네트워크 정보</li>
@@ -1763,7 +1776,7 @@
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="pass">AWS 정보</li>
+					<li class="pass">기본 정보</li>
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="pass">네트워크 정보</li>
@@ -1790,7 +1803,7 @@
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="active">오픈스택 정보</li>
+					<li class="active">기본 정보</li>
 					<li class="before">UAA 정보</li>
 					<li class="before">CONSUL 정보</li>
 					<li class="before">네트워크 정보</li>
@@ -1799,8 +1812,11 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">▶ 오픈스택정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;기본정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
+				<div class="w2ui-field" style="display: inline-block;">
+					<label style="text-align: left; width: 100%; font-size: 13px;" >기본 정보</label>
+				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">배포 명</label>
 					<div>
@@ -1825,9 +1841,13 @@
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">APP SSH Fingerprint</label>
 					<div>
-						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)cfdoamin.com" />
+						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="Diego ssh_proxy 로그인을 위한 핑거프린트를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
+				</div>
+				<br/>
+				<div class="w2ui-field" style="display: inline-block;">
+					<label style="text-align: left; width: 100%; font-size: 13px;" >도메인 정보</label>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">도메인</label>
@@ -1850,7 +1870,10 @@
 						<div class="isMessage"></div>
 					</div>
 				</div>
-				
+				<br/>
+				<div class="w2ui-field" style="display: inline-block;">
+					<label style="text-align: left; width: 100%; font-size: 13px;" >Proxy 정보</label>
+				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">CF 프록시 서버 공인 IP</label>
 					<div>
@@ -1887,7 +1910,7 @@
 		<div rel="body"	style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="pass">오픈스택 정보</li>
+					<li class="pass">기본 정보</li>
 					<li class="active">UAA 정보</li>
 					<li class="before">CONSUL 정보</li>
 					<li class="before">네트워크 정보</li>
@@ -1896,7 +1919,7 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">▶ UAA 정보 설정</div>
+			<div style="margin:15px 1.5%;">■ UAA 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">로그인 비밀번호</label>
@@ -1937,7 +1960,7 @@
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="pass">오픈스택 정보</li>
+					<li class="pass">기본 정보</li>
 					<li class="pass">UAA 정보</li>
 					<li class="active">CONSUL 정보</li>
 					<li class="before">네트워크 정보</li>
@@ -1946,7 +1969,7 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">▶ CONSUL 정보 설정</div>
+			<div style="margin:15px 1.5%;">■ CONSUL 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">암호화 키</label>
@@ -2004,7 +2027,7 @@
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="pass">오픈스택 정보</li>
+					<li class="pass">기본 정보</li>
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="active">네트워크 정보</li>
@@ -2013,7 +2036,7 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">▶ 네트워크정보 설정</div>
+			<div style="margin:15px 1.5%;">■ 네트워크정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Subnet Range(CIDR)</label>
@@ -2098,7 +2121,7 @@
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="pass">오픈스택 정보</li>
+					<li class="pass">기본 정보</li>
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="pass">네트워크 정보</li>
@@ -2107,7 +2130,7 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">▶ 리소스정보 설정</div>
+			<div style="margin:15px 1.5%;">■ 리소스정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">Stemcell</label>
@@ -2138,7 +2161,7 @@
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="pass">오픈스택 정보</li>
+					<li class="pass">기본 정보</li>
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="pass">네트워크 정보</li>
@@ -2163,7 +2186,7 @@
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 				<ul class="progressStep_7">
-					<li class="pass">오픈스택 정보</li>
+					<li class="pass">기본 정보</li>
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="pass">네트워크 정보</li>

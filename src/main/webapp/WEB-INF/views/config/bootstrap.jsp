@@ -1390,7 +1390,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="width:100%;height:15px;paddinf-left:1.5%;display: inline-block;">▶ AWS 정보</div>
+			<div style="width:100%;height:15px;paddinf-left:1.5%;display: inline-block;">■ AWS 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<form id="awsForm" data-toggle="validator" >
 			        <div class="w2ui-field">
@@ -1471,7 +1471,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="width:100%;height:15px;paddinf-left:1.5%;display: inline-block;">▶ 기본 정보</div>
+			<div style="width:100%;height:15px;paddinf-left:1.5%;display: inline-block;">■ 기본 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<form id="awsDefaultForm" data-toggle="validator" >
 			        <div class="w2ui-field">
@@ -1527,7 +1527,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 네트워크 정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">■ 네트워크 정보</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Subnet ID</label>
@@ -1601,7 +1601,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 리소스 정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">■ 리소스 정보</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Stemcell</label>
@@ -1697,7 +1697,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ OPENSTACK 정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">■ OPENSTACK 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">AUTH URL</label>
@@ -1777,7 +1777,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 기본 정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">■ 기본 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">배포명</label>
@@ -1826,7 +1826,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 네트워크 정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">■ 네트워크 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Floating IP</label>
@@ -1900,7 +1900,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">▶ 리소스 정보</div>
+			<div rel="sub-title" class="cont_title" style="margin-left:1.5%;">■ 리소스 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<div class="w2ui-field">
 					<label style="text-align: left; width: 200px; font-size: 11px;">Stemcell</label>
