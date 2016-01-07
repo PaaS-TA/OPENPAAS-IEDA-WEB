@@ -10,11 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.common.CommonService;
 import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.common.ReplaceItem;
+import org.openpaas.ieda.web.common.Sha512Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -209,7 +211,7 @@ public class IEDACfService {
 			// 5. 리소스 정보
 			items.add(new ReplaceItem("[stemcellName]", awsConfig.getStemcellName()));
 			items.add(new ReplaceItem("[stemcellVersion]", awsConfig.getStemcellVersion()));
-			items.add(new ReplaceItem("[boshPassword]", awsConfig.getBoshPassword()));
+			items.add(new ReplaceItem("[boshPassword]", Sha512Crypt.Sha512_crypt(awsConfig.getBoshPassword(), RandomStringUtils.randomAlphabetic(10), 0)));
 		}
 		else{
 			IEDACfOpenstackConfig openstackConfig = openstackRepository.findOne(id);
@@ -256,7 +258,7 @@ public class IEDACfService {
 			// 5. 리소스 정보
 			items.add(new ReplaceItem("[stemcellName]", openstackConfig.getStemcellName()));
 			items.add(new ReplaceItem("[stemcellVersion]", openstackConfig.getStemcellVersion()));
-			items.add(new ReplaceItem("[boshPassword]", openstackConfig.getBoshPassword()));
+			items.add(new ReplaceItem("[boshPassword]", Sha512Crypt.Sha512_crypt(openstackConfig.getBoshPassword(), RandomStringUtils.randomAlphabetic(10), 0)));
 		}
 		return items;
 	}

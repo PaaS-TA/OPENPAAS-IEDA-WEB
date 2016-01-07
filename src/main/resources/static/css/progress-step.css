@@ -52,6 +52,7 @@ ul.progressStep_5 {
     list-style-type: none;
     font-family: arial;
     font-size: 11px;
+	font-weight: 900;
     clear: both;
     line-height: 1em;
     margin: 3px; auto;
@@ -136,6 +137,7 @@ ul.progressStep_6 {
     list-style-type: none;
     font-family: arial;
     font-size: 11px;
+	font-weight: 900;
     clear: both;
     line-height: 1em;
     margin: 0 -1px;
@@ -220,6 +222,7 @@ ul.progressStep_7 {
     list-style-type: none;
     font-family: arial;
     font-size: 11px;
+	font-weight: 900;
     clear: both;
     line-height: 1em;
     margin: 0 -1px;
@@ -306,6 +309,7 @@ ul.progressStep_8 {
     list-style-type: none;
     font-family: arial;
     font-size: 11px;
+	font-weight: 900;
     clear: both;
     line-height: 1em;
     text-align: center;
