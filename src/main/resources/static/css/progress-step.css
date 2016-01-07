@@ -229,7 +229,7 @@ ul.progressStep_7 {
 
 ul.progressStep_7 li{
     float: left;
-    padding: 18px 12px;    /***  [내부영역 Padding] 내부 글자 크기에 따라 조절**/
+    padding: 18px 13px;    /***  [내부영역 Padding] 내부 글자 크기에 따라 조절**/
     color: #fff;
     position: relative;
     border-top: 1px solid #666;
@@ -308,19 +308,18 @@ ul.progressStep_8 {
     font-size: 11px;
     clear: both;
     line-height: 1em;
-    margin: 0 -1px;
     text-align: center;
     width:100%;
 }
 
 ul.progressStep_8 li{
     float: left;
-    padding: 18px 12px;    /***  [내부영역 Padding] 내부 글자 크기에 따라 조절**/
+    padding: 18px 14px;    /***  [내부영역 Padding] 내부 글자 크기에 따라 조절**/
     color: #fff;
     position: relative;
     border-top: 1px solid #666;
     border-bottom: 1px solid #666;
-    width: 11%;				/***  [Step비율] 갯수에 따라 조정 **/
+    width: 12%;				/***  [Step비율] 갯수에 따라 조정 **/
     height:48px;			/***  [Step 높이] ***/
     margin: 0 1.1px;
 }

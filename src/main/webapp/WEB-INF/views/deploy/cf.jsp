@@ -1261,13 +1261,13 @@
 		});
 	}
 	
-	//Release List W2Field 적용
+	// 스템셀 List W2Field 적용
 	function setStemcellList(){
 		$(".w2ui-msg-body input[name='stemcells']").w2field('list', {items : stemcells,maxDropHeight : 200,width : 250});
 		setStemcellData();
 	}
 	
-	// RELEASE release value setgting
+	// 스템셀 value setgting
 	function setStemcellData(){
 		if( !checkEmpty(resourceInfo.stemcellName) && !checkEmpty(resourceInfo.stemcellVersion) ){
 			$(".w2ui-msg-body input[name='stemcells']").data('selected',{text : resourceInfo.stemcellName + "/"+ resourceInfo.stemcellVersion});

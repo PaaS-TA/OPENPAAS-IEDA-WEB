@@ -148,9 +148,8 @@ Diego
 			var directorName = $("#directorName").text().toUpperCase();
 			
 			if (directorName.indexOf("AWS") > 0) {
-				//iaas = "OPENSTACk";
-				//openstackPopup();
-				iaas = "AWS";
+				iaas = "OPENSTACk";
+				//iaas = "AWS";
 				defaultPopup();
 			} else if (directorName.indexOf("OPENSTACK") > 0) {
 				iaas = "OPENSTACk";
@@ -178,6 +177,7 @@ Diego
 						return;
 					} else {
 						var record = w2ui['config_diegoGrid'].get(selected);
+						iaas = record.iaas;
 						getDiegoData(record);
 					}
 				},
@@ -262,11 +262,11 @@ Diego
 				if (data != null && data != "") {
 					initSetting();
 					if (record.iaas.toUpperCase() == "AWS"){
-						iaas = "AWS";
+						//iaas = "AWS";
 						setAwsData(data.contents);
 					}
 					else if (record.iaas.toUpperCase() == "OPENSTACK"){
-						iaas = "OPENSTACK";
+						//iaas = "OPENSTACK";
 						setOpenstackData(data.contents);
 					}
 				}
@@ -362,6 +362,7 @@ Diego
 	// AWS AwsPopup Data Setting
 	function setAwsData(contents) {
 		diegoId = contents.id;
+		iaas = "AWS";
 		defaultInfo = {
 			iaas						:contents.iaas,
 			deploymentName 				:contents.deploymentName,
@@ -379,7 +380,7 @@ Diego
 		cfInfo = {
 			iaas				:contents.iaas,			
 			domain 				:contents.domain,
-			description 		:contents.description,
+			deployment			:contents.deployment,
 			secret 				:contents.secret,			
 			etcdMachines 		:contents.etcdMachines,
 			natsMachines 		:contents.natsMachines,
@@ -390,7 +391,6 @@ Diego
 			consulEncryptKeys 	:contents.consulEncryptKeys,
 			consulServerCert 	:contents.consulServerCert,
 			consulServerKey 	:contents.consulServerKey,
-			
 		}
 		
 		diegoInfo = {
@@ -449,10 +449,11 @@ Diego
 	 
 	//기본정보 팝업
 	function defaultPopup() {
+		//var defaultIaas = (checkEmpty(iaas)) ? defaultInfo.iaas.toUpperCase():iaas.toUpperCase(); 
 		$("#defaultInfoDiv").w2popup({
-			width : 1000,
+			width : 950,
 			height :500,
-			title :"DIEGO 설치 (" + iaas.toUpperCase() + ")",
+			title :"DIEGO 설치 (" + iaas + ")",
 			modal :true,
 			showMax :false,
 			onOpen :function(event) {
@@ -487,7 +488,7 @@ Diego
 		
 		defaultInfo = {
 					id 							: (diegoId) ? diegoId :"",
-					iaas 						: "AWS",
+					iaas 						: iaas.toUpperCase(),
 					deploymentName 				: $(".w2ui-msg-body input[name='deploymentName']").val(),
 					directorUuid 				: $(".w2ui-msg-body input[name='directorUuid']").val(),
 					diegoReleaseName 			: diegoRelease.split("/")[0],
@@ -503,7 +504,7 @@ Diego
 		if (popupValidation()) {
 			$.ajax({
 				type :"PUT",
-				url :"/diego/saveAws",
+				url :(iaas.toUpperCase() =="AWS") ? "/diego/saveAws":"/diego/saveOpenstack",
 				contentType :"application/json",
 				data :JSON.stringify(defaultInfo),
 				success :function(data, status) {
@@ -511,7 +512,7 @@ Diego
 					cfPopup();
 				},
 				error :function(e, status) {
-					w2alert("AWS 설정 등록에 실패 하였습니다.", "DIEGO 설치");
+					w2alert("Diego ("+iaas.toUpperCase()+") 설정 등록에 실패 하였습니다.", "DIEGO 설치");
 				}
 			});
 		}
@@ -520,7 +521,7 @@ Diego
 	//CF 팝업
 	function cfPopup() {
 		$("#cfInfoDiv").w2popup({
-			width  : 1000,
+			width  : 950,
 			height	:800,
 			title 	:"DIEGO 설치 (" + iaas.toUpperCase() + ")",
 			modal 	:true,
@@ -555,7 +556,7 @@ Diego
 	function saveCfInfo(type) {
 		cfInfo = {
 					id 					: (diegoId) ? diegoId :"",
-					iaas 				: iaas,
+					iaas 				: iaas.toUpperCase(),
 					domain				: $(".w2ui-msg-body input[name='domain']").val(),
 					deployment			: $(".w2ui-msg-body input[name='deployment']").val(),
 					secret				: $(".w2ui-msg-body input[name='secret']").val(),
@@ -582,7 +583,7 @@ Diego
 						diegoPopup();
 					},
 					error :function(e, status) {
-						w2alert("AWS 설정 등록에 실패 하였습니다.", "DIEGO 설치");
+						w2alert("Diego ("+iaas.toUpperCase()+") 설정 등록에 실패 하였습니다.", "DIEGO 설치");
 					}
 				});
 			}
@@ -595,8 +596,8 @@ Diego
 	//Diego 팝업
 	function diegoPopup(){
 		$("#diegoInfoDiv").w2popup({
-			width  : 1000,
-			height 	:500,
+			width  : 950,
+			height 	:700,
 			title 	:"DIEGO 설치 ("+iaas.toUpperCase()+")",
 			modal 	:true,
 			showMax :false,
@@ -607,7 +608,7 @@ Diego
 						$(".w2ui-msg-body textarea[name='diegoCaCert']").val(diegoInfo.diegoCaCert);
 						$(".w2ui-msg-body textarea[name='diegoClientCert']").val(diegoInfo.diegoClientCert);
 						$(".w2ui-msg-body textarea[name='diegoClientKey']").val(diegoInfo.diegoClientKey);
-						$(".w2ui-msg-body textarea[name='diegoEncryptionKeys']").val(diegoInfo.diegoEncryptionKeys);
+						$(".w2ui-msg-body input[name='diegoEncryptionKeys']").val(diegoInfo.diegoEncryptionKeys);
 						$(".w2ui-msg-body textarea[name='diegoServerCert']").val(diegoInfo.diegoServerCert);
 						$(".w2ui-msg-body textarea[name='diegoServerKey']").val(diegoInfo.diegoServerKey);
 					}	
@@ -625,7 +626,7 @@ Diego
 	function saveDiegoInfo(type){
 		diegoInfo = {
 				id 					: diegoId,
-				iaas				: iaas,
+				iaas				: iaas.toUpperCase(),
 				diegoCaCert			: $(".w2ui-msg-body textarea[name='diegoCaCert']").val(),
 				diegoClientCert		: $(".w2ui-msg-body textarea[name='diegoClientCert']").val(),
 				diegoClientKey		: $(".w2ui-msg-body textarea[name='diegoClientKey']").val(),
@@ -647,7 +648,7 @@ Diego
 						etcdPopup();
 					},
 					error :function(e, status) {
-						w2alert("AWS UAA 등록에 실패 하였습니다.", "DIEGO 설치");
+						w2alert("Diego ("+iaas.toUpperCase()+") 등록에 실패 하였습니다.", "DIEGO 설치");
 					}
 				});
 			}
@@ -660,7 +661,7 @@ Diego
 	//ETCD 팝업
 	function etcdPopup(){
 		$("#etcdInfoDiv").w2popup({
-			width  : 1000,
+			width  : 950,
 			height 	:700,
 			title 	:"DIEGO 설치 ("+iaas.toUpperCase()+")",
 			modal 	:false,
@@ -690,7 +691,7 @@ Diego
 	function saveEtcdInfo(type){
 		etcdInfo = {
 				id 					: diegoId,
-				iaas				: iaas,
+				iaas				: iaas.toUpperCase(),
 				etcdClientCert		: $(".w2ui-msg-body textarea[name='etcdClientCert']").val(),
 				etcdClientKey		: $(".w2ui-msg-body textarea[name='etcdClientKey']").val(),
 				etcdPeerCaCert		: $(".w2ui-msg-body textarea[name='etcdPeerCaCert']").val(),
@@ -708,11 +709,12 @@ Diego
 					contentType :"application/json",
 					data :JSON.stringify(etcdInfo),
 					success :function(data, status) {
-						if(iaas.toUpperCase() == "AWS")
+						if(iaas.toUpperCase() == "AWS"){
 							awsNetworkPopup();
-						else(iaas.toUpperCase() == "OPENSTACK")
+						}
+						else{
 							openstackNetworkPopup();
-						
+						}
 					},
 					error :function(e, status) {
 						w2alert("ETCD 정보 등록에 실패 하였습니다.", "DIEGO 설치");
@@ -728,7 +730,7 @@ Diego
 	//AWS NETWORK 팝업
 	function awsNetworkPopup(){
 		$("#awsNetworkInfoDiv").w2popup({
-			width  : 1000,
+			width  : 950,
 			height 	:600,
 			title 	:"DIEGO 설치 (AWS)",
 			modal 	:true,
@@ -745,6 +747,10 @@ Diego
 						$(".w2ui-msg-body input[name='subnetStaticTo']").val(networkInfo.subnetStaticTo);
 						$(".w2ui-msg-body input[name='subnetId']").val(networkInfo.subnetId);
 						$(".w2ui-msg-body input[name='cloudSecurityGroups']").val(networkInfo.cloudSecurityGroups);
+						
+						$(".w2ui-msg-body textarea[name='diegoHostKey']").val(networkInfo.diegoHostKey);
+						$(".w2ui-msg-body input[name='diegoServers']").val(networkInfo.diegoServers);
+						$(".w2ui-msg-body input[name='diegoUaaSecret']").val(networkInfo.diegoUaaSecret);
 					}					
 				}
 			},
@@ -760,17 +766,19 @@ Diego
 	function saveAwsNetworkInfo(type) {
 		networkInfo = {
 				id 					: diegoId,
-				iaas				: iaas,
+				iaas				: iaas.toUpperCase(),
 				subnetStaticFrom	: $(".w2ui-msg-body input[name='subnetStaticFrom']").val(),
 				subnetStaticTo		: $(".w2ui-msg-body input[name='subnetStaticTo']").val(),
 				subnetReservedFrom	: $(".w2ui-msg-body input[name='subnetReservedFrom']").val(),
 				subnetReservedTo	: $(".w2ui-msg-body input[name='subnetReservedTo']").val(),
+				
 				subnetRange			: $(".w2ui-msg-body input[name='subnetRange']").val(),
 				subnetGateway		: $(".w2ui-msg-body input[name='subnetGateway']").val(),
 				subnetDns			: $(".w2ui-msg-body input[name='subnetDns']").val(),
 				subnetId			: $(".w2ui-msg-body input[name='subnetId']").val(),
 				cloudSecurityGroups	: $(".w2ui-msg-body input[name='cloudSecurityGroups']").val(),
-				diegoHostKey		: $(".w2ui-msg-body input[name='diegoHostKey']").val(),
+				//3.2 프록시 정보
+				diegoHostKey		: $(".w2ui-msg-body textarea[name='diegoHostKey']").val(),
 				diegoServers		: $(".w2ui-msg-body input[name='diegoServers']").val(),
 				diegoUaaSecret		: $(".w2ui-msg-body input[name='diegoUaaSecret']").val()
 		}
@@ -799,8 +807,8 @@ Diego
 	//RESOURCE 팝업
 	function resourcePopup() {
 		$("#resourceInfoDiv").w2popup({
-			width  : 1000,
-			height	:350,
+			width  : 950,
+			height	:400,
 			title 	:"DIEGO 설치 ("+iaas.toUpperCase()+")",
 			modal 	:true,
 			showMax :false,
@@ -812,7 +820,9 @@ Diego
 						if(!checkEmpty(resourceInfo.stemcellName) &&  !checkEmpty(resourceInfo.stemcellVersion) ){
 							$(".w2ui-msg-body input[name='stemcells']").data('selected',{text :resourceInfo.stemcellName + "/"+ resourceInfo.stemcellVersion});
 						}
-					} 
+					}
+					w2popup.lock("스템셀을 조회 중입니다.", true);
+					getStamcellList();
 				}
 			},
 			onClose :function(event) {
@@ -844,11 +854,11 @@ Diego
 					async 		:true,
 					data 		:JSON.stringify(resourceInfo),
 					success 	:function(data, status) {
-						deploymentFile = data.content.deploymentFile;
+						deploymentFile = data.deploymentFile;
 						deployPopup();
 					},
 					error :function(e, status) {
-						w2alert("Diego Resource 등록에 실패 하였습니다.", "Diego 설치");
+						w2alert("Diego ("+iaas.toUpperCase()+") Resource 등록에 실패 하였습니다.", "Diego 설치");
 					}
 				});
 			}
@@ -868,7 +878,7 @@ Diego
 	//OPENSTACK 조회정보 세팅
 	function setOpenstackData(contents) {
 		diegoId = contents.id;
-		iaas = contents.iaas;
+		iaas = "OPENSTACK";
 		defaultInfo = {
 			iaas						:contents.iaas,
 			deploymentName 				:contents.deploymentName,
@@ -933,7 +943,7 @@ Diego
 			subnetReservedTo 	:contents.subnetReservedTo,
 			subnetStaticFrom 	:contents.subnetStaticFrom,
 			subnetStaticTo 		:contents.subnetStaticTo,
-			cloudNetid 			:contents.cloudNetId,
+			cloudNetId 			:contents.cloudNetId,
 			cloudSecurityGroups :contents.cloudSecurityGroups,
 			diegoHostKey 		:contents.diegoHostKey,
 			diegoServers 		:contents.diegoServers,
@@ -957,7 +967,7 @@ Diego
 	//OPENSTACK NETWORK 팝업
 	function openstackNetworkPopup(){
 		$("#openstackNetworkInfoDiv").w2popup({
-			width  : 1000,
+			width  : 950,
 			height 	:600,
 			title 	:"DIEGO 설치 (OPENSTACK)",
 			modal 	:true,
@@ -974,6 +984,11 @@ Diego
 						$(".w2ui-msg-body input[name='subnetDns']").val(networkInfo.subnetDns);
 						$(".w2ui-msg-body input[name='cloudNetId']").val(networkInfo.cloudNetId);
 						$(".w2ui-msg-body input[name='cloudSecurityGroups']").val(networkInfo.cloudSecurityGroups);
+						
+
+						$(".w2ui-msg-body textarea[name='diegoHostKey']").val(networkInfo.diegoHostKey);
+						$(".w2ui-msg-body input[name='diegoServers']").val(networkInfo.diegoServers);
+						$(".w2ui-msg-body input[name='diegoUaaSecret']").val(networkInfo.diegoUaaSecret);
 					}					
 				}
 			},
@@ -998,7 +1013,13 @@ Diego
 				subnetStaticFrom	: $(".w2ui-msg-body input[name='subnetStaticFrom']").val(),
 				subnetStaticTo		: $(".w2ui-msg-body input[name='subnetStaticTo']").val(),
 				cloudNetId			: $(".w2ui-msg-body input[name='cloudNetId']").val(),
-				cloudSecurityGroups	: $(".w2ui-msg-body input[name='cloudSecurityGroups']").val()
+				cloudSecurityGroups	: $(".w2ui-msg-body input[name='cloudSecurityGroups']").val(),
+				
+				//3.2 프록시 정보
+				diegoHostKey		: $(".w2ui-msg-body textarea[name='diegoHostKey']").val(),
+				diegoServers		: $(".w2ui-msg-body input[name='diegoServers']").val(),
+				diegoUaaSecret		: $(".w2ui-msg-body input[name='diegoUaaSecret']").val()
+				
 		}
 	
 		if (type == 'after') {
@@ -1011,10 +1032,10 @@ Diego
 					async :true,
 					data :JSON.stringify(networkInfo),
 					success :function(data, status) {
-						openstackResourcePopup();
+						resourcePopup();
 					},
 					error :function(e, status) {
-						w2alert("Diego Network 등록에 실패 하였습니다.", "Diego 설치");
+						w2alert("Diego (OPENSTACK) Network 등록에 실패 하였습니다.", "Diego 설치");
 					}
 				});
 			}
@@ -1048,10 +1069,10 @@ Diego
 	
 	// DEPLOY POPUP
 	function deployPopup() {
-		var deployDiv = (iaas == "AWS") ? $("#awsDeployDiv"): $("#openstackDeployDiv");
+		var deployDiv = $("#deployDiv");
 		deployDiv.w2popup({
-			width :800,
-			height :470,
+			width : 950,
+			height :520,
 			modal :true,
 			showMax :true,
 			onClose :initSetting,
@@ -1087,8 +1108,7 @@ Diego
 	// INSTALL POPUP
 	function installPopup(){
 		
-		var installDiv = (iaas == 'AWS') ? $("#awsInstallDiv") : $("#openstackInstallDiv");
-		var deploymentName = (iaas == 'AWS') ? defaultInfo.deploymentName :defaultInfo.deploymentName;
+		var deploymentName = defaultInfo.deploymentName;
 		var message = "DIEGO(배포명:" + deploymentName +  ") ";
 		
 		var requestParameter = {
@@ -1096,9 +1116,9 @@ Diego
 				iaas:iaas
 		};
 		
-		installDiv.w2popup({
-			width 	:800,
-			height 	:520,
+		$("#installDiv").w2popup({
+			width 	: 950,
+			height 	: 520,
 			modal	:true,
 			showMax :true,
 			onOpen :function(event){
@@ -1220,12 +1240,15 @@ Diego
 			success :function(data, status) {
 				console.log("ETCD Releases List");
 				etcdReleases = new Array();
-				data.records.map(function(obj) {
-					etcdReleases.push(obj.name + "/" + obj.version);
-				});
+				if(data.records){
+					data.records.map(function(obj) {
+						etcdReleases.push(obj.name + "/" + obj.version);
+					});
+				}
 				setReleaseList();
 			},
 			error :function(e, status) {
+				w2popup.unlock();
 				w2alert("ETCD Release List 를 가져오는데 실패하였습니다.", "DIEGO 설치");
 			}
 		});
@@ -1267,14 +1290,31 @@ Diego
 			success :function(data, status) {
 				console.log("Stemcell List");
 				stemcells = new Array();
-				data.records.map(function(obj) {
-					stemcells.push(obj.name + "/" + obj.version);
-				});
+				if(data.records){
+					data.records.map(function(obj) {
+						stemcells.push(obj.name + "/" + obj.version);
+					});
+				}
+				setStemcellList();
 			},
 			error :function(e, status) {
+				w2popup.unlock();
 				w2alert("Stemcell List 를 가져오는데 실패하였습니다.", "DIEGO 설치");
 			}
 		});
+	}
+	//스템셀 List W2Field 적용
+	function setStemcellList(){
+		$(".w2ui-msg-body input[name='stemcells']").w2field('list', {items : stemcells,maxDropHeight : 200,width : 250});
+		setStemcellData();
+	}
+	
+	// 스템셀 release value setgting
+	function setStemcellData(){
+		if( !checkEmpty(resourceInfo.stemcellName) && !checkEmpty(resourceInfo.stemcellVersion) ){
+			$(".w2ui-msg-body input[name='stemcells']").data('selected',{text : resourceInfo.stemcellName + "/"+ resourceInfo.stemcellVersion});
+		}
+		w2popup.unlock();
 	}
 	
 	//전역변수 초기화
@@ -1412,8 +1452,8 @@ Diego
 			<div style="margin-left:3%;display:inline-block;width:97%;">
 				<ul class="progressStep_8">
 					<li class="active">기본 정보</li>
-					<li class="before">CF정보</li>
-					<li class="before">Diego정보</li>
+					<li class="before">CF 정보</li>
+					<li class="before">Diego 정보</li>
 					<li class="before">ETCD 정보</li>
 					<li class="before">네트워크 정보</li>
 					<li class="before">리소스 정보</li>
@@ -1477,8 +1517,8 @@ Diego
 			<div style="margin-left:3%;display:inline-block;width:97%;">
 				<ul class="progressStep_8">
 					<li class="pass">기본 정보</li>
-					<li class="active">CF정보</li>
-					<li class="before">Diego정보</li>
+					<li class="active">CF 정보</li>
+					<li class="before">Diego 정보</li>
 					<li class="before">ETCD 정보</li>
 					<li class="before">네트워크 정보</li>
 					<li class="before">리소스 정보</li>
@@ -1599,8 +1639,8 @@ Diego
 			<div style="margin-left:3%;display:inline-block;width:97%;">
 				<ul class="progressStep_8">
 					<li class="pass">기본 정보</li>
-					<li class="pass">CF정보</li>
-					<li class="active">Diego정보</li>
+					<li class="pass">CF 정보</li>
+					<li class="active">Diego 정보</li>
 					<li class="before">ETCD 정보</li>
 					<li class="before">네트워크 정보</li>
 					<li class="before">리소스 정보</li>
@@ -1611,51 +1651,52 @@ Diego
 			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;CONSUL 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left:5%;">
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;암호화 키</label>
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;CA 공개키</label>
 					<div>
-						<input name="encryptKeys" type="text" style="float:left; width:60%;" required placeholder="암호화 키를 입력하세요." />
+						<textarea name="diegoCaCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+							required placeholder="CA 공개키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;에이전트 인증키</label>
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Client 공개키</label>
 					<div>
-						<textarea name="agentCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-							required placeholder="에이전트 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+						<textarea name="diegoClientCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+							required placeholder="Client 공개키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;에이전트 개인키</label>
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Client 키</label>
 					<div>
-						<textarea name="agentKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-							required placeholder="에이전트 개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+						<textarea name="diegoClientKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+							required placeholder="Client 키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;CA 인증키</label>
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Diego 암호화키</label>
 					<div>
-						<textarea name="caCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-							required placeholder="CA 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+						<input name="diegoEncryptionKeys" type="text" style="float:left; width:60%;" required placeholder="Diego 암호화키를 입력하세요." />
+						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;서버 인증키</label>
 					<div>
-						<textarea name="serverCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+						<textarea name="diegoServerCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
 							required placeholder="서버 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;서버 공개키</label>
 					<div>
-						<textarea name="serverKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+						<textarea name="diegoServerKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
 							required placeholder="서버 공개키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 					</div>
 				</div>
 			</div>
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true"> 
-				<button class="btn" style="float:left;" onclick="saveAwsConsulInfo('before');">이전</button>
-				<button class="btn" style="float:right; padding-right:15%" onclick="saveAwsConsulInfo('after');">다음>></button>
+				<button class="btn" style="float:left;" onclick="saveDiegoInfo('before');">이전</button>
+				<button class="btn" style="float:right; padding-right:15%" onclick="saveDiegoInfo('after');">다음>></button>
 			</div>
 		</div>
 	</div>
@@ -1667,8 +1708,8 @@ Diego
 			<div style="margin-left:3%;display:inline-block;width:97%;">
 				<ul class="progressStep_8">
 					<li class="pass">기본 정보</li>
-					<li class="pass">CF정보</li>
-					<li class="pass">Diego정보</li>
+					<li class="pass">CF 정보</li>
+					<li class="pass">Diego 정보</li>
 					<li class="active">ETCD 정보</li>
 					<li class="before">네트워크 정보</li>
 					<li class="before">리소스 정보</li>
@@ -1676,54 +1717,62 @@ Diego
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;CONSUL 정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;ETCD 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left:5%;">
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;암호화 키</label>
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Client 인증키</label>
 					<div>
-						<input name="encryptKeys" type="text" style="float:left; width:60%;" required placeholder="암호화 키를 입력하세요." />
+						<textarea name="etcdClientCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+							required placeholder="Client 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;에이전트 인증키</label>
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Client 키</label>
 					<div>
-						<textarea name="agentCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-							required placeholder="에이전트 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+						<textarea name="etcdClientKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+							required placeholder="Client 키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;에이전트 개인키</label>
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Peer Ca 인증키</label>
 					<div>
-						<textarea name="agentKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-							required placeholder="에이전트 개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+						<textarea name="etcdPeerCaCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+							required placeholder="Peer Ca 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;CA 인증키</label>
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Peer 인증키</label>
 					<div>
-						<textarea name="caCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-							required placeholder="CA 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+						<textarea name="etcdPeerCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+							required placeholder="Peer 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Peer 키</label>
+					<div>
+						<textarea name="etcdPeerKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+							required placeholder="Peer 키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;서버 인증키</label>
 					<div>
-						<textarea name="serverCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+						<textarea name="etcdServerCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
 							required placeholder="서버 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;서버 공개키</label>
 					<div>
-						<textarea name="serverKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+						<textarea name="etcdServerKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
 							required placeholder="서버 공개키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 					</div>
 				</div>
 			</div>
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true"> 
-				<button class="btn" style="float:left;" onclick="saveAwsConsulInfo('before');">이전</button>
-				<button class="btn" style="float:right; padding-right:15%" onclick="saveAwsConsulInfo('after');">다음>></button>
+				<button class="btn" style="float:left;" onclick="saveEtcdInfo('before');">이전</button>
+				<button class="btn" style="float:right; padding-right:15%" onclick="saveEtcdInfo('after');">다음>></button>
 			</div>
 		</div>
 	</div>
@@ -1734,8 +1783,8 @@ Diego
 			<div style="margin-left:3%;display:inline-block;width:97%;">
 				<ul class="progressStep_8">
 					<li class="pass">기본 정보</li>
-					<li class="pass">CF정보</li>
-					<li class="pass">Diego정보</li>
+					<li class="pass">CF 정보</li>
+					<li class="pass">Diego 정보</li>
 					<li class="pass">ETCD 정보</li>
 					<li class="active">네트워크 정보</li>
 					<li class="before">리소스 정보</li>
@@ -1811,6 +1860,31 @@ Diego
 					</div>
 				</div>
 				
+				<br/>
+				<div class="w2ui-field">
+					<label style="text-align:left; width:100%; font-size:13px;">&bull;&nbsp;Proxy 정보</label>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Diego SSH 키</label>
+					<div>
+						<textarea name="diegoHostKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+							required placeholder="Hot 키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Diego SSH 서버 IP</label>
+					<div>
+						<input name="diegoServers" type="text" style="float:left; width:60%;" required placeholder="예) diego-security" />
+						<div class="isMessage"></div>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Diego UAA 비밀번호</label>
+					<div>
+						<input name="diegoUaaSecret" type="text" style="float:left; width:60%;" required placeholder="예) diego-security" />
+						<div class="isMessage"></div>
+					</div>
+				</div>
 			</div>
 			<br />
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1827,8 +1901,8 @@ Diego
 			<div style="margin-left:3%;display:inline-block;width:97%;">
 				<ul class="progressStep_8">
 					<li class="pass">기본 정보</li>
-					<li class="pass">CF정보</li>
-					<li class="pass">Diego정보</li>
+					<li class="pass">CF 정보</li>
+					<li class="pass">Diego 정보</li>
 					<li class="pass">ETCD 정보</li>
 					<li class="pass">네트워크 정보</li>
 					<li class="active">리소스 정보</li>
@@ -1855,21 +1929,21 @@ Diego
 				</div>
 			</div>
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float:left;" onclick="saveAwsResourceInfo('before');">이전</button>
-				<button class="btn" style="float:right; padding-right:15%" onclick="saveAwsResourceInfo('after');">다음>></button>
+				<button class="btn" style="float:left;" onclick="saveResourceInfo('before');">이전</button>
+				<button class="btn" style="float:right; padding-right:15%" onclick="saveResourceInfo('after');">다음>></button>
 			</div>
 		</div>
 	</div>
 	
-	<!-- AWS 배포파일 정보 -->
+	<!-- 배포파일 정보 -->
 	<div id="deployDiv" style="width:100%; height:100%;" hidden="true">
 		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:3%;display:inline-block;width:97%;">
 				<ul class="progressStep_8">
 					<li class="pass">기본 정보</li>
-					<li class="pass">CF정보</li>
-					<li class="pass">Diego정보</li>
+					<li class="pass">CF 정보</li>
+					<li class="pass">Diego 정보</li>
 					<li class="pass">ETCD 정보</li>
 					<li class="pass">네트워크 정보</li>
 					<li class="pass">리소스 정보</li>
@@ -1877,7 +1951,7 @@ Diego
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="width:95%;height:84%;float:left;display:inline-block;">
+			<div style="width:95%;height:84%;float:left;display:inline-block;margin-top: 10px;">
 				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color:#FFF;margin-left:2%" readonly="readonly"></textarea>
 			</div>
 		</div>
@@ -1894,8 +1968,8 @@ Diego
 			<div style="margin-left:3%;display:inline-block;width:97%;">
 				<ul class="progressStep_8">
 					<li class="pass">기본 정보</li>
-					<li class="pass">CF정보</li>
-					<li class="pass">Diego정보</li>
+					<li class="pass">CF 정보</li>
+					<li class="pass">Diego 정보</li>
 					<li class="pass">ETCD 정보</li>
 					<li class="pass">네트워크 정보</li>
 					<li class="pass">리소스 정보</li>
@@ -1903,7 +1977,7 @@ Diego
 					<li class="active">설치</li>
 				</ul>
 			</div>
-			<div style="width:95%;height:84%;float:left;display:inline-block;">
+			<div style="width:95%;height:84%;float:left;display:inline-block;margin-top: 10px;">
 				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color:#FFF;margin-left:1%" readonly="readonly"></textarea>
 			</div>
 		</div>
@@ -1922,8 +1996,9 @@ Diego
 			<div style="margin-left:3%;display:inline-block;width:97%;">
 				<ul class="progressStep_8">
 					<li class="pass">기본 정보</li>
-					<li class="pass">CF정보</li>
-					<li class="pass">Diego정보</li>
+					<li class="pass">CF 정보</li>
+					<li class="pass">Diego 정보</li>
+					<li class="pass">ETCD 정보</li>
 					<li class="active">네트워크 정보</li>
 					<li class="before">리소스 정보</li>
 					<li class="before">배포파일 정보</li>
@@ -1994,6 +2069,32 @@ Diego
 								<input name="subnetReservedTo" id="subnetStaticTo" type="url" style="float:left;width:100%;" placeholder="예) 10.0.0.106" />
 							</span>
 						</div>
+						<div class="isMessage"></div>
+					</div>
+				</div>
+				
+				<br/>
+				<div class="w2ui-field">
+					<label style="text-align:left; width:100%; font-size:13px;">&bull;&nbsp;Proxy 정보</label>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Diego SSH 키</label>
+					<div>
+						<textarea name="diegoHostKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
+							required placeholder="Hot 키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Diego SSH 서버 IP</label>
+					<div>
+						<input name="diegoServers" type="text" style="float:left; width:60%;" required placeholder="예) diego-security" />
+						<div class="isMessage"></div>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Diego UAA 비밀번호</label>
+					<div>
+						<input name="diegoUaaSecret" type="text" style="float:left; width:60%;" required placeholder="예) diego-security" />
 						<div class="isMessage"></div>
 					</div>
 				</div>

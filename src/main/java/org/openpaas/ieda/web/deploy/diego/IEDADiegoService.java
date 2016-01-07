@@ -54,8 +54,8 @@ public class IEDADiegoService {
 					dto.setDirectorUuid(config.getDirectorUuid());
 					dto.setDiegoReleaseName(config.getDiegoReleaseName());
 					dto.setDiegoReleaseVersion(config.getDiegoReleaseVersion());
-					dto.setDiegoReleaseName(config.getDiegoReleaseName());
-					dto.setDiegoReleaseVersion(config.getDiegoReleaseVersion());
+					dto.setCfReleaseName(config.getCfReleaseName());
+					dto.setCfReleaseVersion(config.getCfReleaseVersion());
 					dto.setGardenLinuxReleaseName(config.getGardenLinuxReleaseName());
 					dto.setGardenLinuxReleaseVersion(config.getGardenLinuxReleaseVersion());
 					dto.setEtcdReleaseName(config.getEtcdReleaseName());
@@ -107,8 +107,8 @@ public class IEDADiegoService {
 					dto.setDirectorUuid(config.getDirectorUuid());
 					dto.setDiegoReleaseName(config.getDiegoReleaseName());
 					dto.setDiegoReleaseVersion(config.getDiegoReleaseVersion());
-					dto.setDiegoReleaseName(config.getDiegoReleaseName());
-					dto.setDiegoReleaseVersion(config.getDiegoReleaseVersion());
+					dto.setCfReleaseName(config.getCfReleaseName());
+					dto.setCfReleaseVersion(config.getCfReleaseVersion());
 					dto.setGardenLinuxReleaseName(config.getGardenLinuxReleaseName());
 					dto.setGardenLinuxReleaseVersion(config.getGardenLinuxReleaseVersion());
 					dto.setEtcdReleaseName(config.getEtcdReleaseName());
