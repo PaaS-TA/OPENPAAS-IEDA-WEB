@@ -374,7 +374,8 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					if (awsInfo != null) {
+					console.log("ppp");
+					if (awsInfo != "" && awsInfo != "") {
 						$(".w2ui-msg-body input[name='deploymentName']").val(awsInfo.deploymentName);
 						$(".w2ui-msg-body input[name='directorUuid']").val(awsInfo.directorUuid);
 						$(".w2ui-msg-body input[name='appSshFingerprint']").val(awsInfo.appSshFingerprint);
@@ -386,6 +387,13 @@
 						$(".w2ui-msg-body input[name='proxyStaticIps']").val(awsInfo.proxyStaticIps);
 						$(".w2ui-msg-body textarea[name='sslPemPub']").val(awsInfo.sslPemPub);
 						$(".w2ui-msg-body textarea[name='sslPemRsa']").val(awsInfo.sslPemRsa);
+					}
+					else{
+						console.log("aaa");
+						if( !checkEmpty($("#directorUuid").text()) ){
+							console.log("bbb");
+							$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
+						}
 					}
 					w2popup.lock("릴리즈를 조회 중입니다.", true);
 					getCfRelease();
@@ -450,7 +458,7 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					if (uaaInfo != null) {
+					if (uaaInfo != "") {
 						$(".w2ui-msg-body input[name='loginSecret']").val(uaaInfo.loginSecret);
 						$(".w2ui-msg-body textarea[name='signingKey']").val(uaaInfo.signingKey);
 						$(".w2ui-msg-body textarea[name='verificationKey']").val(uaaInfo.verificationKey);
@@ -506,7 +514,7 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					if (consulInfo != null) {
+					if (consulInfo != "") {
 						$(".w2ui-msg-body textarea[name='agentCert']").val(consulInfo.agentCert);
 						$(".w2ui-msg-body textarea[name='agentKey']").val(consulInfo.agentKey);
 						$(".w2ui-msg-body textarea[name='caCert']").val(consulInfo.caCert);
@@ -569,7 +577,7 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					if (networkInfo != null) {
+					if (networkInfo != "") {
 						$(".w2ui-msg-body input[name='subnetRange']").val(networkInfo.subnetRange);
 						$(".w2ui-msg-body input[name='subnetGateway']").val(networkInfo.subnetGateway);
 						$(".w2ui-msg-body input[name='subnetDns']").val(networkInfo.subnetDns);
@@ -636,7 +644,7 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					if (resourceInfo != null) {
+					if (resourceInfo != "") {
 						$(".w2ui-msg-body input[name='boshPassword']").val(resourceInfo.boshPassword);
 					}
 					w2popup.lock("스템셀을 조회 중입니다.", true);
@@ -763,7 +771,7 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					if (openstackInfo != null) {
+					if (openstackInfo != "") {
 						$(".w2ui-msg-body input[name='deploymentName']").val(openstackInfo.deploymentName);
 						$(".w2ui-msg-body input[name='directorUuid']").val(openstackInfo.directorUuid);
 						$(".w2ui-msg-body input[name='appSshFingerprint']").val(openstackInfo.appSshFingerprint);
@@ -839,7 +847,7 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					if (uaaInfo != null) {
+					if (uaaInfo != "") {
 						$(".w2ui-msg-body input[name='loginSecret']").val(uaaInfo.loginSecret);
 						$(".w2ui-msg-body textarea[name='signingKey']").val(uaaInfo.signingKey);
 						$(".w2ui-msg-body textarea[name='verificationKey']").val(uaaInfo.verificationKey);
@@ -895,7 +903,7 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					if (consulInfo != null) {
+					if (consulInfo != "") {
 						$(".w2ui-msg-body textarea[name='agentCert']").val(consulInfo.agentCert);
 						$(".w2ui-msg-body textarea[name='agentKey']").val(consulInfo.agentKey);
 						$(".w2ui-msg-body textarea[name='caCert']").val(consulInfo.caCert);
@@ -958,7 +966,7 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					if (networkInfo != null) {
+					if (networkInfo != "") {
 						$(".w2ui-msg-body input[name='subnetRange']").val(networkInfo.subnetRange);
 						$(".w2ui-msg-body input[name='subnetGateway']").val(networkInfo.subnetGateway);
 						$(".w2ui-msg-body input[name='subnetDns']").val(networkInfo.subnetDns);
@@ -1025,7 +1033,7 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					if (resourceInfo != null) {
+					if (resourceInfo != "") {
 						$(".w2ui-msg-body input[name='boshPassword']").val(resourceInfo.boshPassword);
 					}
 					w2popup.lock("스템셀을 조회 중입니다.", true);
@@ -1324,12 +1332,6 @@
 		setLayoutContainerHeight();
 	});
 
-	//w2Overay
-	function overlay(text){
-		var over = text.replace( "/\r\n/g", "\n" );
-		
-		$(this).w2overlay(over);
-	}
 </script>
 
 <div id="main">
@@ -1420,7 +1422,7 @@
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">설치관리자 UUID</label>
 					<div>
-						<input name="directorUuid" type="text" style="float: left; width: 60%;" required placeholder="설치관리자 UUID<를 입력하세요." />
+						<input name="directorUuid" type="text" style="float: left; width: 60%;" required placeholder="설치관리자 UUID를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1479,14 +1481,14 @@
 					<label style="text-align: left; width: 40%; font-size: 11px;">프록시 서버 공개키</label>
 					<div>
 						<textarea name="sslPemPub" style="float: left; width: 60%; height: 60px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="프록시 서버 공개키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="프록시 서버 공개키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">프록시 서버 개인키</label>
 					<div>
 						<textarea name="sslPemRsa" style="float: left; width: 60%; height: 60px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="프록시 서버 개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="프록시 서버 개인키를 입력하세요." ></textarea>
 					</div>
 				</div>
 			</div>
@@ -1525,7 +1527,7 @@
 					<div>
 						<div>
 						<textarea name="signingKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="개인키를 입력하세요." ></textarea>
 					</div>
 					</div>
 				</div>
@@ -1534,7 +1536,7 @@
 					<div>
 						<div>
 						<textarea name="verificationKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="공개키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="공개키를 입력하세요." ></textarea>
 					</div>
 					</div>
 				</div>
@@ -1574,35 +1576,35 @@
 					<label style="text-align: left; width: 40%; font-size: 11px;">에이전트 인증키</label>
 					<div>
 						<textarea name="agentCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="에이전트 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="에이전트 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">에이전트 개인키</label>
 					<div>
 						<textarea name="agentKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="에이전트 개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="에이전트 개인키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">CA 인증키</label>
 					<div>
 						<textarea name="caCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="CA 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="CA 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">서버 인증키</label>
 					<div>
 						<textarea name="serverCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="서버 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="서버 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">서버 공개키</label>
 					<div>
 						<textarea name="serverKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="서버 공개키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="서버 공개키를 입력하세요." ></textarea>
 					</div>
 				</div>
 			</div>
@@ -1828,7 +1830,7 @@
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">설치관리자 UUID</label>
 					<div>
-						<input name="directorUuid" type="text" style="float: left; width: 60%;" required placeholder="설치관리자 UUID<를 입력하세요." />
+						<input name="directorUuid" type="text" style="float: left; width: 60%;" required placeholder="설치관리자 UUID를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1886,14 +1888,14 @@
 					<label style="text-align: left; width: 40%; font-size: 11px;">프록시 서버 공개키</label>
 					<div>
 						<textarea name="sslPemPub" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="프록시 서버 공개키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="프록시 서버 공개키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">프록시 서버 개인키</label>
 					<div>
 						<textarea name="sslPemRsa" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="프록시 서버 개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="프록시 서버 개인키를 입력하세요." ></textarea>
 					</div>
 				</div>
 			</div>
@@ -1932,7 +1934,7 @@
 					<div>
 						<div>
 						<textarea name="signingKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="개인키를 입력하세요." ></textarea>
 					</div>
 					</div>
 				</div>
@@ -1941,7 +1943,7 @@
 					<div>
 						<div>
 						<textarea name="verificationKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="공개키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="공개키를 입력하세요." ></textarea>
 					</div>
 					</div>
 				</div>
@@ -1981,35 +1983,35 @@
 					<label style="text-align: left; width: 40%; font-size: 11px;">에이전트 인증키</label>
 					<div>
 						<textarea name="agentCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="에이전트 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="에이전트 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">에이전트 개인키</label>
 					<div>
 						<textarea name="agentKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="에이전트 개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="에이전트 개인키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">CA 인증키</label>
 					<div>
 						<textarea name="caCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="CA 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="CA 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">서버 인증키</label>
 					<div>
 						<textarea name="serverCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="서버 인증키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="서버 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">서버 공개키</label>
 					<div>
 						<textarea name="serverKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="서버 공개키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+							required placeholder="서버 공개키를 입력하세요." ></textarea>
 					</div>
 				</div>
 			</div>

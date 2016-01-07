@@ -88,6 +88,8 @@ public class IEDADiegoService {
 					dto.setDeploymentFile(config.getDeploymentFile());
 					dto.setDeployStatus(config.getDeployStatus());
 					dto.setDeployLog(config.getDeployLog());
+					
+					diegoList.add(dto);
 				}
 			}
 
@@ -139,6 +141,7 @@ public class IEDADiegoService {
 					dto.setDeploymentFile(config.getDeploymentFile());
 					dto.setDeployStatus(config.getDeployStatus());
 					dto.setDeployLog(config.getDeployLog());
+					diegoList.add(dto);
 				}
 			}
 		}

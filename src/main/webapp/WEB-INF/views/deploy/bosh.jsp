@@ -571,7 +571,7 @@ function  awsBoshInfoPopup(){
 					$(".w2ui-msg-body input[name='deploymentName']").val(boshInfo.deploymentName);
 					$(".w2ui-msg-body input[name='directorUuid']").val(boshInfo.directorUuid);
 				} else {
-					if( checkEmpty($("#directorUuid").text()) ){
+					if( !checkEmpty($("#directorUuid").text()) ){
 						$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
 					}
 				}
@@ -846,7 +846,7 @@ function osBoshInfoPopup(){
 					$(".w2ui-msg-body input[name='deploymentName']").val(boshInfo.deploymentName);
 					$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
 				} else {
-					if( checkEmpty($("#directorUuid").text()) ){
+					if( !checkEmpty($("#directorUuid").text()) ){
 						$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
 					}
 				}

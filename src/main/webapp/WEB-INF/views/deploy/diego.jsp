@@ -154,7 +154,7 @@ Diego
 				defaultPopup();
 			} else if (directorName.indexOf("OPENSTACK") > 0) {
 				iaas = "OPENSTACk";
-				openstackPopup();
+				defaultPopup();
 			}
 			else{
 				selectIaas();
@@ -261,11 +261,11 @@ Diego
 			success :function(data, status) {
 				if (data != null && data != "") {
 					initSetting();
-					if (record.iaas.toLowerCase() == "aws"){
+					if (record.iaas.toUpperCase() == "AWS"){
 						iaas = "AWS";
 						setAwsData(data.contents);
 					}
-					else if (record.iaas.toLowerCase() == "openstack"){
+					else if (record.iaas.toUpperCase() == "OPENSTACK"){
 						iaas = "OPENSTACK";
 						setOpenstackData(data.contents);
 					}
@@ -362,7 +362,6 @@ Diego
 	// AWS AwsPopup Data Setting
 	function setAwsData(contents) {
 		diegoId = contents.id;
-		iaas = contents.iaas;
 		defaultInfo = {
 			iaas						:contents.iaas,
 			deploymentName 				:contents.deploymentName,
@@ -451,17 +450,23 @@ Diego
 	//기본정보 팝업
 	function defaultPopup() {
 		$("#defaultInfoDiv").w2popup({
-			width : 900,
-			height :800,
+			width : 1000,
+			height :500,
 			title :"DIEGO 설치 (" + iaas.toUpperCase() + ")",
 			modal :true,
 			showMax :false,
 			onOpen :function(event) {
 				event.onComplete = function() {
-					if (defaultInfo != null) {
+					if (defaultInfo != "") {
 						$(".w2ui-msg-body input[name='deploymentName']").val(defaultInfo.deploymentName);
 						$(".w2ui-msg-body input[name='directorUuid']").val(defaultInfo.directorUuid);
 					}
+					else{
+						if( !checkEmpty($("#directorUuid").text()) ){
+							$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
+						}
+					}
+					
 					getReleases();	
 				}
 			},
@@ -515,14 +520,14 @@ Diego
 	//CF 팝업
 	function cfPopup() {
 		$("#cfInfoDiv").w2popup({
-			width	: 900,
+			width  : 1000,
 			height	:800,
 			title 	:"DIEGO 설치 (" + iaas.toUpperCase() + ")",
 			modal 	:true,
 			showMax :false,
 			onOpen 	:function(event) {
 				event.onComplete = function() {
-					if ( cfInfo != null) {
+					if ( cfInfo != "") {
 						$(".w2ui-msg-body input[name='domain']").val(cfInfo.domain);
 						$(".w2ui-msg-body input[name='deployment']").val(cfInfo.deployment);
 						$(".w2ui-msg-body input[name='secret']").val(cfInfo.secret);
@@ -590,21 +595,21 @@ Diego
 	//Diego 팝업
 	function diegoPopup(){
 		$("#diegoInfoDiv").w2popup({
-			width 	:900,
+			width  : 1000,
 			height 	:500,
 			title 	:"DIEGO 설치 ("+iaas.toUpperCase()+")",
 			modal 	:true,
 			showMax :false,
 			onOpen :function(event) {
 				event.onComplete = function() {
-					if (diegoInfo != null) {
+					if (diegoInfo != "") {
 						//2.1 Diego 정보	
-						$(".w2ui-msg-body textarea[name='diegoCaCert']").val(uaaInfo.diegoCaCert);
-						$(".w2ui-msg-body textarea[name='diegoClientCert']").val(uaaInfo.diegoClientCert);
-						$(".w2ui-msg-body textarea[name='diegoClientKey']").val(uaaInfo.diegoClientKey);
-						$(".w2ui-msg-body textarea[name='diegoEncryptionKeys']").val(uaaInfo.diegoEncryptionKeys);
-						$(".w2ui-msg-body textarea[name='diegoServerCert']").val(uaaInfo.diegoServerCert);
-						$(".w2ui-msg-body textarea[name='diegoServerKey']").val(uaaInfo.diegoServerKey);
+						$(".w2ui-msg-body textarea[name='diegoCaCert']").val(diegoInfo.diegoCaCert);
+						$(".w2ui-msg-body textarea[name='diegoClientCert']").val(diegoInfo.diegoClientCert);
+						$(".w2ui-msg-body textarea[name='diegoClientKey']").val(diegoInfo.diegoClientKey);
+						$(".w2ui-msg-body textarea[name='diegoEncryptionKeys']").val(diegoInfo.diegoEncryptionKeys);
+						$(".w2ui-msg-body textarea[name='diegoServerCert']").val(diegoInfo.diegoServerCert);
+						$(".w2ui-msg-body textarea[name='diegoServerKey']").val(diegoInfo.diegoServerKey);
 					}	
 				}
 			},
@@ -655,14 +660,14 @@ Diego
 	//ETCD 팝업
 	function etcdPopup(){
 		$("#etcdInfoDiv").w2popup({
-			width 	:900,
+			width  : 1000,
 			height 	:700,
 			title 	:"DIEGO 설치 ("+iaas.toUpperCase()+")",
 			modal 	:false,
 			showMax :false,
 			onOpen 	:function(event) {
 				event.onComplete = function() {
-					if (etcdInfo != null) {
+					if (etcdInfo != "") {
 						$(".w2ui-msg-body textarea[name='etcdClientCert']").val(etcdInfo.etcdClientCert);
 						$(".w2ui-msg-body textarea[name='etcdClientKey']").val(etcdInfo.etcdClientKey);
 						$(".w2ui-msg-body textarea[name='etcdPeerCaCert']").val(etcdInfo.etcdPeerCaCert);
@@ -723,14 +728,14 @@ Diego
 	//AWS NETWORK 팝업
 	function awsNetworkPopup(){
 		$("#awsNetworkInfoDiv").w2popup({
-			width 	:900,
+			width  : 1000,
 			height 	:600,
 			title 	:"DIEGO 설치 (AWS)",
 			modal 	:true,
 			showMax :false,
 			onOpen 	:function(event) {
 				event.onComplete = function() {
-					if (networkInfo != null) {
+					if (networkInfo != "") {
 						$(".w2ui-msg-body input[name='subnetRange']").val(networkInfo.subnetRange);
 						$(".w2ui-msg-body input[name='subnetGateway']").val(networkInfo.subnetGateway);
 						$(".w2ui-msg-body input[name='subnetDns']").val(networkInfo.subnetDns);
@@ -794,7 +799,7 @@ Diego
 	//RESOURCE 팝업
 	function resourcePopup() {
 		$("#resourceInfoDiv").w2popup({
-			width 	:900,
+			width  : 1000,
 			height	:350,
 			title 	:"DIEGO 설치 ("+iaas.toUpperCase()+")",
 			modal 	:true,
@@ -802,7 +807,7 @@ Diego
 			onOpen :function(event) {
 				event.onComplete = function() {
 					$(".w2ui-msg-body input[name='stemcells']").w2field('list', {items:stemcells, maxDropHeight :200,width :250});
-					if (resourceInfo != null) {
+					if (resourceInfo != "") {
 						$(".w2ui-msg-body input[name='boshPassword']").val(resourceInfo.boshPassword);
 						if(!checkEmpty(resourceInfo.stemcellName) &&  !checkEmpty(resourceInfo.stemcellVersion) ){
 							$(".w2ui-msg-body input[name='stemcells']").data('selected',{text :resourceInfo.stemcellName + "/"+ resourceInfo.stemcellVersion});
@@ -881,7 +886,7 @@ Diego
 		cfInfo = {
 			iaas				:contents.iaas,			
 			domain 				:contents.domain,
-			description 		:contents.description,
+			deployment 			:contents.deployment,
 			secret 				:contents.secret,			
 			etcdMachines 		:contents.etcdMachines,
 			natsMachines 		:contents.natsMachines,
@@ -952,14 +957,14 @@ Diego
 	//OPENSTACK NETWORK 팝업
 	function openstackNetworkPopup(){
 		$("#openstackNetworkInfoDiv").w2popup({
-			width 	:900,
+			width  : 1000,
 			height 	:600,
 			title 	:"DIEGO 설치 (OPENSTACK)",
 			modal 	:true,
 			showMax :false,
 			onOpen 	:function(event) {
 				event.onComplete = function() {
-					if (networkInfo != null) {
+					if (networkInfo != "") {
 						$(".w2ui-msg-body input[name='subnetStaticFrom']").val(networkInfo.subnetStaticFrom);
 						$(".w2ui-msg-body input[name='subnetStaticTo']").val(networkInfo.subnetStaticTo);
 						$(".w2ui-msg-body input[name='subnetReservedFrom']").val(networkInfo.subnetReservedFrom);
@@ -1588,7 +1593,7 @@ Diego
 	</div>
 	
 	<!-- Diego 정보 설정 DIV -->
-	<div id="DiegoInfoDiv" style="width:100%; height:100%;" hidden="true">
+	<div id="diegoInfoDiv" style="width:100%; height:100%;" hidden="true">
 		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:3%;display:inline-block;width:97%;">
