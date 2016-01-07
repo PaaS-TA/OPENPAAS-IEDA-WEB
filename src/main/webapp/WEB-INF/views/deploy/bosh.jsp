@@ -1793,6 +1793,6 @@ $( window ).resize(function() {
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 			<button class="btn" style="float: left;" onclick="deployPopup()">이전</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
+			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">닫기</button>
 		</div>
 	</div>	
