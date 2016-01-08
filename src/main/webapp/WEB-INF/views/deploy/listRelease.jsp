@@ -26,15 +26,15 @@ $(function() {
 		         {field: 'recid', caption: 'recid', hidden: true}
 		       , {field: 'name', caption: '릴리즈명', size: '20%'}
 		       , {field: 'version', caption: '릴리즈버전', size: '10%'}
-		       , {field: 'currentDeployed', caption: '배포 여부', size: '15%',
+/* 		       , {field: 'currentDeployed', caption: '배포 여부', size: '15%',
 		    	   render: function(record) {
 		    		   if ( record.currentDeployed == 'true' )
 		    			   return '<span class="btn btn-success" style="width:70px">배포</span>';
 		    		   else
 		    			   return '';
 		    	   }
-		       }
-		       , {field: 'jobNames', caption: 'Job템플릿', size: '55%', style: 'text-align:left'}
+		       } */
+		       , {field: 'jobNames', caption: 'Job템플릿', size: '70%', style: 'text-align:left'}
 		       ],
 		onClick: function(event) {
 			var grid = this;

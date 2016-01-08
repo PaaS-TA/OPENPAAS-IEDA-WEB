@@ -21,17 +21,17 @@ $(function() {
 		style: 'text-align:center',
 		columns	:[
 		           {field: 'recid', caption: 'recid', hidden: true}
-		         , {field: 'operatingSystem', caption: '운영체계', size: '20%'}
+		         , {field: 'operatingSystem', caption: '운영체계', size: '30%'}
 		         , {field: 'name', caption: '스템셀명', size: '40%'}		         
-		         , {field: 'version', caption: '스템셀버전', size: '20%'}
-		         , {field: 'deploymentInfo', caption: '배포명', size: '20%',
+		         , {field: 'version', caption: '스템셀버전', size: '30%'}
+/* 		         , {field: 'deploymentInfo', caption: '배포명', size: '20%',
 		        	 	render: function(record) {
 		 	    		   if ( record.deploymentInfo != '' )
 			    			   return '<span class="btn btn-success" style="width:70px">' + record.deploymentInfo + '</span>';
 			    		   else
 			    			   return '';
 		        	 	}
-		        	 }
+		        	 } */
 		         ],
  		onClick: function(event) {
 			var grid = this;

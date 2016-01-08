@@ -31,14 +31,14 @@ $(function() {
          	 {field: 'recid', caption: 'recid', hidden: true}
 	       , {field: 'name', caption: '릴리즈명', size: '20%'}
 	       , {field: 'version', caption: '릴리즈버전', size: '10%'}
-	       , {field: 'currentDeployed', caption: '배포 사용중 여부', size: '15%',
+/* 	       , {field: 'currentDeployed', caption: '배포 사용중 여부', size: '15%',
 	    	   render: function(record) {
 	    		   if ( record.currentDeployed == 'true' )
 	    			   return '<span class="btn btn-success" style="width:70px">배포</span>';
 	    		   else
 	    			   return '';
 	    	   }
-	       }
+	       } */
 	       , {field: 'jobNames', caption: 'Job템플릿', size: '55%', style: 'text-align:left'}
 		]
 	});
@@ -49,17 +49,17 @@ $(function() {
 		style: 'text-align:center',
 		columns:[
            	   {field: 'recid', caption: 'recid', hidden: true}
-	         , {field: 'operatingSystem', caption: '운영체계', size: '20%'}
+	         , {field: 'operatingSystem', caption: '운영체계', size: '30%'}
 	         , {field: 'name', caption: '스템셀명', size: '40%'}		         
-	         , {field: 'version', caption: '스템셀버전', size: '20%'}
-	         , {field: 'deploymentInfo', caption: '배포명', size: '20%',
+	         , {field: 'version', caption: '스템셀버전', size: '30%'}
+/* 	         , {field: 'deploymentInfo', caption: '배포명', size: '20%',
 	        	 	render: function(record) {
 	 	    		   if ( record.deploymentInfo != '' )
 		    			   return '<span class="btn btn-success" style="width:70px">' + record.deploymentInfo + '</span>';
 		    		   else
 		    			   return '';
 	        	 	}
-	        	 }
+	        	 } */
 		]
 	});	
 	
@@ -112,13 +112,13 @@ $( window ).resize(function() {
 	<div id="hMargin"></div>
 	
 	<!-- 릴리즈 목록 -->
-	<div class="title">릴리즈 목록</div>
+	<div class="title">업로드 릴리즈 목록</div>
 	<div id="main_releasesGrid" style="width:100%; height:150px"></div>
 	
 	<div id="hMargin"></div>
 	
 	<!-- 스템셀 목록-->
-	<div class="title">스템셀 목록</div>
+	<div class="title">업로드 스템셀 목록</div>
 	<div id="main_stemcellsGrid" style="width:100%; height:150px"></div>
           
 </div>
