@@ -131,7 +131,7 @@ public class DirectorRestHelper {
 	}
 
 	public static String trackToTask(IEDADirectorConfig defaultDirector, SimpMessagingTemplate messageTemplate,
-			String messageEndpoint, HttpClient client, String taskId) {
+			String messageEndpoint, HttpClient client, String taskId, String logType) {
 		
 		String status = "";
 
@@ -162,7 +162,7 @@ public class DirectorRestHelper {
 
 				// Task Output 조회
 				GetMethod getTaskOutputMethod = new GetMethod(DirectorRestHelper.getTaskOutputURI(
-						defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), taskId, "event"));
+						defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), taskId, logType));
 				getTaskOutputMethod = (GetMethod) DirectorRestHelper.setAuthorization(defaultDirector.getUserId(),
 						defaultDirector.getUserPassword(), (HttpMethodBase) getTaskOutputMethod);
 				String range = "bytes=" + offset + "-";
@@ -191,58 +191,70 @@ public class DirectorRestHelper {
 						offset = Integer.parseInt(splited[1]);
 					}
 
-					String outputs = getTaskOutputMethod.getResponseBodyAsString();
-
-					// Convert output to JSON Format
-					outputs = outputs.substring(0, outputs.length() - 1).replace("\n", ",");
-					outputs = "[" + outputs + "]";
-
-					// Convert Json to TaskOutput Object
-					List<TaskOutput> taskOutputList = mapper.readValue(outputs, new TypeReference<List<TaskOutput>>() {
-					});
-
-					List<String> responseMessage = new ArrayList<String>();
-					for (TaskOutput output : taskOutputList) {
-
-						if (output.getStage() != null) {
-							if (lastStage == null || !lastStage.equals(output.getStage())) {
-								responseMessage.add("");
-								responseMessage.add("  Started    " + output.getStage());
-								System.out.println("");
-								System.out.println("  Started    " + output.getStage());
-							}
+					// fetch debug Log
+					if ( logType.equals("debug") ) {
+						String[] outputs = getTaskOutputMethod.getResponseBodyAsString().split("\n");
+						
+						for ( String output : outputs ) {
+							Thread.sleep(10);
+							sendTaskOutput(messageTemplate, messageEndpoint, "started", Arrays.asList(output));
 						}
-
-						if (output.getStage() != null) {
-
-							if (output.getState().equals("started")) {
-								responseMessage.add("  Started    " + output.getStage() + " > " + output.getTask());
-								System.out.println("  Started    " + output.getStage() + " > " + output.getTask());
-							} else if (output.getState().equals("finished")) {
-								responseMessage.add("  Done       " + output.getStage() + " > " + output.getTask());
-								System.out.println("  Done       " + output.getStage() + " > " + output.getTask());
-							} else if (output.getState().equals("failed")) {
-								responseMessage.add("  Failed      " + output.getStage() + " > " + output.getTask());
-								System.out.println("  Failed     " + output.getStage() + " > " + output.getTask());
-							} else {
-								responseMessage.add("  Processing " + output.getStage() + " > " + output.getTask() + " " + output.getProgress() + "%");
-								System.out.println("  Processing " + output.getStage() + " > " + output.getTask() + " " + output.getProgress() + "%");
-							}
-						} else {
-							HashMap<String, String> error = output.getError();
-							if (error != null) {
-								responseMessage.add(
-										"  Error Code : " + error.get("code") + ", Message :" + error.get("message"));
-								System.out.println(
-										"  Error Code : " + error.get("error") + ", Message :" + error.get("message"));
-							}
-						}
-
-						lastStage = output.getStage();
 					}
-
-					sendTaskOutput(messageTemplate, messageEndpoint, "started", responseMessage);
-
+					// fetch event log
+					else 
+					{
+						String outputs = getTaskOutputMethod.getResponseBodyAsString();
+	
+						// Convert output to JSON Format
+						outputs = outputs.substring(0, outputs.length() - 1).replace("\n", ",");
+						outputs = "[" + outputs + "]";
+	
+						// Convert Json to TaskOutput Object
+						List<TaskOutput> taskOutputList = mapper.readValue(outputs, new TypeReference<List<TaskOutput>>() {
+						});
+	
+						List<String> responseMessage = new ArrayList<String>();
+						for (TaskOutput output : taskOutputList) {
+	
+							if (output.getStage() != null) {
+								if (lastStage == null || !lastStage.equals(output.getStage())) {
+									responseMessage.add("");
+									responseMessage.add("  Started    " + output.getStage());
+									System.out.println("");
+									System.out.println("  Started    " + output.getStage());
+								}
+							}
+	
+							if (output.getStage() != null) {
+	
+								if (output.getState().equals("started")) {
+									responseMessage.add("  Started    " + output.getStage() + " > " + output.getTask());
+									System.out.println("  Started    " + output.getStage() + " > " + output.getTask());
+								} else if (output.getState().equals("finished")) {
+									responseMessage.add("  Done       " + output.getStage() + " > " + output.getTask());
+									System.out.println("  Done       " + output.getStage() + " > " + output.getTask());
+								} else if (output.getState().equals("failed")) {
+									responseMessage.add("  Failed      " + output.getStage() + " > " + output.getTask());
+									System.out.println("  Failed     " + output.getStage() + " > " + output.getTask());
+								} else {
+									responseMessage.add("  Processing " + output.getStage() + " > " + output.getTask() + " " + output.getProgress() + "%");
+									System.out.println("  Processing " + output.getStage() + " > " + output.getTask() + " " + output.getProgress() + "%");
+								}
+							} else {
+								HashMap<String, String> error = output.getError();
+								if (error != null) {
+									responseMessage.add(
+											"  Error Code : " + error.get("code") + ", Message :" + error.get("message"));
+									System.out.println(
+											"  Error Code : " + error.get("error") + ", Message :" + error.get("message"));
+								}
+							}
+	
+							lastStage = output.getStage();
+						}
+	
+						sendTaskOutput(messageTemplate, messageEndpoint, "started", responseMessage);
+					}
 				}
 
 				log.info("### task info : " + taskInfo.getState());
