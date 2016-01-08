@@ -108,7 +108,7 @@ public class CfDeployAsyncService {
 				Header location = postMethod.getResponseHeader("Location");
 				String taskId = DirectorRestHelper.getTaskId(location.getValue());
 				
-				status = DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId);
+				status = DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId, "event");
 				
 			} else {
 				DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("배포 중 오류가 발생하였습니다.[" + statusCode + "]"));

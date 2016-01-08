@@ -79,7 +79,7 @@ public class BoshDeleteDeployAsyncService {
 				Header location = deleteMethod.getResponseHeader("Location");
 				String taskId = DirectorRestHelper.getTaskId(location.getValue());
 				
-				DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId);
+				DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId, "event");
 				
 				if ( aws != null ) awsRepository.delete(aws);
 				if ( openstack != null ) openstackRepository.delete(openstack);

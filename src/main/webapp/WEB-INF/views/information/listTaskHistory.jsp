@@ -127,7 +127,7 @@ function appendLogPopup(type, typeName, requestParameter){
 }
 
 function doGetTaskLog(type, typeName, requestParameter) {
-	var message = "Task (" + requestParameter.taskId + ")의 " + typeName;
+	var message = "Task (" + requestParameter.taskId + ")의 " + typeName + "로그 ";
 	
 	var socket = new SockJS('/task');
 	webSocketClient = Stomp.over(socket); 
@@ -143,10 +143,13 @@ function doGetTaskLog(type, typeName, requestParameter) {
 		       	}
 
  		       	if ( response.state.toLowerCase() != "started" ) {
-		            if ( response.state.toLowerCase() == "done" )	   message = message + " 조회가 완료되었습니다."; 
+/* 		            if ( response.state.toLowerCase() == "done" )	   message = message + " 조회가 완료되었습니다."; 
 		    		if ( response.state.toLowerCase() == "error" )     message = message + " 조회 중 오류가 발생하였습니다.";
-		    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 조회 중 취소되었습니다.";
-		    			
+		    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 조회 중 취소되었습니다."; */
+		    		
+		    		if ( response.state.toLowerCase() == "done" || response.state.toLowerCase() == "error" || response.state.toLowerCase() == "cancelled" )
+						message = message + " 조회가 완료되었습니다."; 	    			
+		    		
 		    		webSocketClient.disconnect();
 					w2alert(message, "Task " + typeName);
 		       	}

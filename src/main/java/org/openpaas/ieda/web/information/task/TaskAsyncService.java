@@ -29,40 +29,16 @@ public class TaskAsyncService {
 	
 	final private String messageEndpoint = "/socket/task"; 
 	
-	private void getDebugLog(String taskId) {
+	private void doGetTaskLog(String logType, String taskId) {
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
 
 		try {
 			HttpClient httpClient = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
-			GetMethod getMethod = new GetMethod(DirectorRestHelper.getTaskOutputURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), taskId, "debug"));
-			getMethod = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)getMethod);
-
-			httpClient.executeMethod(getMethod);
-			
-			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "done", Arrays.asList(getMethod.getResponseBodyAsString()));
-			
-		} catch ( Exception e) {
-			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("Task 디버그 로그 조회 중 Exception이 발생하였습니다."));
-		}
-	}
-	
-	private void getEventLog(String taskId) {
-		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
-
-		try {
-			HttpClient httpClient = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
-			DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId);
+			DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId, logType);
 			
 		} catch ( Exception e) {
 			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("Task 이벤트 로그 조회 중 Exception이 발생하였습니다."));
 		}
-	}
-
-	private void doGetTaskLog(String logType, String taskId) {
-		if ( logType.equals("debug") )
-			getDebugLog(taskId);
-		else if ( logType.equals("event") )
-			getEventLog(taskId);
 	}
 	
 	@Async

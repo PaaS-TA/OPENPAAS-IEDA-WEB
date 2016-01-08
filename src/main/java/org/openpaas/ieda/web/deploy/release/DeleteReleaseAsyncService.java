@@ -44,7 +44,7 @@ public class DeleteReleaseAsyncService {
 				Header location = deleteMethod.getResponseHeader("Location");
 				String taskId = DirectorRestHelper.getTaskId(location.getValue());
 				
-				DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId);
+				DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId, "event");
 				
 			} else {
 				DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("릴리즈 삭제 중 오류가 발생하였습니다.[" + statusCode + "]"));
