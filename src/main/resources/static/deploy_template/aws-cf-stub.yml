@@ -167,7 +167,7 @@ jobs:
   instances: 1  
   networks:
   - name: op_private
-    static_ips: (( static_ips(5) )) 
+    static_ips: (( static_ips(6) )) 
   persistent_disk: 4096
   properties:
     metron_agent:
@@ -187,7 +187,7 @@ jobs:
   instances: 1  
   networks:
   - name: op_private
-    static_ips: (( static_ips(6) )) 
+    static_ips: (( static_ips(7) )) 
   properties:
     consul:
       agent:
@@ -230,7 +230,7 @@ jobs:
   instances: 1  
   networks:
   - name: op_private
-    static_ips: (( static_ips(7) )) 
+    static_ips: (( static_ips(8) )) 
   persistent_disk: 8192
   properties:
     consul:
@@ -281,7 +281,7 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(8) )) 
+    static_ips: (( static_ips(9) )) 
   persistent_disk: 4096
   properties:
     metron_agent:
@@ -301,7 +301,7 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(9) )) 
+    static_ips: (( static_ips(10) )) 
   persistent_disk: 0
   properties:
     metron_agent:
@@ -402,7 +402,7 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(10) )) 
+    static_ips: (( static_ips(11) )) 
   properties:
     doppler:
       zone: z1
@@ -425,7 +425,7 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(11) )) 
+    static_ips: (( static_ips(12) )) 
   properties:
     metron_agent:
       zone: z1
@@ -458,7 +458,7 @@ jobs:
   instances: 1
   networks:
   - name: op_private
-    static_ips: (( static_ips(12) )) 
+    static_ips: (( static_ips(13) )) 
   properties:
     consul:
       agent:
