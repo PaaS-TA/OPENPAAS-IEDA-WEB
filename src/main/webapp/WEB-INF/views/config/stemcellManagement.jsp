@@ -29,7 +29,7 @@
 <script type="text/javascript">
 var downloadClient = "";
 
-var completeButton = '<div class="btn btn-success btn-xs" style="width:70px;">완료</div>';
+var completeButton = '<div class="btn btn-success btn-xs" style="width:70px;">닫기</div>';
 var downloadingButton = '<div class="btn btn-info btn-xs" style="width:70px;">다운 중</div>';
 $(function() {
  	$('#config_opStemcellsGrid').w2grid({

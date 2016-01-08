@@ -10,10 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.common.ReplaceItem;
+import org.openpaas.ieda.web.common.Sha512Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -54,8 +56,8 @@ public class IEDADiegoService {
 					dto.setDirectorUuid(config.getDirectorUuid());
 					dto.setDiegoReleaseName(config.getDiegoReleaseName());
 					dto.setDiegoReleaseVersion(config.getDiegoReleaseVersion());
-					dto.setDiegoReleaseName(config.getDiegoReleaseName());
-					dto.setDiegoReleaseVersion(config.getDiegoReleaseVersion());
+					dto.setCfReleaseName(config.getCfReleaseName());
+					dto.setCfReleaseVersion(config.getCfReleaseVersion());
 					dto.setGardenLinuxReleaseName(config.getGardenLinuxReleaseName());
 					dto.setGardenLinuxReleaseVersion(config.getGardenLinuxReleaseVersion());
 					dto.setEtcdReleaseName(config.getEtcdReleaseName());
@@ -107,8 +109,8 @@ public class IEDADiegoService {
 					dto.setDirectorUuid(config.getDirectorUuid());
 					dto.setDiegoReleaseName(config.getDiegoReleaseName());
 					dto.setDiegoReleaseVersion(config.getDiegoReleaseVersion());
-					dto.setDiegoReleaseName(config.getDiegoReleaseName());
-					dto.setDiegoReleaseVersion(config.getDiegoReleaseVersion());
+					dto.setCfReleaseName(config.getCfReleaseName());
+					dto.setCfReleaseVersion(config.getCfReleaseVersion());
 					dto.setGardenLinuxReleaseName(config.getGardenLinuxReleaseName());
 					dto.setGardenLinuxReleaseVersion(config.getGardenLinuxReleaseVersion());
 					dto.setEtcdReleaseName(config.getEtcdReleaseName());
@@ -244,10 +246,9 @@ public class IEDADiegoService {
 			items.add(new ReplaceItem("[diegoServers]", config.getDiegoServers()));
 			items.add(new ReplaceItem("[diegoUaaSecret]", config.getDiegoUaaSecret()));
 			//4 리소스 정보	
-			items.add(new ReplaceItem("[boshPassword]", config.getBoshPassword()));
 			items.add(new ReplaceItem("[stemcellName]", config.getStemcellName()));
 			items.add(new ReplaceItem("[stemcellVersion]", config.getStemcellVersion()));
-
+			items.add(new ReplaceItem("[boshPassword]", Sha512Crypt.Sha512_crypt(config.getBoshPassword(), RandomStringUtils.randomAlphabetic(10), 0)));
 		}
 		else{
 			IEDADiegoOpenstackConfig config  = openstackRepository.findOne(id);
@@ -304,9 +305,9 @@ public class IEDADiegoService {
 			items.add(new ReplaceItem("[diegoServers]", config.getDiegoServers()));
 			items.add(new ReplaceItem("[diegoUaaSecret]", config.getDiegoUaaSecret()));
 			//4 리소스 정보	
-			items.add(new ReplaceItem("[boshPassword]", config.getBoshPassword()));
 			items.add(new ReplaceItem("[stemcellName]", config.getStemcellName()));
 			items.add(new ReplaceItem("[stemcellVersion]", config.getStemcellVersion()));
+			items.add(new ReplaceItem("[boshPassword]", Sha512Crypt.Sha512_crypt(config.getBoshPassword(), RandomStringUtils.randomAlphabetic(10), 0)));
 		}
 
 		return items;

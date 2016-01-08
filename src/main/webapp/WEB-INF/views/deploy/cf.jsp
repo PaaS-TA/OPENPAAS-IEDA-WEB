@@ -1261,13 +1261,13 @@
 		});
 	}
 	
-	//Release List W2Field 적용
+	// 스템셀 List W2Field 적용
 	function setStemcellList(){
 		$(".w2ui-msg-body input[name='stemcells']").w2field('list', {items : stemcells,maxDropHeight : 200,width : 250});
 		setStemcellData();
 	}
 	
-	// RELEASE release value setgting
+	// 스템셀 value setgting
 	function setStemcellData(){
 		if( !checkEmpty(resourceInfo.stemcellName) && !checkEmpty(resourceInfo.stemcellVersion) ){
 			$(".w2ui-msg-body input[name='stemcells']").data('selected',{text : resourceInfo.stemcellName + "/"+ resourceInfo.stemcellVersion});
@@ -1793,7 +1793,7 @@
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 			<button class="btn" style="float: left;" onclick="deployPopup()">이전</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
+			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">닫기</button>
 		</div>
 	</div>
 	<!-- End AWS Popup -->
@@ -2203,6 +2203,6 @@
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
 			<button class="btn" style="float: left;" onclick="deployPopup()">이전</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">완료</button>
+			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">닫기</button>
 		</div>
 	</div>
