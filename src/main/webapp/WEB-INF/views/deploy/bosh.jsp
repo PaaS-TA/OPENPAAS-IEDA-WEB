@@ -80,19 +80,48 @@ $(function(){
 		    				return '<span class="btn btn-primary" style="width:60px">취소</span>';
 		    			else	if ( record.deployStatus == 'deploying' )
 		    				return '<span class="btn btn-primary" style="width:60px">배포중</span>';
+	    				else	if ( record.deployStatus == 'deleteing' )
+		    				return '<span class="btn btn-primary" style="width:60px">삭제중</span>';
 						else
 		    				return 'N/A';
 		    	   }
 				}
+			, {field: 'deployLog', caption: '배포로그', size: '100px',
+				render: function(record) {
+					if ( record.deployStatus == 'done' || record.deployStatus == 'error') {
+		       				return '<span id="" class="btn btn-primary" style="width:60px" onClick="getDeployLogMsg( \'bosh\', \''+record.iaas+'\', \''+record.id+'\');">로그보기</span>';
+						}
+		    			else {
+		    				return 'N/A';
+						}
+					}
+				}
 			, {field: 'deploymentName', caption: '배포명', size: '100px'}
-			, {field: 'releaseVersion', caption: '릴리즈', size: '100px'}
-			, {field: 'stemcell', caption: '스템셀', size: '240px'}
 			, {field: 'iaas', caption: 'IaaS', size: '100px'}
 			, {field: 'directorUuid', caption: '설치관리자 UUID', size: '220px'}
-			, {field: 'publicIp', caption: '고정 IP', size: '100px'}
+			, {field: 'releaseVersion', caption: '릴리즈', size: '100px'}
+			
+			, {field: 'publicStaticIp', caption: '고정 IP', size: '100px'}
 			, {field: 'subnetRange', caption: '서브넷 범위', size: '100px'}
-			, {field: 'gateway', caption: '게이트웨이', size: '100px'}
-			, {field: 'dns', caption: 'DNS', size: '100px'}
+			, {field: 'subnetStatic', caption: 'VM 할당 IP대역', size: '240px'
+				, render:function(record){
+						if( record.subnetStaticFrom && record.subnetStaticTo ){
+							return record.subnetStaticFrom +" - "+ record.subnetStaticTo;
+						}
+					}
+				}
+			, {field: 'subnetGateway', caption: '게이트웨이', size: '100px'}
+			, {field: 'subnetDns', caption: '서브넷 DNS', size: '100px'}
+			, {field: 'subnetId', caption: '서브넷 ID', size: '100px'}
+			, {field: 'stemcell', caption: '스템셀', size: '240px'
+				, render:function(record){
+						if( record.stemcellName && record.stemcellVersion ){
+							return record.stemcellName +"/"+ record.stemcellVersion;
+						}
+					}
+				}
+			, {field: 'cloudInstanceType', caption: 'Instance Type', size: '100px'}
+			
 			],
 		onClick:function(event) {
 			var grid = this;
@@ -294,7 +323,7 @@ function deletePopup(record){
 			height : 500,
 			title : "<b>BOSH 삭제</b>",
 			body  : body,
-			buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="popupComplete();;">닫기</button>',
+			buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="popupComplete();">닫기</button>',
 			showMax : true,
 			onOpen : function(event){
 				event.onComplete = function(){
@@ -342,7 +371,7 @@ function deletePopup(record){
 //Aws Popup
 function awsPopup(){
 	$("#awsInfoDiv").w2popup({
-		width 	: 670,
+		width 	: 700,
 		height	: 500,
 		title   : "BOSH설치 (AWS)",
 		modal	: true,
@@ -562,7 +591,7 @@ function settingOpenstackData(contents){
 
 function  awsBoshInfoPopup(){
 	$("#boshInfoDiv").w2popup({
-		width 	: 670,
+		width 	: 700,
 		height	: 350,
 		modal	: true,
 		onOpen:function(event){
@@ -616,7 +645,7 @@ function saveBoshInfo(type){
 
 function networkPopup(){
 	$("#networkInfoDiv").w2popup({
-		width 	: 670,
+		width 	: 700,
 		height	: 450,
 		modal	: true,
 		onOpen:function(event){
@@ -672,7 +701,7 @@ function saveNetworkInfo(type){
 
 function awsResourcePopup(){
 	$("#resourceInfoDiv").w2popup({
-		width 	: 670,
+		width 	: 700,
 		height	: 350,
 		modal	: true,
 		onOpen:function(event){
@@ -727,7 +756,7 @@ function saveAwsResourceInfo(type){
 function deployPopup(){
 	var deployDiv = (iaas == "AWS") ? $("#awsDeployDiv") : $("#openstackDeployDiv");
 	deployDiv.w2popup({
-		width 	: 670,
+		width 	: 700,
 		height 	: 520,
 		modal	: true,
 		showMax : true,
@@ -793,7 +822,7 @@ function installPopup(){
 	};
 	
 	installDiv.w2popup({
-		width 	: 670,
+		width 	: 700,
 		height 	: 520,
 		modal	: true,
 		showMax : true,
@@ -818,7 +847,9 @@ function installPopup(){
 					            if ( response.state.toLowerCase() == "done" )	message = message + " 설치가 완료되었습니다."; 
 					    		if ( response.state.toLowerCase() == "error" ) message = message + " 설치 중 오류가 발생하였습니다.";
 					    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 설치 중 취소되었습니다.";
-					    			
+					    		
+					    		$('.w2ui-msg-buttons #deployPopupBtn').prop("disabled", false);
+					    		
 					    		installClient.disconnect();
 								w2alert(message, "BOSH 설치");
 					       	}
@@ -836,7 +867,7 @@ function installPopup(){
 // Openstack BOSH INFO 
 function osBoshInfoPopup(){
 	$("#osBoshInfoDiv").w2popup({
-		width 	: 670,
+		width 	: 700,
 		height	: 450,
 		title   : "BOSH설치 (OPENSTACK)",
 		modal	: true,
@@ -935,7 +966,7 @@ function setStemcellData(){
 
 function openstackPopup(){
 	$("#openstackInfoDiv").w2popup({
-		width 	: 670,
+		width 	: 700,
 		height	: 550,
 		title   : "BOSH설치 (오픈스택)",
 		modal	: true,
@@ -1022,7 +1053,7 @@ function saveOsBoshInfo(type){
 
 function osNetworkInfoPopup(){
 	$("#osNetworkInfoDiv").w2popup({
-		width 	: 670,
+		width 	: 700,
 		height	: 550,
 		modal	: true,
 		onOpen:function(event){
@@ -1077,7 +1108,7 @@ function saveOsNetworkInfo(type){
 
 function osResourceInfoPopup(){
 	$("#osResourceInfoDiv").w2popup({
-		width 	: 670,
+		width 	: 700,
 		height	: 450,
 		modal	: true,
 		onOpen:function(event){
@@ -1230,8 +1261,8 @@ $( window ).resize(function() {
 	<!-- AWS  설정 DIV -->
 	<div id="awsInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:3%;">
+		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
+			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 	            <ul class="progressStep_6" >
 		            <li class="active">AWS 정보</li>
 		            <li class="before">기본 정보</li>
@@ -1241,43 +1272,43 @@ $( window ).resize(function() {
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div class="cont_title">■ AWS정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; AWS정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Access Key ID</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Access Key ID</label>
 		            <div>
 		                <input name="accessKeyId" type="text"  style="float:left;width:60%;" required placeholder="AWS Access Key를 입력하세요."/>
 		            </div>
 				</div>
 				
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Secret Access Key</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Secret Access Key</label>
 		            <div>
 		                <input name="secretAccessKey" type="text"  style="float:left;width:60%;" required placeholder="AWS Secret Access Key를 입력하세요."/>
 		            </div>
 		        </div>
 
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Security Group</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Security Group</label>
 		            <div>
 		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;" required placeholder="시큐리티 그룹을 입력하세요."/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Region</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Region</label>
 		            <div>
 		                <input name="region" type="text"  style="float:left;width:60%;"  required placeholder="설치할 Region을 입력하세요.(예: us-east-1)"/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Private Key Name</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Name</label>
 		            <div>
 		                <input name="privateKeyName" type="text"  style="float:left;width:60%;" required placeholder="Key Pair 이름을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Private Key File</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key File</label>
 	                <div >
   						<span onclick="changeKeyPathType('file');" style="width:200px;"><label><input type="radio" name="keyPathType"  value="file"/>&nbsp;파일 업로드</label></span>
 						&nbsp;&nbsp;
@@ -1301,8 +1332,8 @@ $( window ).resize(function() {
 	<!-- BOSH INFO  설정 DIV -->
 	<div id="boshInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:3%;">
+		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
+			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">AWS 정보</li>
 		            <li class="active">기본 정보</li>
@@ -1312,22 +1343,22 @@ $( window ).resize(function() {
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div class="cont_title">■ 기본정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 기본정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">배포명</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;배포명</label>
 		            <div>
 		                <input name="deploymentName" type="text"  style="float:left;width:60%;" required placeholder="배포명을 입력하세요."/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">설치관리자 UUID</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;설치관리자 UUID</label>
 		            <div>
 		                <input name="directorUuid" type="text" style="float:left;width:60%;"  required placeholder="설치관리자 UUID입력하세요."/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">BOSH 릴리즈</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;BOSH 릴리즈</label>
 		            <div>
 		                <input name="releaseVersion" type="list" style="float:left;width:60%;" />
 		            </div>
@@ -1345,8 +1376,8 @@ $( window ).resize(function() {
 	<!-- Network 설정 DIV -->
 	<div id="networkInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:3%;">
+		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
+			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 	            <ul class="progressStep_6">
 					<li class="pass">AWS 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1356,23 +1387,23 @@ $( window ).resize(function() {
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title">■ 네트워크정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 네트워크정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width:40%; font-size: 11px;">Subnet ID</label>
+					<label style="text-align: left; width:40%; font-size: 11px;">&bull;&nbsp;Subnet ID</label>
 					<div>
 						<input name="subnetId" type="text"  style="float:left;width:60%;"  required placeholder="예) subnet-XXXXXX"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Floating IP</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Floating IP</label>
 		            <div>
 		                <input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="설치관리자에 할당할 Floating IP를 입력하세요."/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size: 11px;">Static IP</label>
+					<label style="text-align:left; width:40%; font-size: 11px;">&bull;&nbsp;Static IP</label>
 					<div>
 						<div style="display:inline-block;width: 60%;">
 							<span style="float:left;width:45%;"><input name="subnetStaticFrom" id="subnetStaticFrom" type="text" style="float:left;width:100%;" placeholder="예) 10.0.0.100"/></span>
@@ -1382,19 +1413,19 @@ $( window ).resize(function() {
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Subnet Range(CIDR)</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Subnet Range(CIDR)</label>
 					<div>
 						<input name="subnetRange" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.0/24"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Gateway IP</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Gateway IP</label>
 					<div>
 						<input name="subnetGateway" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.1"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">DNS</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;DNS</label>
 					<div>
 						<input name="subnetDns" type="text"  style="float:left;width:60%;"  required placeholder="예) 8.8.8.8"/>
 					</div>
@@ -1411,8 +1442,8 @@ $( window ).resize(function() {
 	<!-- Resource  설정 DIV -->
 	<div id="resourceInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:3%;">
+		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
+			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 	            <ul class="progressStep_6">
 					<li class="pass">AWS 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1422,10 +1453,10 @@ $( window ).resize(function() {
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div rel="sub-title" class="cont_title">■ 리소스정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 리소스정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Stemcell</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Stemcell</label>
 					<div>
 						<div>
 							<input type="list" name="stemcells" style="float: left;width:60%;margin-top:1.5px;"  required placeholder="스템셀을 선택하세요.">
@@ -1433,13 +1464,13 @@ $( window ).resize(function() {
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Instance Type</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Instance Type</label>
 					<div>
 						<input name="cloudInstanceType" type="text" style="float:left;width:60%;"  required placeholder="인스턴스 유형을 입력하세요."/>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">VM Password</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;VM Password</label>
 					<div>
 						<input name="boshPassword" type="text" style="float:left;width:60%;"  required placeholder="VM인스턴스의 비밀번호를 입력하세요."/>
 					</div>
@@ -1455,8 +1486,8 @@ $( window ).resize(function() {
 	
 	<div id="awsDeployDiv"  hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="height:60px;margin:0 15px;">
+		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
+			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">AWS 정보</li>
 		            <li class="pass">BOSH 정보</li>
@@ -1479,8 +1510,8 @@ $( window ).resize(function() {
 	<!-- AWS 설치화면 -->
 	<div id="awsInstallDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="height:60px;margin:0 15px;">
+		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
+			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 	            <ul class="progressStep_6">
 		            <li class="pass">AWS 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1505,8 +1536,8 @@ $( window ).resize(function() {
 	<!-- 오픈스택 정보 -->
 	<div id="openstackInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:3%;">
+		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
+			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 	            <ul class="progressStep_6" >
 		            <li class="active">오픈스택 정보</li>
 		            <li class="before">기본 정보</li>
@@ -1516,52 +1547,52 @@ $( window ).resize(function() {
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div class="cont_title">■ 오픈스택정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 오픈스택정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">AUTH URL</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;AUTH URL</label>
 		            <div>
 		                <input name="authUrl" type="text"  style="float:left;width:60%;"  required placeholder="Identify API 인증 링크를 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Tenant</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Tenant</label>
 		            <div>
 		                <input name="tenant" type="text"  style="float:left;width:60%;"  required placeholder="Tenant명을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">User Name</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;User Name</label>
 		            <div>
 		                <input name="userName" type="text"  style="float:left;width:60%;"  required placeholder="계정명을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">API Key</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;API Key</label>
 		            <div>
 		                <input name="apiKey" type="text"  style="float:left;width:60%;"  required placeholder="계정 비밀번호를 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Security Group</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Security Group</label>
 		            <div>
 		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;"  required placeholder="시큐리티 그룹을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Private Key Name</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Name</label>
 		            <div>
 		                <input name="privateKeyName" type="text"  style="float:left;width:60%;"  required placeholder="Key Pair명을 입력하세요."/>
 		            </div>
 		        </div>
 		        
 		        <div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">Private Key Path</label>
+					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Path</label>
 					<div >
 						<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" />&nbsp;파일업로드</label></span>
 						&nbsp;&nbsp;
@@ -1586,8 +1617,8 @@ $( window ).resize(function() {
 	<!-- 기본 정보 -->
 	<div id="osBoshInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:3%;">
+		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
+			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">오픈스택 정보</li>
 		            <li class="active">기본 정보</li>
@@ -1597,25 +1628,25 @@ $( window ).resize(function() {
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div class="cont_title">■ 기본정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 기본정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<form id="osBoshForm">
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">배포명</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;배포명</label>
 			            <div>
 			                <input name="deploymentName" type="text"  style="float:left;width:60%;"  required placeholder="배포명을 입력하세요."/>
 			                <div class="isMessage"></div>
 			            </div>
 			        </div>
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">설치관리자 UUID</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;설치관리자 UUID</label>
 			            <div>
 			                <input name="directorUuid" type="text"  style="float:left;width:60%;"  required placeholder="설치관리자 UUID입력하세요."/>
 			                <div class="isMessage"></div>
 			            </div>
 			        </div>
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">BOSH 릴리즈</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;BOSH 릴리즈</label>
 			            <div>
 			                <input name="releaseVersion" type="list"  style="float:left;width:60%;" required placeholder="BOSH 릴리즈를 선택하세요." />
 			            </div>
@@ -1633,8 +1664,8 @@ $( window ).resize(function() {
 	<!-- 네트워크 정보 -->
 	<div id="osNetworkInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:3%;">
+		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
+			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">오픈스택 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1644,25 +1675,25 @@ $( window ).resize(function() {
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div class="cont_title">■ 네트워크정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 네트워크정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Subnet ID</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Subnet ID</label>
 		            <div>
 		                <input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="Subnet ID를 입력하세요."/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 				<div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Floating IP</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Floating IP</label>
 		            <div>
 		                <input name="publicStaticIp" type="text"  style="float:left;width:60%;" required placeholder="설치관리자에 할당할 Floating IP를 입력하세요."/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Subnet Range(CIDR)</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Subnet Range(CIDR)</label>
 		            <div>
 		                <input name="subnetRange" type="text"  style="float:left;width:60%;" required placeholder="예) 10.0.0.0/24"/>
 		                <div class="isMessage"></div>
@@ -1670,7 +1701,7 @@ $( window ).resize(function() {
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Gateway IP</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Gateway IP</label>
 		            <div>
 		                <input name="subnetGateway" type="text"  style="float:left;width:60%;" required placeholder="예) 10.0.0.1"/>
 		                <div class="isMessage"></div>
@@ -1678,14 +1709,14 @@ $( window ).resize(function() {
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">DNS</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;DNS</label>
 		            <div>
 		                <input name="subnetDns" type="text"  style="float:left;width:60%;"  required placeholder="예) 8.8.8.8"/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size: 11px;">Static IP</label>
+					<label style="text-align:left; width:40%; font-size: 11px;">&bull;&nbsp;Static IP</label>
 					<div>
 						<div style="display:inline-block;width: 60%;">
 							<span style="float:left;width:45%;"><input name="subnetStaticFrom" id="subnetStaticFrom" type="text" style="float:left;width:100%;" placeholder="예) 10.0.0.100"/></span>
@@ -1706,8 +1737,8 @@ $( window ).resize(function() {
 	<!-- 리소스 정보 -->
 	<div id="osResourceInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:3%;">
+		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
+			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">오픈스택 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1717,24 +1748,24 @@ $( window ).resize(function() {
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div class="cont_title">■ 리소스정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 리소스정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 				 <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Stemcell</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Stemcell</label>
 		            <div>
 						<div><input type="list" name="stemcells" style="float: left;width:60%;margin-top:1.5px;"  required placeholder="스템셀을 선택하세요."></div>
 						<div class="isMessage"></div>
 					</div>
 				</div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">Instance Type</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Instance Type</label>
 		            <div>
 		                <input name="cloudInstanceType" type="text"  style="float:left;width:60%;"   required  placeholder="인스턴스 유형을 입력하세요."/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">VM Password</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM Password</label>
 		            <div>
 		                <input name="boshPassword" type="text"  style="float:left;width:60%;"  required  placeholder="VM인스턴스의 비밀번호를 입력하세요."/>
 		                <div class="isMessage"></div>
@@ -1752,8 +1783,8 @@ $( window ).resize(function() {
 	<!-- 배포파일 정보 -->
 	<div id="openstackDeployDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="height:60px;margin:0 15px;">
+		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
+			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">오픈스택 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1776,8 +1807,8 @@ $( window ).resize(function() {
 	<!-- 오픈스택 설치화면 -->
 	<div id="openstackInstallDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOSH 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="height:60px;margin:0 15px;">
+		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
+			<div style="margin-left: 3%;display:inline-block;width: 97%;">
 	            <ul class="progressStep_6">
 		            <li class="pass">오픈스택 정보</li>
 		            <li class="pass">기본 정보</li>

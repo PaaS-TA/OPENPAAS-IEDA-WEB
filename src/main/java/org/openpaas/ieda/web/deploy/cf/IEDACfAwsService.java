@@ -19,7 +19,7 @@ public class IEDACfAwsService {
 	@Autowired
 	private IEDACfService cfService;
 
-	public IEDACfAwsConfig getAwsCfInfo(int id) {
+	public IEDACfAwsConfig getAwsInfo(int id) {
 		IEDACfAwsConfig config = null;
 		try{
 			config = awsRepository.findOne(id);

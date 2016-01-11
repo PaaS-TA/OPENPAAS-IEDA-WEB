@@ -5,7 +5,7 @@ import java.util.Date;
 import lombok.Data;
 
 @Data
-public class CfListDto {
+public class CfInfo {
 
 	private int recid;
 	private int id;
@@ -25,7 +25,7 @@ public class CfListDto {
 	private String description;
 	private String domainOrganization;
 
-	// 1.3 프록시 정보
+	// 1.3 HA프록시 정보
 	private String proxyStaticIps;
 
 	// 4. 네트워크 정보

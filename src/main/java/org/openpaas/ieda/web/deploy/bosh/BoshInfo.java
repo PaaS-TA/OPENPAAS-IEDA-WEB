@@ -9,15 +9,29 @@ public class BoshInfo {
 
 	private int recid;
 	private int id;
+	private String iaas;
+	private Date createdDate;
+	
+	// BOSH
 	private String directorUuid;
 	private String deploymentName;
-	private String iaas;
 	private String releaseVersion;
-	private String stemcell;
-	private String publicIp;
+
+	// NETWORK
+	private String publicStaticIp;
 	private String subnetRange;
-	private String gateway;
-	private String dns;
+	private String subnetStaticFrom;
+	private String subnetStaticTo;
+	private String subnetGateway;
+	private String subnetDns;
+	private String subnetId;
+
+	private String stemcellName;
+	private String stemcellVersion;
+	private String cloudInstanceType;
+
+	//DEPLOY
+	private String deploymentFile;
 	private String deployStatus;
-	private Date createdDate;
+	private String deployLog;
 }

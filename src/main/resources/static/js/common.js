@@ -69,7 +69,6 @@ function checkEmpty(value){
 	return (value == null || value == "") ? true: false;
 }
 
-
 //URL 체크
 function validateIP(input){
 	if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(input))  
@@ -102,7 +101,13 @@ function popupValidation(){
 						if($(this).attr('name') == "subnetStaticFrom" || $(this).attr('name') == "subnetStaticTo"){
 							label = "Static Ip";
 							$(this).css({"border-color":"red"})
-								.parent().parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"});
+								.parent().parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"})
+								.on("change", function(){
+									if( !checkEmpty($(this).val()) ){
+										$(this).css({"border-color":"grey"})
+										.parent().parent().find(".isMessage").text("OK").show().fadeOut();
+									}
+								});
 						}
 						else if($(this).attr('name') == "subnetReservedFrom" || $(this).attr('name') == "subnetReservedTo" ){
 							label = "Reserved Range";
@@ -176,3 +181,50 @@ function popupValidation(){
 	return checkValidation;
 }
 
+
+//Deploy Log 
+function getDeployLogMsg(service, iaas, id){
+	var getParam = {
+			  service	: service
+			, iaas		: iaas
+			, id		: id
+	}
+	
+	$.ajax({
+		type : "POST",
+		url : "/common/getDeployLogMsg",
+		contentType : "application/json",
+		data : JSON.stringify(getParam),
+		success : function(data, status) {
+			if(!checkEmpty(data)){
+				deployLogMsgPopup(service, iaas, data);
+			}
+		},
+		error : function(request, status, error) {
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message, service + " DEPLOY LOG");
+		}
+	});	
+}
+
+function deployLogMsgPopup(service, iaas, msg){
+	var body = '<textarea id="deployLogMsg" style="margin-left:2%;width:95%;height:93%;overflow-y:visible;resize:none;background-color: #FFF; margin:2%" readonly="readonly"></textarea>';
+	
+	w2popup.open({
+		width : 800,
+		height : 700,
+		title : "<b>"+service.toUpperCase()+"Deploy Log</b>",
+		body  : body,
+		buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="w2popup.close();">닫기</button>',
+		showMax : true,
+		onOpen : function(event){
+			event.onComplete = function(){
+				$("#deployLogMsg").text(msg);
+			}
+		}
+	});	
+}
+
+//한글입력 방지
+var popupBodySelector = document.getElement('w2ui-msg-body');
+popupBodySelector.

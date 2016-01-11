@@ -23,7 +23,7 @@ public class IEDABoshOpenstackConfig {
 	@Temporal(TemporalType.DATE)
 	private Date updatedDate;
 	
-	//openstack
+	//OPENSTACK
 	private String authUrl;
 	private String tenant;
 	private String userName;
@@ -32,12 +32,12 @@ public class IEDABoshOpenstackConfig {
 	private String privateKeyPath;	
 	private String defaultSecurityGroups;
 	
-	//bosh
+	//BOSH
 	private String deploymentName;
 	private String directorUuid;
 	private String releaseVersion;
 	
-	//network
+	//NETWORK
 	private String publicStaticIp;
 	private String subnetRange;
 	private String subnetStaticFrom;
@@ -46,14 +46,15 @@ public class IEDABoshOpenstackConfig {
 	private String subnetDns;
 	private String subnetId;
 	
-	//resource
+	//RESOURCE
 	private String stemcellName;
 	private String stemcellVersion;
 	private String cloudInstanceType;
 	
 	private String boshPassword;
-	//deploy
+	//DEPLOY
 	private String deploymentFile;
 	private String deployStatus;
+	private String deployLog;
 
 }

@@ -13,6 +13,23 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
+import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapAwsConfig;
+import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapAwsService;
+import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapOpenstackConfig;
+import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapOpenstackService;
+import org.openpaas.ieda.web.deploy.bosh.IEDABoshAwsConfig;
+import org.openpaas.ieda.web.deploy.bosh.IEDABoshAwsService;
+import org.openpaas.ieda.web.deploy.bosh.IEDABoshOpenstackConfig;
+import org.openpaas.ieda.web.deploy.bosh.IEDABoshOpenstackService;
+import org.openpaas.ieda.web.deploy.cf.IEDACfAwsConfig;
+import org.openpaas.ieda.web.deploy.cf.IEDACfAwsService;
+import org.openpaas.ieda.web.deploy.cf.IEDACfOpenstackConfig;
+import org.openpaas.ieda.web.deploy.cf.IEDACfOpenstackService;
+import org.openpaas.ieda.web.deploy.diego.IEDADiegoAwsConfig;
+import org.openpaas.ieda.web.deploy.diego.IEDADiegoAwsService;
+import org.openpaas.ieda.web.deploy.diego.IEDADiegoOpenstackConfig;
+import org.openpaas.ieda.web.deploy.diego.IEDADiegoOpenstackService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -23,6 +40,22 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class CommonService {
 
+	@Autowired
+	private IEDABootstrapAwsService bootstrapAwsService;
+	@Autowired
+	private IEDABootstrapOpenstackService bootstrapOpenstackService;
+	@Autowired
+	private IEDABoshAwsService boshAwsService;
+	@Autowired
+	private IEDABoshOpenstackService boshOpenstackService;
+	@Autowired
+	private IEDACfAwsService cfAwsService;
+	@Autowired
+	private IEDACfOpenstackService cfOpenstackService;
+	@Autowired
+	private IEDADiegoAwsService diegoAwsService;
+	@Autowired
+	private IEDADiegoOpenstackService diegoOpenstackService;
 	
 	public void uploadKeyFile(MultipartHttpServletRequest request) {
 		Iterator<String> itr =  request.getFileNames();
@@ -81,5 +114,54 @@ public class CommonService {
 			e.printStackTrace();
 		}
 		return contents;
+	}
+
+	public String getDeployMsg(CommonParam.DeployLog param) {
+		log.info("::::::: CommonService  getDeployMsg : " + param);
+		String deployLog = "";
+		switch (param.getService().trim().toLowerCase()) {
+		case "boostrap":
+			if( "AWS".equals(param.getIaas().trim().toUpperCase()) ){
+				IEDABootstrapAwsConfig config = bootstrapAwsService.getAwsInfo(param.getId());
+				deployLog = config.getDeployLog();
+			}
+			else if( "OPENSTACK".equals(param.getIaas().trim().toUpperCase()) ){
+				IEDABootstrapOpenstackConfig config = bootstrapOpenstackService.getOpenstackInfo(param.getId());
+				deployLog = config.getDeployLog();
+			}
+			break;
+		case "bosh":
+			if( "AWS".equals(param.getIaas().trim().toUpperCase()) ){
+				IEDABoshAwsConfig config = boshAwsService.getAwsInfo(param.getId());
+				deployLog = config.getDeployLog();
+			}
+			else if( "OPENSTACK".equals(param.getIaas().trim().toUpperCase()) ){
+				IEDABoshOpenstackConfig config = boshOpenstackService.getOpenstackInfo(param.getId());
+				deployLog = config.getDeployLog();
+			}
+			break;
+		case "cf":
+			if( "AWS".equals(param.getIaas().trim().toUpperCase()) ){
+				IEDACfAwsConfig config = cfAwsService.getAwsInfo(param.getId());
+				deployLog = config.getDeployLog();
+			}
+			else if( "OPENSTACK".equals(param.getIaas().trim().toUpperCase()) ){
+				IEDACfOpenstackConfig config = cfOpenstackService.getOpenstackInfo(param.getId());
+				deployLog = config.getDeployLog();
+			}
+			break;
+		case "diego":
+			if( "AWS".equals(param.getIaas().trim().toUpperCase()) ){
+				IEDADiegoAwsConfig config = diegoAwsService.getAwsInfo(param.getId());
+				deployLog = config.getDeployLog();
+			}
+			else if( "OPENSTACK".equals(param.getIaas().trim().toUpperCase()) ){
+				IEDADiegoOpenstackConfig config = diegoOpenstackService.getOpenstackInfo(param.getId());
+				deployLog = config.getDeployLog();
+			}
+			break;
+		}
+		
+		return deployLog;
 	}
 }

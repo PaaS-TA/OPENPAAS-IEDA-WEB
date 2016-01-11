@@ -20,7 +20,7 @@ public class IEDACfOpenstackService {
 	@Autowired
 	private IEDACfService cfService;
 	
-	public IEDACfOpenstackConfig getOpenstackCfInfo(int id) {
+	public IEDACfOpenstackConfig getOpenstackInfo(int id) {
 		IEDACfOpenstackConfig config = null;
 		try{
 			config = openstackRepository.findOne(id);

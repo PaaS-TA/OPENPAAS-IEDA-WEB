@@ -48,7 +48,7 @@ public class DiegoController {
 
 	@RequestMapping(value="/deploy/diegoList", method=RequestMethod.GET)
 	public ResponseEntity listDiego() {
-		List<DiegoListDto> content = diegoService.getList();
+		List<DiegoInfo> content = diegoService.getList();
 
 		Map<String, Object> result = new HashMap<>();
 

@@ -51,13 +51,61 @@
 			    				return '<span class="btn btn-primary" style="width:60px">취소</span>';
 			    			else	if ( record.deployStatus == 'deploying' )
 			    				return '<span class="btn btn-primary" style="width:60px">배포중</span>';
+		    				else	if ( record.deployStatus == 'deleteing' )
+			    				return '<span class="btn btn-primary" style="width:60px">삭제중</span>';
 							else
 			    				return 'N/A';
 			    	   }
 					}
+				, {field: 'deployLog', caption: '배포로그', size: '100px',
+					render: function(record) {
+						if ( record.deployStatus == 'done' || record.deployStatus == 'error') {
+			       				return '<span id="" class="btn btn-primary" style="width:60px" onClick="getDeployLogMsg( \'cf\', \''+record.iaas+'\', \''+record.id+'\');">로그보기</span>';
+							}
+			    			else {
+			    				return 'N/A';
+							}
+						}
+					}
+				//1.1 Deployment 정보
 				, {field: 'deploymentName', caption: '배포명', size: '100px'}
 				, {field: 'iaas', caption: 'IaaS', size: '100px'}
-				, {field: 'releaseVersion', caption: '릴리즈', size: '100px'}
+				, {field: 'directorUuid', caption: '설치관리자 UUID', size: '280px'}
+				, {field: 'release', caption: '릴리즈', size: '100px'
+					, render:function(record){
+							if( record.releaseName && record.releaseVersion ){
+								return record.releaseName +"/"+ record.releaseVersion;
+							}
+						}
+					}
+				, {field: 'appSshFingerprint', caption: 'SSH 핑거프린트', size: '240px'}
+				// 1.2 기본정보
+				, {field: 'domain', caption: '도메인', size: '180px'}
+				, {field: 'description', caption: '도메인 설명', size: '220px'}
+				, {field: 'domainOrganization', caption: '도메인 그룹', size: '120px'}
+				// 1.3 HA프록시 정보
+				, {field: 'proxyStaticIps', caption: 'HAProxy Ip', size: '120px'}
+				// 4. 네트워크 정보
+				, {field: 'subnetRange', caption: '서브넷 범위', size: '180px'}
+				, {field: 'subnetGateway', caption: '게이트웨이', size: '100px'}
+				, {field: 'subnetDns', caption: 'DNS', size: '100px'}
+				, {field: 'subnetReserved', caption: '할당된 IP', size: '240px'
+					, render:function(record){
+							if( record.subnetReservedFrom && record.subnetReservedTo ){
+								return record.subnetReservedFrom +" - "+ record.subnetReservedTo;
+							}
+						}
+					}
+				, {field: 'subnetStatic', caption: 'VM 할당 IP대역', size: '240px'
+					, render:function(record){
+							if( record.subnetStaticFrom && record.subnetStaticTo ){
+								return record.subnetStaticFrom +" - "+ record.subnetStaticTo;
+							}
+						}
+					}
+				, {field: 'subnetId', caption: '서브넷 ID', size: '140px'}
+				, {field: 'cloudSecurityGroups', caption: '시큐리티 그룹명', size: '100px'}
+				
 				, {field: 'stemcell', caption: '스템셀', size: '240px'
 					, render:function(record){
 							if( record.stemcellName && record.stemcellVersion ){
@@ -65,10 +113,6 @@
 							}
 						}
 					}
-				, {field: 'directorUuid', caption: '설치관리자 UUID', size: '220px'}
-				, {field: 'subnetRange', caption: '서브넷 범위', size: '100px'}
-				, {field: 'subnetGateway', caption: '게이트웨이', size: '100px'}
-				, {field: 'subnetDns', caption: 'DNS', size: '100px'}
 				],
 			onClick:function(event) {
 				var grid = this;
@@ -246,11 +290,11 @@
 			var body = '<textarea id="deleteLogs" style="width:95%;height:90%;overflow-y:visible;resize:none;background-color: #FFF; margin:2%" readonly="readonly"></textarea>';
 			
 			w2popup.open({
-				width : 610,
+				width : 700,
 				height : 500,
 				title : "<b>CF 삭제</b>",
 				body  : body,
-				buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="popupComplete();;">닫기</button>',
+				buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="popupComplete();">닫기</button>',
 				showMax : true,
 				onOpen : function(event){
 					event.onComplete = function(){
@@ -367,7 +411,7 @@
 	// Aws 팝업
 	function awsPopup() {
 		$("#awsInfoDiv").w2popup({
-			width : 800,
+			width : 850,
 			height : 800,
 			title : "CF 설치 (AWS)",
 			modal : true,
@@ -451,7 +495,7 @@
 	// AWS UAA POPUP
 	function awsUaaPopup(){
 		$("#awsUaaInfoDiv").w2popup({
-			width : 800,
+			width : 850,
 			height : 500,
 			title : "CF 설치 (AWS)",
 			modal : true,
@@ -507,7 +551,7 @@
 	// AWS CONSUL Popup
 	function awsConsulPopup(){
 		$("#awsConsulInfoDiv").w2popup({
-			width : 800,
+			width : 850,
 			height : 700,
 			title : "CF 설치 (AWS)",
 			modal : false,
@@ -570,7 +614,7 @@
 	// AWS NETWORK POPUP
 	function awsNetworkPopup(){
 		$("#awsNetworkInfoDiv").w2popup({
-			width : 800,
+			width : 850,
 			height : 600,
 			title : "CF 설치 (AWS)",
 			modal : true,
@@ -637,7 +681,7 @@
 	// AWS RESOURCE POPUP
 	function awsResourcePopup() {
 		$("#awsResourceInfoDiv").w2popup({
-			width : 800,
+			width : 850,
 			height : 350,
 			title : "CF 설치 (AWS)",
 			modal : true,
@@ -764,7 +808,7 @@
 	// Openstack 팝업
 	function openstackPopup() {
 		$("#openstackInfoDiv").w2popup({
-			width : 800,
+			width : 850,
 			height : 800,
 			title : "CF 설치 (OPENSTACK)",
 			modal : true,
@@ -840,7 +884,7 @@
 	// OPENSTACK UAA POPUP
 	function openstackUaaPopup(){
 		$("#openstackUaaInfoDiv").w2popup({
-			width : 800,
+			width : 850,
 			height : 500,
 			title : "CF 설치 (OPENSTACK)",
 			modal : true,
@@ -896,7 +940,7 @@
 	// OPENSTACK CONSUL Popup
 	function openstackConsulPopup(){
 		$("#openstackConsulInfoDiv").w2popup({
-			width : 800,
+			width : 850,
 			height : 700,
 			title : "CF 설치 (OPENSTACK)",
 			modal : true,
@@ -959,7 +1003,7 @@
 	// OPENSTACK NETWORK POPUP
 	function openstackNetworkPopup(){
 		$("#openstackNetworkInfoDiv").w2popup({
-			width : 800,
+			width : 850,
 			height : 600,
 			title : "CF 설치 (OPENSTACK)",
 			modal : true,
@@ -1026,7 +1070,7 @@
 	// OPENSTACK RESOURCE POPUP
 	function openstackResourcePopup() {
 		$("#openstackResourceInfoDiv").w2popup({
-			width : 800,
+			width : 850,
 			height : 350,
 			title : "CF 설치 (OPENSTACK)",
 			modal : true,
@@ -1110,7 +1154,7 @@
 	function deployPopup() {
 		var deployDiv = (iaas == "AWS") ? $("#awsDeployDiv"):$("#openstackDeployDiv");
 		deployDiv.w2popup({
-			width : 800,
+			width : 850,
 			height : 470,
 			modal : true,
 			showMax : true,
@@ -1183,7 +1227,9 @@
 						            if ( response.state.toLowerCase() == "done" )	message = message + " 설치가 완료되었습니다."; 
 						    		if ( response.state.toLowerCase() == "error" ) message = message + " 설치 중 오류가 발생하였습니다.";
 						    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 설치 중 취소되었습니다.";
-						    			
+						    		
+						    		$('.w2ui-msg-buttons #deployPopupBtn').prop("disabled", false);
+						    		
 						    		installClient.disconnect();
 									w2alert(message, "CF 설치");
 						       	}
@@ -1412,7 +1458,7 @@
 					<label style="text-align: left; width: 100%; font-size: 13px;" >기본정보</label>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;" >배포 명</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;배포 명</label>
 					<div>
 						<input name="deploymentName" type="text" style="float: left; width: 60%;" required placeholder="배포 명을 입력하세요." />
 						<div class="isMessage"></div>
@@ -1420,20 +1466,20 @@
 				</div>
 	
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">설치관리자 UUID</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;설치관리자 UUID</label>
 					<div>
 						<input name="directorUuid" type="text" style="float: left; width: 60%;" required placeholder="설치관리자 UUID를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">CF 릴리즈</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;CF 릴리즈</label>
 					<div>
 						<input name="releases" type="list" style="float: left; width: 60%;" required placeholder="CF 릴리즈를 선택하세요." />
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">APP SSH Fingerprint</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;APP SSH Fingerprint</label>
 					<div>
 						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="Diego ssh_proxy 로그인을 위한 핑거프린트를 입력하세요." />
 						<div class="isMessage"></div>
@@ -1445,21 +1491,21 @@
 					<label style="text-align: left; width: 100%; font-size: 13px;" >CF 정보</label>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">도메인</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;도메인</label>
 					<div>
 						<input name="domain" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)cfdoamin.com" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">도메인 설명</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;도메인 설명</label>
 					<div>
 						<input name="description" type="text" style="float: left; width: 60%;" required placeholder="도메인에 대한 설명을 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">도메인 그룹</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;도메인 그룹</label>
 					<div>
 						<input name="domainOrganization" type="text" style="float: left; width: 60%;" required placeholder="도메인 그룹명을 입력하세요." />
 						<div class="isMessage"></div>
@@ -1468,24 +1514,24 @@
 				
 				<br/>
 				<div class="w2ui-field" style="display: inline-block;">
-					<label style="text-align: left; width: 100%; font-size: 13px;" >Proxy 정보</label>
+					<label style="text-align: left; width: 100%; font-size: 13px;" >HAProxy 정보</label>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">CF 프록시 서버 공인 IP</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;HAProxy 공인 IP</label>
 					<div>
 						<input name="proxyStaticIps" type="text" style="float: left; width: 60%;" required placeholder="프록시 서버 공인 IP를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>	
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">프록시 서버 공개키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;HAProxy 인증키</label>
 					<div>
 						<textarea name="sslPemPub" style="float: left; width: 60%; height: 60px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="프록시 서버 공개키를 입력하세요." ></textarea>
+							required placeholder="프록시 서버 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">프록시 서버 개인키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;HAProxy 개인키</label>
 					<div>
 						<textarea name="sslPemRsa" style="float: left; width: 60%; height: 60px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="프록시 서버 개인키를 입력하세요." ></textarea>
@@ -1514,16 +1560,16 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">■ UAA 정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; UAA 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">로그인 비밀번호</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;로그인 비밀번호</label>
 					<div>
 						<input name="loginSecret" type="text" style="float: left; width: 60%;" required placeholder="로그인 비밀번호를 입력하세요." />
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">개인키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;개인키</label>
 					<div>
 						<div>
 						<textarea name="signingKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
@@ -1532,7 +1578,7 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">공개키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;공개키</label>
 					<div>
 						<div>
 						<textarea name="verificationKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
@@ -1564,44 +1610,44 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">■ CONSUL 정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; CONSUL 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">암호화 키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;암호화 키</label>
 					<div>
 						<input name="encryptKeys" type="text" style="float: left; width: 60%;" required placeholder="암호화 키를 입력하세요." />
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">에이전트 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;에이전트 인증키</label>
 					<div>
 						<textarea name="agentCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="에이전트 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">에이전트 개인키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;에이전트 개인키</label>
 					<div>
 						<textarea name="agentKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="에이전트 개인키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">CA 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;CA 인증키</label>
 					<div>
 						<textarea name="caCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="CA 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">서버 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서버 인증키</label>
 					<div>
 						<textarea name="serverCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="서버 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">서버 공개키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서버 공개키</label>
 					<div>
 						<textarea name="serverKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="서버 공개키를 입력하세요." ></textarea>
@@ -1630,45 +1676,45 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">■ 네트워크정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 네트워크정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Subnet Range(CIDR)</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Subnet Range(CIDR)</label>
 					<div>
 						<input name="subnetRange" type="text" style="float: left; width: 60%;" required placeholder="예) 10.0.0.0/24" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Gateway IP</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Gateway IP</label>
 					<div>
 						<input name="subnetGateway" type="url" style="float: left; width: 60%;" required placeholder="예) 10.0.0.1" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">DNS</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;DNS</label>
 					<div>
 						<input name="subnetDns" type="text" style="float: left; width: 60%;" required placeholder="예) 8.8.8.8" />
 						<div class="isMessage"></div>
 					</div>
 				</div>			
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Subnet Id</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Subnet Id</label>
 					<div>
 						<input name="subnetId" type="text" style="float: left; width: 60%;" required placeholder="예) subnet-XXXXXX" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">시큐리티 그룹명</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;시큐리티 그룹명</label>
 					<div>
 						<input name="cloudSecurityGroups" type="text" style="float: left; width: 60%;" required placeholder="예) cf-security" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">VM 할당 IP대역(최소 14개)</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;VM 할당 IP대역(최소 14개)</label>
 					<div>
 						<div style="display: inline-block; width: 60%;">
 							<span style="float: left; width: 45%;">
@@ -1683,7 +1729,7 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">할당된 IP대역</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;할당된 IP대역</label>
 					<div>
 						<div style="display: inline-block; width: 60%;">
 							<span style="float: left; width: 45%;">
@@ -1722,10 +1768,10 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">■ 리소스정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 리소스정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Stemcell</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Stemcell</label>
 					<div>
 						<div>
 							<input type="list" name="stemcells" style="float: left; width:60%; margin-top: 1.5px;" placeholder="스템셀을 선택하세요.">
@@ -1733,7 +1779,7 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">VM 비밀번호</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;VM 비밀번호</label>
 					<div>
 						<input name="boshPassword" type="text" style="float: left; width: 60%;" required placeholder="VM 비밀번호를 입력하세요." />
 						<div class="isMessage"></div>
@@ -1820,7 +1866,7 @@
 					<label style="text-align: left; width: 100%; font-size: 13px;" >기본 정보</label>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">배포 명</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;배포 명</label>
 					<div>
 						<input name="deploymentName" type="text" style="float: left; width: 60%;" required placeholder="배포 명을 입력하세요." />
 						<div class="isMessage"></div>
@@ -1828,20 +1874,20 @@
 				</div>
 	
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">설치관리자 UUID</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;설치관리자 UUID</label>
 					<div>
 						<input name="directorUuid" type="text" style="float: left; width: 60%;" required placeholder="설치관리자 UUID를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">CF 릴리즈</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;CF 릴리즈</label>
 					<div>
 						<input name="releases" type="list" style="float: left; width: 60%;" required placeholder="CF 릴리즈를 선택하세요." />
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">APP SSH Fingerprint</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;APP SSH Fingerprint</label>
 					<div>
 						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="Diego ssh_proxy 로그인을 위한 핑거프린트를 입력하세요." />
 						<div class="isMessage"></div>
@@ -1852,21 +1898,21 @@
 					<label style="text-align: left; width: 100%; font-size: 13px;" >도메인 정보</label>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">도메인</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;도메인</label>
 					<div>
 						<input name="domain" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)cfdoamin.com" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">도메인 설명</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;도메인 설명</label>
 					<div>
 						<input name="description" type="text" style="float: left; width: 60%;" required placeholder="도메인에 대한 설명을 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">도메인 그룹</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;도메인 그룹</label>
 					<div>
 						<input name="domainOrganization" type="text" style="float: left; width: 60%;" required placeholder="도메인 그룹명을 입력하세요." />
 						<div class="isMessage"></div>
@@ -1874,27 +1920,26 @@
 				</div>
 				<br/>
 				<div class="w2ui-field" style="display: inline-block;">
-					<label style="text-align: left; width: 100%; font-size: 13px;" >Proxy 정보</label>
+					<label style="text-align: left; width: 100%; font-size: 13px;" >HAProxy 정보</label>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">CF 프록시 서버 공인 IP</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;HAProxy 공인 IP</label>
 					<div>
 						<input name="proxyStaticIps" type="text" style="float: left; width: 60%;" required placeholder="프록시 서버 공인 IP를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
-				</div>
-	
+				</div>	
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">프록시 서버 공개키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;HAProxy 인증키</label>
 					<div>
-						<textarea name="sslPemPub" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="프록시 서버 공개키를 입력하세요." ></textarea>
+						<textarea name="sslPemPub" style="float: left; width: 60%; height: 60px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
+							required placeholder="프록시 서버 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">프록시 서버 개인키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;HAProxy 개인키</label>
 					<div>
-						<textarea name="sslPemRsa" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
+						<textarea name="sslPemRsa" style="float: left; width: 60%; height: 60px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="프록시 서버 개인키를 입력하세요." ></textarea>
 					</div>
 				</div>
@@ -1921,16 +1966,16 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">■ UAA 정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; UAA 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">로그인 비밀번호</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;로그인 비밀번호</label>
 					<div>
 						<input name="loginSecret" type="text" style="float: left; width: 60%;" required placeholder="로그인 비밀번호를 입력하세요." />
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">개인키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;개인키</label>
 					<div>
 						<div>
 						<textarea name="signingKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
@@ -1939,7 +1984,7 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">공개키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;공개키</label>
 					<div>
 						<div>
 						<textarea name="verificationKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
@@ -1971,44 +2016,44 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">■ CONSUL 정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; CONSUL 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">암호화 키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;암호화 키</label>
 					<div>
 						<input name="encryptKeys" type="text" style="float: left; width: 60%;" required placeholder="암호화 키를 입력하세요." />
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">에이전트 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;에이전트 인증키</label>
 					<div>
 						<textarea name="agentCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="에이전트 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">에이전트 개인키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;에이전트 개인키</label>
 					<div>
 						<textarea name="agentKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="에이전트 개인키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">CA 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;CA 인증키</label>
 					<div>
 						<textarea name="caCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="CA 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">서버 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서버 인증키</label>
 					<div>
 						<textarea name="serverCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="서버 인증키를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">서버 공개키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서버 공개키</label>
 					<div>
 						<textarea name="serverKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="서버 공개키를 입력하세요." ></textarea>
@@ -2038,45 +2083,45 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">■ 네트워크정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 네트워크정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Subnet Range(CIDR)</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Subnet Range(CIDR)</label>
 					<div>
 						<input name="subnetRange" type="text" style="float: left; width: 60%;" required placeholder="예) 10.0.0.0/24" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Gateway IP</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Gateway IP</label>
 					<div>
 						<input name="subnetGateway" type="url" style="float: left; width: 60%;" required placeholder="예) 10.0.0.1" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">DNS</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;DNS</label>
 					<div>
 						<input name="subnetDns" type="text" style="float: left; width: 60%;" required placeholder="예) 8.8.8.8" />
 						<div class="isMessage"></div>
 					</div>
 				</div>			
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Net ID</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Net ID</label>
 					<div>
 						<input name="cloudNetId" type="text" style="float: left; width: 60%;" required placeholder="예) subnet-XXXXXX" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">시큐리티 그룹명</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;시큐리티 그룹명</label>
 					<div>
 						<input name="cloudSecurityGroups" type="text" style="float: left; width: 60%;" required placeholder="예) cf-security" />
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">VM 할당 IP대역(최소 14개)</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;VM 할당 IP대역(최소 14개)</label>
 					<div>
 						<div style="display: inline-block; width: 60%;">
 							<span style="float: left; width: 45%;">
@@ -2091,7 +2136,7 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">할당된 IP대역</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;할당된 IP대역</label>
 					<div>
 						<div style="display: inline-block; width: 60%;">
 							<span style="float: left; width: 45%;">
@@ -2132,10 +2177,10 @@
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;">■ 리소스정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 리소스정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">Stemcell</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Stemcell</label>
 					<div>
 						<div>
 							<input type="list" name="stemcells" style="float: left; width:60%; margin-top: 1.5px;" placeholder="스템셀을 선택하세요.">
@@ -2143,7 +2188,7 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">VM 비밀번호</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;VM 비밀번호</label>
 					<div>
 						<input name="boshPassword" type="text" style="float: left; width: 60%;" required placeholder="VM 비밀번호를 입력하세요." />
 						<div class="isMessage"></div>

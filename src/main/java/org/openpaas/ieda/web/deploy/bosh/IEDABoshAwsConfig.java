@@ -46,11 +46,13 @@ public class IEDABoshAwsConfig {
 	private String subnetId;
 	
 	// RESOURCE
-	private String cloudInstanceType;
 	private String stemcellName;
 	private String stemcellVersion;
+	private String cloudInstanceType;
+	
 	private String boshPassword;
 	
 	private String deploymentFile;
 	private String deployStatus;
+	private String deployLog;
 }

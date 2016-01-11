@@ -13,7 +13,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
-import org.openpaas.ieda.web.common.CommonService;
 import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.common.ReplaceItem;
 import org.openpaas.ieda.web.common.Sha512Crypt;
@@ -32,8 +31,8 @@ public class IEDACfService {
 	@Autowired
 	private IEDACfOpenstackRepository openstackRepository;
 	
-	public List<CfListDto> listCfs() {
-		List<CfListDto> cfList = null;
+	public List<CfInfo> listCfs() {
+		List<CfInfo> cfList = null;
 
 		List<IEDACfAwsConfig> listrAws = awsRepository.findAll();
 		List<IEDACfOpenstackConfig> listOpenstack  = openstackRepository.findAll();
@@ -43,81 +42,81 @@ public class IEDACfService {
 			int recid = 0;
 			if( listrAws != null ){
 				for(IEDACfAwsConfig config : listrAws){
-					CfListDto dto = new CfListDto();
-					dto.setRecid(recid++);
-					dto.setId(config.getId());
-					dto.setIaas("AWS");
-					dto.setCreateDate(config.getCreatedDate());
-					dto.setUpdateDate(config.getUpdatedDate());
+					CfInfo cfInfo = new CfInfo();
+					cfInfo.setRecid(recid++);
+					cfInfo.setId(config.getId());
+					cfInfo.setIaas("AWS");
+					cfInfo.setCreateDate(config.getCreatedDate());
+					cfInfo.setUpdateDate(config.getUpdatedDate());
 					
-					dto.setDeploymentName(config.getDeploymentName());
-					dto.setDirectorUuid(config.getDirectorUuid());
-					dto.setReleaseName(config.getReleaseName());
-					dto.setReleaseVersion(config.getReleaseVersion());
-					dto.setAppSshFingerprint(config.getAppSshFingerprint());
+					cfInfo.setDeploymentName(config.getDeploymentName());
+					cfInfo.setDirectorUuid(config.getDirectorUuid());
+					cfInfo.setReleaseName(config.getReleaseName());
+					cfInfo.setReleaseVersion(config.getReleaseVersion());
+					cfInfo.setAppSshFingerprint(config.getAppSshFingerprint());
 
-					dto.setDomain(config.getDomain());
-					dto.setDescription(config.getDescription());
-					dto.setDomainOrganization(config.getDomainOrganization());
+					cfInfo.setDomain(config.getDomain());
+					cfInfo.setDescription(config.getDescription());
+					cfInfo.setDomainOrganization(config.getDomainOrganization());
 					
-					dto.setProxyStaticIps(config.getProxyStaticIps());
+					cfInfo.setProxyStaticIps(config.getProxyStaticIps());
 					
-					dto.setSubnetRange(config.getSubnetRange());
-					dto.setSubnetGateway(config.getSubnetGateway());
-					dto.setSubnetDns(config.getSubnetDns());
-					dto.setSubnetReservedFrom(config.getSubnetReservedFrom());
-					dto.setSubnetReservedTo(config.getSubnetReservedTo());
-					dto.setSubnetStaticFrom(config.getSubnetStaticFrom());
-					dto.setSubnetStaticTo(config.getSubnetStaticTo());
-					dto.setSubnetId(config.getSubnetId());
+					cfInfo.setSubnetRange(config.getSubnetRange());
+					cfInfo.setSubnetGateway(config.getSubnetGateway());
+					cfInfo.setSubnetDns(config.getSubnetDns());
+					cfInfo.setSubnetReservedFrom(config.getSubnetReservedFrom());
+					cfInfo.setSubnetReservedTo(config.getSubnetReservedTo());
+					cfInfo.setSubnetStaticFrom(config.getSubnetStaticFrom());
+					cfInfo.setSubnetStaticTo(config.getSubnetStaticTo());
+					cfInfo.setSubnetId(config.getSubnetId());
 					
-					dto.setStemcellName(config.getStemcellName());
-					dto.setStemcellVersion(config.getStemcellVersion());
-					dto.setBoshPassword(config.getBoshPassword());
+					cfInfo.setStemcellName(config.getStemcellName());
+					cfInfo.setStemcellVersion(config.getStemcellVersion());
+					cfInfo.setBoshPassword(config.getBoshPassword());
 					
-					dto.setDeployStatus(config.getDeployStatus());
-					dto.setDeployStatus(config.getDeployStatus());
-					cfList.add(dto);
+					cfInfo.setDeployStatus(config.getDeployStatus());
+					cfInfo.setDeployStatus(config.getDeployStatus());
+					cfList.add(cfInfo);
 				}
 			}
 
 			if ( listOpenstack != null ){
 				for(IEDACfOpenstackConfig config : listOpenstack){
-					CfListDto dto = new CfListDto();
-					dto.setRecid(recid++);
-					dto.setId(config.getId());
-					dto.setIaas("OPENSTACK");
-					dto.setCreateDate(config.getCreatedDate());
-					dto.setUpdateDate(config.getUpdatedDate());
+					CfInfo cfInfo = new CfInfo();
+					cfInfo.setRecid(recid++);
+					cfInfo.setId(config.getId());
+					cfInfo.setIaas("OPENSTACK");
+					cfInfo.setCreateDate(config.getCreatedDate());
+					cfInfo.setUpdateDate(config.getUpdatedDate());
 					
-					dto.setDeploymentName(config.getDeploymentName());
-					dto.setDirectorUuid(config.getDirectorUuid());
-					dto.setReleaseName(config.getReleaseName());
-					dto.setReleaseVersion(config.getReleaseVersion());
-					dto.setAppSshFingerprint(config.getAppSshFingerprint());
+					cfInfo.setDeploymentName(config.getDeploymentName());
+					cfInfo.setDirectorUuid(config.getDirectorUuid());
+					cfInfo.setReleaseName(config.getReleaseName());
+					cfInfo.setReleaseVersion(config.getReleaseVersion());
+					cfInfo.setAppSshFingerprint(config.getAppSshFingerprint());
 
-					dto.setDomain(config.getDomain());
-					dto.setDescription(config.getDescription());
-					dto.setDomainOrganization(config.getDomainOrganization());
+					cfInfo.setDomain(config.getDomain());
+					cfInfo.setDescription(config.getDescription());
+					cfInfo.setDomainOrganization(config.getDomainOrganization());
 					
-					dto.setProxyStaticIps(config.getProxyStaticIps());
+					cfInfo.setProxyStaticIps(config.getProxyStaticIps());
 					
-					dto.setSubnetRange(config.getSubnetRange());
-					dto.setSubnetGateway(config.getSubnetGateway());
-					dto.setSubnetDns(config.getSubnetDns());
-					dto.setSubnetReservedFrom(config.getSubnetReservedFrom());
-					dto.setSubnetReservedTo(config.getSubnetReservedTo());
-					dto.setSubnetStaticFrom(config.getSubnetStaticFrom());
-					dto.setSubnetStaticTo(config.getSubnetStaticTo());
-					dto.setSubnetId(config.getCloudNetId());
+					cfInfo.setSubnetRange(config.getSubnetRange());
+					cfInfo.setSubnetGateway(config.getSubnetGateway());
+					cfInfo.setSubnetDns(config.getSubnetDns());
+					cfInfo.setSubnetReservedFrom(config.getSubnetReservedFrom());
+					cfInfo.setSubnetReservedTo(config.getSubnetReservedTo());
+					cfInfo.setSubnetStaticFrom(config.getSubnetStaticFrom());
+					cfInfo.setSubnetStaticTo(config.getSubnetStaticTo());
+					cfInfo.setSubnetId(config.getCloudNetId());
 					
-					dto.setStemcellName(config.getStemcellName());
-					dto.setStemcellVersion(config.getStemcellVersion());
-					dto.setBoshPassword(config.getBoshPassword());
+					cfInfo.setStemcellName(config.getStemcellName());
+					cfInfo.setStemcellVersion(config.getStemcellVersion());
+					cfInfo.setBoshPassword(config.getBoshPassword());
 					
-					dto.setDeployStatus(config.getDeployStatus());
-					dto.setDeployStatus(config.getDeployStatus());
-					cfList.add(dto);
+					cfInfo.setDeployStatus(config.getDeployStatus());
+					cfInfo.setDeployStatus(config.getDeployStatus());
+					cfList.add(cfInfo);
 				}
 			}
 		}

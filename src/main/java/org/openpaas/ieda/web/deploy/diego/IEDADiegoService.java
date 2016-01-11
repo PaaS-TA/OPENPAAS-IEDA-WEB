@@ -32,8 +32,8 @@ public class IEDADiegoService {
 	@Autowired
 	private IEDADiegoOpenstackRepository openstackRepository;
 
-	public List<DiegoListDto> getList() {
-		List<DiegoListDto> diegoList = null;
+	public List<DiegoInfo> getList() {
+		List<DiegoInfo> diegoList = null;
 		List<IEDADiegoAwsConfig> awsList = awsRepository.findAll();
 		List<IEDADiegoOpenstackConfig> openstackList = openstackRepository.findAll();
 
@@ -44,106 +44,106 @@ public class IEDADiegoService {
 
 			if( awsList != null ){
 				for(IEDADiegoAwsConfig config:awsList){
-					DiegoListDto dto = new DiegoListDto();
-					dto.setRecid(recid++);
-					dto.setId(config.getId());
-					dto.setIaas("AWS");
-					dto.setCreateDate(config.getCreatedDate());
-					dto.setUpdateDate(config.getUpdatedDate());
+					DiegoInfo diegoInfo = new DiegoInfo();
+					diegoInfo.setRecid(recid++);
+					diegoInfo.setId(config.getId());
+					diegoInfo.setIaas("AWS");
+					diegoInfo.setCreateDate(config.getCreatedDate());
+					diegoInfo.setUpdateDate(config.getUpdatedDate());
 
 					//1.1 기본정보	
-					dto.setDeploymentName(config.getDeploymentName());
-					dto.setDirectorUuid(config.getDirectorUuid());
-					dto.setDiegoReleaseName(config.getDiegoReleaseName());
-					dto.setDiegoReleaseVersion(config.getDiegoReleaseVersion());
-					dto.setCfReleaseName(config.getCfReleaseName());
-					dto.setCfReleaseVersion(config.getCfReleaseVersion());
-					dto.setGardenLinuxReleaseName(config.getGardenLinuxReleaseName());
-					dto.setGardenLinuxReleaseVersion(config.getGardenLinuxReleaseVersion());
-					dto.setEtcdReleaseName(config.getEtcdReleaseName());
-					dto.setEtcdReleaseVersion(config.getEtcdReleaseVersion());
+					diegoInfo.setDeploymentName(config.getDeploymentName());
+					diegoInfo.setDirectorUuid(config.getDirectorUuid());
+					diegoInfo.setDiegoReleaseName(config.getDiegoReleaseName());
+					diegoInfo.setDiegoReleaseVersion(config.getDiegoReleaseVersion());
+					diegoInfo.setCfReleaseName(config.getCfReleaseName());
+					diegoInfo.setCfReleaseVersion(config.getCfReleaseVersion());
+					diegoInfo.setGardenLinuxReleaseName(config.getGardenLinuxReleaseName());
+					diegoInfo.setGardenLinuxReleaseVersion(config.getGardenLinuxReleaseVersion());
+					diegoInfo.setEtcdReleaseName(config.getEtcdReleaseName());
+					diegoInfo.setEtcdReleaseVersion(config.getEtcdReleaseVersion());
 					//1.2 DIEGO 정보	
-					dto.setDomain(config.getDomain());
-					dto.setDeployment(config.getDeployment());
-					dto.setEtcdMachines(config.getEtcdMachines());
-					dto.setNatsMachines(config.getNatsMachines());
-					dto.setConsulServersLan(config.getConsulServersLan());
+					diegoInfo.setDomain(config.getDomain());
+					diegoInfo.setDeployment(config.getDeployment());
+					diegoInfo.setEtcdMachines(config.getEtcdMachines());
+					diegoInfo.setNatsMachines(config.getNatsMachines());
+					diegoInfo.setConsulServersLan(config.getConsulServersLan());
 
 					//3.1 네트워크 정보	
-					dto.setSubnetStaticFrom(config.getSubnetStaticFrom());
-					dto.setSubnetStaticTo(config.getSubnetStaticTo());
-					dto.setSubnetReservedFrom(config.getSubnetReservedFrom());
-					dto.setSubnetReservedTo(config.getSubnetReservedTo());
-					dto.setSubnetRange(config.getSubnetRange());
-					dto.setSubnetGateway(config.getSubnetGateway());
-					dto.setSubnetDns(config.getSubnetDns());
-					dto.setSubnetId(config.getSubnetId());
-					dto.setCloudSecurityGroups(config.getCloudSecurityGroups());	
+					diegoInfo.setSubnetStaticFrom(config.getSubnetStaticFrom());
+					diegoInfo.setSubnetStaticTo(config.getSubnetStaticTo());
+					diegoInfo.setSubnetReservedFrom(config.getSubnetReservedFrom());
+					diegoInfo.setSubnetReservedTo(config.getSubnetReservedTo());
+					diegoInfo.setSubnetRange(config.getSubnetRange());
+					diegoInfo.setSubnetGateway(config.getSubnetGateway());
+					diegoInfo.setSubnetDns(config.getSubnetDns());
+					diegoInfo.setSubnetId(config.getSubnetId());
+					diegoInfo.setCloudSecurityGroups(config.getCloudSecurityGroups());	
 					//3.2 프록시 정보
-					dto.setDiegoServers(config.getDiegoServers());
+					diegoInfo.setDiegoServers(config.getDiegoServers());
 
 					//4 리소스 정보	
-					dto.setStemcellName(config.getStemcellName());
-					dto.setStemcellVersion(config.getStemcellVersion());
+					diegoInfo.setStemcellName(config.getStemcellName());
+					diegoInfo.setStemcellVersion(config.getStemcellVersion());
 
 					// Deploy 정보
-					dto.setDeploymentFile(config.getDeploymentFile());
-					dto.setDeployStatus(config.getDeployStatus());
-					dto.setDeployLog(config.getDeployLog());
+					diegoInfo.setDeploymentFile(config.getDeploymentFile());
+					diegoInfo.setDeployStatus(config.getDeployStatus());
+					diegoInfo.setDeployLog(config.getDeployLog());
 					
-					diegoList.add(dto);
+					diegoList.add(diegoInfo);
 				}
 			}
 
 			if( openstackList != null){
 				for(IEDADiegoOpenstackConfig config : openstackList ){
-					DiegoListDto dto = new DiegoListDto();
-					dto.setRecid(recid++);
-					dto.setId(config.getId());
-					dto.setIaas("OPENSTACK");
-					dto.setCreateDate(config.getCreatedDate());
-					dto.setUpdateDate(config.getUpdatedDate());
+					DiegoInfo diegoInfo = new DiegoInfo();
+					diegoInfo.setRecid(recid++);
+					diegoInfo.setId(config.getId());
+					diegoInfo.setIaas("OPENSTACK");
+					diegoInfo.setCreateDate(config.getCreatedDate());
+					diegoInfo.setUpdateDate(config.getUpdatedDate());
 
 					//1.1 기본정보	
-					dto.setDeploymentName(config.getDeploymentName());
-					dto.setDirectorUuid(config.getDirectorUuid());
-					dto.setDiegoReleaseName(config.getDiegoReleaseName());
-					dto.setDiegoReleaseVersion(config.getDiegoReleaseVersion());
-					dto.setCfReleaseName(config.getCfReleaseName());
-					dto.setCfReleaseVersion(config.getCfReleaseVersion());
-					dto.setGardenLinuxReleaseName(config.getGardenLinuxReleaseName());
-					dto.setGardenLinuxReleaseVersion(config.getGardenLinuxReleaseVersion());
-					dto.setEtcdReleaseName(config.getEtcdReleaseName());
-					dto.setEtcdReleaseVersion(config.getEtcdReleaseVersion());
+					diegoInfo.setDeploymentName(config.getDeploymentName());
+					diegoInfo.setDirectorUuid(config.getDirectorUuid());
+					diegoInfo.setDiegoReleaseName(config.getDiegoReleaseName());
+					diegoInfo.setDiegoReleaseVersion(config.getDiegoReleaseVersion());
+					diegoInfo.setCfReleaseName(config.getCfReleaseName());
+					diegoInfo.setCfReleaseVersion(config.getCfReleaseVersion());
+					diegoInfo.setGardenLinuxReleaseName(config.getGardenLinuxReleaseName());
+					diegoInfo.setGardenLinuxReleaseVersion(config.getGardenLinuxReleaseVersion());
+					diegoInfo.setEtcdReleaseName(config.getEtcdReleaseName());
+					diegoInfo.setEtcdReleaseVersion(config.getEtcdReleaseVersion());
 					//1.2 DIEGO 정보	
-					dto.setDomain(config.getDomain());
-					dto.setDeployment(config.getDeployment());
-					dto.setEtcdMachines(config.getEtcdMachines());
-					dto.setNatsMachines(config.getNatsMachines());
-					dto.setConsulServersLan(config.getConsulServersLan());
+					diegoInfo.setDomain(config.getDomain());
+					diegoInfo.setDeployment(config.getDeployment());
+					diegoInfo.setEtcdMachines(config.getEtcdMachines());
+					diegoInfo.setNatsMachines(config.getNatsMachines());
+					diegoInfo.setConsulServersLan(config.getConsulServersLan());
 
 					//3.1 네트워크 정보	
-					dto.setSubnetStaticFrom(config.getSubnetStaticFrom());
-					dto.setSubnetStaticTo(config.getSubnetStaticTo());
-					dto.setSubnetReservedFrom(config.getSubnetReservedFrom());
-					dto.setSubnetReservedTo(config.getSubnetReservedTo());
-					dto.setSubnetRange(config.getSubnetRange());
-					dto.setSubnetGateway(config.getSubnetGateway());
-					dto.setSubnetDns(config.getSubnetDns());
-					dto.setSubnetId(config.getCloudNetId());
-					dto.setCloudSecurityGroups(config.getCloudSecurityGroups());	
+					diegoInfo.setSubnetStaticFrom(config.getSubnetStaticFrom());
+					diegoInfo.setSubnetStaticTo(config.getSubnetStaticTo());
+					diegoInfo.setSubnetReservedFrom(config.getSubnetReservedFrom());
+					diegoInfo.setSubnetReservedTo(config.getSubnetReservedTo());
+					diegoInfo.setSubnetRange(config.getSubnetRange());
+					diegoInfo.setSubnetGateway(config.getSubnetGateway());
+					diegoInfo.setSubnetDns(config.getSubnetDns());
+					diegoInfo.setSubnetId(config.getCloudNetId());
+					diegoInfo.setCloudSecurityGroups(config.getCloudSecurityGroups());	
 					//3.2 프록시 정보
-					dto.setDiegoServers(config.getDiegoServers());
+					diegoInfo.setDiegoServers(config.getDiegoServers());
 
 					//4 리소스 정보	
-					dto.setStemcellName(config.getStemcellName());
-					dto.setStemcellVersion(config.getStemcellVersion());
+					diegoInfo.setStemcellName(config.getStemcellName());
+					diegoInfo.setStemcellVersion(config.getStemcellVersion());
 
 					// Deploy 정보
-					dto.setDeploymentFile(config.getDeploymentFile());
-					dto.setDeployStatus(config.getDeployStatus());
-					dto.setDeployLog(config.getDeployLog());
-					diegoList.add(dto);
+					diegoInfo.setDeploymentFile(config.getDeploymentFile());
+					diegoInfo.setDeployStatus(config.getDeployStatus());
+					diegoInfo.setDeployLog(config.getDeployLog());
+					diegoList.add(diegoInfo);
 				}
 			}
 		}

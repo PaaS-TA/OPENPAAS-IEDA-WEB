@@ -31,7 +31,7 @@ public class IEDABoshOpenstackService {
 	@Autowired
 	private IEDABoshService boshService;
 	
-	public IEDABoshOpenstackConfig getBoshOpenstackInfo(int id){
+	public IEDABoshOpenstackConfig getOpenstackInfo(int id){
 		return opentstackRepository.findOne(id);
 	}
 

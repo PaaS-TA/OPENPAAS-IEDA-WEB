@@ -5,7 +5,7 @@ import java.util.Date;
 import lombok.Data;
 
 @Data
-public class DiegoListDto {
+public class DiegoInfo {
 
 	private int recid;
 	private int id;

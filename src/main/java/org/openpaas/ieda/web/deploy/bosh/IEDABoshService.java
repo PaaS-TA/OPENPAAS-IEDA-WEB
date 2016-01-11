@@ -59,7 +59,7 @@ public class IEDABoshService {
 
 		int recid = 0;
 		if( boshAwsList.size() > 0 ){
-			for(IEDABoshAwsConfig aws : boshAwsList){
+			for(IEDABoshAwsConfig config : boshAwsList){
 				
 /*				// 기본관리자 UUID와 다른 경우 목록에서 제외
 				if ( !defaultDirector.getDirectorUuid().equals(aws.getDirectorUuid()) )
@@ -67,36 +67,49 @@ public class IEDABoshService {
 				
 				BoshInfo boshInfo = new BoshInfo();
 				boshInfo.setRecid(recid++);
-				boshInfo.setId(aws.getId());
-				boshInfo.setDeploymentName(aws.getDeploymentName());
+				boshInfo.setId(config.getId());
+				boshInfo.setDeploymentName(config.getDeploymentName());
 				boshInfo.setIaas("AWS");
-				boshInfo.setDirectorUuid(aws.getDirectorUuid());
-				boshInfo.setReleaseVersion(aws.getReleaseVersion());
-				if(!StringUtils.isEmpty(aws.getStemcellName()) && !StringUtils.isEmpty(aws.getStemcellVersion())){
-					boshInfo.setStemcell(aws.getStemcellName() + "/" + aws.getStemcellVersion());
-				}
-				boshInfo.setPublicIp(aws.getPublicStaticIp());
-				boshInfo.setSubnetRange(aws.getSubnetRange());
-				boshInfo.setGateway(aws.getSubnetGateway());
-				boshInfo.setDns(aws.getSubnetDns());
-				boshInfo.setDeployStatus(aws.getDeployStatus());
+				boshInfo.setCreatedDate(config.getCreatedDate());
+
+				// BOSH
+				boshInfo.setDirectorUuid(config.getDirectorUuid());;
+				boshInfo.setDeploymentName(config.getDeploymentName());;
+				boshInfo.setReleaseVersion(config.getReleaseVersion());;
+
+				// NETWORK
+				boshInfo.setPublicStaticIp(config.getPublicStaticIp());;
+				boshInfo.setSubnetRange(config.getSubnetRange());;
+				boshInfo.setSubnetStaticFrom(config.getSubnetStaticFrom());;
+				boshInfo.setSubnetStaticTo(config.getSubnetStaticTo());;
+				boshInfo.setSubnetGateway(config.getSubnetGateway());;
+				boshInfo.setSubnetDns(config.getSubnetDns());;
+				boshInfo.setSubnetId(config.getSubnetId());;
+
+				boshInfo.setStemcellName(config.getStemcellName());;
+				boshInfo.setStemcellVersion(config.getStemcellVersion());;
+				boshInfo.setCloudInstanceType(config.getCloudInstanceType());;
+
+				//DEPLOY
+				boshInfo.setDeploymentFile(config.getDeploymentFile());;
+				boshInfo.setDeployStatus(config.getDeployStatus());;
+				boshInfo.setDeployLog(config.getDeployLog());;
 				
 /* 				if ( deployedList != null && deployedList.size() > 0 ) {
 					for ( DeploymentInfo deployment : deployedList ) {
-						if ( deployment.getName().equals(aws.getDeploymentName()) ) {
+						if ( deployment.getName().equals(config.getDeploymentName()) ) {
 							boshInfo.setDeployed(true);
 							break;
 						}
 					}
 				}*/
 				
-				boshInfo.setCreatedDate(aws.getCreatedDate());
 				boshList.add(boshInfo);
 			}
 		}
 
 		if( boshOpenstackList.size() >0 ){
-			for(IEDABoshOpenstackConfig openstack : boshOpenstackList){
+			for(IEDABoshOpenstackConfig config : boshOpenstackList){
 				
 /*				// 기본관리자 UUID와 다른 경우 목록에서 제외
 				if ( !defaultDirector.getDirectorUuid().equals(openstack.getDirectorUuid()) )
@@ -104,23 +117,37 @@ public class IEDABoshService {
 				
 				BoshInfo boshInfo = new BoshInfo();
 				boshInfo.setRecid(recid++);
-				boshInfo.setId(openstack.getId());
-				boshInfo.setDeploymentName(openstack.getDeploymentName());
+				boshInfo.setId(config.getId());
+				boshInfo.setDeploymentName(config.getDeploymentName());
 				boshInfo.setIaas("OPENSTACK");
-				boshInfo.setDirectorUuid(openstack.getDirectorUuid());
-				boshInfo.setReleaseVersion(openstack.getReleaseVersion());
-				if(!StringUtils.isEmpty(openstack.getStemcellName()) && !StringUtils.isEmpty(openstack.getStemcellVersion())){
-					boshInfo.setStemcell(openstack.getStemcellName() + "/" + openstack.getStemcellVersion());
-				}
-				boshInfo.setPublicIp(openstack.getPublicStaticIp());
-				boshInfo.setSubnetRange(openstack.getSubnetRange());
-				boshInfo.setGateway(openstack.getSubnetGateway());
-				boshInfo.setDns(openstack.getSubnetDns());
-				boshInfo.setDeployStatus(openstack.getDeployStatus());
+				boshInfo.setCreatedDate(config.getCreatedDate());
+
+				// BOSH
+				boshInfo.setDirectorUuid(config.getDirectorUuid());;
+				boshInfo.setDeploymentName(config.getDeploymentName());;
+				boshInfo.setReleaseVersion(config.getReleaseVersion());;
+
+				// NETWORK
+				boshInfo.setPublicStaticIp(config.getPublicStaticIp());;
+				boshInfo.setSubnetRange(config.getSubnetRange());;
+				boshInfo.setSubnetStaticFrom(config.getSubnetStaticFrom());;
+				boshInfo.setSubnetStaticTo(config.getSubnetStaticTo());;
+				boshInfo.setSubnetGateway(config.getSubnetGateway());;
+				boshInfo.setSubnetDns(config.getSubnetDns());;
+				boshInfo.setSubnetId(config.getSubnetId());;
+
+				boshInfo.setStemcellName(config.getStemcellName());;
+				boshInfo.setStemcellVersion(config.getStemcellVersion());;
+				boshInfo.setCloudInstanceType(config.getCloudInstanceType());;
+
+				//DEPLOY
+				boshInfo.setDeploymentFile(config.getDeploymentFile());;
+				boshInfo.setDeployStatus(config.getDeployStatus());;
+				boshInfo.setDeployLog(config.getDeployLog());;
 				
 /* 				if ( deployedList != null && deployedList.size() > 0 ) {
 					for ( DeploymentInfo deployment : deployedList ) {
-						if ( deployment.getName().equals(openstack.getDeploymentName()) ) {
+						if ( deployment.getName().equals(config.getDeploymentName()) ) {
 							boshInfo.setDeployed(true);
 							break;
 						}

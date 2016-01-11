@@ -69,6 +69,16 @@ Diego
 			    				return 'N/A';
 			    	   }
 					}
+				, {field: 'deployLog', caption: '배포로그', size: '100px',
+					render: function(record) {
+			    			if ( record.deployStatus == 'done' || record.deployStatus == 'error') {
+			       				return '<span id="" class="btn btn-primary" style="width:60px" onClick="getDeployLogMsg( \'diego\', \''+record.iaas+'\', \''+record.id+'\');">로그보기</span>';
+							}
+			    			else {
+			    				return 'N/A';
+							}
+						}
+					}
 				, {field:'deploymentName', caption:'배포명', size:'100px'}
 				, {field:'iaas', caption:'IaaS', size:'100px'}
 				, {field:'directorUuid', caption:'설치관리자 UUID', size:'220px'}
@@ -309,7 +319,7 @@ Diego
 				height :500,
 				title :"<b>DIEGO 삭제</b>",
 				body  :body,
-				buttons :'<button class="btn" style="float:right; padding-right:15%;" onclick="popupComplete();;">닫기</button>',
+				buttons :'<button class="btn" style="float:right; padding-right:15%;" onclick="popupComplete();">닫기</button>',
 				showMax :true,
 				onOpen :function(event){
 					event.onComplete = function(){
@@ -331,7 +341,9 @@ Diego
 							            if ( response.state.toLowerCase() == "done" )	message = message + " 삭제가 완료되었습니다."; 
 							    		if ( response.state.toLowerCase() == "error" ) message = message + " 삭제 중 오류가 발생하였습니다.";
 							    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 삭제 중 취소되었습니다.";
-							    			
+							    		
+							    		
+							    		
 							    		deleteClient.disconnect();
 										w2alert(message, "DIEGO 삭제");
 							       	}
@@ -1143,7 +1155,9 @@ Diego
 						            if ( response.state.toLowerCase() == "done" )	message = message + " 설치가 완료되었습니다."; 
 						    		if ( response.state.toLowerCase() == "error" ) message = message + " 설치 중 오류가 발생하였습니다.";
 						    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 설치 중 취소되었습니다.";
-						    			
+						    		
+						    		$('.w2ui-msg-buttons #deployPopupBtn').prop("disabled", false);
+						    		
 						    		installClient.disconnect();
 									w2alert(message, "DIEGO 설치");
 						       	}

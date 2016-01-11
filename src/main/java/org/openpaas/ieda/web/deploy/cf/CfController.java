@@ -1,13 +1,11 @@
 package org.openpaas.ieda.web.deploy.cf;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
 
-import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.web.common.BaseController;
 import org.openpaas.ieda.web.deploy.release.ReleaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +53,7 @@ public class CfController extends BaseController{
 	
 	@RequestMapping(value="/deploy/cfList", method=RequestMethod.GET)
 	public ResponseEntity listCfs() {
-		List<CfListDto> content = cfService.listCfs();
+		List<CfInfo> content = cfService.listCfs();
 		
 		Map<String, Object> result = new HashMap<>();
 		
@@ -70,7 +68,7 @@ public class CfController extends BaseController{
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	public ResponseEntity saveAwsCfInfo(@PathVariable int id){
 		
-		IEDACfAwsConfig config = cfAwsService.getAwsCfInfo(id);
+		IEDACfAwsConfig config = cfAwsService.getAwsInfo(id);
 		Map<String, Object> result =  new HashMap<>();
 		result.put("contents", config);
 		return new ResponseEntity<>(result, HttpStatus.OK);
@@ -125,7 +123,7 @@ public class CfController extends BaseController{
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	public ResponseEntity getOpenstackCfInfo(@PathVariable int id){
 		
-		IEDACfOpenstackConfig config = cfOpenstackService.getOpenstackCfInfo(id);
+		IEDACfOpenstackConfig config = cfOpenstackService.getOpenstackInfo(id);
 		Map<String, Object> result =  new HashMap<>();
 		result.put("contents", config);
 		return new ResponseEntity<>(result, HttpStatus.OK);

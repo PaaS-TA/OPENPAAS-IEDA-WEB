@@ -72,3 +72,8 @@ a:hover{text-decoration:none;}
 	height:10px;
 	font-size: 10px;
 }
+
+/* 팝업창  input, textarea 한글 입력 금지 */
+.w2ui-box1 .w2ui-msg-body .w2ui-field input, textarea{
+	ime-mode:disabled;
+}

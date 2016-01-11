@@ -83,7 +83,7 @@ public class BoshController extends BaseController {
 	
 	@RequestMapping(value="/bosh/openstack/{id}", method=RequestMethod.GET)
 	public ResponseEntity getOpenstackInfo(@PathVariable int id){
-		IEDABoshOpenstackConfig config = openstackService.getBoshOpenstackInfo(id);
+		IEDABoshOpenstackConfig config = openstackService.getOpenstackInfo(id);
 		
 		Map<String, Object> result =  new HashMap<>();
 		result.put("contents", config);
