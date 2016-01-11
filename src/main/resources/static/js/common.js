@@ -226,5 +226,4 @@ function deployLogMsgPopup(service, iaas, msg){
 }
 
 //한글입력 방지
-var popupBodySelector = document.getElement('w2ui-msg-body');
-popupBodySelector.
+//var popupBodySelector = document.getElement('w2ui-msg-body');
