@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.config.bootstrap;
+package org.openpaas.ieda.web.deploy.bootstrap;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,7 +21,7 @@ import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.common.ReplaceItem;
 import org.openpaas.ieda.web.common.Sha512Crypt;
-import org.openpaas.ieda.web.config.bootstrap.BootStrapDto.Delete;
+import org.openpaas.ieda.web.deploy.bootstrap.BootStrapDto.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

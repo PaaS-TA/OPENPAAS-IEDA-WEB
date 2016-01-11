@@ -55,7 +55,7 @@ $( window ).resize(function() {
 </script>
 
 <div id="main">
-	<div class="page_site">서비스 정보조회 > <strong>설치 목록</strong></div>
+	<div class="page_site">정보조회 > <strong>설치 목록</strong></div>
 	
 	<!-- 설치 관리자 -->
 	<div class="title">설치 관리자</div>

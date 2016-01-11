@@ -326,7 +326,7 @@ $(window).resize(function() {
 </script>
 
 <div id="main">
-	<div class="page_site">설치관리자 환경설정 > <strong>스템셀 관리</strong></div>
+	<div class="page_site">환경설정 및 관리 > <strong>스템셀 관리</strong></div>
 	
 	<!-- OpenPaaS 스템셀 목록-->
 	<div class="title">스템셀 목록</div>

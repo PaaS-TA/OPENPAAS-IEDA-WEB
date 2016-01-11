@@ -133,6 +133,12 @@ function popupValidation(){
 							label = $(this).parent().parent().find("label").text();
 						}
 					}
+					else if( inputType == 'file'){
+						if($(this).attr('name') == "keyPathFile"){
+							label = "Private Key File";
+							$(this).css({"border-color":"red"});
+						}
+					}
 					
 					$(this).css({"border-color":"red"});
 				}
@@ -162,6 +168,16 @@ function popupValidation(){
 							emptyFieldLabels.push(label);
 						}
 					}
+					else if( inputType == 'file'){
+						console("keyPathFilekeyPathFile");
+						if($(this).attr('name') == "keyPathFile"){
+							console("PPPPPPPPPPPPPPPPPPPP");
+							if($.inArray($(this).val().split('.').pop().toLowerCase(), ['pem']) == -1) {
+								console("YYYYYYYY");
+								emptyFieldLabels.push("Empty Key File");
+							}
+						}
+					}
 				}
 				else if( tagType.toLowerCase() == "textarea" ){
 					$(this).css({"border":"1px solid #bbb"});//.parent().find(".isMessage").text("");
@@ -172,7 +188,12 @@ function popupValidation(){
 
 	if(emptyFieldLabels.length > 0){
 		checkValidation = false;
-		w2alert(emptyFieldLabels[0] + "을(를) 필드값을 확인하세요.");
+		if( emptyFieldLabels[0] == "Empty Key File"){
+			w2alert("KeyPath File은 .pem 파일만 등록 가능합니다.", $(".w2ui-msg-title b").text());
+			return;
+		}
+		
+		w2alert(emptyFieldLabels[0] + "을(를) 필드값을 확인하세요.", $(".w2ui-msg-title b").text() );
 	}
 	else{
 		checkValidation = true;

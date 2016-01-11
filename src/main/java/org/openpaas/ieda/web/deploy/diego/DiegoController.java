@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.openpaas.ieda.web.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-public class DiegoController {
+public class DiegoController extends BaseController{
 
 	@Autowired
 	private IEDADiegoService diegoService; 
@@ -58,7 +59,11 @@ public class DiegoController {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
-	//AWS 상세정보
+	/**
+	 * AWS 상세조회
+	 * @param id
+	 * @return
+	 */
 	@RequestMapping(value="/diego/aws/{id}", method=RequestMethod.GET)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	public ResponseEntity saveAwsDiegoInfo(@PathVariable int id){
@@ -69,7 +74,11 @@ public class DiegoController {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
-	//OPENSTACK 상세정보
+	/**
+	 * OPENSTACK 상세조회
+	 * @param id
+	 * @return
+	 */
 	@RequestMapping(value="/diego/openstack/{id}", method=RequestMethod.GET)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	public ResponseEntity saveOpenstackDiegoInfo(@PathVariable int id){
@@ -80,7 +89,11 @@ public class DiegoController {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
-	//AWS 기본정보 저장
+	/**
+	 * AWS 기본정보 저장
+	 * @param dto
+	 * @return
+	 */
 	@RequestMapping(value="/diego/saveAws", method=RequestMethod.PUT)
 	public ResponseEntity saveAwsInfo(@RequestBody @Valid DiegoParam.Default dto){
 
@@ -89,7 +102,11 @@ public class DiegoController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 
-	//AWS 기본정보 저장
+	/**
+	 * AWS CF 정보 저장
+	 * @param dto
+	 * @return
+	 */
 	@RequestMapping(value="/diego/saveAwsCf", method=RequestMethod.PUT)
 	public ResponseEntity saveAwsCfInfo(@RequestBody @Valid DiegoParam.Cf dto){
 
@@ -98,7 +115,11 @@ public class DiegoController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 
-	//AWS Diego 정보 저장
+	/**
+	 * AWS Diego 정보 저장
+	 * @param dto
+	 * @return
+	 */
 	@RequestMapping(value="/diego/saveAwsDiego", method=RequestMethod.PUT)
 	public ResponseEntity saveAwsDiegoInfo(@RequestBody @Valid DiegoParam.Diego dto){
 
@@ -107,7 +128,11 @@ public class DiegoController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 
-	//AWS ETCD 정보 저장
+	/**
+	 * AWS ETCD 정보 저장
+	 * @param dto
+	 * @return
+	 */
 	@RequestMapping(value="/diego/saveAwsEtcd", method=RequestMethod.PUT)
 	public ResponseEntity saveAwsEtcdInfo(@RequestBody @Valid DiegoParam.Etcd dto){
 
@@ -116,7 +141,11 @@ public class DiegoController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 
-	//AWS 네트워크 정보 저장
+	/**
+	 * AWS 네트워크 정보 저장
+	 * @param dto
+	 * @return
+	 */
 	@RequestMapping(value="/diego/saveAwsNetwork", method=RequestMethod.PUT)
 	public ResponseEntity saveAwsNetworkInfo(@RequestBody @Valid DiegoParam.AwsNetwork dto){
 
@@ -125,7 +154,11 @@ public class DiegoController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 
-	//AWS 리소스 정보 저장
+	/**
+	 * AWS 리소스 정보 저장
+	 * @param dto
+	 * @return
+	 */
 	@RequestMapping(value="/diego/saveAwsResource", method=RequestMethod.PUT)
 	public ResponseEntity saveAwsResourceInfo(@RequestBody @Valid DiegoParam.Resource dto){
 
@@ -135,7 +168,11 @@ public class DiegoController {
 	}
 
 
-	//OPENSTACK 기본정보 저장
+	/**
+	 * OPENSTACK 기본정보 저장
+	 * @param dto
+	 * @return
+	 */
 	@RequestMapping(value="/diego/saveOpenstack", method=RequestMethod.PUT)
 	public ResponseEntity saveOpenstackDiegoInfo(@RequestBody @Valid DiegoParam.Default dto){
 
@@ -144,7 +181,11 @@ public class DiegoController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 
-	//AWS 기본정보 저장
+	/**
+	 * OPENSTACK CF정보 저장
+	 * @param dto
+	 * @return
+	 */
 	@RequestMapping(value="/diego/saveOpenstackCf", method=RequestMethod.PUT)
 	public ResponseEntity saveOpenstackCfInfo(@RequestBody @Valid DiegoParam.Cf dto){
 
@@ -153,7 +194,11 @@ public class DiegoController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 
-	//OPENSTACK Diego 정보 저장
+	/**
+	 * OPENSTACK Diego 정보 저장
+	 * @param dto
+	 * @return
+	 */
 	@RequestMapping(value="/diego/saveOpenstackDiego", method=RequestMethod.PUT)
 	public ResponseEntity saveOpenstackDiegoInfo(@RequestBody @Valid DiegoParam.Diego dto){
 
@@ -162,7 +207,11 @@ public class DiegoController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 
-	//OPENSTACK ETCD 정보 저장
+	/**
+	 * OPENSTACK ETCD 정보 저장
+	 * @param dto
+	 * @return
+	 */
 	@RequestMapping(value="/diego/saveOpenstackEtcd", method=RequestMethod.PUT)
 	public ResponseEntity saveOpenstackEtcdInfo(@RequestBody @Valid DiegoParam.Etcd dto){
 
@@ -171,7 +220,11 @@ public class DiegoController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 
-	//OPENSTACK 네트워크 정보 저장
+	/**
+	 * OPENSTACK 네트워크 정보 저장
+	 * @param dto
+	 * @return
+	 */
 	@RequestMapping(value="/diego/saveOpenstackNetwork", method=RequestMethod.PUT)
 	public ResponseEntity saveOpenstackNetworkInfo(@RequestBody @Valid DiegoParam.OpenstackNetwork dto){
 
@@ -180,7 +233,11 @@ public class DiegoController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 
-	//OPENSTACK 리소스 정보 저장
+	/**
+	 * OPENSTACK 리소스 정보 저장
+	 * @param dto
+	 * @return
+	 */
 	@RequestMapping(value="/diego/saveOpenstackResource", method=RequestMethod.PUT)
 	public ResponseEntity saveOpenstackResourceInfo(@RequestBody @Valid DiegoParam.Resource dto){
 

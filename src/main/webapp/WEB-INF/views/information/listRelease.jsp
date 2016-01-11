@@ -226,7 +226,7 @@ function doDeleteLocalRelease(requestParameter) {
 	w2popup.lock("로컬 릴리즈 삭제중...", true);
 	
 	$.ajax({
-		type : "PUT",
+		type : "DELETE",
 		url : "/deleteLocalRelease",
 		contentType : "application/json",
 		data : JSON.stringify(requestParameter),
@@ -359,7 +359,7 @@ function popupClose() {
 </script>
 
 <div id="main">
-	<div class="page_site">서비스 설치관리 > <strong>릴리즈 업로드</strong></div>
+	<div class="page_site">정보조회 > <strong>릴리즈 업로드</strong></div>
 	
 	<!-- 설치 관리자 -->
 	<div class="title">설치 관리자</div>

@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.config.bootstrap;
+package org.openpaas.ieda.web.deploy.bootstrap;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,9 +40,9 @@ public class BootstrapController extends BaseController {
 	@Autowired
 	private BootstrapDeleteDeployAsyncService bootstrapDeleteDeployAsyncService;
 	
-	@RequestMapping(value = "/config/bootstrap", method=RequestMethod.GET)
+	@RequestMapping(value = "/deploy/bootstrap", method=RequestMethod.GET)
 	public String main() {
-		return "/config/bootstrap";
+		return "/deploy/bootstrap";
 	}
 	
 	@RequestMapping(value="/bootstraps", method=RequestMethod.GET)

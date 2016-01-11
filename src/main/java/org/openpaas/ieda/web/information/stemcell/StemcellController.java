@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.deploy.stemcell;
+package org.openpaas.ieda.web.information.stemcell;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,9 +35,9 @@ public class StemcellController extends BaseController {
 	@Autowired
 	private UploadStemcellAsyncService uploadStemcellAsyncService;
 
-	@RequestMapping(value = "/deploy/listStemcell", method = RequestMethod.GET)
+	@RequestMapping(value = "/information/listStemcell", method = RequestMethod.GET)
 	public String List() {
-		return "/deploy/listStemcell";
+		return "/information/listStemcell";
 	}
 	
 	// 스템셀 목록 조회
@@ -94,7 +94,7 @@ public class StemcellController extends BaseController {
 	}
 	
 	// 다운로드받은 로컬 스템셀 목록 조회
-	@RequestMapping(value = "/deploy/localAwsStemcells", method = RequestMethod.GET)
+	@RequestMapping(value = "/information/localAwsStemcells", method = RequestMethod.GET)
 	public ResponseEntity localAwsStemcells() {
 		List<String> contents = service.localAwsStemcells();
 
@@ -106,7 +106,7 @@ public class StemcellController extends BaseController {
 	}
 	
 	// 다운로드받은 로컬 스템셀 목록 조회
-	@RequestMapping(value = "/deploy/localOpenstackStemcells", method = RequestMethod.GET)
+	@RequestMapping(value = "/information/localOpenstackStemcells", method = RequestMethod.GET)
 	public ResponseEntity localOpenstackStemcells() {
 		List<String> contents = service.localOpenstackStemcells();
 

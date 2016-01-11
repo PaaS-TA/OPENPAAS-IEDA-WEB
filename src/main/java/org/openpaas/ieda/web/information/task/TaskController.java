@@ -54,12 +54,12 @@ public class TaskController extends BaseController {
 		
 		return new ResponseEntity(result, HttpStatus.OK);
 	}
-
+/*
 	@RequestMapping( value="/tasks/{taskId}", method =RequestMethod.GET)
 	public ResponseEntity listTaskHistory(@PathVariable String taskId){
 		taskService.listTask();
 		return new ResponseEntity(HttpStatus.OK);
-	}
+	}*/
 	
 	@MessageMapping("/task")
     @SendTo("/socket/task")

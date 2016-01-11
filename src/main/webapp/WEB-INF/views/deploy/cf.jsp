@@ -71,7 +71,7 @@
 				, {field: 'deploymentName', caption: '배포명', size: '100px'}
 				, {field: 'iaas', caption: 'IaaS', size: '100px'}
 				, {field: 'directorUuid', caption: '설치관리자 UUID', size: '280px'}
-				, {field: 'release', caption: '릴리즈', size: '100px'
+				, {field: 'release', caption: 'CF 릴리즈', size: '100px'
 					, render:function(record){
 							if( record.releaseName && record.releaseVersion ){
 								return record.releaseName +"/"+ record.releaseVersion;
@@ -84,12 +84,12 @@
 				, {field: 'description', caption: '도메인 설명', size: '220px'}
 				, {field: 'domainOrganization', caption: '도메인 그룹', size: '120px'}
 				// 1.3 HA프록시 정보
-				, {field: 'proxyStaticIps', caption: 'HAProxy Ip', size: '120px'}
+				, {field: 'proxyStaticIps', caption: 'HAProxy 공인 IP', size: '120px'}
 				// 4. 네트워크 정보
 				, {field: 'subnetRange', caption: '서브넷 범위', size: '180px'}
 				, {field: 'subnetGateway', caption: '게이트웨이', size: '100px'}
 				, {field: 'subnetDns', caption: 'DNS', size: '100px'}
-				, {field: 'subnetReserved', caption: '할당된 IP', size: '240px'
+				, {field: 'subnetReserved', caption: '할당된 IP 대역', size: '240px'
 					, render:function(record){
 							if( record.subnetReservedFrom && record.subnetReservedTo ){
 								return record.subnetReservedFrom +" - "+ record.subnetReservedTo;
@@ -103,7 +103,7 @@
 							}
 						}
 					}
-				, {field: 'subnetId', caption: '서브넷 ID', size: '140px'}
+				, {field: 'subnetId', caption: '서브넷 ID(NET ID)', size: '140px'}
 				, {field: 'cloudSecurityGroups', caption: '시큐리티 그룹명', size: '100px'}
 				
 				, {field: 'stemcell', caption: '스템셀', size: '240px'
@@ -1381,9 +1381,7 @@
 </script>
 
 <div id="main">
-	<div class="page_site">
-		설치관리자 환경설정 > <strong>Cf 설치</strong>
-	</div>
+	<div class="page_site">플랫폼 설치 > <strong>Cf 설치</strong></div>
 
 	<!-- 설치 관리자 -->
 	<div class="title">설치 관리자</div>
@@ -1479,9 +1477,9 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;APP SSH Fingerprint</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;SSH 핑거프린트</label>
 					<div>
-						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="Diego ssh_proxy 로그인을 위한 핑거프린트를 입력하세요." />
+						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="Diego SSH 핑거프린트를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1887,9 +1885,9 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;APP SSH Fingerprint</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;SSH 핑거프린트</label>
 					<div>
-						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="Diego ssh_proxy 로그인을 위한 핑거프린트를 입력하세요." />
+						<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="Diego SSH 핑거프린트를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>

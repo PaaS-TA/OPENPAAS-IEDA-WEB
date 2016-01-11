@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.deploy.release;
+package org.openpaas.ieda.web.information.release;
 
 import java.io.File;
 import java.text.DecimalFormat;

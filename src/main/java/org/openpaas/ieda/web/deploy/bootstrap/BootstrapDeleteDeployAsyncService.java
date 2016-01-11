@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.config.bootstrap;
+package org.openpaas.ieda.web.deploy.bootstrap;
 
 import java.io.BufferedReader;
 import java.io.File;

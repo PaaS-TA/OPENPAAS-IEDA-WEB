@@ -99,9 +99,9 @@ $(function(){
 			, {field: 'deploymentName', caption: '배포명', size: '100px'}
 			, {field: 'iaas', caption: 'IaaS', size: '100px'}
 			, {field: 'directorUuid', caption: '설치관리자 UUID', size: '220px'}
-			, {field: 'releaseVersion', caption: '릴리즈', size: '100px'}
+			, {field: 'releaseVersion', caption: 'BOSH 릴리즈', size: '100px'}
 			
-			, {field: 'publicStaticIp', caption: '고정 IP', size: '100px'}
+			, {field: 'publicStaticIp', caption: '디렉터 공인 IP', size: '100px'}
 			, {field: 'subnetRange', caption: '서브넷 범위', size: '100px'}
 			, {field: 'subnetStatic', caption: 'VM 할당 IP대역', size: '240px'
 				, render:function(record){
@@ -111,8 +111,8 @@ $(function(){
 					}
 				}
 			, {field: 'subnetGateway', caption: '게이트웨이', size: '100px'}
-			, {field: 'subnetDns', caption: '서브넷 DNS', size: '100px'}
-			, {field: 'subnetId', caption: '서브넷 ID', size: '100px'}
+			, {field: 'subnetDns', caption: 'DNS', size: '100px'}
+			, {field: 'subnetId', caption: '서브넷 ID(NET ID)', size: '100px'}
 			, {field: 'stemcell', caption: '스템셀', size: '240px'
 				, render:function(record){
 						if( record.stemcellName && record.stemcellVersion ){
@@ -120,7 +120,7 @@ $(function(){
 						}
 					}
 				}
-			, {field: 'cloudInstanceType', caption: 'Instance Type', size: '100px'}
+			, {field: 'cloudInstanceType', caption: '인스턴스 유형', size: '100px'}
 			
 			],
 		onClick:function(event) {
@@ -1205,7 +1205,7 @@ $( window ).resize(function() {
 </script>
 
 <div id="main">
-	<div class="page_site">설치관리자 환경설정 > <strong>Bosh 설치</strong></div>
+	<div class="page_site">플랫폼 설치 > <strong>Bosh 설치</strong></div>
 	
 	<!-- 설치 관리자 -->
 	<div class="title">설치 관리자</div>
@@ -1360,7 +1360,7 @@ $( window ).resize(function() {
 		        <div class="w2ui-field">
 		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;BOSH 릴리즈</label>
 		            <div>
-		                <input name="releaseVersion" type="list" style="float:left;width:60%;" />
+		                <input name="releaseVersion" type="list" style="float:left;width:60%;" placeholder="BOSH 릴리즈를 선택하세요." />
 		            </div>
 		        </div>
 		    </div>
@@ -1390,20 +1390,20 @@ $( window ).resize(function() {
 			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 네트워크정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width:40%; font-size: 11px;">&bull;&nbsp;Subnet ID</label>
+					<label style="text-align: left; width:40%; font-size: 11px;">&bull;&nbsp;서브넷 ID(NET ID)</label>
 					<div>
 						<input name="subnetId" type="text"  style="float:left;width:60%;"  required placeholder="예) subnet-XXXXXX"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Floating IP</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 공인 IP</label>
 		            <div>
-		                <input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="설치관리자에 할당할 Floating IP를 입력하세요."/>
+		                <input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="설치관리자에 할당할 디렉터 공인 IP를 입력하세요."/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size: 11px;">&bull;&nbsp;Static IP</label>
+					<label style="text-align:left; width:40%; font-size: 11px;">&bull;&nbsp;VM 할당 IP대역</label>
 					<div>
 						<div style="display:inline-block;width: 60%;">
 							<span style="float:left;width:45%;"><input name="subnetStaticFrom" id="subnetStaticFrom" type="text" style="float:left;width:100%;" placeholder="예) 10.0.0.100"/></span>
@@ -1413,13 +1413,13 @@ $( window ).resize(function() {
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Subnet Range(CIDR)</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서브넷 범위</label>
 					<div>
 						<input name="subnetRange" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.0/24"/>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Gateway IP</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;게이트웨이</label>
 					<div>
 						<input name="subnetGateway" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.1"/>
 					</div>
@@ -1456,7 +1456,7 @@ $( window ).resize(function() {
 			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 리소스정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Stemcell</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;스템셀</label>
 					<div>
 						<div>
 							<input type="list" name="stemcells" style="float: left;width:60%;margin-top:1.5px;"  required placeholder="스템셀을 선택하세요.">
@@ -1464,7 +1464,7 @@ $( window ).resize(function() {
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;Instance Type</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;인스턴스 유형</label>
 					<div>
 						<input name="cloudInstanceType" type="text" style="float:left;width:60%;"  required placeholder="인스턴스 유형을 입력하세요."/>
 					</div>
@@ -1472,7 +1472,7 @@ $( window ).resize(function() {
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;VM Password</label>
 					<div>
-						<input name="boshPassword" type="text" style="float:left;width:60%;"  required placeholder="VM인스턴스의 비밀번호를 입력하세요."/>
+						<input name="boshPassword" type="text" style="float:left;width:60%;"  required placeholder="VM 비밀번호를 입력하세요."/>
 					</div>
 				</div>
 			</div>
@@ -1679,21 +1679,21 @@ $( window ).resize(function() {
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Subnet ID</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;서브넷 ID(NET ID)</label>
 		            <div>
-		                <input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="Subnet ID를 입력하세요."/>
+		                <input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="예) subnet-XXXXXX"/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 				<div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Floating IP</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 공인 IP</label>
 		            <div>
-		                <input name="publicStaticIp" type="text"  style="float:left;width:60%;" required placeholder="설치관리자에 할당할 Floating IP를 입력하세요."/>
+		                <input name="publicStaticIp" type="text"  style="float:left;width:60%;" required placeholder="설치관리자에 할당할 디렉터 공인 IP를 입력하세요."/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Subnet Range(CIDR)</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;서브넷 범위</label>
 		            <div>
 		                <input name="subnetRange" type="text"  style="float:left;width:60%;" required placeholder="예) 10.0.0.0/24"/>
 		                <div class="isMessage"></div>
@@ -1701,7 +1701,7 @@ $( window ).resize(function() {
 		        </div>
 		        
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Gateway IP</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;게이트웨이</label>
 		            <div>
 		                <input name="subnetGateway" type="text"  style="float:left;width:60%;" required placeholder="예) 10.0.0.1"/>
 		                <div class="isMessage"></div>
@@ -1716,7 +1716,7 @@ $( window ).resize(function() {
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size: 11px;">&bull;&nbsp;Static IP</label>
+					<label style="text-align:left; width:40%; font-size: 11px;">&bull;&nbsp;VM 할당 IP대역</label>
 					<div>
 						<div style="display:inline-block;width: 60%;">
 							<span style="float:left;width:45%;"><input name="subnetStaticFrom" id="subnetStaticFrom" type="text" style="float:left;width:100%;" placeholder="예) 10.0.0.100"/></span>
@@ -1751,14 +1751,14 @@ $( window ).resize(function() {
 			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 리소스정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 				 <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Stemcell</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;스템셀</label>
 		            <div>
 						<div><input type="list" name="stemcells" style="float: left;width:60%;margin-top:1.5px;"  required placeholder="스템셀을 선택하세요."></div>
 						<div class="isMessage"></div>
 					</div>
 				</div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Instance Type</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;인스턴스 유형</label>
 		            <div>
 		                <input name="cloudInstanceType" type="text"  style="float:left;width:60%;"   required  placeholder="인스턴스 유형을 입력하세요."/>
 		                <div class="isMessage"></div>

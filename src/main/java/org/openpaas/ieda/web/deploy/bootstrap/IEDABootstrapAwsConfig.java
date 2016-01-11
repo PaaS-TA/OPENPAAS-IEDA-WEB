@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.config.bootstrap;
+package org.openpaas.ieda.web.deploy.bootstrap;
 
 import java.util.Date;
 
@@ -10,9 +10,9 @@ import javax.persistence.TemporalType;
 
 import lombok.Data;
 
-@Entity(name="IEDA_BOOTSTRAP_OPENSTACK")
+@Entity(name="IEDA_BOOTSTRAP_AWS")
 @Data
-public class IEDABootstrapOpenstackConfig {
+public class IEDABootstrapAwsConfig {
 	@Id @GeneratedValue
 	private Integer id;
 	
@@ -22,21 +22,21 @@ public class IEDABootstrapOpenstackConfig {
 	@Temporal(TemporalType.DATE)
 	private Date updatedDate;
 	
-	/** Openstack Info **/
-	private String authUrl;
-	private String tenant;
-	private String userName;
-	private String apiKey;
+	/** AWS Setting Info **/
+	private String accessKeyId;
+	private String secretAccessId;
 	private String defaultSecurityGroups;
+	private String region;
+	private String availabilityZone;
 	private String privateKeyName;
 	private String privateKeyPath;
-
-	/** Openstack Default Info **/
+	
+	/** AWS Default Info **/
 	private String deploymentName;
 	private String directorName;
 	private String boshRelease;
 	private String boshCpiRelease;
-
+	
 	/** Network Info **/
 	private String subnetId;
 	private String privateStaticIp;
@@ -45,7 +45,7 @@ public class IEDABootstrapOpenstackConfig {
 	private String subnetGateway;
 	private String subnetDns;
 	private String ntp;
-
+	
 	/** Resource Info **/
 	private String stemcell;
 	private String cloudInstanceType;

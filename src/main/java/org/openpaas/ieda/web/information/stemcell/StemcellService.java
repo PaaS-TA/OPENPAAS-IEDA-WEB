@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.deploy.stemcell;
+package org.openpaas.ieda.web.information.stemcell;
 
 import java.io.File;
 import java.util.ArrayList;

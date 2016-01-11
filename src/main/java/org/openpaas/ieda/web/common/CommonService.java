@@ -13,10 +13,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
-import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapAwsConfig;
-import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapAwsService;
-import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapOpenstackConfig;
-import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapOpenstackService;
+import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsConfig;
+import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsService;
+import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapOpenstackConfig;
+import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapOpenstackService;
 import org.openpaas.ieda.web.deploy.bosh.IEDABoshAwsConfig;
 import org.openpaas.ieda.web.deploy.bosh.IEDABoshAwsService;
 import org.openpaas.ieda.web.deploy.bosh.IEDABoshOpenstackConfig;
@@ -92,7 +92,7 @@ public class CommonService {
 		File[] listFiles = keyPathFile.listFiles();
 		for (File file : listFiles) {
 			
-			if(!file.getName().endsWith(".pem") && !file.getName().endsWith(".PEM"))
+			if(!file.getName().toLowerCase().endsWith(".pem"))
 				continue;
 			
 			if ( localFiles == null )

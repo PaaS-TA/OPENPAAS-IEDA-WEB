@@ -117,7 +117,7 @@ Diego
 							return record.subnetStaticFrom + " - " + record.subnetStaticTo;
 						}
 					}}
-				, {field:'subnetReserved', caption:'Reserved IP대역', size:'120px'
+				, {field:'subnetReserved', caption:'할당된 IP대역', size:'120px'
 					, render :function(record){
 						if( !checkEmpty(record.subnetReservedFrom) && !checkEmpty(record.subnetReservedTo) ){
 							return record.subnetReservedFrom + " - " + record.subnetReservedTo;
@@ -126,8 +126,8 @@ Diego
 				, {field:'subnetRange', caption:'서브넷 범위', size:'100px'}
 				, {field:'subnetGateway', caption:'게이트웨이', size:'100px'}
 				, {field:'subnetDns', caption:'DNS', size:'100px'}
-				, {field:'subnetId', caption:'서브넷 ID', size:'100px'}
-				, {field:'diegoServers', caption:'Diego Server IP', size:'100px'}
+				, {field:'subnetId', caption:'서브넷 ID(NET ID)', size:'100px'}
+				, {field:'diegoServers', caption:'SSH 서버 IP', size:'100px'}
 				, {field:'stemcell', caption:'스템셀', size:'240px'
 					, render:function(record){
 							if( !checkEmpty(record.stemcellName) && !checkEmpty(record.stemcellVersion) ){
@@ -743,7 +743,7 @@ Diego
 	function awsNetworkPopup(){
 		$("#awsNetworkInfoDiv").w2popup({
 			width  : 950,
-			height 	:600,
+			height 	:700,
 			title 	:"DIEGO 설치 (AWS)",
 			modal 	:true,
 			showMax :false,
@@ -980,7 +980,7 @@ Diego
 	function openstackNetworkPopup(){
 		$("#openstackNetworkInfoDiv").w2popup({
 			width  : 950,
-			height 	:600,
+			height 	:700,
 			title 	:"DIEGO 설치 (OPENSTACK)",
 			modal 	:true,
 			showMax :false,
@@ -1403,9 +1403,7 @@ Diego
 </script>
 
 	<div id="main">
-		<div class="page_site">
-			설치관리자 환경설정 > <strong>Diego 설치</strong>
-		</div>
+		<div class="page_site">플랫폼 설치 > <strong>Diego 설치</strong></div>
 	
 		<!-- 설치 관리자 -->
 		<div class="title">설치 관리자</div>
@@ -1662,7 +1660,7 @@ Diego
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;CONSUL 정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;Diego 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left:5%;">
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;CA 공개키</label>
@@ -1806,8 +1804,11 @@ Diego
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;네트워크정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;네트워크 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left:5%;">
+				<div class="w2ui-field">
+					<label style="text-align:left; width:100%; font-size:13px;">네트워크 정보</label>
+				</div>
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Subnet Range(CIDR)</label>
 					<div>
@@ -1876,7 +1877,7 @@ Diego
 				
 				<br/>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:100%; font-size:13px;">&bull;&nbsp;Proxy 정보</label>
+					<label style="text-align:left; width:100%; font-size:13px;">Proxy 정보</label>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Diego SSH 키</label>
@@ -2019,8 +2020,11 @@ Diego
 					<li class="before">설치</li>
 				</ul>
 			</div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;네트워크정보 설정</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;네트워크 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left:5%;">
+				<div class="w2ui-field">
+					<label style="text-align:left; width:100%; font-size:13px;">네트워크 정보</label>
+				</div>
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Subnet Range(CIDR)</label>
 					<div>
@@ -2089,7 +2093,7 @@ Diego
 				
 				<br/>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:100%; font-size:13px;">&bull;&nbsp;Proxy 정보</label>
+					<label style="text-align:left; width:100%; font-size:13px;">Proxy 정보</label>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Diego SSH 키</label>

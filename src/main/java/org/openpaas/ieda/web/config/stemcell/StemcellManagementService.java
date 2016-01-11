@@ -134,7 +134,7 @@ public class StemcellManagementService {
 		return publicStemcells;
 	}
 
-	/*
+	/**
 	 * # Public Stemcell 목록 동기화
 	 * . IEDA_PUBLIC_STEMCELL 전체 데이터 삭제 
 	 * . Make PUBLIC STEMCELL LIST

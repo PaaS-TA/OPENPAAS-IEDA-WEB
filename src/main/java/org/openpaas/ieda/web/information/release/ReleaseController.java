@@ -1,7 +1,7 @@
 /**
  * @Author Cheolho Moon
  */
-package org.openpaas.ieda.web.deploy.release;
+package org.openpaas.ieda.web.information.release;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,27 +40,13 @@ public class ReleaseController extends BaseController {
 	@Autowired
 	private DeleteReleaseAsyncService deleteReleaseService;
 	
-	@RequestMapping(value="/deploy/listRelease", method=RequestMethod.GET)
+	@RequestMapping(value="/information/listRelease", method=RequestMethod.GET)
 	public String List() {
-		return "/deploy/listRelease";
+		return "/information/listRelease";
 	}
 	
 	@RequestMapping( value="/releases", method =RequestMethod.GET)
 	public ResponseEntity listRelease(){
-		List<ReleaseInfo> contents = releaseService.listRelease();
-		
-		HashMap<String, Object> result = new HashMap<String, Object>();
-		if ( contents != null ) {
-			result.put("total", contents.size());
-			result.put("records", contents);
-		} else
-			result.put("total", 0);
-		
-		return new ResponseEntity( result, HttpStatus.OK);
-	}
-	
-	@RequestMapping( value="/releases/versions", method =RequestMethod.GET)
-	public ResponseEntity listReleaseVersion(){
 		List<ReleaseInfo> contents = releaseService.listRelease();
 		
 		HashMap<String, Object> result = new HashMap<String, Object>();
@@ -144,7 +130,7 @@ public class ReleaseController extends BaseController {
 	 * @param dto
 	 * @return
 	 */
-	@RequestMapping( value="/deleteLocalRelease", method=RequestMethod.PUT)
+	@RequestMapping( value="/deleteLocalRelease", method=RequestMethod.DELETE)
 	public ResponseEntity doDeleteLocalRelease(@RequestBody @Valid ReleaseContentDto.DeleteLocal dto) {
 		
 		releaseService.deleteLocalRelease(dto.getFileName());

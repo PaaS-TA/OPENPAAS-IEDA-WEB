@@ -1,4 +1,4 @@
-package org.openpaas.ieda.web.deploy.release;
+package org.openpaas.ieda.web.information.stemcell;
 
 import java.util.Arrays;
 
@@ -15,8 +15,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
-public class DeleteReleaseAsyncService {
+public class DeleteStemcellAsyncService {
 	
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
@@ -24,19 +26,20 @@ public class DeleteReleaseAsyncService {
 	@Autowired
 	private IEDADirectorConfigService directorConfigService;
 	
-	final private String messageEndpoint = "/socket/deleteRelease"; 
-
-	public void deleteRelease(String releaseName, String releaseVersion) {
+	final private String messageEndpoint = "/socket/deleteStemcell"; 
+	
+	public void deleteStemcell(String stemcellName, String stemcellVersion) {
 		
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
 
 		try {
 			HttpClient httpClient = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
 
-			DeleteMethod deleteMethod = new DeleteMethod(DirectorRestHelper.getDeleteReleaseURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), releaseName, releaseVersion));
+			DeleteMethod deleteMethod = new DeleteMethod(DirectorRestHelper.getDeleteStemcellURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), stemcellName, stemcellVersion));
 			deleteMethod = (DeleteMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)deleteMethod);
 			
 			int statusCode = httpClient.executeMethod(deleteMethod);
+			Header[] headers = deleteMethod.getResponseHeaders();
 			
 			if ( statusCode == HttpStatus.MOVED_PERMANENTLY.value()
 			  || statusCode == HttpStatus.MOVED_TEMPORARILY.value()	) {
@@ -47,16 +50,17 @@ public class DeleteReleaseAsyncService {
 				DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId, "event");
 				
 			} else {
-				DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("릴리즈 삭제 중 오류가 발생하였습니다.[" + statusCode + "]"));
+				DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("스템셀 삭제 중 오류가 발생하였습니다.[" + statusCode + "]"));
 			}
 			
 		} catch ( Exception e) {
-			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("릴리즈 삭제 중 Exception이 발생하였습니다."));
+			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("스템셀 삭제 중 Exception이 발생하였습니다."));
 		}
+
 	}
 
 	@Async
-	public void deleteReleaseAsync(String releaseName, String releaseVersion) {
-		deleteRelease(releaseName, releaseVersion);
-	}
+	public void deleteStemcellAsync(String stemcellName, String stemcellVersion) {
+		deleteStemcell(stemcellName, stemcellVersion);
+	}	
 }

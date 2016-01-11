@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.openpaas.ieda.web.config.bootstrap.IEDABootstrapAwsConfig;
+import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -39,10 +39,10 @@ function goPage(page, title) {
 	<div class="leftMenu_02"><div class="leftMenu_ti">플랫폼 설치</div></div>
 	<div class="leftMenu li">
 		<ul>
-		<li><a href="javascript:goPage('<c:url value="/config/bootstrap"/>', 'BOOTSTRAP 설치');">BOOTSTRAP 설치</a></li>
+		<li><a href="javascript:goPage('<c:url value="/deploy/bootstrap"/>', 'BOOTSTRAP 설치');">BOOTSTRAP 설치</a></li>
 		<li><a href="javascript:goPage('<c:url value="/deploy/bosh"/>', 'BOSH 설치');">BOSH 설치</a></li>		
-		<li><a href="javascript:goPage('<c:url value="/deploy/cf"/>', 'BOSH 설치');">CF 설치</a></li>
-		<li><a href="javascript:goPage('<c:url value="/deploy/diego"/>', 'BOSH 설치');">Diego 설치</a></li>
+		<li><a href="javascript:goPage('<c:url value="/deploy/cf"/>', 'CF 설치');">CF 설치</a></li>
+		<li><a href="javascript:goPage('<c:url value="/deploy/diego"/>', 'DIEGO 설치');">Diego 설치</a></li>
 		</ul>
 	</div>
 	
@@ -50,8 +50,8 @@ function goPage(page, title) {
 	<div class="leftMenu_03"><div class="leftMenu_ti">정보조회</div></div>
 	<div class="leftMenu li">
 		<ul>
-		<li><a href="javascript:goPage('<c:url value="/deploy/listStemcell"/>', '스템셀 업로드');">스템셀 업로드</a></li>		
-		<li><a href="javascript:goPage('<c:url value="/deploy/listRelease"/>', '릴리즈 업로드');">릴리즈 업로드</a></li>
+		<li><a href="javascript:goPage('<c:url value="/information/listStemcell"/>', '스템셀 업로드');">스템셀 업로드</a></li>		
+		<li><a href="javascript:goPage('<c:url value="/information/listRelease"/>', '릴리즈 업로드');">릴리즈 업로드</a></li>
 		<li><a href="javascript:goPage('<c:url value="/information/listDeployment"/>', '배포목록');">배포 정보</a></li>
 		<li><a href="javascript:goPage('<c:url value="/information/listTaskHistory"/>', 'Task정보');">Task 정보</a></li>
 		</ul>

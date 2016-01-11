@@ -1,4 +1,5 @@
-package org.openpaas.ieda.web.deploy.stemcell;
+package org.openpaas.ieda.web.information.release;
+
 
 import java.io.File;
 import java.util.Arrays;
@@ -17,11 +18,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Service
-public class UploadStemcellAsyncService {
+public class UploadReleaseAsyncService {
 	
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
@@ -29,28 +27,27 @@ public class UploadStemcellAsyncService {
 	@Autowired
 	private IEDADirectorConfigService directorConfigService;
 	
-	final private String messageEndpoint = "/socket/uploadStemcell"; 
-
+	final private String messageEndpoint = "/socket/uploadRelease"; 
 	
-	public void uploadStemcell(String stemcellDir, String stemcellFileName) {
-
+	public void uploadRelease(String releaseDir, String releaseFileName) {
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
 
 		try {
 			HttpClient httpClient = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
 			
-			PostMethod postMethod = new PostMethod(DirectorRestHelper.getUploadStemcellURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort()));
+			PostMethod postMethod = new PostMethod(DirectorRestHelper.getUploadReleaseURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort()));
 			postMethod = (PostMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)postMethod);
 			postMethod.setRequestHeader("Content-Type", "application/x-compressed");
 			
-  			String uploadFile = stemcellDir + System.getProperty("file.separator") + stemcellFileName;
+  			String uploadFile = releaseDir + System.getProperty("file.separator") + releaseFileName;
 			File fileToUpload = new File(uploadFile);
 			
 			postMethod.setRequestEntity(new FileRequestEntity(new File(uploadFile), "application/x-compressed"));
 
-			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "Started", Arrays.asList("Uploading Stemcell ...", ""));
+			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "Started", Arrays.asList("Uploading Release ...", ""));
 			
 			int statusCode = httpClient.executeMethod(postMethod);
+			
 			if ( statusCode == HttpStatus.MOVED_PERMANENTLY.value()
 			  || statusCode == HttpStatus.MOVED_TEMPORARILY.value()	) {
 				
@@ -60,16 +57,16 @@ public class UploadStemcellAsyncService {
 				DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId, "event");
 				
 			} else {
-				DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("스템셀 업로드 중 오류가 발생하였습니다.[" + statusCode + "]"));
+				DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("릴리즈 업로드 중 오류가 발생하였습니다.[" + statusCode + "]"));
 			}
 			
 		} catch ( Exception e) {
-			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("스템셀 업로드 중 Exception이 발생하였습니다."));
+			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("릴리즈 업로드 중 Exception이 발생하였습니다."));
 		}
 	}
 
 	@Async
-	public void uploadStemcellAsync(String stemcellDir, String stemcellFileName) {
-		uploadStemcell(stemcellDir, stemcellFileName);
+	public void uploadReleaseAsync(String releaseDir, String releaseFileName) {
+		uploadRelease(releaseDir, releaseFileName);
 	}
 }

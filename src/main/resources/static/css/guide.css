@@ -251,7 +251,7 @@ a:active {
 .cont_title{font-size:13px; font-weight:bold; color:#333; margin-top:70px;padding-bottom:10px;}
 .cont_title1{font-size:13px; font-weight:bold; color:#333; margin-top:20px;padding-bottom:10px;}
 
-.page_site{text-align:right; padding:0 10px 15px 0; color:#666;}
+.page_site{text-align:right; padding:0 10px 15px 0; color:#666;font-size:12px;}
 
 .search_box{width:1020px; height:auto;float:left; background:#f2f2f2; padding:12px 0; margin:10px 0; }
 .search_li{font-weight:bold; padding-left:21px;}

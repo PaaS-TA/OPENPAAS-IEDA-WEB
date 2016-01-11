@@ -432,7 +432,7 @@ function lock (msg) {
 </script>
 
 <div id="main">
-	<div class="page_site">설치관리자 환경설정 > <strong>설치관리자 설정</strong></div>
+	<div class="page_site">환경설정 및 관리 > <strong>설치관리자 설정</strong></div>
 	
 	<!-- 설치 관리자 -->
 	<div class="title">설치 관리자</div>

@@ -81,4 +81,4 @@ resource_pools:
 
 - name: router
   cloud_properties:
-    instance_type: m1.medium
+    instance_type: m1.small
