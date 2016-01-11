@@ -66,7 +66,6 @@ public class IEDABootstrapAwsService {
 		config.setBoshCpiRelease(dto.getBoshCpiRelease());
 		
 		Date now = new Date();
-		config.setCreatedDate(now);
 		config.setUpdatedDate(now);
 		return awsRepository.save(config);
 	}

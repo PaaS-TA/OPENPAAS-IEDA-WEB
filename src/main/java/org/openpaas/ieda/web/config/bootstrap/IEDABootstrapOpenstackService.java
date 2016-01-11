@@ -35,11 +35,11 @@ public class IEDABootstrapOpenstackService {
 	}
 
 	public IEDABootstrapOpenstackConfig saveOpenstackInfoSave(BootStrapDto.OpenStack dto) {
-		IEDABootstrapOpenstackConfig config;
-		Date now = new Date();
+		IEDABootstrapOpenstackConfig config = null;
+		
 		if( StringUtils.isEmpty(dto.getId())){
 			config = new IEDABootstrapOpenstackConfig();
-			config.setCreatedDate(now);
+
 		} else { 
 			config = openstackRepository.findOne(Integer.parseInt(dto.getId()));
 		}
@@ -51,8 +51,9 @@ public class IEDABootstrapOpenstackService {
 		config.setDefaultSecurityGroups(dto.getDefaultSecurityGroups());
 		config.setPrivateKeyName(dto.getPrivateKeyName());
 		config.setPrivateKeyPath(dto.getPrivateKeyPath());
-		
-		
+
+		Date now = new Date();
+		config.setCreatedDate(now);
 		config.setUpdatedDate(now);
 		return openstackRepository.save(config);
 	}
@@ -66,7 +67,6 @@ public class IEDABootstrapOpenstackService {
 		config.setBoshCpiRelease(dto.getBoshCpiRelease());
 		
 		Date now = new Date();
-		config.setCreatedDate(now);
 		config.setUpdatedDate(now);
 		return openstackRepository.save(config);
 	}
@@ -80,6 +80,7 @@ public class IEDABootstrapOpenstackService {
 		config.setSubnetGateway(dto.getSubnetGateway());
 		config.setSubnetDns(dto.getSubnetDns());
 		config.setNtp(dto.getNtp());
+		
 		Date now = new Date();
 		config.setUpdatedDate(now);
 		return openstackRepository.save(config);
@@ -93,7 +94,7 @@ public class IEDABootstrapOpenstackService {
 
 		Date now = new Date();
 		config.setUpdatedDate(now);
-		//Sample/Stub File Create & Merge create Deploy File
+		
 		String deplymentFileName = bootstrapService.createSettingFile(Integer.parseInt(dto.getId()), "OPENSTACK");
 		config.setDeploymentFile(deplymentFileName);
 		return openstackRepository.save(config);
