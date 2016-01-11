@@ -87,7 +87,9 @@ public class DirectorRestHelper {
 	// deploy
 	public static String getDeployURI(String host, int port) {
 		return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).path("deployments")
-				.queryParam("recreate", "true").build().toUri().toString();
+				.build().toUri().toString();
+/*		return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).path("deployments")
+				.queryParam("recreate", "true").build().toUri().toString();*/
 	}
 
 	public static String getDeleteDeploymentURI(String host, int port, String deploymentName) {
