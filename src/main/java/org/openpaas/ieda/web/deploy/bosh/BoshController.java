@@ -61,7 +61,7 @@ public class BoshController extends BaseController {
 	}
 	
 	@RequestMapping(value="/deploy/boshList", method=RequestMethod.GET)
-	public ResponseEntity listBootstrap() {
+	public ResponseEntity listBosh() {
 		List<BoshInfo> content = boshService.getBoshList();
 		
 		HashMap<String, Object> result = new HashMap<String, Object>();

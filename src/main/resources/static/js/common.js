@@ -220,6 +220,9 @@ function getDeployLogMsg(service, iaas, id){
 			if(!checkEmpty(data)){
 				deployLogMsgPopup(service, iaas, data);
 			}
+			else{
+				w2alert("배포 로그가 존재 하지 않습니다.", service + " DEPLOY LOG");
+			}
 		},
 		error : function(request, status, error) {
 			var errorResult = JSON.parse(request.responseText);
