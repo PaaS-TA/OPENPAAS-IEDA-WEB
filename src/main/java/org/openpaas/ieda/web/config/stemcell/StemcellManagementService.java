@@ -257,10 +257,10 @@ public class StemcellManagementService {
 
 	// 다운로드 스템셀
 	public List<String> doDownloadStemcell(String subLink, String stemcellFile, BigDecimal fileSize) {
-		log.info("stemcell Dir     : " + LocalDirectoryConfiguration.getStemcellDir());
-		log.info("Stemcell Name    : " + PUBLIC_STEMCELLS_BASE_URL + "/"  + stemcellFile);
-		log.info("Stemcell Size    : " + fileSize);
-		log.info("downloaded  file : " + LocalDirectoryConfiguration.getStemcellDir()+ System.getProperty("file.separator") +stemcellFile);
+		log.debug("stemcell Dir     : " + LocalDirectoryConfiguration.getStemcellDir());
+		log.debug("Stemcell Name    : " + PUBLIC_STEMCELLS_BASE_URL + "/"  + stemcellFile);
+		log.debug("Stemcell Size    : " + fileSize);
+		log.debug("downloaded  file : " + LocalDirectoryConfiguration.getStemcellDir()+ System.getProperty("file.separator") +stemcellFile);
 		
 		String downloadLink = PUBLIC_STEMCELLS_BASE_URL + "/" + subLink;
 		
@@ -277,7 +277,7 @@ public class StemcellManagementService {
 	        while ((count = in.read(data, 0, 4096)) != -1) {
 	            fout.write(data, 0, count);
 	            received += count;
-	            log.info("progress : " + (int)((received/total) *100));
+	            log.debug("progress : " + (int)((received/total) *100));
 	        }
 	    } catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -316,22 +316,17 @@ public class StemcellManagementService {
 		command += stemcell;
 		
 		try {
-			log.info("1");
 			Process process = r.exec(command);
 			process.getInputStream();
-			log.info("2");
 			inputStream = process.getInputStream();
 			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-			log.info("3");
 			String info = null;
 			while ((info = bufferedReader.readLine()) != null) {
 				//String ;
-				//log.info("info:" + info);
 				//if (info == null || info.equals("")) {
 //				if (info == null ) {
 //					break;
 //				}
-				log.info(info);
 			}
 
 		} catch (IOException e) {
@@ -351,7 +346,7 @@ public class StemcellManagementService {
 		}	
 */
 		/*
-		 * try { // 디렉토리 변경 log.info("다운로드 받을 스템셀 : " +
+		 * try { // 디렉토리 변경 
 		 * PUBLIC_STEMCELLS_BASE_URL + "/" + stemcell);
 		 * 
 		 * // 스템셀 다운로드 //Runtime.getRuntime().exec(
@@ -364,7 +359,6 @@ public class StemcellManagementService {
 		 * File[] files = dir.listFiles();
 		 * 
 		 * ArrayList filPaths = new ArrayList(); for (File file : files) {
-		 * log.info("내부 디렉토리 : " + file.getAbsolutePath() );
 		 * filPaths.add(file.getAbsolutePath()); }
 		 */
 		return null;
@@ -374,12 +368,10 @@ public class StemcellManagementService {
 	public void doDeleteStemcell(String stemcellFile) {
 		final String stemcellToDelete = LocalDirectoryConfiguration.getStemcellDir() + System.getProperty("file.separator")  + stemcellFile;
 		try {
-			log.info("Stemcell to delete : " + stemcellToDelete);
 			
 			File file = new File(stemcellToDelete);
 			
 			if ( file.delete() ) {
-				log.info("Delete Stemcell Success : " + stemcellFile);
 				return;
 			} else {
 				throw new IEDACommonException("failedDeleteOperation.publicStemcell.exception",

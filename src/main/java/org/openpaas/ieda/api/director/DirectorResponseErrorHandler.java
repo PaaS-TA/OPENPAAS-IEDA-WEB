@@ -12,13 +12,13 @@ public class DirectorResponseErrorHandler implements ResponseErrorHandler {
 
 	@Override
 	public boolean hasError(ClientHttpResponse response) throws IOException {
-		log.info("# DirectorResponseErrorHandler STATUS CODE : " + response.getStatusCode());
+		log.debug("# DirectorResponseErrorHandler STATUS CODE : " + response.getStatusCode());
 		return RestErrorUtil.isError(response.getStatusCode());
 	}
 
 	@Override
 	public void handleError(ClientHttpResponse response) throws IOException {
-		log.info("# Response error: {} {}", response.getStatusCode(), response.getStatusText());
+		log.debug("# Response error: {} {}", response.getStatusCode(), response.getStatusText());
 	}
 
 }

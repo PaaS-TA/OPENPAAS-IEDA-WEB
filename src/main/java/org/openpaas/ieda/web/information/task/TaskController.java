@@ -64,8 +64,6 @@ public class TaskController extends BaseController {
 	@MessageMapping("/task")
     @SendTo("/socket/task")
 	public ResponseEntity doGetTaskLog(@RequestBody @Valid TaskDto.GetLog dto) {
-		log.info("# Task TYPE : " + dto.getLogType());
-		log.info("# Task ID   : " + dto.getTaskId());
 		
 		taskAsyncservice.doGetTaskLogAsync(dto.getLogType(), dto.getTaskId());
 		

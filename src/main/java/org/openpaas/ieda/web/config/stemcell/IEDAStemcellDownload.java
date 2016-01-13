@@ -49,7 +49,6 @@ public class IEDAStemcellDownload {
 	@Async
 	public void doDownload(StemcellContentDto.Download dto) {
 		
-		log.info("@@ status :: "  + status + " percentage :: " + this.getPercentage() );
 		if( status != null && status.equals(DownloadStatus.DOWNLOADING) ){
 			throw new IEDACommonException("failedDownloadStemcell.publicStemcell.exception",
 					"다운로드 중인 스템셀이 존재합니다.", HttpStatus.LOCKED);
@@ -78,7 +77,6 @@ public class IEDAStemcellDownload {
 	            received += count;
 	            if(percentage != (int)((received/stemcellSize) *100)){ 
 	            	percentage = (int)((received/stemcellSize) *100);
-	            	log.info("received:" + received + ", stemcellTotalSize: " + stemcellSize + " = " + percentage);
 					messagingTemplate.convertAndSend("/socket/downloadStemcell", dto.getRecid()+"/"+percentage);
 	            }
 	        }

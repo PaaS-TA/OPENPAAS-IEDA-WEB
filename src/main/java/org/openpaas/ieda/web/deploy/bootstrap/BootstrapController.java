@@ -99,7 +99,6 @@ public class BootstrapController extends BaseController {
 	
 	@RequestMapping(value="/bootstrap/awsResource", method=RequestMethod.PUT)
 	public ResponseEntity doBootstrapResourcesSave(@RequestBody @Valid BootStrapDto.AwsResource dto){
-		log.info( "Controll Value ::: " + dto);
 		IEDABootstrapAwsConfig config = awsService.saveAwsResourcesInfos(dto);
 		
 		return new ResponseEntity(config, HttpStatus.OK);
@@ -115,14 +114,12 @@ public class BootstrapController extends BaseController {
 	@MessageMapping("/bootstrapDelete")
 	@SendTo("/bootstrap/bootstrapDelete")
 	public ResponseEntity deleteBootstrap(@RequestBody @Valid BootStrapDto.Delete dto){
-		log.info("### deleteBootstrap async");
 		bootstrapDeleteDeployAsyncService.deleteDeployAsync(dto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@RequestMapping( value="/bootstrap/delete", method=RequestMethod.DELETE)
 	public ResponseEntity deleteJustOnlyBootstrapRecord(@RequestBody @Valid BootStrapDto.Delete dto){
-		log.info("### deleteBootstrap");
 		bootstrapService.deleteBootstrapInfoRecord(dto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -136,7 +133,6 @@ public class BootstrapController extends BaseController {
 	
 	@RequestMapping(value="/bootstrap/setOsBoshInfo", method=RequestMethod.PUT)
 	public ResponseEntity doOpenstackBoshInfoSave(@RequestBody @Valid BootStrapDto.OpenstackDefault dto){
-		log.info("# OpenStack Default : " + dto.toString());
 		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackDefaultInfoSave(dto);
 		return new ResponseEntity(config, HttpStatus.OK);
 	}

@@ -152,9 +152,7 @@ public class StemcellService {
 			
 			Pattern pattern = Pattern.compile(regx);
 	        Matcher matcher = pattern.matcher(fileInfo.getName().toLowerCase());
-	        log.info("::: Stemcell Name ::: " + fileInfo.getName());
 	        if(matcher.find()){
-	        	log.info("::: Stemcell Match ::: " + matcher.find());
 	        	localStemcells.add(fileInfo.getName());
 	        }
 		}		
@@ -184,9 +182,7 @@ public class StemcellService {
 			
 			Pattern pattern = Pattern.compile(regx);
 	        Matcher matcher = pattern.matcher(fileInfo.getName().toLowerCase());
-	        log.info("::: Stemcell Name ::: " + fileInfo.getName());
 	        if(matcher.find()){
-	        	log.info("::: Stemcell Match ::: " + matcher.find());
 	        	localStemcells.add(fileInfo.getName());
 	        }
 		}		

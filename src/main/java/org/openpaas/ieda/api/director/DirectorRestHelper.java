@@ -151,7 +151,7 @@ public class DirectorRestHelper {
 				getTaskStausMethod = (GetMethod) DirectorRestHelper.setAuthorization(defaultDirector.getUserId(),
 						defaultDirector.getUserPassword(), (HttpMethodBase) getTaskStausMethod);
 				int statusCode = client.executeMethod(getTaskStausMethod);
-				log.info("#### status code(" + messageEndpoint + ") : " + statusCode);
+				log.debug("#### status code(" + messageEndpoint + ") : " + statusCode);
 				if (HttpStatus.valueOf(statusCode) != HttpStatus.OK) {
 					System.out.println("Query Task Status is not ok(" + statusCode + ").");
 					sendTaskOutput(messageTemplate, messageEndpoint, "error",
@@ -259,7 +259,7 @@ public class DirectorRestHelper {
 					}
 				}
 
-				log.info("### task info : " + taskInfo.getState());
+				log.debug("### task info : " + taskInfo.getState());
 
 				// Task 완료 여부 확인
 				if (taskInfo.getState().equalsIgnoreCase("done")) {

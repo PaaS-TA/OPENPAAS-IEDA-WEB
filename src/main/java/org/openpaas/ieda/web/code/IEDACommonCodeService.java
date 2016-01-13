@@ -37,8 +37,6 @@ public class IEDACommonCodeService {
 	public List<IEDACommonCode> getChildCodeList(int parentCodeIdx) {
 		List<IEDACommonCode> list = repository.findByParentCodeIdxOrderBySortOrderAsc(parentCodeIdx);
 		
-		log.info("getChildCodeList() list size : " + list.size());
-		
 		if ( list.isEmpty() || list.size() == 0 ) {
 			throw new IEDACommonException("notfound.code.exception",
 					"코드 [" + parentCodeIdx + "]에 해당하는 하위 코드가 존재하지 않습니다.",

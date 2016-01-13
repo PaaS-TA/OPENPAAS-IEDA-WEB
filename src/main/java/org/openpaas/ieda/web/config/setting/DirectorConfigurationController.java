@@ -76,7 +76,6 @@ public class DirectorConfigurationController extends BaseController {
 	 */
 	@RequestMapping(value="/directors", method=RequestMethod.POST)
 	public ResponseEntity createDirector(@RequestBody @Valid IEDADirectorConfigDto.Create directorDto, BindingResult result) {
-		log.info("#### Director Regist###" + directorDto.toString());
 		if (result.hasErrors()) {
 			// 잘못된 요청입니다.
 			IEDAErrorResponse errorResponse = new IEDAErrorResponse();

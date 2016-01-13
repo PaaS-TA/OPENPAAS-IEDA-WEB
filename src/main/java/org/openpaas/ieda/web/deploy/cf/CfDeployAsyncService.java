@@ -127,8 +127,6 @@ public class CfDeployAsyncService {
 			}
 		}
 		
-		log.info("### Deploy Status = " + status);
-		
 		if ( aws != null ) {
 			aws.setDeployStatus(status);
 			awsRepository.save(aws);

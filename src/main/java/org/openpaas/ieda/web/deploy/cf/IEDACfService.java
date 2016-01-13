@@ -145,7 +145,6 @@ public class IEDACfService {
 
 			List<ReplaceItem> replaceItems = setReplaceItems(id, iaas);
 			for (ReplaceItem item : replaceItems) {
-				log.info(item.getTargetItem() +" / "+  item.getSourceItem());
 				content = content.replace(item.getTargetItem(), item.getSourceItem());
 			}
 

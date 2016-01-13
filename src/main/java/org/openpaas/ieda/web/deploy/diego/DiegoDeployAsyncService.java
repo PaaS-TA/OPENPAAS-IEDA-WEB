@@ -133,8 +133,6 @@ public class DiegoDeployAsyncService {
 			}
 		}
 		
-		log.info("### Deploy Status = " + status);
-		
 		if ( aws != null ) {
 			aws.setDeployStatus(status);
 			awsRepository.save(aws);

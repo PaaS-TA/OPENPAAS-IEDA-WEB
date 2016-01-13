@@ -92,7 +92,6 @@ public class BoshController extends BaseController {
 	
 	@RequestMapping(value="/bosh/saveAwsInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveAwsInfo(@RequestBody @Valid BoshParam.AWS dto){
-		log.info("### saveAwsInfo :: " + dto.toString());
 		IEDABoshAwsConfig awsInfo =  awsService.saveBoshAwsInfo(dto);	
 		
 		return new ResponseEntity<>(awsInfo.getId(), HttpStatus.OK);
@@ -226,7 +225,6 @@ public class BoshController extends BaseController {
 		if(contents != null ){
 			for(ReleaseInfo releaseInfo: contents){
 				if("bosh".equals(releaseInfo.getName())){
-					log.info("@@@@@ " + releaseInfo.getName()+ "/" + releaseInfo.getVersion());
 					releases.add(releaseInfo);
 				}
 			}

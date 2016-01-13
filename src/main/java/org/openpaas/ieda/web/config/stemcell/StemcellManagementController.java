@@ -67,10 +67,10 @@ public class StemcellManagementController extends BaseController {
 	@MessageMapping("/stemcellDownloading")
 	@SendTo("/stemcell/downloadStemcell")
 	public ResponseEntity doDownloadStemcell(@RequestBody @Valid StemcellContentDto.Download dto) {
-		log.info("stemcell dir : " + LocalDirectoryConfiguration.getStemcellDir());
-		log.info("doDownload key      : " + dto.getKey());
-		log.info("doDownload fileName : " + dto.getFileName());
-		log.info("doDownload fileSize : " + new BigDecimal(dto.getFileSize()));
+		log.debug("stemcell dir : " + LocalDirectoryConfiguration.getStemcellDir());
+		log.debug("doDownload key      : " + dto.getKey());
+		log.debug("doDownload fileName : " + dto.getFileName());
+		log.debug("doDownload fileSize : " + new BigDecimal(dto.getFileSize()));
 		
 		stemcellDownloadService.doDownload(dto);
 		
@@ -89,7 +89,7 @@ public class StemcellManagementController extends BaseController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		log.info("doDelete stemecllFileName : " + requestMap.get("stemcellFileName"));
+		log.debug("doDelete stemecllFileName : " + requestMap.get("stemcellFileName"));
 		
 		String stemcellFileName = requestMap.get("stemcellFileName");
 		if ( StringUtils.isEmpty(stemcellFileName) ) {

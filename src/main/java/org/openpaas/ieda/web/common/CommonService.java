@@ -74,7 +74,7 @@ public class CommonService {
                 stream.write(bytes);
                 stream.close();
             } catch (IOException e) {
-                log.info(e.getMessage());
+                log.debug(e.getMessage());
                 e.printStackTrace();
             }
         } 
@@ -117,7 +117,6 @@ public class CommonService {
 	}
 
 	public String getDeployMsg(CommonParam.DeployLog param) {
-		log.info("::::::: CommonService  getDeployMsg : " + param);
 		String deployLog = "";
 		switch (param.getService().trim().toLowerCase()) {
 		case "boostrap":

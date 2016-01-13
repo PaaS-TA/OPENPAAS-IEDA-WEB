@@ -42,13 +42,10 @@ public class IEDACommonCodeController {
 
 		Page<IEDACommonCode> page = repository.findAll(pageable);
 		
-		log.info("page.getSize() : " + page.getSize());
-		log.info("page.getTotalElements() : " + page.getTotalElements());
-		
 		List<IEDACommonCodeDto.Response> contents = page.getContent().stream()
 													.map(code -> modelMapper.map(code, IEDACommonCodeDto.Response.class))
 													.collect(Collectors.toList());
-		log.info("list count   : " + contents.size());
+		log.debug("list count   : " + contents.size());
 		PageImpl<IEDACommonCodeDto.Response> result = new PageImpl<>(contents, pageable, page.getTotalElements());
 		
 		return new ResponseEntity<>(result, HttpStatus.OK);

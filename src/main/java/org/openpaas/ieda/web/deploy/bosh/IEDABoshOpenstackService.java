@@ -73,8 +73,6 @@ public class IEDABoshOpenstackService {
 	}
 	
 	public IEDABoshOpenstackConfig saveOsNetworkInfo(BoshParam.OsNetwork dto){
-		log.info("# dto: " + dto.toString());
-		
 		IEDABoshOpenstackConfig config = opentstackRepository.findOne(Integer.parseInt(dto.getId()));
 		
 		config.setPublicStaticIp(dto.getPublicStaticIp());
@@ -109,13 +107,10 @@ public class IEDABoshOpenstackService {
 	public IEDABoshOpenstackConfig getOpentstackInfo(int id) {
 		IEDABoshOpenstackConfig config =  null;
 		try{
-			log.info("==="+id);
 			config = opentstackRepository.findOne(id);
 			
-			log.info("==="+config.toString());
 		}catch(Exception e){
 			e.printStackTrace();
-			log.info("ERROR MESSAGE ::: " + e.getMessage());
 			throw new IEDACommonException("illigalArgument.bootstrap.exception",
 					"해당하는 BOOTSTRAP이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}

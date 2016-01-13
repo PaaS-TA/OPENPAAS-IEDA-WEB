@@ -101,7 +101,6 @@ public class StemcellController extends BaseController {
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		result.put("total", contents.size());
 		result.put("records", contents);
-		log.info("::: STEMCELLS ::" + contents);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
@@ -113,7 +112,6 @@ public class StemcellController extends BaseController {
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		result.put("total", contents.size());
 		result.put("records", contents);
-		log.info("::: STEMCELLS ::" + contents);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
