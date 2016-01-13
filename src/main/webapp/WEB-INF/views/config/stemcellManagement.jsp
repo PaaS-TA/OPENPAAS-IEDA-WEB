@@ -24,13 +24,15 @@
 		height: 100%;
 	}
 </style>
+
 <script type="text/javascript" src="<c:url value='/js/sockjs-0.3.4.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/js/stomp.js'/>"></script>
+
 <script type="text/javascript">
 var downloadClient = "";
 
-var completeButton = '<div class="btn btn-success btn-xs" style="width:70px;">닫기</div>';
-var downloadingButton = '<div class="btn btn-info btn-xs" style="width:70px;">다운 중</div>';
+var completeButton = '<div class="btn btn-success btn-xs" style="width:100px;">Downloaded</div>';
+var downloadingButton = '<div class="btn btn-info btn-xs" style="width:100px;">Downloading</div>';
 $(function() {
  	$('#config_opStemcellsGrid').w2grid({
 		name: 'config_opStemcellsGrid',

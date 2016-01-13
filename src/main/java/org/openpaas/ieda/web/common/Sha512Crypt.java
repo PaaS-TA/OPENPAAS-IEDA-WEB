@@ -460,21 +460,4 @@ public final class Sha512Crypt {
 	 * Test rig
 	 */
 
-	public static void main(String arg[]) {
-		// selfTest();
-		// selfTest();
-		String saltKey = "$6$abcdefghij";
-		String plainText = "1q2w3e4r5t";
-
-		String result = Sha512_crypt(plainText, saltKey, 0);
-		System.out.println("test result is:" + result);
-		System.out.println("test should be:" + saltKey);
-
-		if (verifyPassword(plainText,
-				"$6$abcdefghij$3pMQ3zOoRbnQCFSOoqCURFtWRZC2x8tX8yVrJc6YjQmpQM6su9.MyxMak6aaRs.gAc5Lh0hXw4JUdrrmWtJ2C.")) {
-			System.out.println("Passed verifyPassword well");
-		} else {
-			System.out.println("Failed verifyPassword Badly");
-		}
-	}
 }

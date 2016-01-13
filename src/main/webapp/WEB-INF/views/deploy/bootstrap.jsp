@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<link rel="stylesheet" type="text/css" href="/css/progress-step.css"/>
+<link rel="stylesheet" type="text/css" href="<c:url value='/css/progress-step.css'/>"/>
 <style type="text/css">
 .w2ui-popup .w2ui-msg-body{background-color: #FFF; }
 
@@ -33,8 +33,10 @@
 }
 
 </style>
-<script type="text/javascript" src="/js/sockjs-0.3.4.js"></script>
-<script type="text/javascript" src="/js/stomp.js"></script>
+
+<script type="text/javascript" src="<c:url value='/js/sockjs-0.3.4.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/js/stomp.js'/>"></script>
+
 <script type="text/javascript">
 
 //private common variable

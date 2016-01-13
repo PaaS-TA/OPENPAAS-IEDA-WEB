@@ -4,16 +4,23 @@ import org.modelmapper.ModelMapper;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-import lombok.extern.slf4j.Slf4j;
-
-@SpringBootApplication
 @EnableAsync
-public class OpenpaasIedaWebApplication {
+@SpringBootApplication
+public class OpenpaasIedaWebApplication extends SpringBootServletInitializer {
+	
+    @Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+ 
+    	LocalDirectoryConfiguration.initialize();
+       	return builder.sources(OpenpaasIedaWebApplication.class);
+	}
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
     	LocalDirectoryConfiguration.initialize();
     	SpringApplication.run(OpenpaasIedaWebApplication.class, args);
     }
