@@ -161,47 +161,6 @@ public class IEDABoshService {
 		return boshList;
 	}
 
-	public void boshInstall(String deployFileName) {
-		InputStream inputStream = null;
-		BufferedReader bufferedReader = null;
-		Runtime r = Runtime.getRuntime();
-		String command = "";
-		
-		try{
-			command += LocalDirectoryConfiguration.getScriptDir()+ System.getProperty("file.separator")  + "bosh-deploy.sh ";
-			command += LocalDirectoryConfiguration.getDeploymentDir()+ System.getProperty("file.separator")  + deployFileName ;
-
-			Process process = r.exec(command);
-			inputStream = process.getInputStream();
-			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-			String info = null;
-			String streamLogs = "";
-			while ((info = bufferedReader.readLine()) != null){
-				streamLogs += info;
-				messagingTemplate.convertAndSend("/bosh/boshInstall", info);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inputStream != null)
-					inputStream.close();
-			} catch (Exception e) {
-			}
-			try {
-				if (bufferedReader != null){
-					bufferedReader.close();
-					messagingTemplate.convertAndSend("/bosh/boshInstall", "complete");
-				}
-			} catch (Exception e) {
-			}
-		}
-
-	}
-
 	public String createSettingFile(Integer id, String iaas) {
 		// 파일 가져오기
 		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/"+iaas.toLowerCase()+"-bosh-param.yml");
