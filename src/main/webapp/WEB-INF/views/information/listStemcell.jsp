@@ -315,18 +315,7 @@ $( window ).resize(function() {
 	<div class="page_site">정보조회 > <strong>스템셀 업로드</strong></div>
 	
 	<!-- 설치 관리자 -->
-	<div class="title">설치 관리자</div>
-	
-	<table class="tbl1" border="1" cellspacing="0">
-	<tr>
-		<th width="18%" class="th_fb">관리자 이름</th><td class="td_fb"><b id="directorName"></b></td>
-		<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb"><b id="userId"></b></td>
-	</tr>
-	<tr>
-		<th width="18%" >관리자 URL</th><td><b id="directorUrl"></b></td>
-		<th width="18%" >관리자 UUID</th><td ><b id="directorUuid"></b></td>
-	</tr>
-	</table>
+	<div id="isDefaultDirector"></div>
 	
 	<!-- 업로드된 스템셀 목록-->
 	<div class="pdt20">

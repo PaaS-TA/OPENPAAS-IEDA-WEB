@@ -47,7 +47,7 @@ public class IEDADirectorConfigService {
 
 		if ( directorConfig == null ) {
 			throw new IEDACommonException("notfound.director.exception",
-					"기본 설치관리자 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+					"기본 설치관리자가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 
 		return directorConfig;

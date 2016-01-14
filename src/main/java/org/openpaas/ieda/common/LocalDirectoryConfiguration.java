@@ -10,7 +10,6 @@ public class LocalDirectoryConfiguration {
 	final private static String STEMCELL_DIR   = BASE_DIR + System.getProperty("file.separator") + "stemcell";
 	final private static String RELEASE_DIR    = BASE_DIR + System.getProperty("file.separator") + "release";
 	final private static String DEPLOYMENT_DIR = BASE_DIR + System.getProperty("file.separator") + "deployment";
-	final private static String SCRIPT_DIR     = BASE_DIR + System.getProperty("file.separator") + "script";
 	final private static String TEMP_DIR       = BASE_DIR + System.getProperty("file.separator") + "temp";
 	
 	public static boolean initialize() {
@@ -19,7 +18,6 @@ public class LocalDirectoryConfiguration {
 			getStemcellDir();
 			getReleaseDir();
 			getDeploymentDir();
-			getScriptDir();
 			getTempDir();
 		} catch ( Exception e ) {
 			e.printStackTrace();
@@ -67,13 +65,6 @@ public class LocalDirectoryConfiguration {
 		if ( !checkAndMakeDirectory(DEPLOYMENT_DIR) )
 			throw new IEDACommonException("notfound.deployment.local.exception", "배포관련 저장 위치 조회 중 오류가 발생했습니다.", HttpStatus.NOT_FOUND);
 		return DEPLOYMENT_DIR;
-	}
-	
-	public static String getScriptDir() {
-		if ( !checkAndMakeDirectory(SCRIPT_DIR) )
-			throw new IEDACommonException("notfound.script.local.exception", "스크립트저장 위치 조회 중 오류가 발생했습니다.", HttpStatus.NOT_FOUND);
-		
-		return SCRIPT_DIR;
 	}
 	
 	public static String getTempDir() {

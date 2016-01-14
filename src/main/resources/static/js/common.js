@@ -2,6 +2,13 @@
 function getDefaultDirector(url) {
 	var isOk = true;
 	
+	var directorInfoDiv = '<div class="title">설치 관리자</div>';
+	directorInfoDiv += '<table class="tbl1" border="1" cellspacing="0">';
+	directorInfoDiv += '<tr><th width="18%" class="th_fb">관리자 이름</th><td class="td_fb"><b id="directorName"></b></td>';
+	directorInfoDiv += '<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb"><b id="userId"></b></td></tr>';
+	directorInfoDiv += '<tr><th width="18%" >관리자 URL</th><td><b id="directorUrl"></b></td>';
+	directorInfoDiv += '<th width="18%" >관리자 UUID</th><td ><b id="directorUuid"></b></td></tr></table>';
+	
 	jQuery.ajax({
 		type: "get",
 		url: url,
@@ -9,26 +16,27 @@ function getDefaultDirector(url) {
 		error: function(request, status, error) {
 			console.log(request.responseText);
 			var errorResult = JSON.parse(request.responseText);
-			w2alert(errorResult.message, "알림");
 			isOk = false;
+			var errorDirectorDiv = '<div class="alert alert-danger" style="font-size:15px;text-align:center;"><strong>'+errorResult.message+'</strong></div>';
+			$("#isDefaultDirector").html(errorDirectorDiv + directorInfoDiv);
 		},
 		success: function(data) {
-			if ( data == null || data == "" )
-				isOk = false;
-			else {
-				$('#directorName').text(data.directorName + '(' + data.directorCpi + ')' );
-				$('#userId').text(data.userId);
-				
-				diretorUrl = "https://" + data.directorUrl + ":" + data.directorPort;
-				
-				$('#directorUrl').text(diretorUrl);
-				$('#directorUuid').text(data.directorUuid);
-			}
+			$("#isDefaultDirector").html(directorInfoDiv);
+			setDefaultDirectorInfo(data);
 		}
-
 	});
 	
 	return isOk;
+}
+
+function setDefaultDirectorInfo(data){
+	$('#directorName').text(data.directorName + '(' + data.directorCpi + ')' );
+	$('#userId').text(data.userId);
+	
+	var diretorUrl = "https://" + data.directorUrl + ":" + data.directorPort;
+	
+	$('#directorUrl').text(diretorUrl);
+	$('#directorUuid').text(data.directorUuid);
 }
 
 function setCommonCode(url, id) {

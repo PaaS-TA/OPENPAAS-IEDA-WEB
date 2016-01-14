@@ -156,6 +156,8 @@ $(function() {
 						$('.defaultDirector').text('');
 					}
 					w2ui['config_directorGrid'].delete(record);
+					
+					initView();
 				})
 				.no(function () { 
 			        console.log("user clicked NO")
@@ -435,18 +437,7 @@ function lock (msg) {
 	<div class="page_site">환경설정 및 관리 > <strong>설치관리자 설정</strong></div>
 	
 	<!-- 설치 관리자 -->
-	<div class="title">설치 관리자</div>
-	
-	<table class="tbl1" border="1" cellspacing="0">
-	<tr>
-		<th width="18%" class="th_fb">관리자 이름</th><td class="td_fb"><b class='defaultDirector' id="directorName"></b></td>
-		<th width="18%" class="th_fb">관리자 계정</th><td class="td_fb"><b class='defaultDirector' id="userId"></b></td>
-	</tr>
-	<tr>
-		<th width="18%" >관리자 URL</th><td><b class='defaultDirector' id="directorUrl"></b></td>
-		<th width="18%" >관리자 UUID</th><td ><b class='defaultDirector' id="directorUuid"></b></td>
-	</tr>
-	</table>
+	<div id="isDefaultDirector"></div>
 	
 	<!-- 설치관리자 목록-->
 	<div class="pdt20">
@@ -460,8 +451,6 @@ function lock (msg) {
 		<!-- //Btn -->
 	    </div>
 	</div>
-	
-	<div id="hMargin"></div>
 	
 	<div id="config_directorGrid" style="width:100%; height:500px"></div>	
 </div>
