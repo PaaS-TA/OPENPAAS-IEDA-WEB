@@ -72,13 +72,13 @@ public class DirectorConfigurationControllerTest {
 //	}
 	
 	
-	@Test
+/*	@Test
 	public void getDefaultDirector() throws Exception {
 		ResultActions result = mockMvc.perform(get("/directors/default"));
 		
 		result.andDo(print());
 		result.andExpect(status().isOk());
-	}
+	}*/
 	
 //	@Rollback
 //	@Test

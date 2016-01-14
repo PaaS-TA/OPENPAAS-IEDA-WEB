@@ -66,7 +66,7 @@ public class DiegoController extends BaseController{
 	 */
 	@RequestMapping(value="/diego/aws/{id}", method=RequestMethod.GET)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	public ResponseEntity saveAwsDiegoInfo(@PathVariable int id){
+	public ResponseEntity getAwsDiegoInfo(@PathVariable int id){
 
 		IEDADiegoAwsConfig config = awsService.getAwsInfo(id);
 		Map<String, Object> result =  new HashMap<>();
@@ -81,7 +81,7 @@ public class DiegoController extends BaseController{
 	 */
 	@RequestMapping(value="/diego/openstack/{id}", method=RequestMethod.GET)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	public ResponseEntity saveOpenstackDiegoInfo(@PathVariable int id){
+	public ResponseEntity getOpenstackDiegoInfo(@PathVariable int id){
 
 		IEDADiegoOpenstackConfig config = openstackService.getOpenstackInfo(id);
 		Map<String, Object> result =  new HashMap<>();

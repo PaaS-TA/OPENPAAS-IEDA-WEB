@@ -66,7 +66,7 @@ public class CfController extends BaseController{
 	// ====== AWS
 	@RequestMapping(value="/cf/aws/{id}", method=RequestMethod.GET)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	public ResponseEntity saveAwsCfInfo(@PathVariable int id){
+	public ResponseEntity getAwsCfInfo(@PathVariable int id){
 		
 		IEDACfAwsConfig config = cfAwsService.getAwsInfo(id);
 		Map<String, Object> result =  new HashMap<>();
