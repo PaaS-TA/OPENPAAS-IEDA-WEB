@@ -58,7 +58,7 @@ public class IEDACommonCodeControllerTest {
 		return createDto;
 	}*/
 	
-	@Test
+/*	@Test
 	public void getCodes() throws Exception {
 		ResultActions result = mockMvc.perform(get("/codes"));
 		
@@ -80,7 +80,7 @@ public class IEDACommonCodeControllerTest {
 		
 		result.andDo(print());
 		result.andExpect(status().isOk());
-	}	
+	}	*/
 	
 	/*	@Test
 	public void createCode() throws Exception {
