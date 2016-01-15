@@ -602,8 +602,10 @@ function saveAwsInfo(){
 			data : JSON.stringify(awsInfo), 
 			success : function(data, status) {
 				bootstrapId = data.id;
-				console.log("keypath::"+ bootstrapId);
-				keyPathFileUpload(iaas);
+				console.log("####### ::::: " + $(".w2ui-msg-body input[name=keyPathType]").val());
+				if( $(".w2ui-msg-body input[name=keyPathType]").val() == "file" ){
+					keyPathFileUpload(iaas);
+				}
 			},
 			error : function( e, status ) {
 				w2alert("AWS 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
@@ -613,8 +615,9 @@ function saveAwsInfo(){
 }
 
 function keyPathFileUpload(iaas){
-	var awsForm = $(".w2ui-msg-body #awsForm")[0];
-	var awsFormData = new FormData(awsForm);
+	var form = $(".w2ui-msg-body #keyForm")[0];
+	var formData = new FormData(form);
+	console.log("KeyFile =====");
 	$.ajax({
 		type : "POST",
 		url : "/common/keyPathFileUpload",
@@ -623,10 +626,14 @@ function keyPathFileUpload(iaas){
 		async : true,
 		processData: false, 
 		contentType:false,
-		data : awsFormData,  
+		data : formData,  
 		success : function(data, status) {
-			if(iaas=="AWS") awsDefaultPopup();
-			else osNetworkInfoPopup();
+			if( iaas.toUpperCase() == "AWS"){
+				awsDefaultPopup();
+			}
+			else if(iaas.toUpperCase() == "OPENSTACK") {
+				osBoshInfoPop();
+			}
 		},
 		error : function( e, status ) {
 			w2alert( iaas + " 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
@@ -1119,7 +1126,10 @@ function saveOpenstackInfo(){
 			data : JSON.stringify(openstackInfo),
 			success : function(data, status) {
 				bootstrapId = data.id;
-				osBoshInfoPop();
+				console.log("####### ::::: " + $(".w2ui-msg-body input[name=keyPathType]").val());
+				if( $(".w2ui-msg-body input[name=keyPathType]").val() == "file" ){
+					keyPathFileUpload(iaas);
+				}
 			},
 			error : function( e, status ) {
 				console.log(e + "status ::: " + status);
@@ -1371,7 +1381,7 @@ function osDeployPopup(){
 	        </div>
 			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; AWS 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<form id="awsForm" data-toggle="validator" >
+		    	<form id="keyForm" data-toggle="validator" >
 			        <div class="w2ui-field">
 			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Access Key ID</label>
 			            <div>
@@ -1678,66 +1688,67 @@ function osDeployPopup(){
 	        </div>
 			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; OPENSTACK 정보</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;AUTH URL</label>
-					<div>
-						<input name="authUrl" type="text"  style="float:left;width:60%;"  required placeholder="Identify API 인증 링크를 입력하세요."/>
-						<div class="isMessage"></div>
+		    	<form id="keyForm" data-toggle="validator" >
+					<div class="w2ui-field">
+						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;AUTH URL</label>
+						<div>
+							<input name="authUrl" type="text"  style="float:left;width:60%;"  required placeholder="Identify API 인증 링크를 입력하세요."/>
+							<div class="isMessage"></div>
+						</div>
 					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Tenant</label>
-					<div>
-						<input name="tenant" type="text"  style="float:left;width:60%;"  required placeholder="Tenant명을 입력하세요."/>
-						<div class="isMessage"></div>
+					<div class="w2ui-field">
+						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Tenant</label>
+						<div>
+							<input name="tenant" type="text"  style="float:left;width:60%;"  required placeholder="Tenant명을 입력하세요."/>
+							<div class="isMessage"></div>
+						</div>
 					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;User Name</label>
-					<div>
-						<input name="userName" type="text"  style="float:left;width:60%;" required placeholder="계정명을 입력하세요."/>
-						<div class="isMessage"></div>
+					<div class="w2ui-field">
+						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;User Name</label>
+						<div>
+							<input name="userName" type="text"  style="float:left;width:60%;" required placeholder="계정명을 입력하세요."/>
+							<div class="isMessage"></div>
+						</div>
 					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;API KEY</label>
-					<div>
-						<input name="apiKey" type="text"  style="float:left;width:60%;"   required placeholder="계정 비밀번호를 입력하세요."/>
-						<div class="isMessage"></div>
+					<div class="w2ui-field">
+						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;API KEY</label>
+						<div>
+							<input name="apiKey" type="text"  style="float:left;width:60%;"   required placeholder="계정 비밀번호를 입력하세요."/>
+							<div class="isMessage"></div>
+						</div>
 					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Security Group</label>
-					<div>
-						<input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;"  required placeholder="시큐리티 그룹을 입력하세요."/>
-						<div class="isMessage"></div>
+					<div class="w2ui-field">
+						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Security Group</label>
+						<div>
+							<input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;"  required placeholder="시큐리티 그룹을 입력하세요."/>
+							<div class="isMessage"></div>
+						</div>
 					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Name</label>
-					<div>
-						<input name="privateKeyName" type="text"  style="float:left;width:60%;"  required placeholder="Key Pair명을 입력하세요."/>
-						<div class="isMessage"></div>
+					<div class="w2ui-field">
+						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Name</label>
+						<div>
+							<input name="privateKeyName" type="text"  style="float:left;width:60%;"  required placeholder="Key Pair명을 입력하세요."/>
+							<div class="isMessage"></div>
+						</div>
 					</div>
-				</div>
-				<!-- privateKeyPath -->
-				<div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key File</label>
-	                <div >
-  						<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" />&nbsp;파일업로드</label></span>
-						&nbsp;&nbsp;
-						<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" />&nbsp;목록에서 선택</label></span>
-					</div>
-		        </div>
-		        <div class="w2ui-field">			         	
-	                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();"/>
-		            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
-					<div id="keyPathDiv" ></div>
-		        </div>
+					<!-- privateKeyPath -->
+			        <div class="w2ui-field">
+			        	<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key File</label>
+		                <div >
+		 					<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" />&nbsp;파일업로드</label></span>
+							&nbsp;&nbsp;
+							<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" />&nbsp;목록에서 선택</label></span>
+						</div>
+			        </div>
+			        <div class="w2ui-field">			         	
+		                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();"/>
+			            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
+						<div id="keyPathDiv" ></div>
+			        </div>
+		        </form>
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-				<!-- <button class="btn" style="float: left;" onclick="popupComplete();">취소</button> -->
 				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOpenstackInfo();">다음>></button>
 		    </div>
 		</div>

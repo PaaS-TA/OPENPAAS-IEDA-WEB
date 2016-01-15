@@ -480,9 +480,9 @@ function saveAwsInfo(){
 }
 
 function keyPathFileUpload(){
-	var form = (iaas == "AWS") ? $(".w2ui-msg-body #awsForm")[0] : $(".w2ui-msg-body #osBoshForm")[0];
-	
+	var form = $(".w2ui-msg-body #keyForm")[0];
 	var formData = new FormData(form);
+	
 	$.ajax({
 		type : "POST",
 		url : "/common/keyPathFileUpload",
@@ -1264,53 +1264,55 @@ $( window ).resize(function() {
 	        </div>
 			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; AWS정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Access Key ID</label>
-		            <div>
-		                <input name="accessKeyId" type="text"  style="float:left;width:60%;" required placeholder="AWS Access Key를 입력하세요."/>
-		            </div>
-				</div>
-				
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Secret Access Key</label>
-		            <div>
-		                <input name="secretAccessKey" type="text"  style="float:left;width:60%;" required placeholder="AWS Secret Access Key를 입력하세요."/>
-		            </div>
-		        </div>
-
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Security Group</label>
-		            <div>
-		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;" required placeholder="시큐리티 그룹을 입력하세요."/>
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Region</label>
-		            <div>
-		                <input name="region" type="text"  style="float:left;width:60%;"  required placeholder="설치할 Region을 입력하세요.(예: us-east-1)"/>
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Name</label>
-		            <div>
-		                <input name="privateKeyName" type="text"  style="float:left;width:60%;" required placeholder="Key Pair 이름을 입력하세요."/>
-		            </div>
-		        </div>
-		        
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key File</label>
-	                <div >
-  						<span onclick="changeKeyPathType('file');" style="width:200px;"><label><input type="radio" name="keyPathType"  value="file"/>&nbsp;파일 업로드</label></span>
-						&nbsp;&nbsp;
-						<span onclick="changeKeyPathType('list');" style="width:200px;"><label><input type="radio" name="keyPathType"  value="list"/>&nbsp;목록에서 선택</label></span>
+		    	<form id="keyForm" data-toggle="validator" >
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Access Key ID</label>
+			            <div>
+			                <input name="accessKeyId" type="text"  style="float:left;width:60%;" required placeholder="AWS Access Key를 입력하세요."/>
+			            </div>
 					</div>
-		        </div>
-		        
-		        <div class="w2ui-field">			         	
-	                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();"/>
-		            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
-					<div id="keyPathDiv" ></div>
-		        </div>
+					
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Secret Access Key</label>
+			            <div>
+			                <input name="secretAccessKey" type="text"  style="float:left;width:60%;" required placeholder="AWS Secret Access Key를 입력하세요."/>
+			            </div>
+			        </div>
+	
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Security Group</label>
+			            <div>
+			                <input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;" required placeholder="시큐리티 그룹을 입력하세요."/>
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Region</label>
+			            <div>
+			                <input name="region" type="text"  style="float:left;width:60%;"  required placeholder="설치할 Region을 입력하세요.(예: us-east-1)"/>
+			            </div>
+			        </div>
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Name</label>
+			            <div>
+			                <input name="privateKeyName" type="text"  style="float:left;width:60%;" required placeholder="Key Pair 이름을 입력하세요."/>
+			            </div>
+			        </div>
+			        
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key File</label>
+		                <div >
+	  						<span onclick="changeKeyPathType('file');" style="width:200px;"><label><input type="radio" name="keyPathType"  value="file"/>&nbsp;파일 업로드</label></span>
+							&nbsp;&nbsp;
+							<span onclick="changeKeyPathType('list');" style="width:200px;"><label><input type="radio" name="keyPathType"  value="list"/>&nbsp;목록에서 선택</label></span>
+						</div>
+			        </div>
+			        
+			        <div class="w2ui-field">			         	
+		                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();"/>
+			            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
+						<div id="keyPathDiv" ></div>
+			        </div>
+		        </form>
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1539,63 +1541,64 @@ $( window ).resize(function() {
 	        </div>
 			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 오픈스택정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;AUTH URL</label>
-		            <div>
-		                <input name="authUrl" type="text"  style="float:left;width:60%;"  required placeholder="Identify API 인증 링크를 입력하세요."/>
-		            </div>
-		        </div>
-		        
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Tenant</label>
-		            <div>
-		                <input name="tenant" type="text"  style="float:left;width:60%;"  required placeholder="Tenant명을 입력하세요."/>
-		            </div>
-		        </div>
-		        
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;User Name</label>
-		            <div>
-		                <input name="userName" type="text"  style="float:left;width:60%;"  required placeholder="계정명을 입력하세요."/>
-		            </div>
-		        </div>
-		        
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;API Key</label>
-		            <div>
-		                <input name="apiKey" type="text"  style="float:left;width:60%;"  required placeholder="계정 비밀번호를 입력하세요."/>
-		            </div>
-		        </div>
-		        
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Security Group</label>
-		            <div>
-		                <input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;"  required placeholder="시큐리티 그룹을 입력하세요."/>
-		            </div>
-		        </div>
-		        
-		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Name</label>
-		            <div>
-		                <input name="privateKeyName" type="text"  style="float:left;width:60%;"  required placeholder="Key Pair명을 입력하세요."/>
-		            </div>
-		        </div>
-		        
-		        <div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Path</label>
-					<div >
-						<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" />&nbsp;파일업로드</label></span>
-						&nbsp;&nbsp;
-	  					<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" />&nbsp;목록에서 선택</label></span>
-					</div>
-		        </div>
-		        
-		        <div class="w2ui-field">			         	
-	                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();" />
-		            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
-					<div id="keyPathDiv" ></div>
-		        </div>
-		        
+		    	<form id="keyForm" data-toggle="validator" >
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;AUTH URL</label>
+			            <div>
+			                <input name="authUrl" type="text"  style="float:left;width:60%;"  required placeholder="Identify API 인증 링크를 입력하세요."/>
+			            </div>
+			        </div>
+			        
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Tenant</label>
+			            <div>
+			                <input name="tenant" type="text"  style="float:left;width:60%;"  required placeholder="Tenant명을 입력하세요."/>
+			            </div>
+			        </div>
+			        
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;User Name</label>
+			            <div>
+			                <input name="userName" type="text"  style="float:left;width:60%;"  required placeholder="계정명을 입력하세요."/>
+			            </div>
+			        </div>
+			        
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;API Key</label>
+			            <div>
+			                <input name="apiKey" type="text"  style="float:left;width:60%;"  required placeholder="계정 비밀번호를 입력하세요."/>
+			            </div>
+			        </div>
+			        
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Security Group</label>
+			            <div>
+			                <input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;"  required placeholder="시큐리티 그룹을 입력하세요."/>
+			            </div>
+			        </div>
+			        
+			        <div class="w2ui-field">
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Name</label>
+			            <div>
+			                <input name="privateKeyName" type="text"  style="float:left;width:60%;"  required placeholder="Key Pair명을 입력하세요."/>
+			            </div>
+			        </div>
+			        
+			        <div class="w2ui-field">
+						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Path</label>
+						<div >
+							<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" />&nbsp;파일업로드</label></span>
+							&nbsp;&nbsp;
+		  					<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" />&nbsp;목록에서 선택</label></span>
+						</div>
+			        </div>
+			        
+			        <div class="w2ui-field">			         	
+		                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();" />
+			            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
+						<div id="keyPathDiv" ></div>
+			        </div>
+		        </form>
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
