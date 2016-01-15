@@ -32,7 +32,7 @@ public class StemcellManagementController extends BaseController {
 	private StemcellManagementService service;
 	
 	@Autowired
-	private IEDAStemcellManagementDownload stemcellDownloadService;
+	private StemcellManagementDownloadAsyncService stemcellDownloadService;
 	
 	@RequestMapping(value="/config/stemcellManagement", method=RequestMethod.GET)
 	public String List() {
@@ -66,7 +66,7 @@ public class StemcellManagementController extends BaseController {
 	 */
 	@MessageMapping("/stemcellDownloading")
 	@SendTo("/stemcell/downloadStemcell")
-	public ResponseEntity doDownloadStemcell(@RequestBody @Valid StemcellManagementDto.Download dto) {
+	public ResponseEntity doDownloadStemcell(@RequestBody @Valid StemcellManagementParam.Download dto) {
 		log.debug("stemcell dir : " + LocalDirectoryConfiguration.getStemcellDir());
 		log.debug("doDownload key      : " + dto.getKey());
 		log.debug("doDownload fileName : " + dto.getFileName());

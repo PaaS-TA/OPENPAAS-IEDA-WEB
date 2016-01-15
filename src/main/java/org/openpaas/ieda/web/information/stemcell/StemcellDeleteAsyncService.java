@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-public class DeleteStemcellAsyncService {
+public class StemcellDeleteAsyncService {
 	
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;

@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 @Service
-public class IEDAStemcellManagementDownload {
+public class StemcellManagementDownloadAsyncService {
 	
 	private boolean isAvailable;
 	final private String PUBLIC_STEMCELLS_BASE_URL = "https://bosh-jenkins-artifacts.s3.amazonaws.com";
@@ -41,7 +41,7 @@ public class IEDAStemcellManagementDownload {
 	public enum DownloadStatus {AVAILABLE, DOWNLOADING};
 
 	@Async
-	public void doDownload(StemcellManagementDto.Download dto) {
+	public void doDownload(StemcellManagementParam.Download dto) {
 		
 		if( status != null && status.equals(DownloadStatus.DOWNLOADING) ){
 			throw new IEDACommonException("failedDownloadStemcell.publicStemcell.exception",

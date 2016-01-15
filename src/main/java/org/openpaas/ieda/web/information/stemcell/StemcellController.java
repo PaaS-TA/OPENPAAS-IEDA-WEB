@@ -9,7 +9,6 @@ import org.openpaas.ieda.api.StemcellInfo;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.common.BaseController;
 import org.openpaas.ieda.web.config.stemcell.StemcellManagementConfig;
-import org.openpaas.ieda.web.config.stemcell.StemcellManagementDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +29,10 @@ public class StemcellController extends BaseController {
 	private StemcellService service;
 
 	@Autowired
-	private DeleteStemcellAsyncService deleteStemcellAsyncService;
+	private StemcellDeleteAsyncService stemcellDeleteService;
 	
 	@Autowired
-	private UploadStemcellAsyncService uploadStemcellAsyncService;
+	private StemcellUploadAsyncService stemcellUploadService;
 
 	@RequestMapping(value = "/information/listStemcell", method = RequestMethod.GET)
 	public String List() {
@@ -75,8 +74,8 @@ public class StemcellController extends BaseController {
 	// 스템셀 업로드
 	@MessageMapping("/stemcellUploading")
     @SendTo("/socket/uploadStemcell")
-	public ResponseEntity doUploadStemcell(@RequestBody @Valid StemcellManagementDto.Upload dto) {
-		uploadStemcellAsyncService.uploadStemcellAsync(LocalDirectoryConfiguration.getStemcellDir(), dto.getFileName());
+	public ResponseEntity doUploadStemcell(@RequestBody @Valid StemcellParam.Upload dto) {
+		stemcellUploadService.uploadStemcellAsync(LocalDirectoryConfiguration.getStemcellDir(), dto.getFileName());
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -88,8 +87,8 @@ public class StemcellController extends BaseController {
 	 */
 	@MessageMapping("/stemcellDelete")
     @SendTo("/socket/deleteStemcell")
-	public ResponseEntity doDeleteStemcell(@RequestBody @Valid StemcellManagementDto.Delete dto) {
-		deleteStemcellAsyncService.deleteStemcellAsync(dto.getStemcellName(), dto.getVersion());
+	public ResponseEntity doDeleteStemcell(@RequestBody @Valid StemcellParam.Delete dto) {
+		stemcellDeleteService.deleteStemcellAsync(dto.getStemcellName(), dto.getVersion());
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	

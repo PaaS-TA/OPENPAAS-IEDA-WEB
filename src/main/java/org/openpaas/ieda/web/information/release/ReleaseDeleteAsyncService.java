@@ -16,7 +16,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DeleteReleaseAsyncService {
+public class ReleaseDeleteAsyncService {
 	
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;

@@ -4,23 +4,8 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import lombok.Data;
 
-public class StemcellManagementDto {
+public class StemcellManagementParam {
 
-	@Data
-	public static class Upload {
-		@NotBlank
-		private String fileName;
-	}
-
-	@Data
-	public static class Delete {
-		@NotBlank
-		private String stemcellName;
-
-		@NotBlank
-		private String version;
-	}
-	
 	@Data
 	public static class Download {
 		

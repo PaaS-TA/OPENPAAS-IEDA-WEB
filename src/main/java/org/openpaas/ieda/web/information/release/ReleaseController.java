@@ -35,10 +35,10 @@ public class ReleaseController extends BaseController {
 	private ReleaseService releaseService;
 	
 	@Autowired
-	private UploadReleaseAsyncService uploadReleaseService;
+	private ReleaseUploadAsyncService releaseUploadService;
 	
 	@Autowired
-	private DeleteReleaseAsyncService deleteReleaseService;
+	private ReleaseDeleteAsyncService releaseDeleteService;
 	
 	@RequestMapping(value="/information/listRelease", method=RequestMethod.GET)
 	public String List() {
@@ -108,7 +108,7 @@ public class ReleaseController extends BaseController {
 	@MessageMapping("/releaseUploading")
 	@SendTo("/socket/uploadRelease")
 	public ResponseEntity doUploadRelease(@RequestBody @Valid ReleaseContentDto.Upload dto) {
-		uploadReleaseService.uploadReleaseAsync(LocalDirectoryConfiguration.getReleaseDir(), dto.getFileName());
+		releaseUploadService.uploadReleaseAsync(LocalDirectoryConfiguration.getReleaseDir(), dto.getFileName());
 		return new ResponseEntity(HttpStatus.OK);
 	}
 	
@@ -121,7 +121,7 @@ public class ReleaseController extends BaseController {
 	@SendTo("/socket/deleteRelease")
 	public ResponseEntity doDeleteRelease(@RequestBody @Valid ReleaseContentDto.Delete dto) {
 		
-		deleteReleaseService.deleteReleaseAsync(dto.getFileName(), dto.getVersion());
+		releaseDeleteService.deleteReleaseAsync(dto.getFileName(), dto.getVersion());
 		return new ResponseEntity(HttpStatus.OK);
 	}
 	
