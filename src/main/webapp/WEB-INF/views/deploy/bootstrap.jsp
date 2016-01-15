@@ -362,7 +362,7 @@ function deletePop(record){
 		// 단순 레코드 삭제
 		var url = "/bootstrap/delete";
 		$.ajax({
-			type : "PUT",
+			type : "DELETE",
 			url : url,
 			data : JSON.stringify(requestParameter),
 			contentType : "application/json",
