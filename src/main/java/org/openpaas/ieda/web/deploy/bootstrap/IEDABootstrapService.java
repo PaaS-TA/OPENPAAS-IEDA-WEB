@@ -1,13 +1,10 @@
 package org.openpaas.ieda.web.deploy.bootstrap;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,44 +115,29 @@ public class IEDABootstrapService {
 	}
 
 	public String createSettingFile(Integer id, String iaas) {
-		URL classPath = null;
-		URL stubPath = null;
 		String settingFileName = null;
-		File settingFile = null;
-		File stubFile = null;
 		
 		String content = "";
 		String stubContent = "";
 		String deplymentFileName = ""; 
 		
-		// 파일 가져오기
-		if("AWS".equals(iaas.toUpperCase())){
-			classPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-microbosh-param.yml");
-			stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/aws-microbosh-stub.yml");
-			settingFileName = "aws-microbosh-param-"+id+".yml";
-		}
-		else if("OPENSTACK".equals(iaas.toUpperCase())){
-			classPath = this.getClass().getClassLoader().getResource("static/deploy_template/openstack-microbosh-param.yml");
-			stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/openstack-microbosh-stub.yml");
-			settingFileName = "openstack-microbosh-param-"+id+".yml";
-		}
-		
 		try {
-			settingFile = new File(classPath.toURI());//resource.getFile();
-			stubFile = new File(stubPath.toURI());
-			content = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
-			stubContent = IOUtils.toString(new FileInputStream(stubFile), "UTF-8");
+			settingFileName = iaas.toLowerCase() + "-microbosh-param-"+id+".yml";
+			
+			InputStream paramIs =  this.getClass().getClassLoader().getResourceAsStream("static/deploy_template/"+iaas.toLowerCase()+"-microbosh-param.yml");
+			InputStream stubIs =  this.getClass().getClassLoader().getResourceAsStream("static/deploy_template/"+iaas.toLowerCase()+"-microbosh-stub.yml");
+			
+			content = IOUtils.toString(paramIs, "UTF-8");
+			stubContent = IOUtils.toString(stubIs, "UTF-8");
 			
 			List<ReplaceItem> ReplaceItems = makeReplaceItems(id, iaas);
 			for (ReplaceItem item : ReplaceItems) {
 				content = content.replace(item.getTargetItem(), item.getSourceItem());
 			}
 
-			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir()  + System.getProperty("file.separator") + stubFile.getName()), "UTF-8");
+			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir()  + System.getProperty("file.separator") + iaas.toLowerCase()+"-microbosh-stub.yml"), "UTF-8");
 			IOUtils.write(content, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName), "UTF-8");
-			deplymentFileName = CommonUtils.setSpiffMerge(iaas, id, "microbosh", stubFile.getName(), settingFileName);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			deplymentFileName = CommonUtils.setSpiffMerge(iaas, id, "microbosh", iaas.toLowerCase()+"-microbosh-stub.yml", settingFileName);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

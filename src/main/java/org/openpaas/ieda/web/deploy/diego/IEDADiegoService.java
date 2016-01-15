@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -152,13 +153,6 @@ public class IEDADiegoService {
 	}
 
 	public String createSettingFile(int id, String iaas) {
-		// 파일 가져오기
-		URL classPath = this.getClass().getClassLoader().getResource("static/deploy_template/"+iaas.toLowerCase()+"-diego-param.yml");
-		URL stubPath = this.getClass().getClassLoader().getResource("static/deploy_template/"+iaas.toLowerCase()+"-diego-stub.yml");
-
-		File settingFile;
-		File stubDeploy;
-
 		String content = "";
 		String stubContent = "";
 		String settingFileName = iaas.toLowerCase()+"-diego-"+id+".yml";
@@ -166,21 +160,20 @@ public class IEDADiegoService {
 		String deplymentFileName = ""; 
 
 		try {
-			settingFile = new File(classPath.toURI());//resource.getFile();
-			stubDeploy = new File(stubPath.toURI());
-			content = IOUtils.toString(new FileInputStream(settingFile), "UTF-8");
-			stubContent = IOUtils.toString(new FileInputStream(stubDeploy), "UTF-8");
+			InputStream paramIs =  this.getClass().getClassLoader().getResourceAsStream("static/deploy_template/"+iaas.toLowerCase()+"-diego-param.yml");
+			InputStream stubIs =  this.getClass().getClassLoader().getResourceAsStream("static/deploy_template/"+iaas.toLowerCase()+"-diego-stub.yml");
+			
+			content = IOUtils.toString(paramIs, "UTF-8");
+			stubContent = IOUtils.toString(stubIs, "UTF-8");
 
 			List<ReplaceItem> replaceItems = setReplaceItems(id, iaas);
 			for (ReplaceItem item : replaceItems) {
 				content = content.replace(item.getTargetItem(), item.getSourceItem());
 			}
 
-			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + stubDeploy.getName()), "UTF-8");
+			IOUtils.write(stubContent, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + iaas.toLowerCase()+"-diego-stub.yml"), "UTF-8");
 			IOUtils.write(content, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + System.getProperty("file.separator") + settingFileName), "UTF-8");
-			deplymentFileName = CommonUtils.setSpiffMerge(iaas, id, "diego", stubDeploy.getName(), settingFileName);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			deplymentFileName = CommonUtils.setSpiffMerge(iaas, id, "diego", iaas.toLowerCase()+"-diego-stub.yml", settingFileName);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
