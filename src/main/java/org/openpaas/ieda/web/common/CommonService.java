@@ -63,6 +63,8 @@ public class CommonService {
 		if (!keyPathFile.isDirectory()){
 			keyPathFile.mkdir();
 		}
+		
+		log.debug("request.getFileName : " + request.getFileNames().toString());
 			
         if(itr.hasNext()) {
             MultipartFile mpf = request.getFile(itr.next());
@@ -73,6 +75,9 @@ public class CommonService {
                         new BufferedOutputStream(new FileOutputStream(new File(keyFilePath)));
                 stream.write(bytes);
                 stream.close();
+                
+                log.debug("keyFilePath : " + keyFilePath);
+                
             } catch (IOException e) {
                 log.debug(e.getMessage());
                 e.printStackTrace();
