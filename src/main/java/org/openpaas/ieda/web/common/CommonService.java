@@ -14,21 +14,21 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsConfig;
-import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsService;
+import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsRepository;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapOpenstackConfig;
-import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapOpenstackService;
+import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapOpenstackRepository;
 import org.openpaas.ieda.web.deploy.bosh.IEDABoshAwsConfig;
-import org.openpaas.ieda.web.deploy.bosh.IEDABoshAwsService;
+import org.openpaas.ieda.web.deploy.bosh.IEDABoshAwsRepository;
 import org.openpaas.ieda.web.deploy.bosh.IEDABoshOpenstackConfig;
-import org.openpaas.ieda.web.deploy.bosh.IEDABoshOpenstackService;
+import org.openpaas.ieda.web.deploy.bosh.IEDABoshOpenstackRepository;
 import org.openpaas.ieda.web.deploy.cf.IEDACfAwsConfig;
-import org.openpaas.ieda.web.deploy.cf.IEDACfAwsService;
+import org.openpaas.ieda.web.deploy.cf.IEDACfAwsRepository;
 import org.openpaas.ieda.web.deploy.cf.IEDACfOpenstackConfig;
-import org.openpaas.ieda.web.deploy.cf.IEDACfOpenstackService;
+import org.openpaas.ieda.web.deploy.cf.IEDACfOpenstackRepository;
 import org.openpaas.ieda.web.deploy.diego.IEDADiegoAwsConfig;
-import org.openpaas.ieda.web.deploy.diego.IEDADiegoAwsService;
+import org.openpaas.ieda.web.deploy.diego.IEDADiegoAwsRepository;
 import org.openpaas.ieda.web.deploy.diego.IEDADiegoOpenstackConfig;
-import org.openpaas.ieda.web.deploy.diego.IEDADiegoOpenstackService;
+import org.openpaas.ieda.web.deploy.diego.IEDADiegoOpenstackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,21 +41,21 @@ import lombok.extern.slf4j.Slf4j;
 public class CommonService {
 
 	@Autowired
-	private IEDABootstrapAwsService bootstrapAwsService;
+	private IEDABootstrapAwsRepository bootstrapAwsRepository;
 	@Autowired
-	private IEDABootstrapOpenstackService bootstrapOpenstackService;
+	private IEDABootstrapOpenstackRepository bootstrapOpenstackRepository;
 	@Autowired
-	private IEDABoshAwsService boshAwsService;
+	private IEDABoshAwsRepository boshAwsRepository;
 	@Autowired
-	private IEDABoshOpenstackService boshOpenstackService;
+	private IEDABoshOpenstackRepository boshOpenstackRepository;
 	@Autowired
-	private IEDACfAwsService cfAwsService;
+	private IEDACfAwsRepository cfAwsRepository;
 	@Autowired
-	private IEDACfOpenstackService cfOpenstackService;
+	private IEDACfOpenstackRepository cfOpenstackRepository;
 	@Autowired
-	private IEDADiegoAwsService diegoAwsService;
+	private IEDADiegoAwsRepository diegoAwsRepository;
 	@Autowired
-	private IEDADiegoOpenstackService diegoOpenstackService;
+	private IEDADiegoOpenstackRepository diegoOpenstackRepository;
 	
 	public void uploadKeyFile(MultipartHttpServletRequest request) {
 		Iterator<String> itr =  request.getFileNames();
@@ -126,41 +126,49 @@ public class CommonService {
 		switch (param.getService().trim().toLowerCase()) {
 		case "boostrap":
 			if( "AWS".equals(param.getIaas().trim().toUpperCase()) ){
-				IEDABootstrapAwsConfig config = bootstrapAwsService.getAwsInfo(param.getId());
+				IEDABootstrapAwsConfig config = bootstrapAwsRepository.findOne(param.getId());
+				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
 			else if( "OPENSTACK".equals(param.getIaas().trim().toUpperCase()) ){
-				IEDABootstrapOpenstackConfig config = bootstrapOpenstackService.getOpenstackInfo(param.getId());
+				IEDABootstrapOpenstackConfig config = bootstrapOpenstackRepository.findOne(param.getId());
+				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
 			break;
 		case "bosh":
 			if( "AWS".equals(param.getIaas().trim().toUpperCase()) ){
-				IEDABoshAwsConfig config = boshAwsService.getAwsInfo(param.getId());
+				IEDABoshAwsConfig config = boshAwsRepository.findOne(param.getId());
+				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
 			else if( "OPENSTACK".equals(param.getIaas().trim().toUpperCase()) ){
-				IEDABoshOpenstackConfig config = boshOpenstackService.getOpenstackInfo(param.getId());
+				IEDABoshOpenstackConfig config = boshOpenstackRepository.findOne(param.getId());
+				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
 			break;
 		case "cf":
 			if( "AWS".equals(param.getIaas().trim().toUpperCase()) ){
-				IEDACfAwsConfig config = cfAwsService.getAwsInfo(param.getId());
+				IEDACfAwsConfig config = cfAwsRepository.findOne(param.getId());
+				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
 			else if( "OPENSTACK".equals(param.getIaas().trim().toUpperCase()) ){
-				IEDACfOpenstackConfig config = cfOpenstackService.getOpenstackInfo(param.getId());
+				IEDACfOpenstackConfig config = cfOpenstackRepository.findOne(param.getId());
+				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
 			break;
 		case "diego":
 			if( "AWS".equals(param.getIaas().trim().toUpperCase()) ){
-				IEDADiegoAwsConfig config = diegoAwsService.getAwsInfo(param.getId());
+				IEDADiegoAwsConfig config = diegoAwsRepository.findOne(param.getId());
+				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
 			else if( "OPENSTACK".equals(param.getIaas().trim().toUpperCase()) ){
-				IEDADiegoOpenstackConfig config = diegoOpenstackService.getOpenstackInfo(param.getId());
+				IEDADiegoOpenstackConfig config = diegoOpenstackRepository.findOne(param.getId());
+				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
 			break;

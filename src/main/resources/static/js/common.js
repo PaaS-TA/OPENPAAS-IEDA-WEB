@@ -231,7 +231,7 @@ function getDeployLogMsg(service, iaas, id){
 				deployLogMsgPopup(service, iaas, data);
 			}
 			else{
-				w2alert("배포 로그가 존재 하지 않습니다.", service + " DEPLOY LOG");
+				w2alert("배포 로그가 존재 하지 않습니다.", "배포 로그");
 			}
 		},
 		error : function(request, status, error) {

@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +12,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
 public class CommonController {
 
@@ -49,7 +50,7 @@ public class CommonController {
 	@RequestMapping(value="/common/getDeployLogMsg", method=RequestMethod.POST)
 	public ResponseEntity getDeployLogMsg(@RequestBody @Valid CommonParam.DeployLog param){
 		String deployLogMsg = commonService.getDeployMsg(param);
-		
+		log.debug("deployLogMsg  : [\n"+ deployLogMsg +"\n]");
 		return new ResponseEntity(deployLogMsg, HttpStatus.OK);
 	}
 }
