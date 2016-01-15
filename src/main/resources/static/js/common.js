@@ -17,7 +17,9 @@ function getDefaultDirector(url) {
 			console.log(request.responseText);
 			var errorResult = JSON.parse(request.responseText);
 			isOk = false;
-			var errorDirectorDiv = '<div class="alert alert-danger" style="font-size:15px;text-align:center;"><strong>'+errorResult.message+'</strong></div>';
+			var message = "기본 설치관리자가 존재하지 않습니다. 플랫폼설치 -> BOOSTRAP설치 메뉴를 이용해서 BOOTSTRAP 설치 후 설치관리자를 등록하세요.";
+			/*var errorDirectorDiv = '<div class="alert alert-danger" style="font-size:15px;text-align:center;"><strong>'+errorResult.message+'</strong></div>';*/
+			var errorDirectorDiv = '<div class="alert alert-danger" style="font-size:15px;text-align:center;"><strong>' + message + '</strong></div>';
 			$("#isDefaultDirector").html(errorDirectorDiv + directorInfoDiv);
 		},
 		success: function(data) {
