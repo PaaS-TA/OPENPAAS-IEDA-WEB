@@ -47,7 +47,7 @@ public class StemcellManagementService {
 	private IEDADirectorConfigService directorConfigService;
 	
 	@Autowired
-	private IEDAStemcellContentRepository repository;
+	private IEDAStemcellManagementRepository repository;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -71,14 +71,14 @@ public class StemcellManagementService {
 		return element.getTextContent();
 	}
 
-	private List<StemcellContent> makePublicStemcells(List<StemcellContent> publicStemcells, NodeList contents) {
+	private List<StemcellManagementConfig> makePublicStemcells(List<StemcellManagementConfig> publicStemcells, NodeList contents) {
 
 		for (int i = 0; i < contents.getLength(); i++) {
 			Node node = contents.item(i);
 
 			key = getXMLNodeToString(node, "Key");
 
-			StemcellContent stemcell = new StemcellContent();
+			StemcellManagementConfig stemcell = new StemcellManagementConfig();
 
 			stemcell.setKey(key);
 			stemcell.setLastModified(getXMLNodeToString(node, "LastModified"));
@@ -92,12 +92,12 @@ public class StemcellManagementService {
 		return publicStemcells;
 	}
 
-	private List<StemcellContent> getAllPublicStemcell() {
-		List<StemcellContent> publicStemcells = null;
+	private List<StemcellManagementConfig> getAllPublicStemcell() {
+		List<StemcellManagementConfig> publicStemcells = null;
 		
 		try {
 			String isTruncated = "true";
-			publicStemcells = new ArrayList<StemcellContent>();
+			publicStemcells = new ArrayList<StemcellManagementConfig>();
 
 			int idx = 1;
 
@@ -145,9 +145,9 @@ public class StemcellManagementService {
 		repository.deleteAll();
 		
 		// AWS S3로부터 스템셀 목록 조회
-		List<StemcellContent> publicStemcells = getAllPublicStemcell();
+		List<StemcellManagementConfig> publicStemcells = getAllPublicStemcell();
 
-		for (StemcellContent stemcell : publicStemcells) {
+		for (StemcellManagementConfig stemcell : publicStemcells) {
 
 			String keyInfo = stemcell.getKey();
 
@@ -212,25 +212,25 @@ public class StemcellManagementService {
 				.collect(Collectors.toList());*/
 	}
 	
-	public List<StemcellContent> getStemcellList(String os, String osVersion, String iaas) {
+	public List<StemcellManagementConfig> getStemcellList(String os, String osVersion, String iaas) {
 		if ( repository.count() == 0 ) {
 			syncPublicStemcell();
 		}
 		
-		List<StemcellContent> stemcellList = repository.findByOsAndOsVersionAndIaasAllIgnoreCaseOrderByOsVersionDesc(os, osVersion, iaas);
+		List<StemcellManagementConfig> stemcellList = repository.findByOsAndOsVersionAndIaasAllIgnoreCaseOrderByOsVersionDesc(os, osVersion, iaas);
 		
 		// 다운로드 받은 스템셀
 		List<String> localStemcells = getLocalStemcellList();
 		List<Map<String, String>> localStemcellFileInfos = getLocalStemcellFileList();
 
 		// 로컬에 스템셀 파일이 존재하는 여부 표시
-		for (StemcellContent stemcell : stemcellList) {
+		for (StemcellManagementConfig stemcell : stemcellList) {
 			stemcell.setIsExisted((existStemcells(localStemcells, (t) -> t.equals(stemcell.getStemcellFileName()))) ? "Y" : "N");
 			stemcell.setIsDose((doseStemcells(localStemcellFileInfos, (t) -> t.equals(stemcell.getStemcellFileName()), (x) -> x.equals(stemcell.getSize()) )) ? "Y" : "N");
 		}
 		
 		// 스템셀 버전 역순으로 정렬
-		Comparator<StemcellContent> byStemcellVersion = Collections.reverseOrder(Comparator.comparing(StemcellContent::getStemcellVersion));
+		Comparator<StemcellManagementConfig> byStemcellVersion = Collections.reverseOrder(Comparator.comparing(StemcellManagementConfig::getStemcellVersion));
 		return stemcellList.stream().sorted(byStemcellVersion).collect(Collectors.toList());
 	}
 	

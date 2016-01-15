@@ -32,7 +32,7 @@ public class StemcellManagementController extends BaseController {
 	private StemcellManagementService service;
 	
 	@Autowired
-	private IEDAStemcellDownload stemcellDownloadService;
+	private IEDAStemcellManagementDownload stemcellDownloadService;
 	
 	@RequestMapping(value="/config/stemcellManagement", method=RequestMethod.GET)
 	public String List() {
@@ -48,7 +48,7 @@ public class StemcellManagementController extends BaseController {
 	@RequestMapping(value="/publicStemcells", method=RequestMethod.GET)
 	public ResponseEntity getPublicStemcells(@RequestParam  HashMap<String, String> requestMap) {
 		
-		List<StemcellContent> stemcellList = service.getStemcellList(requestMap.get("os").toUpperCase(),
+		List<StemcellManagementConfig> stemcellList = service.getStemcellList(requestMap.get("os").toUpperCase(),
 				requestMap.get("osVersion").toUpperCase(),
 				requestMap.get("iaas").toUpperCase());
 		
@@ -66,7 +66,7 @@ public class StemcellManagementController extends BaseController {
 	 */
 	@MessageMapping("/stemcellDownloading")
 	@SendTo("/stemcell/downloadStemcell")
-	public ResponseEntity doDownloadStemcell(@RequestBody @Valid StemcellContentDto.Download dto) {
+	public ResponseEntity doDownloadStemcell(@RequestBody @Valid StemcellManagementDto.Download dto) {
 		log.debug("stemcell dir : " + LocalDirectoryConfiguration.getStemcellDir());
 		log.debug("doDownload key      : " + dto.getKey());
 		log.debug("doDownload fileName : " + dto.getFileName());

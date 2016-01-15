@@ -4,7 +4,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import lombok.Data;
 
-public class StemcellContentDto {
+public class StemcellManagementDto {
 
 	@Data
 	public static class Upload {

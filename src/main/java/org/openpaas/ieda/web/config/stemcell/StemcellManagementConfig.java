@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Entity(name="IEDA_PUBLIC_STEMCELLS")
-public class StemcellContent {
+public class StemcellManagementConfig {
 	
 	@Id @GeneratedValue
 	@Column(name="ID")

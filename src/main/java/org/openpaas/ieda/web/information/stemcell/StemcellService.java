@@ -2,7 +2,6 @@ package org.openpaas.ieda.web.information.stemcell;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,8 +20,8 @@ import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
-import org.openpaas.ieda.web.config.stemcell.IEDAStemcellContentRepository;
-import org.openpaas.ieda.web.config.stemcell.StemcellContent;
+import org.openpaas.ieda.web.config.stemcell.IEDAStemcellManagementRepository;
+import org.openpaas.ieda.web.config.stemcell.StemcellManagementConfig;
 import org.openpaas.ieda.web.config.stemcell.StemcellManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 public class StemcellService {
 	
 	@Autowired
-	private IEDAStemcellContentRepository stemcellContentRepository;
+	private IEDAStemcellManagementRepository stemcellContentRepository;
 
 	@Autowired
 	private StemcellManagementService stemcellManagementService;
@@ -105,7 +104,7 @@ public class StemcellService {
 		return stemcellInfoList;
 	}
 
-	public List<StemcellContent> listLocalStemcells() {
+	public List<StemcellManagementConfig> listLocalStemcells() {
 		
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
 		
@@ -115,7 +114,7 @@ public class StemcellService {
 			if ( defaultDirector.getDirectorCpi().toUpperCase().contains("OPENSTACK") ) filterString = "OPENSTACK";
 		}
 		
-		List<StemcellContent> returnList = null;
+		List<StemcellManagementConfig> returnList = null;
 		List<String> localStemcellList = stemcellManagementService.getLocalStemcellList();
 
 		if ( filterString != null && filterString.length() > 0 )
