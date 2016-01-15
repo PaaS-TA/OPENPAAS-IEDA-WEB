@@ -35,7 +35,8 @@ public class ReleaseControllerTest {
 	final String LOCAL_BOSH_RELEASE_LIST_URL = "/release/localBoshList";
 	final String LOCAL_BOSH_AWS_CPI_LIST_URL = "/release/localBoshAwsCpiList";
 	final String LOCAL_BOSH_OPENSTACK_CPI_LIST_URL = "/release/localBoshOpenstackCpiList";
-	final String LOCAL_FILTER_RELEASE_LIST_URL = "/release/getReleaseList/cf";
+	final String LOCAL_FILTER_CF_RELEASE_LIST_URL = "/release/getReleaseList/cf";
+	final String LOCAL_FILTER_DIEGO_RELEASE_LIST_URL = "/release/getReleaseList/diego";
 	
 	@Autowired
 	WebApplicationContext wac;
@@ -102,8 +103,17 @@ public class ReleaseControllerTest {
 	}
 
 	@Test
-	public void testListLocalFilterReleaseList() throws Exception {
-		ResultActions result = mockMvc.perform(get(LOCAL_FILTER_RELEASE_LIST_URL)
+	public void testListLocalFilterCfReleaseList() throws Exception {
+		ResultActions result = mockMvc.perform(get(LOCAL_FILTER_CF_RELEASE_LIST_URL)
+				.contentType(MediaType.APPLICATION_JSON));
+
+		result.andDo(MockMvcResultHandlers.print())
+		.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+	
+	@Test
+	public void testListLocalFilterDiegoReleaseList() throws Exception {
+		ResultActions result = mockMvc.perform(get(LOCAL_FILTER_DIEGO_RELEASE_LIST_URL)
 				.contentType(MediaType.APPLICATION_JSON));
 
 		result.andDo(MockMvcResultHandlers.print())
