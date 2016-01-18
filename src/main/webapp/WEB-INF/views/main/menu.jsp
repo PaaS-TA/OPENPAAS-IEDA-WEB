@@ -47,7 +47,7 @@ function goPage(page, title) {
 	</div>
 	
 	<!-- 정보조회 -->
-	<div class="leftMenu_03"><div class="leftMenu_ti">정보조회</div></div>
+	<div class="leftMenu_03"><div class="leftMenu_ti">정보 조회</div></div>
 	<div class="leftMenu li">
 		<ul>
 		<li><a href="javascript:goPage('<c:url value="/information/listStemcell"/>', '스템셀 업로드');">스템셀 업로드</a></li>		
