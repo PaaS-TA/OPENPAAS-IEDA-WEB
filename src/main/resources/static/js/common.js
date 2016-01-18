@@ -231,12 +231,12 @@ function getDeployLogMsg(service, iaas, id){
 				deployLogMsgPopup(service, iaas, data);
 			}
 			else{
-				w2alert("배포 로그가 존재 하지 않습니다.", "배포 로그");
+				w2alert("배포 로그가 존재 하지 않습니다.",  iaas.toUpperCase() + " 배포로그");
 			}
 		},
 		error : function(request, status, error) {
 			var errorResult = JSON.parse(request.responseText);
-			w2alert(errorResult.message, service + " DEPLOY LOG");
+			w2alert(errorResult.message, iaas.toUpperCase() + " 배포로그");
 		}
 	});	
 }

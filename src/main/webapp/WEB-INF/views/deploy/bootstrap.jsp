@@ -970,7 +970,7 @@ function installPopup(){
 	};
 	
 	installDiv.w2popup({
-		width : 670,
+		width : 700,
 		height : 490,
 		modal	: true,
 		showMax : true,		
