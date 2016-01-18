@@ -14,7 +14,6 @@ function getDefaultDirector(url) {
 		url: url,
 		async : false,
 		error: function(request, status, error) {
-			console.log(request.responseText);
 			var errorResult = JSON.parse(request.responseText);
 			isOk = false;
 			var message = "기본 설치관리자가 존재하지 않습니다. 플랫폼설치 -> BOOSTRAP설치 메뉴를 이용해서 BOOTSTRAP 설치 후 설치관리자를 등록하세요.";
@@ -213,14 +212,14 @@ function popupValidation(){
 }
 
 
-//Deploy Log 
+// 
 function getDeployLogMsg(service, iaas, id){
 	var getParam = {
 			  service	: service
 			, iaas		: iaas
 			, id		: id
 	}
-	
+	console.log(iaas.toUpperCase() + " 배포로그");
 	$.ajax({
 		type : "POST",
 		url : "/common/getDeployLogMsg",
@@ -231,12 +230,12 @@ function getDeployLogMsg(service, iaas, id){
 				deployLogMsgPopup(service, iaas, data);
 			}
 			else{
-				w2alert("배포 로그가 존재 하지 않습니다.",  iaas.toUpperCase() + " 배포로그");
+				w2alert("배포 로그가 존재 하지 않습니다.",  service.toUpperCase() + " 배포로그");
 			}
 		},
 		error : function(request, status, error) {
 			var errorResult = JSON.parse(request.responseText);
-			w2alert(errorResult.message, iaas.toUpperCase() + " 배포로그");
+			w2alert(errorResult.message, service.toUpperCase() + " 배포로그");
 		}
 	});	
 }
@@ -247,7 +246,7 @@ function deployLogMsgPopup(service, iaas, msg){
 	w2popup.open({
 		width : 800,
 		height : 700,
-		title : "<b>"+service.toUpperCase()+"Deploy Log</b>",
+		title : "<b>"+service.toUpperCase()+ " 배포로그"+"</b>",
 		body  : body,
 		buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="w2popup.close();">닫기</button>',
 		showMax : true,
