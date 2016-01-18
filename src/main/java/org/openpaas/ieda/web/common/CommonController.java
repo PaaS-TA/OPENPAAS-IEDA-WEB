@@ -49,8 +49,10 @@ public class CommonController {
 	
 	@RequestMapping(value="/common/getDeployLogMsg", method=RequestMethod.POST)
 	public ResponseEntity getDeployLogMsg(@RequestBody @Valid CommonParam.DeployLog param){
+		log.info("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\n" + param);
+		log.info("\nDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
 		String deployLogMsg = commonService.getDeployMsg(param);
-		log.debug("deployLogMsg  : [\n"+ deployLogMsg +"\n]");
+		log.info("deployLogMsg  : [\n"+ deployLogMsg +"\n]");
 		return new ResponseEntity(deployLogMsg, HttpStatus.OK);
 	}
 }

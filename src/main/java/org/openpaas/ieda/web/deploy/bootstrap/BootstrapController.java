@@ -35,7 +35,7 @@ public class BootstrapController extends BaseController {
 	private IEDABootstrapService bootstrapService;
 	
 	@Autowired
-	private BoostrapDeployAsyncService boostrapDeployAsyncService;
+	private BootstrapDeployAsyncService bootstrapDeployAsyncService;
 	
 	@Autowired
 	private BootstrapDeleteDeployAsyncService bootstrapDeleteDeployAsyncService;
@@ -107,7 +107,7 @@ public class BootstrapController extends BaseController {
 	@MessageMapping("/bootstrapInstall")
 	@SendTo("/bootstrap/bootstrapInstall")
 	public ResponseEntity doInstallBootstrap(@RequestBody @Valid BootStrapDto.Install dto){
-		boostrapDeployAsyncService.deployAsync(dto);
+		bootstrapDeployAsyncService.deployAsync(dto);
 		return new ResponseEntity(HttpStatus.OK);
 	}
 	

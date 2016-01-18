@@ -56,56 +56,56 @@ public class CommonService {
 	private IEDADiegoAwsRepository diegoAwsRepository;
 	@Autowired
 	private IEDADiegoOpenstackRepository diegoOpenstackRepository;
-	
+
 	public void uploadKeyFile(MultipartHttpServletRequest request) {
 		Iterator<String> itr =  request.getFileNames();
 		File keyPathFile = new File(LocalDirectoryConfiguration.getSshDir());
 		if (!keyPathFile.isDirectory()){
 			keyPathFile.mkdir();
 		}
-		
+
 		log.debug("request.getFileName : " + request.getFileNames().toString());
-			
-        if(itr.hasNext()) {
-            MultipartFile mpf = request.getFile(itr.next());
-            try {
-            	String keyFilePath = LocalDirectoryConfiguration.getSshDir() + System.getProperty("file.separator") + mpf.getOriginalFilename();
-                byte[] bytes = mpf.getBytes();
-                BufferedOutputStream stream =
-                        new BufferedOutputStream(new FileOutputStream(new File(keyFilePath)));
-                stream.write(bytes);
-                stream.close();
-                
-                log.debug("keyFilePath : " + keyFilePath);
-                
-            } catch (IOException e) {
-                log.debug(e.getMessage());
-                e.printStackTrace();
-            }
-        } 
+
+		if(itr.hasNext()) {
+			MultipartFile mpf = request.getFile(itr.next());
+			try {
+				String keyFilePath = LocalDirectoryConfiguration.getSshDir() + System.getProperty("file.separator") + mpf.getOriginalFilename();
+				byte[] bytes = mpf.getBytes();
+				BufferedOutputStream stream =
+						new BufferedOutputStream(new FileOutputStream(new File(keyFilePath)));
+				stream.write(bytes);
+				stream.close();
+
+				log.debug("keyFilePath : " + keyFilePath);
+
+			} catch (IOException e) {
+				log.debug(e.getMessage());
+				e.printStackTrace();
+			}
+		} 
 	}
 
 	public List<String> getKeyFileList() {
 
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("KeyFile only","pem");
-		
+
 		File keyPathFile = new File(LocalDirectoryConfiguration.getSshDir());
 		if ( !keyPathFile.isDirectory() ) return null;
-		
+
 		List<String> localFiles = null;
-		
+
 		File[] listFiles = keyPathFile.listFiles();
 		for (File file : listFiles) {
-			
+
 			if(!file.getName().toLowerCase().endsWith(".pem"))
 				continue;
-			
+
 			if ( localFiles == null )
 				localFiles = new ArrayList<String>();
 
 			localFiles.add(file.getName());
 		}
-		
+
 		return localFiles;
 	}
 
@@ -123,57 +123,57 @@ public class CommonService {
 
 	public String getDeployMsg(CommonParam.DeployLog param) {
 		String deployLog = "";
-		switch (param.getService().trim().toLowerCase()) {
-		case "boostrap":
-			if( "AWS".equals(param.getIaas().trim().toUpperCase()) ){
+		log.info("SERVICE : "+param.getService().toLowerCase());
+		log.info("IAAS : "+param.getIaas().toUpperCase());
+		if("bootstrap".equals(param.getService().toLowerCase())) {
+			log.info("BOOTSTRAP");
+			if( "AWS".equals(param.getIaas().toUpperCase()) ){
 				IEDABootstrapAwsConfig config = bootstrapAwsRepository.findOne(param.getId());
 				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
-			else if( "OPENSTACK".equals(param.getIaas().trim().toUpperCase()) ){
+			else if( "OPENSTACK".equals(param.getIaas().toUpperCase()) ){
 				IEDABootstrapOpenstackConfig config = bootstrapOpenstackRepository.findOne(param.getId());
 				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
-			break;
-		case "bosh":
-			if( "AWS".equals(param.getIaas().trim().toUpperCase()) ){
+		}
+		else if("bosh".equals(param.getService().toLowerCase())) {
+			if( "AWS".equals(param.getIaas().toUpperCase()) ){
 				IEDABoshAwsConfig config = boshAwsRepository.findOne(param.getId());
 				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
-			else if( "OPENSTACK".equals(param.getIaas().trim().toUpperCase()) ){
+			else if( "OPENSTACK".equals(param.getIaas().toUpperCase()) ){
 				IEDABoshOpenstackConfig config = boshOpenstackRepository.findOne(param.getId());
 				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
-			break;
-		case "cf":
-			if( "AWS".equals(param.getIaas().trim().toUpperCase()) ){
+		}
+		else if("cf".equals(param.getService().toLowerCase())) {
+			if( "AWS".equals(param.getIaas().toUpperCase()) ){
 				IEDACfAwsConfig config = cfAwsRepository.findOne(param.getId());
 				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
-			else if( "OPENSTACK".equals(param.getIaas().trim().toUpperCase()) ){
+			else if( "OPENSTACK".equals(param.getIaas().toUpperCase()) ){
 				IEDACfOpenstackConfig config = cfOpenstackRepository.findOne(param.getId());
 				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
-			break;
-		case "diego":
-			if( "AWS".equals(param.getIaas().trim().toUpperCase()) ){
+		}
+		else if("diego".equals(param.getService().toLowerCase())) {
+			if( "AWS".equals(param.getIaas().toUpperCase()) ){
 				IEDADiegoAwsConfig config = diegoAwsRepository.findOne(param.getId());
 				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
-			else if( "OPENSTACK".equals(param.getIaas().trim().toUpperCase()) ){
+			else if( "OPENSTACK".equals(param.getIaas().toUpperCase()) ){
 				IEDADiegoOpenstackConfig config = diegoOpenstackRepository.findOne(param.getId());
 				log.debug("RESULT [\n"+config+ "\n]" );
 				deployLog = config.getDeployLog();
 			}
-			break;
 		}
-		
 		return deployLog;
 	}
 }
