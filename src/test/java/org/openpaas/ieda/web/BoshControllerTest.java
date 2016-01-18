@@ -29,9 +29,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @WebAppConfiguration
 @Transactional
 public class BoshControllerTest {
+	final String VIEW_URL = "/deploy/bosh";
 	final String LIST_URL = "/deploy/boshList";
 	final String AWS_DETAIL_URL = "/bosh/aws/1";
 	final String OPENSTACK_DETAIL_URL = "/bosh/openstack/1";
+	final String BOSH_RELEASES_URL = "/bosh/releases";
 	
 	@Autowired WebApplicationContext wac;
 	@Autowired ObjectMapper objectMapper;
@@ -50,6 +52,15 @@ public class BoshControllerTest {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
+	@Test
+	public void testList() throws Exception{
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(VIEW_URL)
+				.contentType(MediaType.APPLICATION_JSON));
+		
+		result.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+	
 	@Test
 	public void testListBosh() throws Exception{
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(LIST_URL)
@@ -131,10 +142,14 @@ public class BoshControllerTest {
 //	public void testDeleteBosh() {
 //		fail("Not yet implemented");
 //	}
-//
-//	@Test
-//	public void testListRelease() {
-//		fail("Not yet implemented");
-//	}
+
+	@Test
+	public void testListRelease() throws Exception{
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(BOSH_RELEASES_URL)
+				.contentType(MediaType.APPLICATION_JSON));
+		
+		result.andDo(MockMvcResultHandlers.print())
+		.andExpect(MockMvcResultMatchers.status().isOk());
+	}
 
 }

@@ -1,6 +1,5 @@
 package org.openpaas.ieda.web;
 
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.junit.Before;
@@ -29,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Transactional
 @IntegrationTest
 public class StemcellControllerTest {
-
+	final String VIEW_URL = "/information/listStemcell";
 	final String STEMCELL_LIST_URL = "/stemcells";
 	final String LOCAL_STEMCELL_LIST_URL = "/localStemcells";
 	final String LOCAL_AWS_STEMCELL_LIST_URL = "/information/localAwsStemcells";
@@ -49,10 +48,14 @@ public class StemcellControllerTest {
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
-//	@Test
-//	public void testList() throws Exception {
-//		fail("Not yet implemented");
-//	}
+	@Test
+	public void testList() throws Exception {
+		ResultActions result = mockMvc.perform(get(VIEW_URL)
+				.contentType(MediaType.APPLICATION_JSON));
+
+		result.andDo(MockMvcResultHandlers.print())
+		.andExpect(MockMvcResultMatchers.status().isOk());
+	}
 
 	@Test
 	public void testListStemcell() throws Exception {

@@ -1,6 +1,5 @@
 package org.openpaas.ieda.web;
 
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.junit.Before;
@@ -30,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @IntegrationTest
 public class DeploymentsControllerTest {
 
+	final String VIEW_URL = "/information/listDeployment";
 	final String DEPLOYMENT_URL = "/deployments";
 	
 	@Autowired
@@ -46,10 +46,14 @@ public class DeploymentsControllerTest {
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
-	/*@Test
-	public void testList() {
-		fail("Not yet implemented");
-	}*/
+	@Test
+	public void testList()  throws Exception {
+		ResultActions result = mockMvc.perform(get(VIEW_URL)
+				.contentType(MediaType.APPLICATION_JSON));
+
+		result.andDo(MockMvcResultHandlers.print())
+		.andExpect(MockMvcResultMatchers.status().isOk());
+	}
 
 	@Test
 	public void testListDeployment() throws Exception {

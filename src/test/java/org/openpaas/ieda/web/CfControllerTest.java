@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @WebAppConfiguration
 @Transactional
 public class CfControllerTest {
-
+	final String VIEW_URL = "/deploy/cfList";
 	final String LIST_URL = "/deploy/cfList";
 	final String AWS_DETAIL_URL = "/cf/aws/1";
 	final String OPENSTACK_DETAIL_URL = "/cf/openstack/1";
@@ -54,6 +54,15 @@ public class CfControllerTest {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
+	@Test
+	public void testMain() throws Exception {
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(VIEW_URL)
+				.contentType(MediaType.APPLICATION_JSON));
+		
+		result.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+	
 	@Test
 	public void testListCfs() throws Exception {
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(LIST_URL)

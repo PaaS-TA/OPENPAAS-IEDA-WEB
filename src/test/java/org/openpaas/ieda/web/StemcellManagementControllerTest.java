@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Transactional
 @IntegrationTest
 public class StemcellManagementControllerTest {
-
+	final String VIEW_URL = "/config/stemcellManagement";
 	final String PUBLIC_STEMCELL_URL = "/publicStemcells";
 	
 	@Autowired
@@ -44,6 +44,15 @@ public class StemcellManagementControllerTest {
 	@Before
 	public void setUp() throws Exception {
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+	}
+	
+	@Test
+	public void testLists() throws Exception {
+		ResultActions result = mockMvc.perform(get(VIEW_URL)
+				.contentType(MediaType.APPLICATION_JSON));
+
+		result.andDo(MockMvcResultHandlers.print())
+		.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
 	@Test

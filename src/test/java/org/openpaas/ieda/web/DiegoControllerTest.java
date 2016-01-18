@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Transactional
 @IntegrationTest
 public class DiegoControllerTest {
-
+	final String VIEW_URL = "/deploy/diegoList";
 	final String LIST_URL = "/deploy/diegoList";
 	final String AWS_DETAIL_URL = "/diego/aws/1";
 	final String OPENSTACK_DETAIL_URL = "/diego/openstack/1";
@@ -60,6 +60,15 @@ public class DiegoControllerTest {
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
+	@Test
+	public void testMain() throws Exception{
+		ResultActions result = mockMvc.perform(get(VIEW_URL)
+				.contentType(MediaType.APPLICATION_JSON));
+		
+		result.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+	
 	@Test
 	public void testListDiego() throws Exception{
 		ResultActions result = mockMvc.perform(get(LIST_URL)

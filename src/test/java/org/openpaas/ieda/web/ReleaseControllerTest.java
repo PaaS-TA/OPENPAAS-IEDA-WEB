@@ -1,6 +1,5 @@
 package org.openpaas.ieda.web;
 
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.junit.Before;
@@ -29,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Transactional
 @IntegrationTest
 public class ReleaseControllerTest {
-
+	final String VIEW_URL = "/releases";
 	final String RELEASE_LIST_URL = "/releases";
 	final String LOCAL_RELEASE_LIST_URL = "/localReleases";
 	final String LOCAL_BOSH_RELEASE_LIST_URL = "/release/localBoshList";
@@ -52,10 +51,14 @@ public class ReleaseControllerTest {
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
-//	@Test
-//	public void testList() {
-//		fail("Not yet implemented");
-//	}
+	@Test
+	public void testList() throws Exception {
+		ResultActions result = mockMvc.perform(get(VIEW_URL)
+				.contentType(MediaType.APPLICATION_JSON));
+
+		result.andDo(MockMvcResultHandlers.print())
+		.andExpect(MockMvcResultMatchers.status().isOk());
+	}
 
 	@Test
 	public void testListRelease() throws Exception {

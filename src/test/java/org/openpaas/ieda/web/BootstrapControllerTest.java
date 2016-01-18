@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @WebAppConfiguration
 @Transactional
 public class BootstrapControllerTest {
-
+	final String VIEW_URL = "/deploy/bootstrap";
 	final String LIST_URL = "/bootstraps";
 	final String AWS_DETAIL_URL = "/bootstrap/aws/1";
 	final String OPENSTACK_DETAIL_URL = "/bootstrap/openstack/1";
@@ -54,6 +54,15 @@ public class BootstrapControllerTest {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
+	@Test
+	public void testMain() throws Exception{
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(VIEW_URL)
+				.contentType(MediaType.APPLICATION_JSON));
+		
+		result.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+	
 	@Test
 	public void testListBootstrap() throws Exception{
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(LIST_URL)
