@@ -44,7 +44,6 @@ public class BootstrapDeployAsyncService {
 		IEDABootstrapOpenstackConfig openstack = null;
 		String deploymentFileName = null;
 		String publicIp = "";
-		log.info("###################");
 		if( "AWS".equals(dto.getIaas())) { 
 			aws = awsRepository.findOne(Integer.parseInt(dto.getId()));
 			if ( aws != null ) {
@@ -154,18 +153,12 @@ public class BootstrapDeployAsyncService {
 	public IEDABootstrapAwsConfig saveAWSDeployStatus(IEDABootstrapAwsConfig aws, String status) {
 		if ( aws == null ) return null;
 		aws.setDeployStatus(status);
-		log.info("***************************");
-		log.info(""+aws);
-		log.info("***************************");
 		return awsRepository.save(aws);
 	}
 	
 	public IEDABootstrapOpenstackConfig saveOpenstackDeployStatus(IEDABootstrapOpenstackConfig openstack, String status) {
 		if ( openstack == null ) return null;
 		openstack.setDeployStatus(status);
-		log.info("***************************");
-		log.info(""+openstack);
-		log.info("***************************");
 		return openstackRepository.save(openstack);
 	}
 

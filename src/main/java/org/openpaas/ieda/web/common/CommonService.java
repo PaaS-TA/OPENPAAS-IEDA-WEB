@@ -123,10 +123,7 @@ public class CommonService {
 
 	public String getDeployMsg(CommonParam.DeployLog param) {
 		String deployLog = "";
-		log.info("SERVICE : "+param.getService().toLowerCase());
-		log.info("IAAS : "+param.getIaas().toUpperCase());
 		if("bootstrap".equals(param.getService().toLowerCase())) {
-			log.info("BOOTSTRAP");
 			if( "AWS".equals(param.getIaas().toUpperCase()) ){
 				IEDABootstrapAwsConfig config = bootstrapAwsRepository.findOne(param.getId());
 				log.debug("RESULT [\n"+config+ "\n]" );
