@@ -79,6 +79,7 @@ public class DiegoDeployAsyncService {
 		}
 		
 		String status = "";
+		String content = "", temp = "";
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
 		
 		BufferedReader br = null;
@@ -94,7 +95,6 @@ public class DiegoDeployAsyncService {
 			
 			String deployFile = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
 			
-			String content = "", temp = "";
 			
 			fis = new FileInputStream(deployFile);
 			isr = new InputStreamReader(fis, "UTF-8");
@@ -135,10 +135,12 @@ public class DiegoDeployAsyncService {
 		
 		if ( aws != null ) {
 			aws.setDeployStatus(status);
+			aws.setDeployLog(content);
 			awsRepository.save(aws);
 		}
 		if ( openstack != null ) {
 			openstack.setDeployStatus(status);
+			openstack.setDeployLog(content);
 			openstackRepository.save(openstack);
 		}
 

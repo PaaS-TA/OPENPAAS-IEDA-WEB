@@ -1,7 +1,9 @@
 package org.openpaas.ieda.web.deploy.cf;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
@@ -74,6 +76,7 @@ public class CfDeployAsyncService {
 		
 		String status = "";
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
+		String content = "", temp = "";
 		
 		BufferedReader br = null;
 		InputStreamReader isr = null;
@@ -88,7 +91,7 @@ public class CfDeployAsyncService {
 			
 			String deployFile = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
 			
-			String content = "", temp = "";
+			
 			
 			fis = new FileInputStream(deployFile);
 			isr = new InputStreamReader(fis, "UTF-8");
@@ -129,10 +132,12 @@ public class CfDeployAsyncService {
 		
 		if ( aws != null ) {
 			aws.setDeployStatus(status);
+			aws.setDeployLog(content);
 			awsRepository.save(aws);
 		}
 		if ( openstack != null ) {
 			openstack.setDeployStatus(status);
+			openstack.setDeployLog(content);
 			openstackRepository.save(openstack);
 		}
 
