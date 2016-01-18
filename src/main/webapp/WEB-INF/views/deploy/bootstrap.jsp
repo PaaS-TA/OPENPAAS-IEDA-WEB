@@ -116,8 +116,8 @@ $(function() {
 			, {field: 'instanceType', caption: '인스턴스 유형', size: '100px'}
 			, {field: 'boshPassword', caption: 'VM 비밀번호', size: '100px'}
 			, {field: 'deploymentFile', caption: '배포파일명', size: '150px'}
-			, {field: 'createdDate', caption: '생성일자', size: '100px'}
-			, {field: 'updatedDate', caption: '수정일자', size: '100px'}
+			, {field: 'createdDate', caption: '생성일자', size: '100px', hidden: true}
+			, {field: 'updatedDate', caption: '수정일자', size: '100px', hidden: true}
 			
 			],
 		onClick:function(event) {

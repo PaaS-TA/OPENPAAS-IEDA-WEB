@@ -137,6 +137,8 @@ Diego
 							}
 						}
 					}
+				, {field: 'createdDate', caption: '생성일자', size: '100px', hidden: true}
+				, {field: 'updatedDate', caption: '수정일자', size: '100px', hidden: true}
 				],
 			onClick:function(event) {
 				var grid = this;
