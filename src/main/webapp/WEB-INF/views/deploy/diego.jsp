@@ -1834,7 +1834,7 @@ Diego
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;VM 할당 IP대역(최소 14개)</label>
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;VM 할당 IP대역</label>
 					<div>
 						<div style="display:inline-block; width:60%;">
 							<span style="float:left; width:45%;">
@@ -1849,7 +1849,7 @@ Diego
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;할당된 IP대역</label>
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;할당된 IP대역(최소 14개)</label>
 					<div>
 						<div style="display:inline-block; width:60%;">
 							<span style="float:left; width:45%;">
@@ -2050,7 +2050,7 @@ Diego
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;VM 할당 IP대역(최소 14개)</label>
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;VM 할당 IP대역</label>
 					<div>
 						<div style="display:inline-block; width:60%;">
 							<span style="float:left; width:45%;">
@@ -2065,7 +2065,7 @@ Diego
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;할당된 IP대역</label>
+					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;할당된 IP대역(최소 14개)</label>
 					<div>
 						<div style="display:inline-block; width:60%;">
 							<span style="float:left; width:45%;">

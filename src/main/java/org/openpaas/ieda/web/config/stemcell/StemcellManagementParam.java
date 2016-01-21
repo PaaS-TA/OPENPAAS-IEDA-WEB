@@ -1,6 +1,6 @@
 package org.openpaas.ieda.web.config.stemcell;
 
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
@@ -9,16 +9,13 @@ public class StemcellManagementParam {
 	@Data
 	public static class Download {
 		
-		@NotBlank
+		@NotNull
 		private String recid;
-		
-		@NotBlank
+		@NotNull
 		private String key;
-		
-		@NotBlank
+		@NotNull
 		private String fileName;
-		
-		@NotBlank
+		@NotNull
 		private String fileSize;
 	}
 }

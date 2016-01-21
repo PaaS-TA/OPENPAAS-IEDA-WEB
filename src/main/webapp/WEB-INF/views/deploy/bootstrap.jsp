@@ -191,7 +191,7 @@ $(function() {
 		
 		w2confirm({
 			title 	: "BOOTSTRAP 삭제",
-			msg		: "BOOTSTRAP 정보를 삭제하시겠습니까?",
+			msg		: message,
 			yes_text: "확인",
 			yes_callBack : function(event){
 					deletePop(record);						
@@ -1379,7 +1379,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; AWS 정보</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; AWS 정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<form id="keyForm" data-toggle="validator" >
 			        <div class="w2ui-field">
@@ -1460,7 +1460,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 기본 정보</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 기본 정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<form id="awsDefaultForm" data-toggle="validator" >
 			        <div class="w2ui-field">
@@ -1516,7 +1516,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;네트워크 정보</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;네트워크 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;서브넷 ID(NET ID)</label>
@@ -1590,7 +1590,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 리소스 정보</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 리소스 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
 					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;스템셀</label>
@@ -1608,9 +1608,9 @@ function osDeployPopup(){
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM 패스워드</label>
+					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM Password</label>
 					<div>
-						<input name="boshPassword" type="text"  style="float:left;width:330px;"  required placeholder="VVM 패스워드를 입력하세요."/>
+						<input name="boshPassword" type="text"  style="float:left;width:330px;"  required placeholder="VVM Password를 입력하세요."/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1686,7 +1686,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; OPENSTACK 정보</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; OPENSTACK 정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<form id="keyForm" data-toggle="validator" >
 					<div class="w2ui-field">
@@ -1767,7 +1767,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 기본 정보</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 기본 정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<div class="w2ui-field">
 					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;배포명</label>
@@ -1815,7 +1815,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 네트워크 정보</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 네트워크 정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<div class="w2ui-field">
 					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;서브넷 ID(NET ID)</label>
@@ -1888,7 +1888,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 리소스 정보</div>
+			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 리소스 정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<div class="w2ui-field">
 					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;스템셀</label>
@@ -1906,9 +1906,9 @@ function osDeployPopup(){
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM 패스워드</label>
+					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM Password</label>
 					<div>
-						<input name="boshPassword" type="text"  style="float:left;width:330px;"  required placeholder="VM 패스워드를 입력하세요."/>
+						<input name="boshPassword" type="text"  style="float:left;width:330px;"  required placeholder="VM Password를 입력하세요."/>
 						<div class="isMessage"></div>
 					</div>
 				</div>

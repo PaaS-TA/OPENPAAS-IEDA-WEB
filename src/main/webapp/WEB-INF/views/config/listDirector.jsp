@@ -94,14 +94,22 @@ $(function() {
  				return;
  			}
  			else{
-	 			w2confirm(record.directorName + "를 " + "기본관리자로 설정하시겠습니까?","기본관리자 설정")
-	 			.yes(function(){
-	 				registDefault(record.iedaDirectorConfigSeq, record.directorName);
-	 				w2ui['config_directorGrid'].reset();
-	 			})
-	 			.no(function () { 
-	 		        console.log("user clicked NO")
-	 		    });;
+	 			w2confirm({
+	 				title 			: "기본관리자 설정",
+	 				msg 			: record.directorName + "를 " + "기본관리자로 설정하시겠습니까?",
+	 				yes_text 		: "확인",
+	 				no_text			: "취소",
+	 				yes_callBack	: function(envent){
+	 									w2ui['config_directorGrid'].lock("기본관리자 설정 중입니다.", {
+	 										spinner: true, opacity : 1
+	 									});
+	 									registDefault(record.iedaDirectorConfigSeq, record.directorName);
+	 									w2ui['config_directorGrid'].reset();
+	 									},
+	 				no_callBack		: function(envent){ 
+	 		        						console.log("user clicked NO");
+	 		    						}
+	 			});
  			}
  		}
 	});
@@ -145,8 +153,12 @@ $(function() {
 		else {
 			var record = w2ui['config_directorGrid'].get(selected);
 
-			w2confirm("설치 관리자(" + record.directorName + ")를 삭제하시겠습니까?","설치 관리자 삭제")
-				.yes(function(){
+			w2confirm({
+				title		: "설치 관리자 삭제",
+				msg			: "설치 관리자(" + record.directorName + ")를 삭제하시겠습니까?",
+				yes_text	: "확인",
+				no_text		: "취소",
+				yes_callBack: function(event){
 					// 디렉터 삭제
 					deleteDirector(record.iedaDirectorConfigSeq);
 					
@@ -158,10 +170,12 @@ $(function() {
 					w2ui['config_directorGrid'].delete(record);
 					
 					initView();
-				})
-				.no(function () { 
-			        console.log("user clicked NO")
-			    });
+				},
+				no_callBack	: function(){
+					console.log("user clicked NO");
+				}
+						
+			});
 		}
 	});// 설정관리자 삭제 버튼 END
 });
