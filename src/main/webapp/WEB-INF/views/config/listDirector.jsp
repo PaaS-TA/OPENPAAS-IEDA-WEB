@@ -95,12 +95,12 @@ $(function() {
  			}
  			else{
 	 			w2confirm({
-	 				title 			: "기본 설치 관리자 설정",
-	 				msg 			: record.directorName + "를 " + "기본 설치 관리자로 설정하시겠습니까?",
+	 				title 			: "기본관리자 설정",
+	 				msg 			: record.directorName + "를 " + "기본관리자로 설정하시겠습니까?",
 	 				yes_text 		: "확인",
 	 				no_text			: "취소",
 	 				yes_callBack	: function(envent){
-	 									w2ui['config_directorGrid'].lock("기본 설치 관리자 설정 중입니다.", {
+	 									w2ui['config_directorGrid'].lock("기본관리자 설정 중입니다.", {
 	 										spinner: true, opacity : 1
 	 									});
 	 									registDefault(record.iedaDirectorConfigSeq, record.directorName);
