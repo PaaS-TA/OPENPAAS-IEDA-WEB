@@ -1,6 +1,5 @@
 package org.openpaas.ieda.web;
 
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.junit.Before;
@@ -58,30 +57,30 @@ public class DashboardControllerTest {
 		.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
-	@Test
-	public void testListDeployment() throws Exception {
-		ResultActions result = mockMvc.perform(get(DEPLOYMENTS_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
-	
-	@Test
-	public void testListRelease() throws Exception {
-		ResultActions result = mockMvc.perform(get(RELEASES_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
-	@Test
-	public void testListStemcell() throws Exception {
-		ResultActions result = mockMvc.perform(get(STEMCELLS_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testListDeployment() throws Exception {
+//		ResultActions result = mockMvc.perform(get(DEPLOYMENTS_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
+//	
+//	@Test
+//	public void testListRelease() throws Exception {
+//		ResultActions result = mockMvc.perform(get(RELEASES_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
+//	@Test
+//	public void testListStemcell() throws Exception {
+//		ResultActions result = mockMvc.perform(get(STEMCELLS_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
 }

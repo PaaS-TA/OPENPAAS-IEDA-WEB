@@ -47,23 +47,23 @@ public class TaskControllerTest {
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
-	@Test
-	public void testList() throws Exception {
-		ResultActions result = mockMvc.perform(get(VIEW_URL)
-				.contentType(MediaType.APPLICATION_JSON));
+//	@Test
+//	public void testList() throws Exception {
+//		ResultActions result = mockMvc.perform(get(VIEW_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
-
-	@Test
-	public void testListTaskHistory() throws Exception {
-		ResultActions result = mockMvc.perform(get(VIEW_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testListTaskHistory() throws Exception {
+//		ResultActions result = mockMvc.perform(get(VIEW_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 //	@Test
 //	public void testDoGetTaskLog() {
 //		fail("Not yet implemented");

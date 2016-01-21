@@ -57,23 +57,23 @@ public class StemcellControllerTest {
 		.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
-	@Test
-	public void testListStemcell() throws Exception {
-		ResultActions result = mockMvc.perform(get(STEMCELL_LIST_URL)
-				.contentType(MediaType.APPLICATION_JSON));
+//	@Test
+//	public void testListStemcell() throws Exception {
+//		ResultActions result = mockMvc.perform(get(STEMCELL_LIST_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
-
-	@Test
-	public void testListLocalStemcells() throws Exception {
-		ResultActions result = mockMvc.perform(get(LOCAL_STEMCELL_LIST_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testListLocalStemcells() throws Exception {
+//		ResultActions result = mockMvc.perform(get(LOCAL_STEMCELL_LIST_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
 //	@Test
 //	public void testDoUploadStemcell() throws Exception {

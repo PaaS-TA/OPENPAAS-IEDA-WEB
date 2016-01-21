@@ -55,13 +55,13 @@ public class DeploymentsControllerTest {
 		.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
-	@Test
-	public void testListDeployment() throws Exception {
-		ResultActions result = mockMvc.perform(get(DEPLOYMENT_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testListDeployment() throws Exception {
+//		ResultActions result = mockMvc.perform(get(DEPLOYMENT_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
 }

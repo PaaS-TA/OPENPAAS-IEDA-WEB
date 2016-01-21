@@ -51,23 +51,23 @@ public class ReleaseControllerTest {
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
-	@Test
-	public void testList() throws Exception {
-		ResultActions result = mockMvc.perform(get(VIEW_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
-
-	@Test
-	public void testListRelease() throws Exception {
-		ResultActions result = mockMvc.perform(get(RELEASE_LIST_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testList() throws Exception {
+//		ResultActions result = mockMvc.perform(get(VIEW_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
+//
+//	@Test
+//	public void testListRelease() throws Exception {
+//		ResultActions result = mockMvc.perform(get(RELEASE_LIST_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
 	@Test
 	public void testListLocalRelease()  throws Exception {
@@ -105,23 +105,23 @@ public class ReleaseControllerTest {
 		.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
-	@Test
-	public void testListLocalFilterCfReleaseList() throws Exception {
-		ResultActions result = mockMvc.perform(get(LOCAL_FILTER_CF_RELEASE_LIST_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testListLocalFilterCfReleaseList() throws Exception {
+//		ResultActions result = mockMvc.perform(get(LOCAL_FILTER_CF_RELEASE_LIST_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 	
-	@Test
-	public void testListLocalFilterDiegoReleaseList() throws Exception {
-		ResultActions result = mockMvc.perform(get(LOCAL_FILTER_DIEGO_RELEASE_LIST_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testListLocalFilterDiegoReleaseList() throws Exception {
+//		ResultActions result = mockMvc.perform(get(LOCAL_FILTER_DIEGO_RELEASE_LIST_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
 //	@Test
 //	public void testDoUploadRelease() {
