@@ -112,12 +112,12 @@ public class IEDADirectorConfigService {
 								, createDto.getUserId()
 								, createDto.getUserPassword());
 		
-		log.debug("User Info ::: " + info.toString() + "\n isUser ::: " + ( info == null || info.getUser() == null || info.getUser().equals("") ) );
 		
 		if ( info == null || StringUtils.isEmpty(info.getUser())) {
 			throw new IEDACommonException("unauthenticated.director.exception",
 					"디렉터에 로그인 실패하였습니다.", HttpStatus.BAD_REQUEST);
 		}
+		log.debug("User Info ::: " + info.toString() + "\n isUser ::: " + ( info == null || info.getUser() == null || info.getUser().equals("") ) );
 		
 		Date now = new Date();
 

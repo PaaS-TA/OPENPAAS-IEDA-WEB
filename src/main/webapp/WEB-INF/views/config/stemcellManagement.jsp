@@ -33,6 +33,7 @@ var downloadClient = "";
 
 var completeButton = '<div class="btn btn-success btn-xs" style="width:100px;">Downloaded</div>';
 var downloadingButton = '<div class="btn btn-info btn-xs" style="width:100px;">Downloading</div>';
+
 $(function() {
  	$('#config_opStemcellsGrid').w2grid({
 		name: 'config_opStemcellsGrid',
@@ -43,7 +44,7 @@ $(function() {
 		style: 'text-align:center',
 		columns:[
 			 {field: 'recid', caption: '운영체계', hidden: true}
-			,{field: 'os', caption: '운영체계', size: '10%'}
+			,{field: 'os', caption: '운영체계', size: '10%'}			
 			,{field: 'osVersion', caption: '버전', size: '10%'}
 			,{field: 'iaas', caption: 'IaaS', size: '10%', sortable: true}
 			,{field: 'stemcellVersion', caption: '스템셀버전', size: '10%'}
@@ -58,7 +59,7 @@ $(function() {
 						return downloadingButton;
 					}
 					else{
-						return '<div class="btn" id="isExisted_'+record.recid+'" style="position: relative;"><div class="progress-label"></div></div>';
+						return '<div class="btn" id="isExisted_'+record.recid+'" style="position: relative;width:100px;"></div>';
 					}
 				}
 			}
@@ -166,33 +167,29 @@ function doSync() {
 		msg : '스템셀 목록을 동기화 하시겠습니까?',
 		title : '스템셀 목록 동기화',
 		yes_text : '확인',
-		no_text : '취소'
-	}).yes(function() {
-		
-		w2popup.lock('스템셀 목록 동기화 중입니다.', true);
-
-		$.ajax({
-			method : 'PUT',
-			type : "json",
-			url : "/syncPublicStemcell",
-			contentType : "application/json",
-			success : function(data, status) {
-				
-				w2ui['config_opStemcellsGrid'].reset();
-				doSearch();
-				w2popup.unlock();
-				w2alert("스템셀 목록 동기화 처리가 완료되었습니다.", "스템셀 목록 동기화");
-			},
-			error : function(request, status, error) {
-				w2popup.unlock();
-				var errorResult = JSON.parse(request.responseText);
-				w2alert(errorResult.message, "스템셀 목록 동기화");
-			}
-		});
-	}).no(function() {
-		// do nothing
-	});
-	
+		no_text : '취소',
+		yes_callBack : function(event){
+			w2ui['config_opStemcellsGrid'].lock('목록 동기화 중입니다.', true);
+			$.ajax({
+				method : 'PUT',
+				type : "json",
+				url : "/syncPublicStemcell",
+				contentType : "application/json",
+				success : function(data, status) {
+					
+					w2ui['config_opStemcellsGrid'].reset();
+					doSearch();
+					w2ui['config_opStemcellsGrid'].unlock();
+					w2alert("스템셀 목록 동기화 처리가 완료되었습니다.", "스템셀 목록 동기화");
+				},
+				error : function(request, status, error) {
+					w2ui['config_opStemcellsGrid'].unlock();
+					var errorResult = JSON.parse(request.responseText);
+					w2alert(errorResult.message, "스템셀 목록 동기화");
+				}
+			});
+		}
+	});	
 }
 
 // 스템셀 다운로드
@@ -203,76 +200,57 @@ function doDownload() {
 	var message = record.stemcellVersion + '버전의 스템셀 ' + record.stemcellFileName + '을 다운로드 하시겠습니까?';
 	
 	w2confirm({
-		msg : message,
-		title : '스템셀 다운로드',
-		yes_text : '확인',
-		no_text : '취소'
-	}).yes(function() {
-		var requestParameter = {
-				recid : record.recid,
-				key : record.key,
-				fileName : record.stemcellFileName,
-				fileSize : record.size
-			};
+		title 			: '스템셀 다운로드',
+		msg 			: message,
+		yes_text 		: '확인',
+		no_text 		: '취소',
+		yes_callBack	: function(event){
+			var requestParameter = {
+					recid 		: record.recid,
+					key 		: record.key,
+					fileName	: record.stemcellFileName,
+					fileSize	: record.size
+					};
 			progressGrow(requestParameter);		
-
-	}).no(function() {
-		// do nothing
+			
+		}
 	});
 }
 
 //PROGRESSBAR 생성
 function progressGrow(requestParameter) {
-	var progressbar = $("td #isExisted_" + requestParameter.recid);
-	var progressLabel = $(".progress-label");
+	//var progressbar = $("td #isExisted_" + requestParameter.recid);
 	var downloadPercentage = 0;
-	progressbar.progressbar({
-		value : false,
-		change : function() {
-			progressLabel.text( progressbar.progressbar("value") + "%" );
-		},
-		complete : function() {
-			//progressLabel.text("Complete!");
-		}
-	});
-	getDownloadStatus(requestParameter);
-}
-
-function getDownloadStatus(requestParameter){
-	var progressbar = $("td #isExisted_" + requestParameter.recid);
-	var progressLabel = $(".progress-label");
+	var progressBarDiv = '<div class="progress">';
+	progressBarDiv += '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" >';
+	progressBarDiv += '</div></div>';
+	$("#isExisted_" + requestParameter.recid).html(progressBarDiv);	
 	//소켓 연결
 	var socket = new SockJS('/stemcellDownloading');
 	downloadClient = Stomp.over(socket);
 	var status = 0;
 	downloadClient.connect({}, function(frame) {
-		console.log('Connected: ' + frame);
         downloadClient.subscribe('/socket/downloadStemcell', function(data){
         	//데이터에서 타겟을 받아서 지정
         	//progressbar status change
         	status = data.body.split('/')[1];
         	var recid = data.body.split('/')[0];
-        	console
-    		var targetProgressbar =  $("td #isExisted_" + recid);
-    		
         	console.log("### Download Status ::: " + status);
         	 if ( status < 100 ) {
-        		 $("td #isExisted_" + recid +" "+ ".progress-label").text( status+ "%" );
-        		 targetProgressbar.progressbar("value", status);
+        		 $("#isExisted_" + recid+ " .progress .progress-bar")
+        		 	.css({"width": status + "%"
+        		 		, "padding-top": "5px"
+        		 		, "text-align": "center"	
+        		 	}).text( status + "%");
 		    }
 		    else if(status == 100) {
-		    	progressLabel.text('');
-		    	targetProgressbar.parent().html(completeButton);
+		    	$("#isExisted_" + recid).parent().html(completeButton);
 		    }      		
         });
-		socketSendDownLoadData(requestParameter);
+        downloadClient.send("/send/stemcellDownloading", {}, JSON.stringify(requestParameter));
 	});
 }
 
-function socketSendDownLoadData(requestParameter) {
-	downloadClient.send("/send/stemcellDownloading", {}, JSON
-			.stringify(requestParameter));
-}
 
 // 스템셀 삭제
 function doDelete() {
@@ -284,32 +262,30 @@ function doDelete() {
 	};
 
 	w2confirm({
-		msg : '선택된 스템셀 ' + record.stemcellFileName + '을 삭제하시겠습니까?',
-		title : '스템셀 삭제',
-		yes_text : '확인',
-		no_text : '취소'
-	}).yes(function() {
-		
-		$.ajax({
-			method : 'delete',
-			type : "json",
-			url : "/deletePublicStemcell",
-			contentType : "application/json",
-			data : JSON.stringify(requestParameter),
-			success : function(data, status) {
-				record.isExisted = 'N';
-				w2ui['config_opStemcellsGrid'].reload();
-				$('#doDelete').attr('disabled', true);
-				w2ui['config_opStemcellsGrid'].selectNone();
-				w2alert("삭제 처리가 완료되었습니다.", "스템셀  삭제");
-			},
-			error : function(e) {
-				w2alert("오류가 발생하였습니다.");
-			}
-		});
-	}).no(function() {
-		// do nothing
-	});
+		title 		 : '스템셀 삭제',
+		msg 		 : '선택된 스템셀 ' + record.stemcellFileName + '을 삭제하시겠습니까?',
+		yes_text 	 : '확인',
+		no_text 	 : '취소',
+		yes_callBack : function(event){
+			$.ajax({
+				method 	: 'delete',
+				type 	: "json",
+				url 	: "/deletePublicStemcell",
+				contentType : "application/json",
+				data 	: JSON.stringify(requestParameter),
+				success : function(data, status) {
+					record.isExisted = 'N';
+					w2ui['config_opStemcellsGrid'].reload();
+					$('#doDelete').attr('disabled', true);
+					w2ui['config_opStemcellsGrid'].selectNone();
+					w2alert("삭제 처리가 완료되었습니다.", "스템셀  삭제");
+				},
+				error : function(e) {
+					w2alert("오류가 발생하였습니다.");
+				}
+			});
+		}
+	});		
 }
 
 function lock (msg) {

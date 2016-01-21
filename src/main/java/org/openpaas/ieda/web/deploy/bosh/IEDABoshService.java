@@ -61,7 +61,7 @@ public class IEDABoshService {
 		if( boshAwsList.size() > 0 ){
 			for(IEDABoshAwsConfig config : boshAwsList){
 				
-/*				// 기본관리자 UUID와 다른 경우 목록에서 제외
+/*				// 기본 설치 관리자 UUID와 다른 경우 목록에서 제외
 				if ( !defaultDirector.getDirectorUuid().equals(aws.getDirectorUuid()) )
 					continue;*/
 				
@@ -111,7 +111,7 @@ public class IEDABoshService {
 		if( boshOpenstackList.size() >0 ){
 			for(IEDABoshOpenstackConfig config : boshOpenstackList){
 				
-/*				// 기본관리자 UUID와 다른 경우 목록에서 제외
+/*				// 기본 설치 관리자 UUID와 다른 경우 목록에서 제외
 				if ( !defaultDirector.getDirectorUuid().equals(openstack.getDirectorUuid()) )
 					continue;*/
 				

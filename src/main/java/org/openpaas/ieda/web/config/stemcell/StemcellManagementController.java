@@ -73,6 +73,7 @@ public class StemcellManagementController extends BaseController {
 		log.debug("doDownload fileSize : " + new BigDecimal(dto.getFileSize()));
 		
 		stemcellDownloadService.doDownload(dto);
+		//stemcellDownloadService.stemcellDownloading(dto);
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

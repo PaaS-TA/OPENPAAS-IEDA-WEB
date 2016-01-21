@@ -73,35 +73,43 @@ $(function() {
   	
  	initView();
  	
- 	// 기본관리자 설정
+ 	// 기본 설치 관리자 설정
  	$("#setDefaultDirector").click(function(){
  		if($("#setDefaultDirector").attr('disabled') == "disabled") return;
  		
  		var selected = w2ui['config_directorGrid'].getSelection();
  		if( selected.length == 0 ){
- 			w2alert("선택된 정보가 없습니다.", "기본관리자 설정");
+ 			w2alert("선택된 정보가 없습니다.", "기본 설치 관리자 설정");
  			return;
  		}
  		else  if ( selected.length > 1 ){
- 			w2alert("기본관리자 설정은 하나만 선택 가능합니다.", "기본관리자 설정");
+ 			w2alert("기본 설치 관리자 설정은 하나만 선택 가능합니다.", "기본 설치 관리자 설정");
  			return;
  		}
  		else{
  			var record = w2ui['config_directorGrid'].get(selected);
  			if( record.defaultYn == "Y" ){
  				//클릭시 버튼  Disable 
- 				w2alert("선택한 설정관리자는 이미 기본관리자로 설정되어 있습니다.","기본관리자 설정");
+ 				w2alert("선택한 설치 관리자는 이미 기본 설치 관리자로 설정되어 있습니다.","기본 설치 관리자 설정");
  				return;
  			}
  			else{
-	 			w2confirm(record.directorName + "를 " + "기본관리자로 설정하시겠습니까?","기본관리자 설정")
-	 			.yes(function(){
-	 				registDefault(record.iedaDirectorConfigSeq, record.directorName);
-	 				w2ui['config_directorGrid'].reset();
-	 			})
-	 			.no(function () { 
-	 		        console.log("user clicked NO")
-	 		    });;
+	 			w2confirm({
+	 				title 			: "기본 설치 관리자 설정",
+	 				msg 			: record.directorName + "를 " + "기본 설치 관리자로 설정하시겠습니까?",
+	 				yes_text 		: "확인",
+	 				no_text			: "취소",
+	 				yes_callBack	: function(envent){
+	 									w2ui['config_directorGrid'].lock("기본 설치 관리자 설정 중입니다.", {
+	 										spinner: true, opacity : 1
+	 									});
+	 									registDefault(record.iedaDirectorConfigSeq, record.directorName);
+	 									w2ui['config_directorGrid'].reset();
+	 									},
+	 				no_callBack		: function(envent){ 
+	 		        						console.log("user clicked NO");
+	 		    						}
+	 			});
  			}
  		}
 	});
@@ -145,8 +153,12 @@ $(function() {
 		else {
 			var record = w2ui['config_directorGrid'].get(selected);
 
-			w2confirm("설치 관리자(" + record.directorName + ")를 삭제하시겠습니까?","설치 관리자 삭제")
-				.yes(function(){
+			w2confirm({
+				title		: "설치 관리자 삭제",
+				msg			: "설치 관리자(" + record.directorName + ")를 삭제하시겠습니까?",
+				yes_text	: "확인",
+				no_text		: "취소",
+				yes_callBack: function(event){
 					// 디렉터 삭제
 					deleteDirector(record.iedaDirectorConfigSeq);
 					
@@ -158,10 +170,12 @@ $(function() {
 					w2ui['config_directorGrid'].delete(record);
 					
 					initView();
-				})
-				.no(function () { 
-			        console.log("user clicked NO")
-			    });
+				},
+				no_callBack	: function(){
+					console.log("user clicked NO");
+				}
+						
+			});
 		}
 	});// 설정관리자 삭제 버튼 END
 });
@@ -269,7 +283,7 @@ function validateAllInputField() {
 	return isOk;
 }
 
-//기본관리자 설정
+//기본 설치 관리자 설정
 function registDefault(seq, target){
 	
 	$.ajax({
@@ -277,14 +291,14 @@ function registDefault(seq, target){
 		url : "/director/default/"+seq,
 		contentType : "application/json",
 		success : function(data, status) {
-			w2alert("기본 관리자를 \n" + target +"로 설정하였습니다.",  "기본관리자 설정", doSearch);
+			w2alert("기본 설치 관리자를 \n" + target +"로 설정하였습니다.",  "기본 설치 관리자 설정", doSearch);
 			
 			getDefaultDirector("<c:url value='/directors/default'/>");
 		},
 		error : function(request, status, error) {
 
 			var errorResult = JSON.parse(request.responseText);
-			w2alert(errorResult.message, "기본관리자 설정");
+			w2alert(errorResult.message, "기본 설치 관리자 설정");
 		}
 	});
 }
@@ -444,7 +458,7 @@ function lock (msg) {
 		<div class="title fl">설치관리자 목록</div>
 		<div class="fr"> 
 		<!-- Btn -->
-		<span id="setDefaultDirector" class="btn btn-primary" style="width:150px" >기본관리자로 설정</span>
+		<span id="setDefaultDirector" class="btn btn-primary" style="width:180px" >기본 설치 관리자로 설정</span>
 		<span id="addSetting" class="btn btn-primary" style="width:130px" >설정 추가</span>
 		<span id="updateSetting" class="btn btn-info" style="width:130px" >설정 수정</span>
 		<span id="deleteSetting" class="btn btn-danger" style="width:130px" >설정 삭제</span>
