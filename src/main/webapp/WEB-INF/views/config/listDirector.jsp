@@ -133,7 +133,7 @@ $(function() {
 		var selected = w2ui['config_directorGrid'].getSelection();
 		
 		if( selected.length == 0 ){
-			w2alert("선택된 정보가 없습니다.", "설치 관리자 삭제");
+			w2alert("선택된 정보가 없습니다.", "설치 관리자 정보 수정");
 			return;
 		}
 		
@@ -347,8 +347,8 @@ function registDirectorConfig(){
 function updateDirectorConfigPopup(record) {
 	
 	w2confirm({
-		title 	: "설치관리자 정보수정 확인",
-		msg		: "설치관리자 정보를 수정하시겠습니까?",
+		title 	: "설치 관리자 정보 수정",
+		msg		: "설치 관리자 정보를 수정하시겠습니까?",
 		yes_text: "확인",
 		yes_callBack : function(envent){
 			
