@@ -430,8 +430,6 @@ public final class Sha512Crypt {
 				"$6$rounds=10$roundstoolow", "the minimum number is still observed",
 				"$6$rounds=1000$roundstoolow$kUMsbe306n21p9R.FRkW3IGn.S9NPN0x50YhH1xhLsPuWGsUSklZt58jaTfF4ZEQpyUNGc0dqbpBYYBaHHrsX.", };
 
-		System.out.println("Starting Sha512Crypt tests now...");
-
 		for (int t = 0; t < (msgs.length / 3); t++) {
 			String saltPrefix = msgs[t * 3];
 			String plainText = msgs[t * 3 + 1];
@@ -439,19 +437,16 @@ public final class Sha512Crypt {
 
 			String result = Sha512_crypt(plainText, cryptText, 0);
 
-			System.out.println("test " + t + " result is:" + result);
-			System.out.println("test " + t + " should be:" + cryptText);
-
 			if (result.equals(cryptText)) {
-				System.out.println("Passed Crypt well");
+//				System.out.println("Passed Crypt well");
 			} else {
-				System.out.println("Failed Crypt Badly");
+//				System.out.println("Failed Crypt Badly");
 			}
 
 			if (verifyPassword(plainText, cryptText)) {
-				System.out.println("Passed verifyPassword well");
+//				System.out.println("Passed verifyPassword well");
 			} else {
-				System.out.println("Failed verifyPassword Badly");
+//				System.out.println("Failed verifyPassword Badly");
 			}
 		}
 	}

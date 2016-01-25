@@ -7,11 +7,11 @@ import java.util.Arrays;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
+import org.openpaas.ieda.web.information.stemcell.FileUploadRequestEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -42,9 +42,9 @@ public class ReleaseUploadAsyncService {
   			String uploadFile = releaseDir + System.getProperty("file.separator") + releaseFileName;
 			File fileToUpload = new File(uploadFile);
 			
-			postMethod.setRequestEntity(new FileRequestEntity(new File(uploadFile), "application/x-compressed"));
+			postMethod.setRequestEntity(new FileUploadRequestEntity(new File(uploadFile), "application/x-compressed", messagingTemplate, messageEndpoint));
 
-			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "Started", Arrays.asList("Uploading Release ...", ""));
+			DirectorRestHelper.sendTaskOutputWithTag(messagingTemplate, messageEndpoint, "Started", releaseFileName, Arrays.asList("Uploading Release ...", ""));
 			
 			int statusCode = httpClient.executeMethod(postMethod);
 			
@@ -54,14 +54,15 @@ public class ReleaseUploadAsyncService {
 				Header location = postMethod.getResponseHeader("Location");
 				String taskId = DirectorRestHelper.getTaskId(location.getValue());
 				
-				DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId, "event");
+				DirectorRestHelper.trackToTaskWithTag(defaultDirector, messagingTemplate, messageEndpoint, releaseFileName, httpClient, taskId, "event");
 				
-			} else {
-				DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("릴리즈 업로드 중 오류가 발생하였습니다.[" + statusCode + "]"));
+			}
+			else {
+				DirectorRestHelper.sendTaskOutputWithTag(messagingTemplate, messageEndpoint, "error", releaseFileName, Arrays.asList("릴리즈 업로드 중 오류가 발생하였습니다.[" + statusCode + "]"));
 			}
 			
 		} catch ( Exception e) {
-			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, "error", Arrays.asList("릴리즈 업로드 중 Exception이 발생하였습니다."));
+			DirectorRestHelper.sendTaskOutputWithTag(messagingTemplate, messageEndpoint, "error", releaseFileName, Arrays.asList("릴리즈 업로드 중 Exception이 발생하였습니다."));
 		}
 	}
 

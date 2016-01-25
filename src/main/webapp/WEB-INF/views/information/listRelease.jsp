@@ -8,8 +8,6 @@
 
 var uploadClient = null;
 var deleteClient = null;
-var appendLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:95%;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
-var appendLogPopupButton = '<button class="btn closeBtn" onclick="popupClose();">닫기</button>'
 
 $(function() {
  	// 기본 설치 관리자 정보 조회
@@ -177,7 +175,7 @@ function doDeleteRelease() {
 		, no_text:'취소'
 	})
 	.yes(function() {
-		appendLogPopup("delete",requestParameter);
+		deleteLogPopup(requestParameter);
 
 	})
 	.no(function() {
@@ -213,7 +211,7 @@ function LocalStemcellUploadOrDelete(op) {
 		})
 		.yes(function() {
 			if ( op == "upload" )
-				appendLogPopup("upload",requestParameter);
+				uploadLogPopup(requestParameter);
 			else if ( op == "delete" )
 				doDeleteLocalRelease(requestParameter);
 		})
@@ -250,19 +248,42 @@ function doDeleteLocalRelease(requestParameter) {
 }
 
 //Log Popup Create
-function appendLogPopup(type, requestParameter){
+function uploadLogPopup(requestParameter){
+	var uploadLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:85%;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
+	var uploadLogPopupButton = '<button id="closeBtn" class="btn closeBtn" onclick="popupClose(); disabled">확인</button>'
+	var progressLayer = '<div class="progress" style="height:6%;margin:10px 0 0 0;">';
+	progressLayer += '<div class="progress-bar progress-bar-striped active" role="progressbar" ';
+	progressLayer += 'aria-valuemin="0" aria-valuemax="100" style=";padding-top:0.5%;font-size:13px;"></div></div>';
 	
 	w2popup.open({
-		title	: (type == "upload") ? '<b>릴리즈 업로드</b>':'<b>릴리즈 삭제</b>',
-		body	: appendLogPopupBody,
-		buttons : appendLogPopupButton,
+		title	: '<b>릴리즈 업로드</b>',
+		body	: progressLayer + uploadLogPopupBody,
+		buttons : uploadLogPopupButton,
 		width 	: 800,
 		height	: 550,
 		modal	: true,
 		showMax : true,
 		onOpen  : function(){
-			if(type =="upload") doUploadConnect(requestParameter);
-			else doDeleteConnect(requestParameter);
+			doUploadConnect(requestParameter);
+		}
+	});
+}
+
+//Log Popup Create
+function deleteLogPopup(requestParameter){
+	var deleteLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:95%;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
+	var deleteLogPopupButton = '<button id="closeBtn" class="btn closeBtn" onclick="popupClose(); disabled">확인</button>';
+	
+	w2popup.open({
+		title	: '<b>릴리즈 삭제</b>',
+		body	: deleteLogPopupBody,
+		buttons : deleteLogPopupButton,
+		width 	: 800,
+		height	: 550,
+		modal	: true,
+		showMax : true,
+		onOpen  : function(){
+			doDeleteConnect(requestParameter);
 		}
 	});
 }
@@ -278,20 +299,33 @@ function doUploadConnect(requestParameter){
         console.log('Connected: ' + frame);
         uploadClient.subscribe('/socket/uploadRelease', function(data){
         	var response = JSON.parse(data.body);
-	        
-        	if ( response.messages != null ) {
-		       	for ( var i=0; i < response.messages.length; i++) {
-		       		$("textarea[name='logAppendArea']").append(response.messages[i] + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
-		       	}
-		       	
-		       	if ( response.state.toLowerCase() != "started" ) {
-		            if ( response.state.toLowerCase() == "done" )	message = message + " 업로드 되었습니다."; 
-		    		if ( response.state.toLowerCase() == "error" ) message = message + " 업로드 중 오류가 발생하였습니다.";
-		    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 업로드 중 취소되었습니다.";
-		    			
-		    		uploadClient.disconnect();
-					w2alert(message, "릴리즈 업로드");
-		       	}
+        	if(requestParameter.fileName == response.tag){
+	        	if(  response.state.toLowerCase() != "progress" ) {
+		        	if ( response.messages != null ) {
+				       	for ( var i=0; i < response.messages.length; i++) {
+				       		$("textarea[name='logAppendArea']").append(response.messages[i] + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
+				       	}
+				       	
+				       	if ( response.state.toLowerCase() != "started" ) {
+				            if ( response.state.toLowerCase() == "done" )	message = message + " 업로드 되었습니다."; 
+				    		if ( response.state.toLowerCase() == "error" ) message = message + " 업로드 중 오류가 발생하였습니다.";
+				    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 업로드 중 취소되었습니다.";
+				    			
+				    		uploadClient.disconnect();
+							w2alert(message, "릴리즈 업로드");
+				       	}
+		        	}
+	        	}
+	        	else{
+	        		//progressbar
+		       		console.log("#### :" + data);
+		       		if( response.messages < 100){
+		       			$(".w2ui-box1 .progress-bar").css("width", response.messages+"%").text("Uploading "+response.messages+"% ");
+		       		}
+		       		else if( response.messages = 100){
+		       			$(".w2ui-box1 .progress-bar").css("width", "100%").text("Uploaded");
+		       		}
+	        	}
         	}
         });
         socketSendUploadData(requestParameter);

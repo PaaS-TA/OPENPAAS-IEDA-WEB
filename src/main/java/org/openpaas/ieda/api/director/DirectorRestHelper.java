@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -153,7 +154,6 @@ public class DirectorRestHelper {
 				int statusCode = client.executeMethod(getTaskStausMethod);
 				log.debug("#### status code(" + messageEndpoint + ") : " + statusCode);
 				if (HttpStatus.valueOf(statusCode) != HttpStatus.OK) {
-					System.out.println("Query Task Status is not ok(" + statusCode + ").");
 					sendTaskOutput(messageTemplate, messageEndpoint, "error",
 							Arrays.asList("Task " + taskId + " : 상태 조회 중 오류가 발생하였습니다."));
 					break;
@@ -203,8 +203,7 @@ public class DirectorRestHelper {
 						}
 					}
 					// fetch event log
-					else 
-					{
+					else {
 						String outputs = getTaskOutputMethod.getResponseBodyAsString();
 	
 						// Convert output to JSON Format
@@ -222,8 +221,6 @@ public class DirectorRestHelper {
 								if (lastStage == null || !lastStage.equals(output.getStage())) {
 									responseMessage.add("");
 									responseMessage.add("  Started    " + output.getStage());
-									System.out.println("");
-									System.out.println("  Started    " + output.getStage());
 								}
 							}
 	
@@ -231,24 +228,19 @@ public class DirectorRestHelper {
 	
 								if (output.getState().equals("started")) {
 									responseMessage.add("  Started    " + output.getStage() + " > " + output.getTask());
-									System.out.println("  Started    " + output.getStage() + " > " + output.getTask());
 								} else if (output.getState().equals("finished")) {
 									responseMessage.add("  Done       " + output.getStage() + " > " + output.getTask());
-									System.out.println("  Done       " + output.getStage() + " > " + output.getTask());
 								} else if (output.getState().equals("failed")) {
 									responseMessage.add("  Failed      " + output.getStage() + " > " + output.getTask());
-									System.out.println("  Failed     " + output.getStage() + " > " + output.getTask());
 								} else {
 									responseMessage.add("  Processing " + output.getStage() + " > " + output.getTask() + " " + output.getProgress() + "%");
-									System.out.println("  Processing " + output.getStage() + " > " + output.getTask() + " " + output.getProgress() + "%");
 								}
-							} else {
+							}
+							else {
 								HashMap<String, String> error = output.getError();
 								if (error != null) {
 									responseMessage.add(
 											"  Error Code : " + error.get("code") + ", Message :" + error.get("message"));
-									System.out.println(
-											"  Error Code : " + error.get("error") + ", Message :" + error.get("message"));
 								}
 							}
 	
@@ -263,22 +255,18 @@ public class DirectorRestHelper {
 
 				// Task 완료 여부 확인
 				if (taskInfo.getState().equalsIgnoreCase("done")) {
-					System.out.println("Task " + taskId + " done");
 					sendTaskOutput(messageTemplate, messageEndpoint, "done",
 							Arrays.asList("", "Task " + taskId + " done"));
 					status = "done";
 					break;
 				} else if (taskInfo.getState().equalsIgnoreCase("error")) {
-					System.out.println("An error occurred while executing the task " + taskId);
 					sendTaskOutput(messageTemplate, messageEndpoint, "error",
 							Arrays.asList("", "An error occurred while executing the task " + taskId));
 					status = "error";
 					break;
 				} else if (taskInfo.getState().equalsIgnoreCase("cancelled")) {
-					System.out.println("Cancelled Task " + taskId);
 					sendTaskOutput(messageTemplate, messageEndpoint, "cancelled",
-							Arrays.
-							asList("", "Canceled Task " + taskId));
+							Arrays.asList("", "Canceled Task " + taskId));
 					status = "cancelled";
 					break;
 				}
@@ -294,6 +282,155 @@ public class DirectorRestHelper {
 		
 		return status;
 	}
+	
+	public static String trackToTaskWithTag(IEDADirectorConfig defaultDirector, SimpMessagingTemplate messageTemplate, 
+			String messageEndpoint, String tag, HttpClient client, String taskId, String logType) {
+		
+		String status = "";
+
+		try {
+			sendTaskOutputWithTag(messageTemplate, messageEndpoint, "started", tag, Arrays.asList("Director task " + taskId));
+
+			ObjectMapper mapper = new ObjectMapper();
+
+			String lastStage = null;
+			int offset = 0;
+			while (true) {
+				// Task 상태 조회
+				GetMethod getTaskStausMethod = new GetMethod(DirectorRestHelper
+						.getTaskStatusURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), taskId));
+				getTaskStausMethod = (GetMethod) DirectorRestHelper.setAuthorization(defaultDirector.getUserId(),
+						defaultDirector.getUserPassword(), (HttpMethodBase) getTaskStausMethod);
+				int statusCode = client.executeMethod(getTaskStausMethod);
+				log.debug("#### status code(" + messageEndpoint + ") : " + statusCode);
+				if (HttpStatus.valueOf(statusCode) != HttpStatus.OK) {
+					sendTaskOutputWithTag(messageTemplate, messageEndpoint, "error", tag, 
+							Arrays.asList("Task " + taskId + " : 상태 조회 중 오류가 발생하였습니다."));
+					break;
+				}
+
+				// Convert Json to TaskInfo Object
+				TaskInfo taskInfo = mapper.readValue(getTaskStausMethod.getResponseBodyAsString(), TaskInfo.class);
+
+				// Task Output 조회
+				GetMethod getTaskOutputMethod = new GetMethod(DirectorRestHelper.getTaskOutputURI(
+						defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), taskId, logType));
+				getTaskOutputMethod = (GetMethod) DirectorRestHelper.setAuthorization(defaultDirector.getUserId(),
+						defaultDirector.getUserPassword(), (HttpMethodBase) getTaskOutputMethod);
+				String range = "bytes=" + offset + "-";
+				getTaskOutputMethod.setRequestHeader("Range", range);
+				statusCode = client.executeMethod(getTaskOutputMethod);
+
+				if (statusCode == HttpStatus.NO_CONTENT.value()) {
+					Thread.sleep(THREAD_SLEEP_TIME);
+					continue;
+				}
+
+				if (statusCode == HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE.value()) {
+					Thread.sleep(THREAD_SLEEP_TIME);
+					continue;
+				}
+
+				if (statusCode == HttpStatus.OK.value() || statusCode == HttpStatus.PARTIAL_CONTENT.value()) {
+
+					Header contentRange = getTaskOutputMethod.getResponseHeader("Content-Range");
+					if (contentRange == null) {
+						Thread.sleep(THREAD_SLEEP_TIME);
+						continue;
+					}
+					if ( !StringUtils.isEmpty(contentRange) ) {
+						String[] splited = contentRange.getValue().split("/");
+						offset = Integer.parseInt(splited[1]);
+					}
+
+					// fetch debug Log
+					if ( logType.equals("debug") ) {
+						String[] outputs = getTaskOutputMethod.getResponseBodyAsString().split("\n");
+						
+						for ( String output : outputs ) {
+							Thread.sleep(10);
+							sendTaskOutputWithTag(messageTemplate, messageEndpoint, "started", tag, Arrays.asList(output));
+						}
+					}
+					// fetch event log
+					else {
+						String outputs = getTaskOutputMethod.getResponseBodyAsString();
+	
+						// Convert output to JSON Format
+						outputs = outputs.substring(0, outputs.length() - 1).replace("\n", ",");
+						outputs = "[" + outputs + "]";
+	
+						// Convert Json to TaskOutput Object
+						List<TaskOutput> taskOutputList = mapper.readValue(outputs, new TypeReference<List<TaskOutput>>() {
+						});
+	
+						List<String> responseMessage = new ArrayList<String>();
+						for (TaskOutput output : taskOutputList) {
+	
+							if (output.getStage() != null) {
+								if (lastStage == null || !lastStage.equals(output.getStage())) {
+									responseMessage.add("");
+									responseMessage.add("  Started    " + output.getStage());
+								}
+							}
+	
+							if (output.getStage() != null) {
+	
+								if (output.getState().equals("started")) {
+									responseMessage.add("  Started    " + output.getStage() + " > " + output.getTask());
+								} else if (output.getState().equals("finished")) {
+									responseMessage.add("  Done       " + output.getStage() + " > " + output.getTask());
+								} else if (output.getState().equals("failed")) {
+									responseMessage.add("  Failed      " + output.getStage() + " > " + output.getTask());
+								} else {
+									responseMessage.add("  Processing " + output.getStage() + " > " + output.getTask() + " " + output.getProgress() + "%");
+								}
+							}
+							else {
+								HashMap<String, String> error = output.getError();
+								if (error != null) {
+									responseMessage.add(
+											"  Error Code : " + error.get("code") + ", Message :" + error.get("message"));
+								}
+							}
+	
+							lastStage = output.getStage();
+						}
+	
+						sendTaskOutputWithTag(messageTemplate, messageEndpoint, "started", tag, responseMessage);
+					}
+				}
+
+				log.debug("### task info : " + taskInfo.getState());
+				// Task 완료 여부 확인
+				if (taskInfo.getState().equalsIgnoreCase("done")) {
+					sendTaskOutputWithTag(messageTemplate, messageEndpoint, "done", tag,
+							Arrays.asList("", "Task " + taskId + " done"));
+					status = "done";
+					break;
+				} else if (taskInfo.getState().equalsIgnoreCase("error")) {
+					sendTaskOutputWithTag(messageTemplate, messageEndpoint, "error", tag, 
+							Arrays.asList("", "An error occurred while executing the task " + taskId));
+					status = "error";
+					break;
+				} else if (taskInfo.getState().equalsIgnoreCase("cancelled")) {
+					sendTaskOutputWithTag(messageTemplate, messageEndpoint, "cancelled", tag, 
+							Arrays.asList("", "Canceled Task " + taskId));
+					status = "cancelled";
+					break;
+				}
+
+				Thread.sleep(THREAD_SLEEP_TIME);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			sendTaskOutputWithTag(messageTemplate, messageEndpoint, "error", tag,
+					Arrays.asList("", "An exception occurred while executing the task " + taskId));
+			status = "error";
+		}
+		
+		return status;
+	}
 
 	public static void sendTaskOutput(SimpMessagingTemplate messageTemplate, String messageEndpoint, String status, List<String> messages) {
 		ResponseTaskOuput response = new ResponseTaskOuput();
@@ -303,5 +440,13 @@ public class DirectorRestHelper {
 		messageTemplate.convertAndSend(messageEndpoint, response);
 	}
 	
+	public static void sendTaskOutputWithTag(SimpMessagingTemplate messageTemplate, String messageEndpoint, String status, String tag, List<String> messages) {
+		ResponseTaskOuput response = new ResponseTaskOuput();
+		response.setState(status);
+		response.setTag(tag);
+		response.setMessages(messages);
+
+		messageTemplate.convertAndSend(messageEndpoint, response);
+	}
 	
 }

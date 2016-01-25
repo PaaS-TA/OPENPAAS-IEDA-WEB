@@ -7,8 +7,6 @@
 <script type="text/javascript">
 var uploadClient = null;
 var deleteClient = null;
-var appendLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:95%;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
-var appendLogPopupButton = '<button id="closeBtn" class="btn closeBtn" onclick="popupClose(); disabled">확인</button>'
 
 $(function() {
 	
@@ -163,7 +161,7 @@ function doDeleteStemcell() {
 		, no_text:'취소'
 	})
 	.yes(function() {
-		appendLogPopup("delete",requestParameter);
+		deleteLogPopup(requestParameter);
 	})
 	.no(function() {
 		// do nothing
@@ -189,7 +187,7 @@ function doUploadStemcell() {
 		, no_text:'취소'
 		})
 		.yes(function() {
-			appendLogPopup("upload",requestParameter);
+			uploadLogPopup(requestParameter);
 		})
 		.no(function() {
 			// do nothing
@@ -197,22 +195,45 @@ function doUploadStemcell() {
 }
 
 //Log Popup Create
-function appendLogPopup(type, requestParameter){
+function uploadLogPopup(requestParameter){
+	var uploadLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:85%;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
+	var uploadLogPopupButton = '<button id="closeBtn" class="btn closeBtn" onclick="popupClose(); disabled">확인</button>'
+	var progressLayer = '<div class="progress" style="height:6%;margin:10px 0 0 0;">';
+	progressLayer += '<div class="progress-bar progress-bar-striped active" role="progressbar" ';
+	progressLayer += 'aria-valuemin="0" aria-valuemax="100" style=";padding-top:0.5%;font-size:13px;"></div></div>';
+	
 	w2popup.open({
-		title	: (type =="upload") ? '<b>스템셀 업로드</b>': '<b>스템셀 삭제</b>',
-		body	: appendLogPopupBody,
-		buttons : appendLogPopupButton,
+		title	: '<b>스템셀 업로드</b>',
+		body	: progressLayer + uploadLogPopupBody,
+		buttons : uploadLogPopupButton,
 		width 	: 800,
-		height	: 550,		
+		height	: 550,
 		modal	: true,
 		showMax : true,
 		onOpen  : function(){
-			if(type =="upload") doUploadConnect(requestParameter);
-			else doDeleteConnect(requestParameter);
+			doUploadConnect(requestParameter);
 		}
 	});
 }
 
+//Log Popup Create
+function deleteLogPopup(requestParameter){
+	var deleteLogPopupBody = '<br/><textarea name="logAppendArea" readonly="readonly" style="width:100%;height:95%;overflow-y:visible ;resize:none;background-color: #FFF;"></textarea>';
+	var deleteLogPopupButton = '<button id="closeBtn" class="btn closeBtn" onclick="popupClose(); disabled">확인</button>';
+	
+	w2popup.open({
+		title	: '<b>스템셀 삭제</b>',
+		body	: deleteLogPopupBody,
+		buttons : deleteLogPopupButton,
+		width 	: 800,
+		height	: 550,
+		modal	: true,
+		showMax : true,
+		onOpen  : function(){
+			doDeleteConnect(requestParameter);
+		}
+	});
+}
 
 //Stemcell Upload connect
 function doUploadConnect(requestParameter){
@@ -226,21 +247,35 @@ function doUploadConnect(requestParameter){
         uploadClient.subscribe('/socket/uploadStemcell', function(data){
 
         	var response = JSON.parse(data.body);
-	        
-        	if ( response.messages != null ) {
-		       	for ( var i=0; i < response.messages.length; i++) {
-		       		$("textarea[name='logAppendArea']").append(response.messages[i] + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
-		       	}
-		       	
-		       	if ( response.state.toLowerCase() != "started" ) {
-		            if ( response.state.toLowerCase() == "done" )	message = message + " 업로드 되었습니다."; 
-		    		if ( response.state.toLowerCase() == "error" ) message = message + " 업로드 중 오류가 발생하였습니다.";
-		    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 업로드 중 취소되었습니다.";
-		    			
-		    		uploadClient.disconnect();
-					w2alert(message, "스템셀 업로드");
-		       	}
-        	}
+        	console.log("##### : "+ requestParameter.fileName + " : " + response.tag +" = " +(requestParameter.fileName == response.tag) );
+	        if(requestParameter.fileName == response.tag){
+	        	if ( response.messages != null ) {
+	        		if(  response.state.toLowerCase() != "progress" ) {
+				       	for ( var i=0; i < response.messages.length; i++) {
+				       		$("textarea[name='logAppendArea']").append(response.messages[i] + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
+				       	}
+				       	
+				       	if ( response.state.toLowerCase() != "started" ) {
+				            if ( response.state.toLowerCase() == "done" )	message = message + " 업로드 되었습니다."; 
+				    		if ( response.state.toLowerCase() == "error" ) message = message + " 업로드 중 오류가 발생하였습니다.";
+				    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 업로드 중 취소되었습니다.";
+				    			
+				    		uploadClient.disconnect();
+							w2alert(message, "스템셀 업로드");
+				       	}
+	        		}
+	        		else { 
+			       		//progressbar
+			       		console.log("#### :" + data);
+			       		if( response.messages < 100){
+			       			$(".w2ui-box1 .progress-bar").css("width", response.messages+"%").text("Uploading "+response.messages+"% ");
+			       		}
+			       		else if( response.messages = 100){
+			       			$(".w2ui-box1 .progress-bar").css("width", "100%").text("Uploaded");
+			       		}
+			       	}
+	        	}
+	        }
         });
         socketSendUploadData( requestParameter);
     });
