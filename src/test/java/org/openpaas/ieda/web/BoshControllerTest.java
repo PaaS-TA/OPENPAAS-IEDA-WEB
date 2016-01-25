@@ -143,13 +143,13 @@ public class BoshControllerTest {
 //		fail("Not yet implemented");
 //	}
 
-	@Test
-	public void testListRelease() throws Exception{
-		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(BOSH_RELEASES_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-		
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testListRelease() throws Exception{
+//		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(BOSH_RELEASES_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//		
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
 }
