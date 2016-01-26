@@ -229,19 +229,26 @@ public class ReleaseService {
 					
 					List<ReleaseVersion> versionList = release.getReleaseVersions();
 					for (ReleaseVersion releaseVersion : versionList) {
-						if(release.getName().matches(".*"+filterName+".*")){
-							ReleaseInfo releaseInfo = new ReleaseInfo();
-							releaseInfo.setRecid(idx++);
-							releaseInfo.setName(release.getName());
-							releaseInfo.setVersion(releaseVersion.getVersion());
-	//						releaseInfo.setCurrentDeployed(releaseVersion.getCurrentlyDeployed().toString());
-	//						releaseInfo.setJobNames(releaseVersion.getJobNames().toString());
-							
-							if ( releaseInfoList == null ) 
-								releaseInfoList = new ArrayList<ReleaseInfo>();
-							
-							releaseInfoList.add(releaseInfo);
-						}
+//						if(release.getName().matches(".*"+filterName+".*")){
+//							ReleaseInfo releaseInfo = new ReleaseInfo();
+//							releaseInfo.setRecid(idx++);
+//							releaseInfo.setName(release.getName());
+//							releaseInfo.setVersion(releaseVersion.getVersion());
+//							
+//							if ( releaseInfoList == null ) 
+//								releaseInfoList = new ArrayList<ReleaseInfo>();
+//							
+//							releaseInfoList.add(releaseInfo);
+//						}
+						ReleaseInfo releaseInfo = new ReleaseInfo();
+						releaseInfo.setRecid(idx++);
+						releaseInfo.setName(release.getName());
+						releaseInfo.setVersion(releaseVersion.getVersion());
+						
+						if ( releaseInfoList == null ) 
+							releaseInfoList = new ArrayList<ReleaseInfo>();
+						
+						releaseInfoList.add(releaseInfo);
 					}
 				}
 				
