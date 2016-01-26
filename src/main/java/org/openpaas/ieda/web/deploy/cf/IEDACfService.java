@@ -165,7 +165,7 @@ public class IEDACfService {
 			items.add(new ReplaceItem("[deploymentName]", awsConfig.getDeploymentName()));
 			items.add(new ReplaceItem("[directorUuid]", awsConfig.getDirectorUuid()));
 			items.add(new ReplaceItem("[releaseName]", awsConfig.getReleaseName()));
-			items.add(new ReplaceItem("[releaseVersion]", awsConfig.getReleaseVersion()));
+			items.add(new ReplaceItem("[releaseVersion]", "\""+awsConfig.getReleaseVersion() +"\""));
 			items.add(new ReplaceItem("[appSshFingerprint]", awsConfig.getAppSshFingerprint()));
 			
 			// 1.2 기본정보
