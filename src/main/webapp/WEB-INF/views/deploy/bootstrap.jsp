@@ -1519,23 +1519,23 @@ function osDeployPopup(){
 			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;네트워크 정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;서브넷 ID(NET ID)</label>
+					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;서브넷 ID</label>
 					<div>
-						<input name="subnetId" type="text"  style="float:left;width:330px;"  placeholder="예) subnet-XXXXXX"/>
+						<input name="subnetId" type="text"  style="float:left;width:330px;"  placeholder="서브넷 ID를 입력하세요."/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 내부 IP</label>
 					<div>
-						<input name="privateStaticIp" type="text"  style="float:left;width:330px;" placeholder="설치관리자에 할당할 디렉터 내부 IP를 입력하세요."/>
+						<input name="privateStaticIp" type="text"  style="float:left;width:330px;" placeholder="디렉터 내부 IP를 입력하세요."/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 공인 IP</label>
 					<div>
-						<input name="publicStaticIp" type="text"  style="float:left;width:330px;" required placeholder="설치관리자에 할당할 디렉터 공인 IP를 입력하세요."/>
+						<input name="publicStaticIp" type="text"  style="float:left;width:330px;" required placeholder="디렉터 공인 IP를 입력하세요."/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1690,9 +1690,9 @@ function osDeployPopup(){
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<form id="keyForm" data-toggle="validator" >
 					<div class="w2ui-field">
-						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;AUTH URL</label>
+						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Identify API Tokens URL</label>
 						<div>
-							<input name="authUrl" type="text"  style="float:left;width:60%;"  required placeholder="Identify API 인증 링크를 입력하세요."/>
+							<input name="authUrl" type="text"  style="float:left;width:60%;"  required placeholder="Identify API Tokens URL을 입력하세요."/>
 							<div class="isMessage"></div>
 						</div>
 					</div>
@@ -1704,14 +1704,14 @@ function osDeployPopup(){
 						</div>
 					</div>
 					<div class="w2ui-field">
-						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;User Name</label>
+						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Username</label>
 						<div>
 							<input name="userName" type="text"  style="float:left;width:60%;" required placeholder="계정명을 입력하세요."/>
 							<div class="isMessage"></div>
 						</div>
 					</div>
 					<div class="w2ui-field">
-						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;API KEY</label>
+						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Password</label>
 						<div>
 							<input name="apiKey" type="text"  style="float:left;width:60%;"   required placeholder="계정 비밀번호를 입력하세요."/>
 							<div class="isMessage"></div>
@@ -1818,23 +1818,23 @@ function osDeployPopup(){
 			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 네트워크 정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;서브넷 ID(NET ID)</label>
+					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;네트워크 ID</label>
 					<div>
-						<input name="subnetId" type="text"  style="float:left;width:330px;" required placeholder="예) subnet-XXXXXX"/>
+						<input name="subnetId" type="text"  style="float:left;width:330px;" required placeholder="네트워크 ID를 입력하세요."/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 내부 IP</label>
 					<div>
-						<input name="privateStaticIp" type="text"  style="float:left;width:330px;" required placeholder="설치관리자에 할당할 디렉터 내부 IP를 입력하세요."/>
+						<input name="privateStaticIp" type="text"  style="float:left;width:330px;" required placeholder="디렉터 내부 IP를 입력하세요."/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 공인 IP</label>
 					<div>
-						<input name="publicStaticIp" type="text"  style="float:left;width:330px;"  required placeholder="설치관리자에 할당할 디렉터 공인 IP를 입력하세요."/>
+						<input name="publicStaticIp" type="text"  style="float:left;width:330px;"  required placeholder="디렉터 공인 IP를 입력하세요."/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
