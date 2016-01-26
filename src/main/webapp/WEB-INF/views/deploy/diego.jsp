@@ -73,7 +73,7 @@ Diego
 					}
 				, {field: 'deployLog', caption: '배포로그', size: '100px',
 					render: function(record) {
-			    			if ( record.deployStatus == 'done' || record.deployStatus == 'error') {
+							if ( (record.deployStatus == 'done' || record.deployStatus == 'error') && record.deployLog != null ) {
 			       				return '<span id="" class="btn btn-primary" style="width:60px" onClick="getDeployLogMsg( \'diego\', \''+record.iaas+'\', \''+record.id+'\');">로그보기</span>';
 							}
 			    			else {
@@ -253,10 +253,7 @@ Diego
 			yes_callBack :function() {
 				iaas = $(".w2ui-msg-body input:radio[name='structureType']:checked").val();
 				if (iaas) {
-					if (iaas == "AWS")
-						defaultPopup();
-					else
-						osDiegoInfoPopup();
+					defaultPopup();
 				} else {
 					w2alert("DIEGO를 설치할 클라우드 환경을 선택하세요");
 				}

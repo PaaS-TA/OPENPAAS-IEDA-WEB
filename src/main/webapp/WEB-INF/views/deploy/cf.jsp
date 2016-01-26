@@ -61,7 +61,7 @@
 					}
 				, {field: 'deployLog', caption: '배포로그', size: '100px',
 					render: function(record) {
-						if ( record.deployStatus == 'done' || record.deployStatus == 'error') {
+							if ( (record.deployStatus == 'done' || record.deployStatus == 'error') && record.deployLog != null ) {
 			       				return '<span id="" class="btn btn-primary" style="width:60px" onClick="getDeployLogMsg( \'cf\', \''+record.iaas+'\', \''+record.id+'\');">로그보기</span>';
 							}
 			    			else {
@@ -422,8 +422,7 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					console.log("ppp");
-					if (awsInfo != "" && awsInfo != "") {
+					if (awsInfo != "" && awsInfo != null) {
 						$(".w2ui-msg-body input[name='deploymentName']").val(awsInfo.deploymentName);
 						$(".w2ui-msg-body input[name='directorUuid']").val(awsInfo.directorUuid);
 						$(".w2ui-msg-body input[name='appSshFingerprint']").val(awsInfo.appSshFingerprint);
@@ -437,9 +436,7 @@
 						$(".w2ui-msg-body textarea[name='sslPemRsa']").val(awsInfo.sslPemRsa);
 					}
 					else{
-						console.log("aaa");
 						if( !checkEmpty($("#directorUuid").text()) ){
-							console.log("bbb");
 							$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
 						}
 					}
@@ -819,7 +816,7 @@
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					if (openstackInfo != "") {
+					if ( openstackInfo != "" && openstackInfo != null ) {
 						$(".w2ui-msg-body input[name='deploymentName']").val(openstackInfo.deploymentName);
 						$(".w2ui-msg-body input[name='directorUuid']").val(openstackInfo.directorUuid);
 						$(".w2ui-msg-body input[name='appSshFingerprint']").val(openstackInfo.appSshFingerprint);
@@ -831,6 +828,11 @@
 						$(".w2ui-msg-body input[name='proxyStaticIps']").val(openstackInfo.proxyStaticIps);
 						$(".w2ui-msg-body textarea[name='sslPemPub']").val(openstackInfo.sslPemPub);
 						$(".w2ui-msg-body textarea[name='sslPemRsa']").val(openstackInfo.sslPemRsa);
+					}
+					else{
+						if( !checkEmpty($("#directorUuid").text()) ){
+							$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
+						}
 					}
 					w2popup.lock("릴리즈를 조회 중입니다.", true);
 					getCfRelease();

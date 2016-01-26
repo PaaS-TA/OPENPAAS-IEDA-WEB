@@ -92,7 +92,7 @@ $(function() {
 				}
 			, {field: 'deployLog', caption: '배포로그', size: '100px',
 				render: function(record) {
-						if ( record.deployStatus == 'done' || record.deployStatus == 'error') {
+						if ( (record.deployStatus == 'done' || record.deployStatus == 'error') && record.deployLog != null ) {
 		       				return '<span id="" class="btn btn-primary" style="width:60px" onClick="getDeployLogMsg( \'bootstrap\', \''+record.iaas+'\', \''+record.id+'\');">로그보기</span>';
 						}
 		    			else {
@@ -115,7 +115,16 @@ $(function() {
 			, {field: 'stemcell', caption: '스템셀', size: '320px'}
 			, {field: 'instanceType', caption: '인스턴스 유형', size: '100px'}
 			, {field: 'boshPassword', caption: 'VM 비밀번호', size: '100px'}
-			, {field: 'deploymentFile', caption: '배포파일명', size: '150px'}
+			, {field: 'deploymentFile', caption: '배포파일명', size: '150px',
+					render: function(record) {
+						if ( record.deploymentFile != null ) {
+		       				return '<a href="/common/downloadDeploymentFile/'+recored.deploymentFile+'">' + recored.deploymentFile + '</a>';
+						}
+		    			else {
+		    				return 'N/A';
+						}
+					}
+				}
 			, {field: 'createdDate', caption: '생성일자', size: '100px', hidden: true}
 			, {field: 'updatedDate', caption: '수정일자', size: '100px', hidden: true}
 			

@@ -122,7 +122,7 @@ public class IEDABootstrapService {
 		String deplymentFileName = ""; 
 		
 		try {
-			settingFileName = iaas.toLowerCase() + "-microbosh-param-"+id+".yml";
+			settingFileName = iaas.toLowerCase() + "-microbosh-"+id+".yml";
 			
 			InputStream paramIs =  this.getClass().getClassLoader().getResourceAsStream("static/deploy_template/"+iaas.toLowerCase()+"-microbosh-param.yml");
 			InputStream stubIs =  this.getClass().getClassLoader().getResourceAsStream("static/deploy_template/"+iaas.toLowerCase()+"-microbosh-stub.yml");

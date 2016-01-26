@@ -229,7 +229,7 @@ public class ReleaseService {
 					
 					List<ReleaseVersion> versionList = release.getReleaseVersions();
 					for (ReleaseVersion releaseVersion : versionList) {
-//						if(release.getName().matches(".*"+filterName+".*")){
+//						if(release.getName().matches(".*"+filterName.toLowerCase()+".*")){
 //							ReleaseInfo releaseInfo = new ReleaseInfo();
 //							releaseInfo.setRecid(idx++);
 //							releaseInfo.setName(release.getName());

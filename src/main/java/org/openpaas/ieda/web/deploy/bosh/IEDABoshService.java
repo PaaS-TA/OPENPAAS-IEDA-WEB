@@ -165,7 +165,7 @@ public class IEDABoshService {
 
 		String content = "";
 		String stubContent = "";
-		String settingFileName = iaas.toLowerCase()+"-bosh-param-"+id+".yml";
+		String settingFileName = iaas.toLowerCase()+"-bosh-"+id+".yml";
 		
 		String deplymentFileName = ""; 
 		

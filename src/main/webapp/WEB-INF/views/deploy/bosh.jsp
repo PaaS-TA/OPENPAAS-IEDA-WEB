@@ -89,7 +89,7 @@ $(function(){
 				}
 			, {field: 'deployLog', caption: '배포로그', size: '100px',
 				render: function(record) {
-					if ( record.deployStatus == 'done' || record.deployStatus == 'error') {
+					if ( (record.deployStatus == 'done' || record.deployStatus == 'error') && record.deployLog != null ) {
 		       				return '<span id="" class="btn btn-primary" style="width:60px" onClick="getDeployLogMsg( \'bosh\', \''+record.iaas+'\', \''+record.id+'\');">로그보기</span>';
 						}
 		    			else {
