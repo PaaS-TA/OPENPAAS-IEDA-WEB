@@ -42,7 +42,7 @@ function goPage(page, title) {
 		<li><a href="javascript:goPage('<c:url value="/deploy/bootstrap"/>', 'BOOTSTRAP 설치');">BOOTSTRAP 설치</a></li>
 		<li><a href="javascript:goPage('<c:url value="/deploy/bosh"/>', 'BOSH 설치');">BOSH 설치</a></li>		
 		<li><a href="javascript:goPage('<c:url value="/deploy/cf"/>', 'CF 설치');">CF 설치</a></li>
-		<li><a href="javascript:goPage('<c:url value="/deploy/diego"/>', 'DIEGO 설치');">Diego 설치</a></li>
+		<li><a href="javascript:goPage('<c:url value="/deploy/diego"/>', 'DIEGO 설치');">DIEGO 설치</a></li>
 		</ul>
 	</div>
 	

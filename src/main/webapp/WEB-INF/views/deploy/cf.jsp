@@ -1385,7 +1385,7 @@
 </script>
 
 <div id="main">
-	<div class="page_site">플랫폼 설치 > <strong>Cf 설치</strong></div>
+	<div class="page_site">플랫폼 설치 > <strong>CF 설치</strong></div>
 
 	<!-- 설치 관리자 -->
 	<div id="isDefaultDirector"></div>
