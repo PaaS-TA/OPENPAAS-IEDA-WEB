@@ -212,7 +212,7 @@ public class IEDACfService {
 			items.add(new ReplaceItem("[deploymentName]", openstackConfig.getDeploymentName()));
 			items.add(new ReplaceItem("[directorUuid]", openstackConfig.getDirectorUuid()));
 			items.add(new ReplaceItem("[releaseName]", openstackConfig.getReleaseName()));
-			items.add(new ReplaceItem("[releaseVersion]", openstackConfig.getReleaseVersion()));
+			items.add(new ReplaceItem("[releaseVersion]", "\""+openstackConfig.getReleaseVersion()+"\""));
 
 			// 1.2 기본정보
 			items.add(new ReplaceItem("[domain]", openstackConfig.getDomain()));
