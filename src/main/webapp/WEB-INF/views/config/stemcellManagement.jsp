@@ -211,14 +211,14 @@ function doDownload() {
 					fileName	: record.stemcellFileName,
 					fileSize	: record.size
 					};
-			progressGrow(requestParameter);		
+			progressGrow(requestParameter, record );		
 			
 		}
 	});
 }
 
 //PROGRESSBAR 생성
-function progressGrow(requestParameter) {
+function progressGrow(requestParameter, record) {
 	//var progressbar = $("td #isExisted_" + requestParameter.recid);
 	var downloadPercentage = 0;
 	var progressBarDiv = '<div class="progress">';
@@ -245,6 +245,8 @@ function progressGrow(requestParameter) {
 		    }
 		    else if(status == 100) {
 		    	$("#isExisted_" + recid).parent().html(completeButton);
+		    	doSearch();
+		    	w2ui['config_opStemcellsGrid'].select("");
 		    }      		
         });
         downloadClient.send("/send/stemcellDownloading", {}, JSON.stringify(requestParameter));
