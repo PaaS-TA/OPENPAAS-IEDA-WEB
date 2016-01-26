@@ -470,7 +470,7 @@ function iaasSelectPopup() {
 				else openstackPopup();				
 			}
 			else{
-				w2alert("설치할 Infrastructure 을 선택하세요");
+				w2alert("BOOTSTRAP을 설치할 클라우드 환경을 선택하세요");
 			}
 		}
 	});
@@ -1348,7 +1348,7 @@ function osDeployPopup(){
 	<!-- Infrastructure  설정 DIV -->
 	<div id="bootSelectBody" style="width:100%; height: 80px;" hidden="true">
 		<div class="w2ui-lefted" style="text-align: left;">
-			설치할 Infrastructure 을 선택하세요<br />
+			BOOTSTRAP을 설치할 클라우드 환경을 선택하세요<br />
 			<br />
 		</div>
 		<div class="col-sm-9">

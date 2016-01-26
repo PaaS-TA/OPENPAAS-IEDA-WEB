@@ -246,7 +246,7 @@ function selectIaas(){
 					openstackPopup();				
 			}
 			else{
-				w2alert("설치할 Infrastructure 을 선택하세요");
+				w2alert("BOSH를 설치할 클라우드 환경을 선택하세요");
 			}
 		}
 	});
