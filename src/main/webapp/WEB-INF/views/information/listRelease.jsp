@@ -36,17 +36,14 @@ $(function() {
 		       } */
 		       , {field: 'jobNames', caption: 'Job템플릿', size: '70%', style: 'text-align:left'}
 		       ],
-		onClick: function(event) {
-			var grid = this;
+		onSelect: function(event) {
 			event.onComplete = function() {
-				var sel = grid.getSelection();
-				if ( sel == null || sel == "") {
-					setDisable($('#doDeleteRelease'), true);
-					return;
-				}
-				else{
-					setDisable($('#doDeleteRelease'), false);
-				}
+				setDisable($('#doDeleteRelease'), false);
+			}
+		},
+		onUnselect: function(event) {
+			event.onComplete = function() {
+				setDisable($('#doDeleteRelease'), true);
 			}
 		},
 		onError: function(event) {
@@ -69,19 +66,18 @@ $(function() {
 		       , {field: 'releaseFile', caption: '릴리즈 파일명', size: '50%', style: 'text-align:left'}
 		       , {field: 'releaseFileSize', caption: '릴리즈 파일크기', size: '50%', style: 'text-align:right'}		       
 		       ],
-		onClick: function(event) {
-			var grid = this;
+       onSelect: function(event) {
 			event.onComplete = function() {
-				var sel = grid.getSelection();
-				if ( sel == null || sel == "" || bDefaultDirector == false) {
-					setDisable($('#doUploadRelease'), true);
-					setDisable($('#doDeleteLocalRelease'), true);
-					return;
-				}
-				else{
+				if (  bDefaultDirector ) {
 					setDisable($('#doUploadRelease'), false);
 					setDisable($('#doDeleteLocalRelease'), false);
 				}
+			}
+		},
+		onUnselect: function(event) {
+			event.onComplete = function() {
+				setDisable($('#doUploadRelease'), true);
+				setDisable($('#doDeleteLocalRelease'), true);
 			}
 		},
 		onError: function(event) {

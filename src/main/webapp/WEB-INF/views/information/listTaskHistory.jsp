@@ -32,20 +32,16 @@ $(function() {
 			,{field: 'description', caption: '실행내용', size: '25%', style:"text-align:left"}
 			,{field: 'result', caption: '결과', size: '35%', style:"text-align:left"}
 		],
-		onClick: function(event) {
-			var grid = this;
+		onSelect: function(event) {
 			event.onComplete = function() {
-				var sel = grid.getSelection();
-				if ( sel == null || sel == "") {
-					setDisable($('#showDebugLogBtn'), true);
-					setDisable($('#showEventLogBtn'), true);
-					return;
-				}
-				else{
-					setDisable($('#showDebugLogBtn'), false);
-					setDisable($('#showEventLogBtn'), false);
-
-				}
+				setDisable($('#showDebugLogBtn'), false);
+				setDisable($('#showEventLogBtn'), false);
+			}
+		},
+		onUnselect: function(event) {
+			event.onComplete = function() {
+				setDisable($('#showDebugLogBtn'), true);
+				setDisable($('#showEventLogBtn'), true);
 			}
 		},
 		onError: function(event) {

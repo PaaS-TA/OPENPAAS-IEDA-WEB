@@ -33,17 +33,14 @@ $(function() {
 		        	 	}
 		        	 } */
 		         ],
- 		onClick: function(event) {
-			var grid = this;
+ 		onSelect: function(event) {
+			event.onComplete = function() { 				
+				setDisable($('#doDeleteStemcell'), false);
+			}
+		},
+		onUnselect: function(event) {
 			event.onComplete = function() {
- 				var sel = grid.getSelection();
-				if ( sel == null || sel == "" ) {
-					setDisable($('#doDeleteStemcell'), true);
-					return;
-				}
-				else{
-					setDisable($('#doDeleteStemcell'), false);
-				}
+				setDisable($('#doDeleteStemcell'), true);
 			}
 		},
 		onError: function(event) {
@@ -66,16 +63,16 @@ $(function() {
 			,{field: 'stemcellVersion', caption: '스템셀버전', size: '10%'}
 			,{field: 'stemcellFileName', caption: '파일명', size: '60%', style: 'text-align:left'}
 		],
-		onClick: function(event) {
-			var grid = this;
+		onSelect: function(event) {
 			event.onComplete = function() {
- 				var sel = grid.getSelection();
-				if ( sel == null || sel == "" || bDefaultDirector == false) {
-					setDisable($('#doUploadStemcell'), true);
-					return;
+				if ( bDefaultDirector ) {
+					setDisable($('#doUploadStemcell'), false);
 				}
-				
-				setDisable($('#doUploadStemcell'), false);
+			}
+		},
+		onUnselect: function(event) {
+			event.onComplete = function() {
+				setDisable($('#doUploadStemcell'), true);
 			}
 		},
 		onError: function(event) {
