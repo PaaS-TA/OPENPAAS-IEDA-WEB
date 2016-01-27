@@ -211,7 +211,7 @@ public class IEDABoshService {
 			items.add(new ReplaceItem("[deploymentName]", awsConfig.getDeploymentName()));
 			items.add(new ReplaceItem("[directorUuid]", awsConfig.getDirectorUuid()));
 			items.add(new ReplaceItem("[publicStaticIp]", awsConfig.getPublicStaticIp()));
-			items.add(new ReplaceItem("[releaseVersion]", awsConfig.getReleaseVersion().split("/")[1]));
+			items.add(new ReplaceItem("[releaseVersion]", "\"" + awsConfig.getReleaseVersion().split("/")[1] + "\""));
 			
 			// Network
 			items.add(new ReplaceItem("[subnetId]", awsConfig.getSubnetId()));			
@@ -242,7 +242,7 @@ public class IEDABoshService {
 			// BOSH
 			items.add(new ReplaceItem("[deploymentName]", openstackConfig.getDeploymentName()));
 			items.add(new ReplaceItem("[directorUuid]", openstackConfig.getDirectorUuid()));
-			items.add(new ReplaceItem("[releaseVersion]", openstackConfig.getReleaseVersion().split("/")[1]));
+			items.add(new ReplaceItem("[releaseVersion]", "\"" + openstackConfig.getReleaseVersion().split("/")[1] + "\""));
 			
 			// Network
 			items.add(new ReplaceItem("[publicStaticIp]", openstackConfig.getPublicStaticIp()));

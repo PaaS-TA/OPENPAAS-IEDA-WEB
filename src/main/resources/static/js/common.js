@@ -148,7 +148,6 @@ function popupValidation(){
 							$(this).css({"border-color":"red"});
 						}
 					}
-					
 					$(this).css({"border-color":"red"});
 				}
 				else if( tagType.toLowerCase() == "textarea" ){
@@ -156,6 +155,7 @@ function popupValidation(){
 					$(this).css({"border-color":"red"}); //.parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color":"red"});
 				}
 				
+				console.log("===== : " + label);
 				if(label) emptyFieldLabels.push(label);
 			}
 			//값이 있을 경우
@@ -202,7 +202,7 @@ function popupValidation(){
 			return;
 		}
 		
-		w2alert(emptyFieldLabels[0] + "을(를) 필드값을 확인하세요.", $(".w2ui-msg-title b").text() );
+		w2alert(emptyFieldLabels[0] + "을(를) 확인하세요.", $(".w2ui-msg-title b").text() );
 	}
 	else{
 		checkValidation = true;
@@ -260,3 +260,27 @@ function deployLogMsgPopup(service, iaas, msg){
 
 //한글입력 방지
 //var popupBodySelector = document.getElement('w2ui-msg-body');
+
+//DeploymentFile Download
+function getDownloadDeploymentFile( fileName ){
+	
+	var requestParameter = {
+			deployFileName : fileName
+	}
+	$.ajax({
+		type : "POST",
+		url : "/common/downloadDeploymentFile",///"+ fileName.split(".")[0]
+        contentType : 'application/json;charset=UTF-8',
+        data : JSON.stringify(requestParameter),
+		success : function(data) {
+			console.log(" in sucess");
+			window.open(data);
+			//window.location.href = data;
+		},
+		error:function (xhr, ajaxOptions, thrownError){
+			console.log(" in error"+ xhr);
+			console.log(" in error"+ ajaxOptions);
+			console.log(" in error"+ thrownError);
+		}
+	});	
+}

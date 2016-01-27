@@ -70,13 +70,14 @@ public class IEDACfService {
 					cfInfo.setSubnetStaticFrom(config.getSubnetStaticFrom());
 					cfInfo.setSubnetStaticTo(config.getSubnetStaticTo());
 					cfInfo.setSubnetId(config.getSubnetId());
-					
+					cfInfo.setCloudSecurityGroups(config.getCloudSecurityGroups());
 					cfInfo.setStemcellName(config.getStemcellName());
 					cfInfo.setStemcellVersion(config.getStemcellVersion());
 					cfInfo.setBoshPassword(config.getBoshPassword());
 					
 					cfInfo.setDeployStatus(config.getDeployStatus());
-					cfInfo.setDeployStatus(config.getDeployStatus());
+					cfInfo.setDeployLog(config.getDeployLog());
+					cfInfo.setDeploymentFile(config.getDeploymentFile());
 					cfList.add(cfInfo);
 				}
 			}
@@ -110,13 +111,14 @@ public class IEDACfService {
 					cfInfo.setSubnetStaticFrom(config.getSubnetStaticFrom());
 					cfInfo.setSubnetStaticTo(config.getSubnetStaticTo());
 					cfInfo.setSubnetId(config.getCloudNetId());
-					
+					cfInfo.setCloudSecurityGroups(config.getCloudSecurityGroups());
 					cfInfo.setStemcellName(config.getStemcellName());
 					cfInfo.setStemcellVersion(config.getStemcellVersion());
 					cfInfo.setBoshPassword(config.getBoshPassword());
 					
 					cfInfo.setDeployStatus(config.getDeployStatus());
-					cfInfo.setDeployStatus(config.getDeployStatus());
+					cfInfo.setDeployLog(config.getDeployLog());
+					cfInfo.setDeploymentFile(config.getDeploymentFile());
 					cfList.add(cfInfo);
 				}
 			}
@@ -165,7 +167,7 @@ public class IEDACfService {
 			items.add(new ReplaceItem("[deploymentName]", awsConfig.getDeploymentName()));
 			items.add(new ReplaceItem("[directorUuid]", awsConfig.getDirectorUuid()));
 			items.add(new ReplaceItem("[releaseName]", awsConfig.getReleaseName()));
-			items.add(new ReplaceItem("[releaseVersion]", "\""+awsConfig.getReleaseVersion() +"\""));
+			items.add(new ReplaceItem("[releaseVersion]", "\"" + awsConfig.getReleaseVersion() + "\""));
 			items.add(new ReplaceItem("[appSshFingerprint]", awsConfig.getAppSshFingerprint()));
 			
 			// 1.2 기본정보
@@ -212,7 +214,7 @@ public class IEDACfService {
 			items.add(new ReplaceItem("[deploymentName]", openstackConfig.getDeploymentName()));
 			items.add(new ReplaceItem("[directorUuid]", openstackConfig.getDirectorUuid()));
 			items.add(new ReplaceItem("[releaseName]", openstackConfig.getReleaseName()));
-			items.add(new ReplaceItem("[releaseVersion]", "\""+openstackConfig.getReleaseVersion()+"\""));
+			items.add(new ReplaceItem("[releaseVersion]", "\"" + openstackConfig.getReleaseVersion() + "\""));
 
 			// 1.2 기본정보
 			items.add(new ReplaceItem("[domain]", openstackConfig.getDomain()));

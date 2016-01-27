@@ -1,12 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<%
-response.setHeader("Cache-Control","no-cache");
-response.setHeader("Pragma","no-cache"); 
-response.setDateHeader("Expires",0);
-%>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,7 +8,7 @@ response.setDateHeader("Expires",0);
 <meta http-equiv="Cache-Control" content="no-cache" /> 
 <meta http-equiv="Expires" content="0" />
 <meta http-equiv="Pragma" content="no-cache" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Open PaaS 플랫폼 설치 자동화</title>

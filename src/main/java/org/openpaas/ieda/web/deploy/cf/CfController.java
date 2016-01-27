@@ -54,7 +54,7 @@ public class CfController extends BaseController{
 	@RequestMapping(value="/deploy/cfList", method=RequestMethod.GET)
 	public ResponseEntity listCfs() {
 		List<CfInfo> content = cfService.listCfs();
-		
+		System.out.println("#####\n" + content);
 		Map<String, Object> result = new HashMap<>();
 		
 		result.put("total", (content == null) ? 0:content.size());

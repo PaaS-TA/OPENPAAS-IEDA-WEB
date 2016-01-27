@@ -1,14 +1,20 @@
 package org.openpaas.ieda.web.common;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.IOUtils;
@@ -71,11 +77,16 @@ public class CommonService {
 			try {
 				String keyFilePath = LocalDirectoryConfiguration.getSshDir() + System.getProperty("file.separator") + mpf.getOriginalFilename();
 				byte[] bytes = mpf.getBytes();
+				File isKeyFile = new File(keyFilePath);
 				BufferedOutputStream stream =
-						new BufferedOutputStream(new FileOutputStream(new File(keyFilePath)));
+						new BufferedOutputStream(new FileOutputStream(isKeyFile));
 				stream.write(bytes);
 				stream.close();
 
+				isKeyFile.setReadOnly();
+				//isKeyFile.setReadable(true, true);
+				//isKeyFile.setWritable(false, false);
+				//isKeyFile.canRead();
 				log.debug("keyFilePath : " + keyFilePath);
 
 			} catch (IOException e) {
@@ -173,4 +184,24 @@ public class CommonService {
 		}
 		return deployLog;
 	}
+
+	//	public FileInputStream downloadDeploymentFile(String deploymentFileName) {
+	////		InputStream is = new FileInputStream(LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName);
+	////		IOUtils.copy(is);
+	//		File file = null;
+	//		FileInputStream fis = null; 
+	//		
+	//		try {
+	//			file = new File(LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName);
+	//			
+	//			//fis = new FileInputStream(file);
+	//		}
+	//		catch (FileNotFoundException e) {
+	//			// TODO Auto-generated catch block
+	//			e.printStackTrace();
+	//		}
+	//		
+	//		return fis;
+	//	}
+
 }

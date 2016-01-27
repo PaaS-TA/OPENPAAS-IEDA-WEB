@@ -61,6 +61,7 @@
 					}
 				, {field: 'deployLog', caption: '배포로그', size: '100px',
 					render: function(record) {
+							console.log("###" + record.deployStatus  +" / " + record.deployStatus +" / " + record.deployLog )
 							if ( (record.deployStatus == 'done' || record.deployStatus == 'error') && record.deployLog != null ) {
 			       				return '<span id="" class="btn btn-primary" style="width:60px" onClick="getDeployLogMsg( \'cf\', \''+record.iaas+'\', \''+record.id+'\');">로그보기</span>';
 							}
@@ -117,6 +118,18 @@
 					}
 				, {field: 'createdDate', caption: '생성일자', size: '100px', hidden: true}
 				, {field: 'updatedDate', caption: '수정일자', size: '100px', hidden: true}
+				, {field: 'deploymentFile', caption: '배포파일명', size: '180px',
+					render: function(record) {
+						if ( record.deploymentFile != null ) {
+		       				//return '<a style="color:#333;" onClick="getDownloadDeploymentFile(\''+record.deploymentFile+'\')">' + record.deploymentFile + '</a>';
+		       				//return '<a style="color:#333;" href="/common/downloadDeploymentFile/'+record.deploymentFile+'">' + record.deploymentFile + '</a>';
+							return record.deploymentFile;
+						}
+		    			else {
+		    				return 'N/A';
+						}
+					}
+				}
 				],
 			onClick:function(event) {
 				var grid = this;
@@ -528,6 +541,7 @@
 		}
 		
 		if( type == 'after'){
+			console.log("=====saveAwsUaaInfo====");
 			if (popupValidation()) {
 				//ajax AwsInfo Save
 				$.ajax({
@@ -1560,19 +1574,15 @@
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;개인키</label>
 					<div>
-						<div>
 						<textarea name="signingKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="개인키를 입력하세요." ></textarea>
-					</div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;공개키</label>
 					<div>
-						<div>
 						<textarea name="verificationKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="공개키를 입력하세요." ></textarea>
-					</div>
 					</div>
 				</div>
 			</div>
@@ -1966,19 +1976,15 @@
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;개인키</label>
 					<div>
-						<div>
 						<textarea name="signingKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="개인키를 입력하세요." ></textarea>
-					</div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;공개키</label>
 					<div>
-						<div>
 						<textarea name="verificationKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
 							required placeholder="공개키를 입력하세요." ></textarea>
-					</div>
 					</div>
 				</div>
 			</div>

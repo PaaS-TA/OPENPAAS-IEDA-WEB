@@ -190,13 +190,13 @@ public class IEDADiegoService {
 			items.add(new ReplaceItem("[deploymentName]", config.getDeploymentName()));
 			items.add(new ReplaceItem("[directorUuid]", config.getDirectorUuid()));
 			items.add(new ReplaceItem("[diegoReleaseName]", config.getDiegoReleaseName()));
-			items.add(new ReplaceItem("[diegoReleaseVersion]", config.getDiegoReleaseVersion()));
+			items.add(new ReplaceItem("[diegoReleaseVersion]", "\"" + config.getDiegoReleaseVersion() + "\""));
 			items.add(new ReplaceItem("[cfReleaseName]", config.getCfReleaseName()));
-			items.add(new ReplaceItem("[cfReleaseVersion]", config.getCfReleaseVersion()));
+			items.add(new ReplaceItem("[cfReleaseVersion]", "\"" + config.getCfReleaseVersion() + "\""));
 			items.add(new ReplaceItem("[gardenLinuxReleaseName]", config.getGardenLinuxReleaseName()));
-			items.add(new ReplaceItem("[gardenLinuxReleaseVersion]", config.getGardenLinuxReleaseVersion()));
+			items.add(new ReplaceItem("[gardenLinuxReleaseVersion]", "\"" + config.getGardenLinuxReleaseVersion() + "\""));
 			items.add(new ReplaceItem("[etcdReleaseName]", config.getEtcdReleaseName()));
-			items.add(new ReplaceItem("[etcdReleaseVersion]", config.getEtcdReleaseVersion()));
+			items.add(new ReplaceItem("[etcdReleaseVersion]", "\"" + config.getEtcdReleaseVersion() + "\""));
 			//1.2 CF 정보
 			items.add(new ReplaceItem("[domain]", config.getDomain()));
 			items.add(new ReplaceItem("[deployment]", config.getDeployment()));
@@ -249,13 +249,13 @@ public class IEDADiegoService {
 			items.add(new ReplaceItem("[deploymentName]", config.getDeploymentName()));
 			items.add(new ReplaceItem("[directorUuid]", config.getDirectorUuid()));
 			items.add(new ReplaceItem("[diegoReleaseName]", config.getDiegoReleaseName()));
-			items.add(new ReplaceItem("[diegoReleaseVersion]", config.getDiegoReleaseVersion()));
+			items.add(new ReplaceItem("[diegoReleaseVersion]", "\"" + config.getDiegoReleaseVersion() + "\""));
 			items.add(new ReplaceItem("[cfReleaseName]", config.getCfReleaseName()));
-			items.add(new ReplaceItem("[cfReleaseVersion]", config.getCfReleaseVersion()));
+			items.add(new ReplaceItem("[cfReleaseVersion]", "\"" + config.getCfReleaseVersion() + "\""));
 			items.add(new ReplaceItem("[gardenLinuxReleaseName]", config.getGardenLinuxReleaseName()));
-			items.add(new ReplaceItem("[gardenLinuxReleaseVersion]", config.getGardenLinuxReleaseVersion()));
+			items.add(new ReplaceItem("[gardenLinuxReleaseVersion]", "\"" + config.getGardenLinuxReleaseVersion() + "\""));
 			items.add(new ReplaceItem("[etcdReleaseName]", config.getEtcdReleaseName()));
-			items.add(new ReplaceItem("[etcdReleaseVersion]", config.getEtcdReleaseVersion()));
+			items.add(new ReplaceItem("[etcdReleaseVersion]", "\"" + config.getEtcdReleaseVersion() + "\""));
 			//1.2 CF 정보
 			items.add(new ReplaceItem("[domain]", config.getDomain()));
 			items.add(new ReplaceItem("[deployment]", config.getDeployment()));

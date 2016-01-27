@@ -139,6 +139,18 @@ Diego
 					}
 				, {field: 'createdDate', caption: '생성일자', size: '100px', hidden: true}
 				, {field: 'updatedDate', caption: '수정일자', size: '100px', hidden: true}
+				, {field: 'deploymentFile', caption: '배포파일명', size: '180px',
+					render: function(record) {
+							if ( record.deploymentFile != null ) {
+			       				//return '<a style="color:#333;" onClick="getDownloadDeploymentFile(\''+record.deploymentFile+'\')">' + record.deploymentFile + '</a>';
+			       				//return '<a style="color:#333;" href="/common/downloadDeploymentFile/'+record.deploymentFile+'">' + record.deploymentFile + '</a>';
+								return record.deploymentFile;
+							}
+			    			else {
+			    				return 'N/A';
+							}
+						}
+					}
 				],
 			onClick:function(event) {
 				var grid = this;
@@ -1572,28 +1584,22 @@ Diego
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Consul Agent Cert</label>
 					<div>
-						<div>
 						<textarea name="consulAgentCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
 							required placeholder="Consul 서버의 Agent Cert를 입력하세요." onblur="overlay($(this).val());"></textarea>
-					</div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Consul Agent Key</label>
 					<div>
-						<div>
 						<textarea name="consulAgentKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
 							required placeholder="Consul Agent Key를 입력하세요." onblur="overlay($(this).val());"></textarea>
-					</div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Consul CaCert</label>
 					<div>
-						<div>
 						<textarea name="consulCaCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
 							required placeholder="Consul CaCert를 입력하세요." onblur="overlay($(this).val());"></textarea>
-					</div>
 					</div>
 				</div>
 				<div class="w2ui-field">
@@ -1606,19 +1612,15 @@ Diego
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Consul ServerCert</label>
 					<div>
-						<div>
 						<textarea name="consulServerCert" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
 							required placeholder="Consul ServerCert를 입력하세요." onblur="overlay($(this).val());"></textarea>
-					</div>
 					</div>
 				</div>
 				<div class="w2ui-field">
 					<label style="text-align:left; width:40%; font-size:11px;">&bull;&nbsp;Consul ServerKey</label>
 					<div>
-						<div>
 						<textarea name="consulServerKey" style="float:left; width:60%; height:80px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
 							required placeholder="Consul ServerKey를 입력하세요." onblur="overlay($(this).val());"></textarea>
-					</div>
 					</div>
 				</div>
 			</div>

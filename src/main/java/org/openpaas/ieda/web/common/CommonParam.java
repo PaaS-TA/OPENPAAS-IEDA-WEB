@@ -15,4 +15,10 @@ public class CommonParam {
 		@NotNull
 		private Integer id;
 	}
+	
+	@Data
+	public static class Download{
+		@NotNull
+		private String deployFileName;
+	}
 }
