@@ -5,7 +5,7 @@
 
 	<groupId>org.openpaas.ieda</groupId>
 	<artifactId>OPENPAAS-IEDA-WEB</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>OPENPAAS-IEDA-WEB</name>
@@ -183,7 +183,16 @@
 			<artifactId>esapi</artifactId>
 			<version>2.0GA</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>2.10.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-rest</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

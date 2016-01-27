@@ -124,6 +124,18 @@ $(function(){
 			, {field: 'cloudInstanceType', caption: '인스턴스 유형', size: '100px'}
 			, {field: 'createdDate', caption: '생성일자', size: '100px', hidden: true}
 			, {field: 'updatedDate', caption: '수정일자', size: '100px', hidden: true}
+			, {field: 'deploymentFile', caption: '배포파일명', size: '180px',
+				render: function(record) {
+						if ( record.deploymentFile != null ) {
+		       				//return '<a style="color:#333;" onClick="getDownloadDeploymentFile(\''+record.deploymentFile+'\')">' + record.deploymentFile + '</a>';
+		       				//return '<a style="color:#333;" href="/common/downloadDeploymentFile/'+record.deploymentFile+'">' + record.deploymentFile + '</a>';
+							return record.deploymentFile;
+						}
+		    			else {
+		    				return 'N/A';
+						}
+					}
+				}
 			],
 		onClick:function(event) {
 			var grid = this;
@@ -1383,15 +1395,15 @@ $( window ).resize(function() {
 			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 네트워크정보 설정</div>
 			<div class="w2ui-page page-0" style="padding-left: 5%;">
 				<div class="w2ui-field">
-					<label style="text-align: left; width:40%; font-size: 11px;">&bull;&nbsp;서브넷 ID(NET ID)</label>
+					<label style="text-align: left; width:40%; font-size: 11px;">&bull;&nbsp;서브넷 ID</label>
 					<div>
-						<input name="subnetId" type="text"  style="float:left;width:60%;"  required placeholder="예) subnet-XXXXXX"/>
+						<input name="subnetId" type="text"  style="float:left;width:60%;"  required placeholder="서브넷 ID를 입력하세요."/>
 					</div>
 				</div>
 				<div class="w2ui-field">
 		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 공인 IP</label>
 		            <div>
-		                <input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="설치관리자에 할당할 디렉터 공인 IP를 입력하세요."/>
+		                <input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="디렉터 공인 IP를 입력하세요."/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>
@@ -1535,7 +1547,7 @@ $( window ).resize(function() {
 		            <li class="active">오픈스택 정보</li>
 		            <li class="before">기본 정보</li>
 		            <li class="before">네트워크 정보</li>
-		            <li class="before">리소스 설정</li>
+		            <li class="before">리소스 정보</li>
 		            <li class="before">배포파일 정보</li>
 		            <li class="before">설치</li>
 	            </ul>
@@ -1544,9 +1556,9 @@ $( window ).resize(function() {
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<form id="keyForm" data-toggle="validator" >
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;AUTH URL</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Identify API Tokens URL</label>
 			            <div>
-			                <input name="authUrl" type="text"  style="float:left;width:60%;"  required placeholder="Identify API 인증 링크를 입력하세요."/>
+			                <input name="authUrl" type="text"  style="float:left;width:60%;"  required placeholder="Identify API Tokens URL을 입력하세요."/>
 			            </div>
 			        </div>
 			        
@@ -1558,14 +1570,14 @@ $( window ).resize(function() {
 			        </div>
 			        
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;User Name</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Username</label>
 			            <div>
 			                <input name="userName" type="text"  style="float:left;width:60%;"  required placeholder="계정명을 입력하세요."/>
 			            </div>
 			        </div>
 			        
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;API Key</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Password</label>
 			            <div>
 			                <input name="apiKey" type="text"  style="float:left;width:60%;"  required placeholder="계정 비밀번호를 입력하세요."/>
 			            </div>
@@ -1673,16 +1685,16 @@ $( window ).resize(function() {
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;서브넷 ID(NET ID)</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;네트워크 ID</label>
 		            <div>
-		                <input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="예) subnet-XXXXXX"/>
+		                <input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 ID를 입력하세요."/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>
 				<div class="w2ui-field">
 		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 공인 IP</label>
 		            <div>
-		                <input name="publicStaticIp" type="text"  style="float:left;width:60%;" required placeholder="설치관리자에 할당할 디렉터 공인 IP를 입력하세요."/>
+		                <input name="publicStaticIp" type="text"  style="float:left;width:60%;" required placeholder="디렉터 공인 IP를 입력하세요."/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>
