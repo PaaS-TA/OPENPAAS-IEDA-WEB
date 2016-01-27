@@ -26,7 +26,6 @@ import org.modelmapper.ModelMapper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
-import org.openpaas.ieda.web.config.stemcell.StemcellManagementParam.Download;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

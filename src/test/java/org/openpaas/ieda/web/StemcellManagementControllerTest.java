@@ -1,6 +1,5 @@
 package org.openpaas.ieda.web;
 
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.junit.Before;

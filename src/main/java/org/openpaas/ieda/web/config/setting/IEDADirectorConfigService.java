@@ -20,7 +20,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.openpaas.ieda.api.Info;
 import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
-import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

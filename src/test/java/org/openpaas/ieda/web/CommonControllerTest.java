@@ -1,12 +1,8 @@
 package org.openpaas.ieda.web;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.openpaas.ieda.web.common.CommonController;
-import org.openpaas.ieda.web.common.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;

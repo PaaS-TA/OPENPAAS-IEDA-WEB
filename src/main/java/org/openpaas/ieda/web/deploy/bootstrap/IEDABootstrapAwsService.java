@@ -2,8 +2,6 @@ package org.openpaas.ieda.web.deploy.bootstrap;
 
 import java.util.Date;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.openpaas.ieda.common.IEDACommonException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
