@@ -137,20 +137,20 @@ $(function(){
 					}
 				}
 			],
-		onClick:function(event) {
-			var grid = this;
+		onSelect : function(event) {
 			event.onComplete = function() {
-				var sel = grid.getSelection();
-
-				if ( sel == null || sel == "" || bDefaultDirector == false ) {
-					$('#modifyBtn').attr('disabled', true);
-					$('#deleteBtn').attr('disabled', true);
-					return;
-				}
-				else{
+				if ( bDefaultDirector  != null) {
 					$('#modifyBtn').attr('disabled', false);
 					$('#deleteBtn').attr('disabled', false);
+					return;
 				}
+			}
+		},
+		onUnselect : function(event) {
+			event.onComplete = function() {
+				$('#modifyBtn').attr('disabled', true);
+				$('#deleteBtn').attr('disabled', true);
+				return;
 			}
 		}
 	});

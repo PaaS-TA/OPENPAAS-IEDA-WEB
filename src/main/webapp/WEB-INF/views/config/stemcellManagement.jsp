@@ -64,15 +64,10 @@ $(function() {
 				}
 			}
 		],
-		onClick: function(event) {
+		onSelect: function(event) {
 			var grid = this;
 			event.onComplete = function() {
 				var sel = grid.getSelection();
-				if ( sel == null || sel == "") {
-					$('#doDownload').attr('disabled', true);
-					$('#doDelete').attr('disabled', true);
-					return;
-				}
 				
 				var record = grid.get(sel);
 				if ( record.isExisted == 'Y' ) {
@@ -87,6 +82,13 @@ $(function() {
 					// 삭제 버튼 Disable
 					$('#doDelete').attr('disabled', true);
 				}
+			}
+		},
+		onUnselect: function(event) {
+			var grid = this;
+			event.onComplete = function() {
+				$('#doDownload').attr('disabled', true);
+				$('#doDelete').attr('disabled', true);
 			}
 		}
 		

@@ -131,20 +131,18 @@ $(function() {
 			, {field: 'updatedDate', caption: '수정일자', size: '100px', hidden: true}
 			
 			],
-		onClick:function(event) {
-			var grid = this;
+		onSelect : function(event) {
 			event.onComplete = function() {
-				var sel = grid.getSelection();
-				if ( sel == null || sel == "") {
-					$('#modifyBtn').attr('disabled', true);
-					$('#deleteBtn').attr('disabled', true);
-					return;
-				}
-				else{
-					$('#modifyBtn').attr('disabled', false);
-					$('#deleteBtn').attr('disabled', false);
-				}
-				
+				$('#modifyBtn').attr('disabled', false);
+				$('#deleteBtn').attr('disabled', false);
+				return;
+			}
+		},
+		onUnselect : function(event) {
+			event.onComplete = function() {
+				$('#modifyBtn').attr('disabled', true);
+				$('#deleteBtn').attr('disabled', true);
+				return;
 			}
 		}
 	});

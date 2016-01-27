@@ -41,21 +41,13 @@ $(function() {
 		         },
 		         {field: 'directorUUID', caption: '관리자 UUID', size: '30%'}
 		         ],
-		onClick:function(event) {
+		onSelect : function(event) {
 			var grid = this;
 			event.onComplete = function() {
 				var sel = grid.getSelection();
-				if ( sel == null || sel == "") {
-					$('#setDefaultDirector').attr('disabled', true);
-					$('#deleteSetting').attr('disabled', true);
-					$('#updateSetting').attr('disabled', true);
-					return;
-				}
-				
 				var record = grid.get(sel);
 				if ( record.defaultYn == 'Y' ) {
 					$('#setDefaultDirector').attr('disabled', true);
-					
 				}
 				else {
 					$('#setDefaultDirector').attr('disabled', false);
@@ -63,6 +55,13 @@ $(function() {
 				
 				$('#updateSetting').attr('disabled', false);
 				$('#deleteSetting').attr('disabled', false);
+			}
+		},
+		onUnselect : function(event) {
+			event.onComplete = function() {
+				$('#setDefaultDirector').attr('disabled', true);
+				$('#deleteSetting').attr('disabled', true);
+				$('#updateSetting').attr('disabled', true);
 			}
 		},
 		onError: function(event) {
@@ -167,7 +166,7 @@ $(function() {
 						// 기본 설치 관리자 정보 조회
 						$('.defaultDirector').text('');
 					}
-					w2ui['config_directorGrid'].delete(record);
+					w2ui['config_directorGrid'].clear();
 					
 					initView();
 				},
