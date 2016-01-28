@@ -46,6 +46,6 @@ public class CfInfo {
 	// Deploy 정보
 	private String deploymentFile;
 	private String deployStatus;
-	private String deployLog;
+	private int taskId;
 
 }

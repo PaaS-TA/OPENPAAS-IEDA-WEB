@@ -129,7 +129,6 @@ public class CfParam {
 		// Deploy 정보
 		private String deploymentFile;
 		private String deployStatus;
-		private String deployLog;
 	}
 		
 	@Data

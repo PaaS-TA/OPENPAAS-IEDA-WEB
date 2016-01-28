@@ -75,6 +75,7 @@ public class CfDeployAsyncService {
 		String status = "";
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
 		String content = "", temp = "";
+		String taskId = "";
 		
 		BufferedReader br = null;
 		InputStreamReader isr = null;
@@ -107,7 +108,7 @@ public class CfDeployAsyncService {
 			  || statusCode == HttpStatus.MOVED_TEMPORARILY.value()	) {
 				
 				Header location = postMethod.getResponseHeader("Location");
-				String taskId = DirectorRestHelper.getTaskId(location.getValue());
+				taskId = DirectorRestHelper.getTaskId(location.getValue());
 				
 				status = DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId, "event");
 				
@@ -130,12 +131,12 @@ public class CfDeployAsyncService {
 		
 		if ( aws != null ) {
 			aws.setDeployStatus(status);
-			aws.setDeployLog(content);
+			aws.setTaskId(Integer.parseInt(taskId));
 			awsRepository.save(aws);
 		}
 		if ( openstack != null ) {
 			openstack.setDeployStatus(status);
-			openstack.setDeployLog(content);
+			openstack.setTaskId(Integer.parseInt(taskId));
 			openstackRepository.save(openstack);
 		}
 

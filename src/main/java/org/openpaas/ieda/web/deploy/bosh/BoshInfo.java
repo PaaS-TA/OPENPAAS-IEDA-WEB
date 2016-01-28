@@ -33,5 +33,5 @@ public class BoshInfo {
 	//DEPLOY
 	private String deploymentFile;
 	private String deployStatus;
-	private String deployLog;
+	private Integer taskId;
 }

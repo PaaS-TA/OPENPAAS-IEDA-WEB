@@ -87,16 +87,7 @@ $(function(){
 		    				return 'N/A';
 		    	   }
 				}
-			, {field: 'deployLog', caption: '배포로그', size: '100px',
-				render: function(record) {
-					if ( (record.deployStatus == 'done' || record.deployStatus == 'error') && record.deployLog != null ) {
-		       				return '<span id="" class="btn btn-primary" style="width:60px" onClick="getDeployLogMsg( \'bosh\', \''+record.iaas+'\', \''+record.id+'\');">로그보기</span>';
-						}
-		    			else {
-		    				return 'N/A';
-						}
-					}
-				}
+			, {field: 'taskId', caption: 'TASK ID', size: '100px', hidden: true}
 			, {field: 'deploymentName', caption: '배포명', size: '100px'}
 			, {field: 'iaas', caption: 'IaaS', size: '100px'}
 			, {field: 'directorUuid', caption: '설치관리자 UUID', size: '220px'}
@@ -1351,15 +1342,15 @@ $( window ).resize(function() {
 			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 기본정보 설정</div>
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;배포명</label>
-		            <div>
-		                <input name="deploymentName" type="text"  style="float:left;width:60%;" required placeholder="배포명을 입력하세요."/>
-		            </div>
-		        </div>
-		        <div class="w2ui-field">
 		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;설치관리자 UUID</label>
 		            <div>
 		                <input name="directorUuid" type="text" style="float:left;width:60%;"  required placeholder="설치관리자 UUID입력하세요."/>
+		            </div>
+		        </div>
+		        <div class="w2ui-field">
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;배포명</label>
+		            <div>
+		                <input name="deploymentName" type="text"  style="float:left;width:60%;" required placeholder="배포명을 입력하세요."/>
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
@@ -1475,7 +1466,7 @@ $( window ).resize(function() {
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;VM Password</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;VM 비밀번호</label>
 					<div>
 						<input name="boshPassword" type="text" style="float:left;width:60%;"  required placeholder="VM 비밀번호를 입력하세요."/>
 					</div>
@@ -1638,16 +1629,16 @@ $( window ).resize(function() {
 		    <div class="w2ui-page page-0" style="padding-left:5%;">
 		    	<form id="osBoshForm">
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;배포명</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;설치관리자 UUID</label>
 			            <div>
-			                <input name="deploymentName" type="text"  style="float:left;width:60%;"  required placeholder="배포명을 입력하세요."/>
+			                <input name="directorUuid" type="text"  style="float:left;width:60%;"  required placeholder="설치관리자 UUID입력하세요."/>
 			                <div class="isMessage"></div>
 			            </div>
 			        </div>
 			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;설치관리자 UUID</label>
+			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;배포명</label>
 			            <div>
-			                <input name="directorUuid" type="text"  style="float:left;width:60%;"  required placeholder="설치관리자 UUID입력하세요."/>
+			                <input name="deploymentName" type="text"  style="float:left;width:60%;"  required placeholder="배포명을 입력하세요."/>
 			                <div class="isMessage"></div>
 			            </div>
 			        </div>
@@ -1771,9 +1762,9 @@ $( window ).resize(function() {
 		            </div>
 		        </div>
 		        <div class="w2ui-field">
-		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM Password</label>
+		            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM 비밀번호</label>
 		            <div>
-		                <input name="boshPassword" type="text"  style="float:left;width:60%;"  required  placeholder="VM인스턴스의 비밀번호를 입력하세요."/>
+		                <input name="boshPassword" type="text"  style="float:left;width:60%;"  required  placeholder="VM 비밀번호를 입력하세요."/>
 		                <div class="isMessage"></div>
 		            </div>
 		        </div>

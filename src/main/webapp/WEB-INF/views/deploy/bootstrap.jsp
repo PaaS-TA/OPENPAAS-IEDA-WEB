@@ -1616,9 +1616,9 @@ function osDeployPopup(){
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM Password</label>
+					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM 비밀번호</label>
 					<div>
-						<input name="boshPassword" type="text"  style="float:left;width:330px;"  required placeholder="VVM Password를 입력하세요."/>
+						<input name="boshPassword" type="text"  style="float:left;width:330px;"  required placeholder="VM 비밀번호를 입력하세요."/>
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1914,9 +1914,9 @@ function osDeployPopup(){
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM Password</label>
+					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM 비밀번호</label>
 					<div>
-						<input name="boshPassword" type="text"  style="float:left;width:330px;"  required placeholder="VM Password를 입력하세요."/>
+						<input name="boshPassword" type="text"  style="float:left;width:330px;"  required placeholder="VM 비밀번호를 입력하세요."/>
 						<div class="isMessage"></div>
 					</div>
 				</div>

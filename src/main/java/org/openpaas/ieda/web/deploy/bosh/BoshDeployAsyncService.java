@@ -77,7 +77,7 @@ public class BoshDeployAsyncService {
 		BufferedReader br = null;
 		InputStreamReader isr = null;
 		FileInputStream fis = null;
-
+		String taskId = "";
 		try {
 			HttpClient httpClient = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
 			
@@ -105,7 +105,7 @@ public class BoshDeployAsyncService {
 			  || statusCode == HttpStatus.MOVED_TEMPORARILY.value()	) {
 				
 				Header location = postMethod.getResponseHeader("Location");
-				String taskId = DirectorRestHelper.getTaskId(location.getValue());
+				taskId = DirectorRestHelper.getTaskId(location.getValue());
 				
 				status = DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId, "event");
 				
@@ -128,12 +128,10 @@ public class BoshDeployAsyncService {
 		
 		if ( aws != null ) {
 			aws.setDeployStatus(status);
-			aws.setDeployLog(content);
 			awsRepository.save(aws);
 		}
 		if ( openstack != null ) {
 			openstack.setDeployStatus(status);
-			openstack.setDeployLog(content);
 			openstackRepository.save(openstack);
 		}
 

@@ -59,17 +59,7 @@
 			    				return 'N/A';
 			    	   }
 					}
-				, {field: 'deployLog', caption: '배포로그', size: '100px',
-					render: function(record) {
-							console.log("###" + record.deployStatus  +" / " + record.deployStatus +" / " + record.deployLog )
-							if ( (record.deployStatus == 'done' || record.deployStatus == 'error') && record.deployLog != null ) {
-			       				return '<span id="" class="btn btn-primary" style="width:60px" onClick="getDeployLogMsg( \'cf\', \''+record.iaas+'\', \''+record.id+'\');">로그보기</span>';
-							}
-			    			else {
-			    				return 'N/A';
-							}
-						}
-					}
+				, {field: 'taskId', caption: 'TASK ID', size: '100px', hidden: true}
 				//1.1 Deployment 정보
 				, {field: 'deploymentName', caption: '배포명', size: '100px'}
 				, {field: 'iaas', caption: 'IaaS', size: '100px'}
@@ -419,7 +409,6 @@
 			boshPassword 		: contents.boshPassword,
 			deploymentFile 		: contents.deploymentFile,
 			deployStatus 		: contents.deployStatus,
-			deployLog 			: contents.deployLog,
 		}
 		
 		awsPopup();
@@ -814,7 +803,6 @@
 			boshPassword 		: contents.boshPassword,
 			deploymentFile 		: contents.deploymentFile,
 			deployStatus 		: contents.deployStatus,
-			deployLog 			: contents.deployLog,
 		}
 		
 		openstackPopup();
@@ -1461,6 +1449,13 @@
 					<label style="text-align: left; width: 100%; font-size: 13px;" >기본정보</label>
 				</div>
 				<div class="w2ui-field">
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;설치관리자 UUID</label>
+					<div>
+						<input name="directorUuid" type="text" style="float: left; width: 60%;" required placeholder="설치관리자 UUID를 입력하세요." />
+						<div class="isMessage"></div>
+					</div>
+				</div>
+				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;배포 명</label>
 					<div>
 						<input name="deploymentName" type="text" style="float: left; width: 60%;" required placeholder="배포 명을 입력하세요." />
@@ -1468,13 +1463,7 @@
 					</div>
 				</div>
 	
-				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;설치관리자 UUID</label>
-					<div>
-						<input name="directorUuid" type="text" style="float: left; width: 60%;" required placeholder="설치관리자 UUID를 입력하세요." />
-						<div class="isMessage"></div>
-					</div>
-				</div>
+				
 				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;CF 릴리즈</label>
 					<div>
@@ -1527,10 +1516,10 @@
 					</div>
 				</div>	
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;HAProxy 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;HAProxy 인증서</label>
 					<div>
 						<textarea name="sslPemPub" style="float: left; width: 60%; height: 60px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="프록시 서버 인증키를 입력하세요." ></textarea>
+							required placeholder="프록시 서버 인증서를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
@@ -1618,10 +1607,10 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;에이전트 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;에이전트 인증서</label>
 					<div>
 						<textarea name="agentCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="에이전트 인증키를 입력하세요." ></textarea>
+							required placeholder="에이전트 인증서를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
@@ -1632,24 +1621,24 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;CA 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;CA 인증서</label>
 					<div>
 						<textarea name="caCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="CA 인증키를 입력하세요." ></textarea>
+							required placeholder="CA 인증서를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서버 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서버 인증서</label>
 					<div>
 						<textarea name="serverCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="서버 인증키를 입력하세요." ></textarea>
+							required placeholder="서버 인증서를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서버 공개키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서버 개인키</label>
 					<div>
 						<textarea name="serverKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="서버 공개키를 입력하세요." ></textarea>
+							required placeholder="서버 개인키를 입력하세요." ></textarea>
 					</div>
 				</div>
 			</div>
@@ -1778,9 +1767,9 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;VM Password</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;VM 비밀번호</label>
 					<div>
-						<input name="boshPassword" type="text" style="float: left; width: 60%;" required placeholder="VM Password를 입력하세요." />
+						<input name="boshPassword" type="text" style="float: left; width: 60%;" required placeholder="VM 비밀번호를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1865,17 +1854,16 @@
 					<label style="text-align: left; width: 100%; font-size: 13px;" >기본 정보</label>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;배포 명</label>
-					<div>
-						<input name="deploymentName" type="text" style="float: left; width: 60%;" required placeholder="배포 명을 입력하세요." />
-						<div class="isMessage"></div>
-					</div>
-				</div>
-	
-				<div class="w2ui-field">
 					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;설치관리자 UUID</label>
 					<div>
 						<input name="directorUuid" type="text" style="float: left; width: 60%;" required placeholder="설치관리자 UUID를 입력하세요." />
+						<div class="isMessage"></div>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;배포 명</label>
+					<div>
+						<input name="deploymentName" type="text" style="float: left; width: 60%;" required placeholder="배포 명을 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>
@@ -1929,10 +1917,10 @@
 					</div>
 				</div>	
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;HAProxy 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;HAProxy 인증서</label>
 					<div>
 						<textarea name="sslPemPub" style="float: left; width: 60%; height: 60px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="프록시 서버 인증키를 입력하세요." ></textarea>
+							required placeholder="프록시 서버 인증서를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
@@ -2020,10 +2008,10 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;에이전트 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;에이전트 인증서</label>
 					<div>
 						<textarea name="agentCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="에이전트 인증키를 입력하세요." ></textarea>
+							required placeholder="에이전트 인증서를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
@@ -2034,24 +2022,24 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;CA 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;CA 인증서</label>
 					<div>
 						<textarea name="caCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="CA 인증키를 입력하세요." ></textarea>
+							required placeholder="CA 인증서를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서버 인증키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서버 인증서</label>
 					<div>
 						<textarea name="serverCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="서버 인증키를 입력하세요." ></textarea>
+							required placeholder="서버 인증서를 입력하세요." ></textarea>
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서버 공개키</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;서버 개인키</label>
 					<div>
 						<textarea name="serverKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-							required placeholder="서버 공개키를 입력하세요." ></textarea>
+							required placeholder="서버 개인키를 입력하세요." ></textarea>
 					</div>
 				</div>
 			</div>
@@ -2183,9 +2171,9 @@
 					</div>
 				</div>
 				<div class="w2ui-field">
-					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;VM Password</label>
+					<label style="text-align: left; width: 40%; font-size: 11px;">&bull;&nbsp;VM 비밀번호</label>
 					<div>
-						<input name="boshPassword" type="text" style="float: left; width: 60%;" required placeholder="VM Password를 입력하세요." />
+						<input name="boshPassword" type="text" style="float: left; width: 60%;" required placeholder="VM 비밀번호를 입력하세요." />
 						<div class="isMessage"></div>
 					</div>
 				</div>
