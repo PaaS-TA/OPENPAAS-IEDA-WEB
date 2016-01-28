@@ -69,8 +69,6 @@ properties:
     ssh_proxy:
       host_key: |+
 [diegoHostKey]
-      servers: [[diegoServers]]
-      uaa_secret: [diegoUaaSecret]
 
   etcd:
     client_cert: |+

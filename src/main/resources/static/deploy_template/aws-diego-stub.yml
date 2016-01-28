@@ -315,8 +315,8 @@ properties:
       enable_cf_auth: true
       enable_diego_auth: false
       host_key: (( merge ))
-      servers: (( merge ))
-      uaa_secret: (( merge ))
+      servers: (( jobs.access.networks.oc_network.static_ips ))
+      uaa_secret: (( .meta.cf_properties.secret ))      
       uaa_token_url: (( "https://uaa." .meta.domain "/oauth/token" ))
     ssl:
       skip_cert_verify: true
