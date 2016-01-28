@@ -63,32 +63,32 @@ public class CfControllerTest {
 			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 	
-	@Test
-	public void testListCfs() throws Exception {
-		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(LIST_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-		
-		result.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testListCfs() throws Exception {
+//		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(LIST_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//		
+//		result.andDo(MockMvcResultHandlers.print())
+//			.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
-	@Test
-	public void testGetAwsCfInfoInt() throws Exception {
-		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(AWS_DETAIL_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-		
-		result.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isOk());
-	}
-
-	@Test
-	public void testGetOpenstackCfInfo() throws Exception {
-		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(OPENSTACK_DETAIL_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-		
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testGetAwsCfInfoInt() throws Exception {
+//		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(AWS_DETAIL_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//		
+//		result.andDo(MockMvcResultHandlers.print())
+//			.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
+//
+//	@Test
+//	public void testGetOpenstackCfInfo() throws Exception {
+//		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(OPENSTACK_DETAIL_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//		
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 	
 //	@Test
 //	public void testSaveAwsCfInfoDefault() {

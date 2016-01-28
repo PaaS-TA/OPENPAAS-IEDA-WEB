@@ -61,32 +61,32 @@ public class BoshControllerTest {
 			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 	
-	@Test
-	public void testListBosh() throws Exception{
-		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(LIST_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-		
-		result.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testListBosh() throws Exception{
+//		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(LIST_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//		
+//		result.andDo(MockMvcResultHandlers.print())
+//			.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
-	@Test
-	public void testGetAwsInfo() throws Exception{
-		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(AWS_DETAIL_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-		
-		result.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isOk());
-	}
-
-	@Test
-	public void testGetOpenstackInfo() throws Exception{
-		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(OPENSTACK_DETAIL_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-		
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testGetAwsInfo() throws Exception{
+//		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(AWS_DETAIL_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//		
+//		result.andDo(MockMvcResultHandlers.print())
+//			.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
+//
+//	@Test
+//	public void testGetOpenstackInfo() throws Exception{
+//		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(OPENSTACK_DETAIL_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//		
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
 //	@Test
 //	public void testSaveAwsInfo() {

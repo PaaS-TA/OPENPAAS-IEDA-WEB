@@ -69,32 +69,32 @@ public class DiegoControllerTest {
 			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 	
-	@Test
-	public void testListDiego() throws Exception{
-		ResultActions result = mockMvc.perform(get(LIST_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-		
-		result.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testListDiego() throws Exception{
+//		ResultActions result = mockMvc.perform(get(LIST_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//		
+//		result.andDo(MockMvcResultHandlers.print())
+//			.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
-	@Test
-	public void testGetAwsDiegoInfoInt() throws Exception {
-		ResultActions result = mockMvc.perform(get(AWS_DETAIL_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
-
-	@Test
-	public void testGetOpenstackDiegoInfoInt() throws Exception {
-		ResultActions result = mockMvc.perform(get(OPENSTACK_DETAIL_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testGetAwsDiegoInfoInt() throws Exception {
+//		ResultActions result = mockMvc.perform(get(AWS_DETAIL_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
+//
+//	@Test
+//	public void testGetOpenstackDiegoInfoInt() throws Exception {
+//		ResultActions result = mockMvc.perform(get(OPENSTACK_DETAIL_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
 	/*@Test
 	public void testSaveAwsInfo() {
