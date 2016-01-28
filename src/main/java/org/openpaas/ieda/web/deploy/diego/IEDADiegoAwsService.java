@@ -88,7 +88,8 @@ public class IEDADiegoAwsService {
 		config.setDiegoEncryptionKeys(dto.getDiegoEncryptionKeys());
 		config.setDiegoServerCert(dto.getDiegoServerCert());
 		config.setDiegoServerKey(dto.getDiegoServerKey());
-
+		config.setDiegoHostKey(dto.getDiegoHostKey());
+		
 		Date now = new Date();
 		config.setUpdatedDate(now);
 		return awsRepository.save(config);
@@ -124,10 +125,6 @@ public class IEDADiegoAwsService {
 
 		config.setSubnetId(dto.getSubnetId());
 		config.setCloudSecurityGroups(dto.getCloudSecurityGroups());
-
-		config.setDiegoHostKey(dto.getDiegoHostKey());
-		config.setDiegoServers(dto.getDiegoServers());
-		config.setDiegoUaaSecret(dto.getDiegoUaaSecret());
 
 		Date now = new Date();
 		config.setUpdatedDate(now);

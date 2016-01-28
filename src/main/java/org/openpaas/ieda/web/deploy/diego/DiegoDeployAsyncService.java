@@ -80,6 +80,7 @@ public class DiegoDeployAsyncService {
 		
 		String status = "";
 		String content = "", temp = "";
+		String taskId = "";
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
 		
 		BufferedReader br = null;
@@ -112,7 +113,7 @@ public class DiegoDeployAsyncService {
 			  || statusCode == HttpStatus.MOVED_TEMPORARILY.value()	) {
 				
 				Header location = postMethod.getResponseHeader("Location");
-				String taskId = DirectorRestHelper.getTaskId(location.getValue());
+				taskId = DirectorRestHelper.getTaskId(location.getValue());
 				
 				status = DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId, "event");
 				
@@ -135,15 +136,14 @@ public class DiegoDeployAsyncService {
 		
 		if ( aws != null ) {
 			aws.setDeployStatus(status);
-			aws.setDeployLog(content);
+			aws.setTaskId(Integer.parseInt(taskId));
 			awsRepository.save(aws);
 		}
 		if ( openstack != null ) {
 			openstack.setDeployStatus(status);
-			openstack.setDeployLog(content);
+			openstack.setTaskId(Integer.parseInt(taskId));
 			openstackRepository.save(openstack);
 		}
-
 	}
 
 	@Async

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -86,7 +87,7 @@ public class IEDABoshService {
 				//DEPLOY
 				boshInfo.setDeploymentFile(config.getDeploymentFile());;
 				boshInfo.setDeployStatus(config.getDeployStatus());;
-				boshInfo.setDeployLog(config.getDeployLog());;
+				if( !StringUtils.isEmpty( config.getTaskId() ) ) boshInfo.setTaskId(config.getTaskId());
 				
 /* 				if ( deployedList != null && deployedList.size() > 0 ) {
 					for ( DeploymentInfo deployment : deployedList ) {
@@ -136,7 +137,7 @@ public class IEDABoshService {
 				//DEPLOY
 				boshInfo.setDeploymentFile(config.getDeploymentFile());;
 				boshInfo.setDeployStatus(config.getDeployStatus());;
-				boshInfo.setDeployLog(config.getDeployLog());;
+				if( !StringUtils.isEmpty( config.getTaskId() ) ) boshInfo.setTaskId(config.getTaskId());
 				
 /* 				if ( deployedList != null && deployedList.size() > 0 ) {
 					for ( DeploymentInfo deployment : deployedList ) {

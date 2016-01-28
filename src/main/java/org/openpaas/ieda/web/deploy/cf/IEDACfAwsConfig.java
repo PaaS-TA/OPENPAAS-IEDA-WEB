@@ -105,6 +105,5 @@ public class IEDACfAwsConfig {
 	private String deploymentFile;
 	@Column(length = 100)
 	private String deployStatus;
-	@Column(columnDefinition = "TEXT")
-	private String deployLog;
+	private Integer taskId;
 }

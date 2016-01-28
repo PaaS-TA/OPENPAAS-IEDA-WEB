@@ -140,42 +140,6 @@ public class CommonService {
 				deployLog = config.getDeployLog();
 			}
 		}
-		else if("bosh".equals(param.getService().toLowerCase())) {
-			if( "AWS".equals(param.getIaas().toUpperCase()) ){
-				IEDABoshAwsConfig config = boshAwsRepository.findOne(param.getId());
-				log.debug("RESULT [\n"+config+ "\n]" );
-				deployLog = config.getDeployLog();
-			}
-			else if( "OPENSTACK".equals(param.getIaas().toUpperCase()) ){
-				IEDABoshOpenstackConfig config = boshOpenstackRepository.findOne(param.getId());
-				log.debug("RESULT [\n"+config+ "\n]" );
-				deployLog = config.getDeployLog();
-			}
-		}
-		else if("cf".equals(param.getService().toLowerCase())) {
-			if( "AWS".equals(param.getIaas().toUpperCase()) ){
-				IEDACfAwsConfig config = cfAwsRepository.findOne(param.getId());
-				log.debug("RESULT [\n"+config+ "\n]" );
-				deployLog = config.getDeployLog();
-			}
-			else if( "OPENSTACK".equals(param.getIaas().toUpperCase()) ){
-				IEDACfOpenstackConfig config = cfOpenstackRepository.findOne(param.getId());
-				log.debug("RESULT [\n"+config+ "\n]" );
-				deployLog = config.getDeployLog();
-			}
-		}
-		else if("diego".equals(param.getService().toLowerCase())) {
-			if( "AWS".equals(param.getIaas().toUpperCase()) ){
-				IEDADiegoAwsConfig config = diegoAwsRepository.findOne(param.getId());
-				log.debug("RESULT [\n"+config+ "\n]" );
-				deployLog = config.getDeployLog();
-			}
-			else if( "OPENSTACK".equals(param.getIaas().toUpperCase()) ){
-				IEDADiegoOpenstackConfig config = diegoOpenstackRepository.findOne(param.getId());
-				log.debug("RESULT [\n"+config+ "\n]" );
-				deployLog = config.getDeployLog();
-			}
-		}
 		return deployLog;
 	}
 

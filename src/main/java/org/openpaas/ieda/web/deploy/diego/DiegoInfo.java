@@ -51,5 +51,5 @@ public class DiegoInfo {
 	// Deploy 정보
 	private String deploymentFile;
 	private String deployStatus;
-	private String deployLog;	
+	private Integer taskId;
 }

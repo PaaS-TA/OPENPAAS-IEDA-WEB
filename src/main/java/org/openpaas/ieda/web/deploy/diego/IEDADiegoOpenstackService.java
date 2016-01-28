@@ -89,6 +89,7 @@ public class IEDADiegoOpenstackService {
 		config.setDiegoEncryptionKeys(dto.getDiegoEncryptionKeys());
 		config.setDiegoServerCert(dto.getDiegoServerCert());
 		config.setDiegoServerKey(dto.getDiegoServerKey());
+		config.setDiegoHostKey(dto.getDiegoHostKey());
 		
 		Date now = new Date();
 		config.setUpdatedDate(now);
@@ -125,10 +126,6 @@ public class IEDADiegoOpenstackService {
 		
 		config.setCloudNetId(dto.getCloudNetId());
 		config.setCloudSecurityGroups(dto.getCloudSecurityGroups());
-		
-		config.setDiegoHostKey(dto.getDiegoHostKey());
-		config.setDiegoServers(dto.getDiegoServers());
-		config.setDiegoUaaSecret(dto.getDiegoUaaSecret());
 		
 		Date now = new Date();
 		config.setUpdatedDate(now);

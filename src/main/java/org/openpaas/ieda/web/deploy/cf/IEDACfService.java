@@ -16,6 +16,7 @@ import org.openpaas.ieda.web.common.Sha512Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,8 +73,9 @@ public class IEDACfService {
 					cfInfo.setBoshPassword(config.getBoshPassword());
 					
 					cfInfo.setDeployStatus(config.getDeployStatus());
-					cfInfo.setDeployLog(config.getDeployLog());
 					cfInfo.setDeploymentFile(config.getDeploymentFile());
+					if( !StringUtils.isEmpty( config.getTaskId() ) ) cfInfo.setTaskId(config.getTaskId());
+					
 					cfList.add(cfInfo);
 				}
 			}
@@ -113,8 +115,8 @@ public class IEDACfService {
 					cfInfo.setBoshPassword(config.getBoshPassword());
 					
 					cfInfo.setDeployStatus(config.getDeployStatus());
-					cfInfo.setDeployLog(config.getDeployLog());
 					cfInfo.setDeploymentFile(config.getDeploymentFile());
+					if( !StringUtils.isEmpty( config.getTaskId() ) ) cfInfo.setTaskId(config.getTaskId());
 					cfList.add(cfInfo);
 				}
 			}

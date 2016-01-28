@@ -120,10 +120,6 @@ public class IEDADiegoOpenstackConfig {
 	//3.2 프록시 정보
 	@Column(columnDefinition = "TEXT")
 	private String diegoHostKey;
-	@Column(length = 100)
-	private String diegoServers;
-	@Column(length = 100)
-	private String diegoUaaSecret;
 	
 	//4 리소스 정보	
 	@Column(length = 200)
@@ -138,6 +134,5 @@ public class IEDADiegoOpenstackConfig {
 	private String deploymentFile;
 	@Column(length = 100)
 	private String deployStatus;
-	@Column(columnDefinition = "TEXT")
-	private String deployLog;
+	private Integer taskId;
 }

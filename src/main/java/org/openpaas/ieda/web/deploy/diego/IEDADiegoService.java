@@ -16,6 +16,7 @@ import org.openpaas.ieda.web.common.Sha512Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,8 +77,6 @@ public class IEDADiegoService {
 					diegoInfo.setSubnetDns(config.getSubnetDns());
 					diegoInfo.setSubnetId(config.getSubnetId());
 					diegoInfo.setCloudSecurityGroups(config.getCloudSecurityGroups());	
-					//3.2 프록시 정보
-					diegoInfo.setDiegoServers(config.getDiegoServers());
 
 					//4 리소스 정보	
 					diegoInfo.setStemcellName(config.getStemcellName());
@@ -86,7 +85,7 @@ public class IEDADiegoService {
 					// Deploy 정보
 					diegoInfo.setDeploymentFile(config.getDeploymentFile());
 					diegoInfo.setDeployStatus(config.getDeployStatus());
-					diegoInfo.setDeployLog(config.getDeployLog());
+					if( !StringUtils.isEmpty( config.getTaskId() ) ) diegoInfo.setTaskId(config.getTaskId());
 					
 					diegoList.add(diegoInfo);
 				}
@@ -129,8 +128,6 @@ public class IEDADiegoService {
 					diegoInfo.setSubnetDns(config.getSubnetDns());
 					diegoInfo.setSubnetId(config.getCloudNetId());
 					diegoInfo.setCloudSecurityGroups(config.getCloudSecurityGroups());	
-					//3.2 프록시 정보
-					diegoInfo.setDiegoServers(config.getDiegoServers());
 
 					//4 리소스 정보	
 					diegoInfo.setStemcellName(config.getStemcellName());
@@ -139,7 +136,8 @@ public class IEDADiegoService {
 					// Deploy 정보
 					diegoInfo.setDeploymentFile(config.getDeploymentFile());
 					diegoInfo.setDeployStatus(config.getDeployStatus());
-					diegoInfo.setDeployLog(config.getDeployLog());
+					if( !StringUtils.isEmpty( config.getTaskId() ) ) diegoInfo.setTaskId(config.getTaskId());
+					
 					diegoList.add(diegoInfo);
 				}
 			}
@@ -208,12 +206,15 @@ public class IEDADiegoService {
 			items.add(new ReplaceItem("[consulServerKey]", CommonUtils.lineAddSpace(config.getConsulServerKey(),6)));
 			//2.1 Diego 정보				
 			items.add(new ReplaceItem("[diegoCaCert]", CommonUtils.lineAddSpace(config.getDiegoCaCert(),10)));
+			//2.2 프록시 정보
+			items.add(new ReplaceItem("[diegoHostKey]",  CommonUtils.lineAddSpace(config.getDiegoHostKey(),8)));
+			//2.3 BBS 인증정보
 			items.add(new ReplaceItem("[diegoClientCert]", CommonUtils.lineAddSpace(config.getDiegoClientCert(),10)));
 			items.add(new ReplaceItem("[diegoClientKey]", CommonUtils.lineAddSpace(config.getDiegoClientKey(),10)));
 			items.add(new ReplaceItem("[diegoEncryptionKeys]", config.getDiegoEncryptionKeys()));
 			items.add(new ReplaceItem("[diegoServerCert]", CommonUtils.lineAddSpace(config.getDiegoServerCert(),8)));
 			items.add(new ReplaceItem("[diegoServerKey]", CommonUtils.lineAddSpace(config.getDiegoServerKey(),8)));
-			//2.2 ETCD 정보
+			//3. ETCD 정보
 			items.add(new ReplaceItem("[etcdClientCert]", CommonUtils.lineAddSpace(config.getEtcdClientCert(),6)));
 			items.add(new ReplaceItem("[etcdClientKey]", CommonUtils.lineAddSpace(config.getEtcdClientKey(),6)));
 			items.add(new ReplaceItem("[etcdPeerCaCert]", CommonUtils.lineAddSpace(config.getEtcdPeerCaCert(),6)));
@@ -221,7 +222,7 @@ public class IEDADiegoService {
 			items.add(new ReplaceItem("[etcdPeerKey]", CommonUtils.lineAddSpace(config.getEtcdPeerKey(),6)));
 			items.add(new ReplaceItem("[etcdServerCert]", CommonUtils.lineAddSpace(config.getEtcdServerCert(),6)));
 			items.add(new ReplaceItem("[etcdServerKey]", CommonUtils.lineAddSpace(config.getEtcdServerKey(),6)));
-			//3.1 네트워크 정보
+			//4. 네트워크 정보
 			items.add(new ReplaceItem("[subnetStatic]", config.getSubnetStaticFrom() + " - " + config.getSubnetStaticTo() ));
 			items.add(new ReplaceItem("[subnetReserved]", config.getSubnetReservedFrom() + " - " + config.getSubnetReservedTo()));
 			items.add(new ReplaceItem("[subnetRange]", config.getSubnetRange()));
@@ -229,11 +230,7 @@ public class IEDADiegoService {
 			items.add(new ReplaceItem("[subnetDns]", config.getSubnetDns()));
 			items.add(new ReplaceItem("[subnetId]", config.getSubnetId()));
 			items.add(new ReplaceItem("[cloudSecurityGroups]", config.getCloudSecurityGroups()));
-			//3.2 프록시 정보
-			items.add(new ReplaceItem("[diegoHostKey]",  CommonUtils.lineAddSpace(config.getDiegoHostKey(),8)));
-			items.add(new ReplaceItem("[diegoServers]", config.getDiegoServers()));
-			items.add(new ReplaceItem("[diegoUaaSecret]", config.getDiegoUaaSecret()));
-			//4 리소스 정보	
+			//5. 리소스 정보	
 			items.add(new ReplaceItem("[stemcellName]", config.getStemcellName()));
 			items.add(new ReplaceItem("[stemcellVersion]", config.getStemcellVersion()));
 			items.add(new ReplaceItem("[boshPassword]", Sha512Crypt.Sha512_crypt(config.getBoshPassword(), RandomStringUtils.randomAlphabetic(10), 0)));
@@ -267,12 +264,15 @@ public class IEDADiegoService {
 			items.add(new ReplaceItem("[consulServerKey]", CommonUtils.lineAddSpace(config.getConsulServerKey(),6)));
 			//2.1 Diego 정보				
 			items.add(new ReplaceItem("[diegoCaCert]", CommonUtils.lineAddSpace(config.getDiegoCaCert(),10)));
+			//2.2 프록시 정보
+			items.add(new ReplaceItem("[diegoHostKey]",  CommonUtils.lineAddSpace(config.getDiegoHostKey(),8)));
+			//2.3 BBS 인증정보
 			items.add(new ReplaceItem("[diegoClientCert]", CommonUtils.lineAddSpace(config.getDiegoClientCert(),10)));
 			items.add(new ReplaceItem("[diegoClientKey]", CommonUtils.lineAddSpace(config.getDiegoClientKey(),10)));
 			items.add(new ReplaceItem("[diegoEncryptionKeys]", config.getDiegoEncryptionKeys()));
 			items.add(new ReplaceItem("[diegoServerCert]", CommonUtils.lineAddSpace(config.getDiegoServerCert(),8)));
 			items.add(new ReplaceItem("[diegoServerKey]", CommonUtils.lineAddSpace(config.getDiegoServerKey(),8)));
-			//2.2 ETCD 정보
+			//3. ETCD 정보
 			items.add(new ReplaceItem("[etcdClientCert]", CommonUtils.lineAddSpace(config.getEtcdClientCert(),6)));
 			items.add(new ReplaceItem("[etcdClientKey]", CommonUtils.lineAddSpace(config.getEtcdClientKey(),6)));
 			items.add(new ReplaceItem("[etcdPeerCaCert]", CommonUtils.lineAddSpace(config.getEtcdPeerCaCert(),6)));
@@ -280,7 +280,7 @@ public class IEDADiegoService {
 			items.add(new ReplaceItem("[etcdPeerKey]", CommonUtils.lineAddSpace(config.getEtcdPeerKey(),6)));
 			items.add(new ReplaceItem("[etcdServerCert]", CommonUtils.lineAddSpace(config.getEtcdServerCert(),6)));
 			items.add(new ReplaceItem("[etcdServerKey]", CommonUtils.lineAddSpace(config.getEtcdServerKey(),6)));
-			//3.1 네트워크 정보
+			//4. 네트워크 정보
 			items.add(new ReplaceItem("[subnetStatic]", config.getSubnetStaticFrom() + " - " + config.getSubnetStaticTo() ));
 			items.add(new ReplaceItem("[subnetReserved]", config.getSubnetReservedFrom() + " - " + config.getSubnetReservedTo()));
 			items.add(new ReplaceItem("[subnetRange]", config.getSubnetRange()));
@@ -288,11 +288,7 @@ public class IEDADiegoService {
 			items.add(new ReplaceItem("[subnetDns]", config.getSubnetDns()));
 			items.add(new ReplaceItem("[cloudNetId]", config.getCloudNetId()));
 			items.add(new ReplaceItem("[cloudSecurityGroups]", config.getCloudSecurityGroups()));
-			//3.2 프록시 정보
-			items.add(new ReplaceItem("[diegoHostKey]",  CommonUtils.lineAddSpace(config.getDiegoHostKey(),8)));
-			items.add(new ReplaceItem("[diegoServers]", config.getDiegoServers()));
-			items.add(new ReplaceItem("[diegoUaaSecret]", config.getDiegoUaaSecret()));
-			//4 리소스 정보	
+			//5. 리소스 정보	
 			items.add(new ReplaceItem("[stemcellName]", config.getStemcellName()));
 			items.add(new ReplaceItem("[stemcellVersion]", config.getStemcellVersion()));
 			items.add(new ReplaceItem("[boshPassword]", Sha512Crypt.Sha512_crypt(config.getBoshPassword(), RandomStringUtils.randomAlphabetic(10), 0)));

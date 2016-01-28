@@ -74,6 +74,10 @@ public class DiegoParam {
 		//2.1 Diego 정보	
 		@NotNull
 		private String diegoCaCert;
+		//2.2 프록시 정보
+		@NotNull
+		private String diegoHostKey;
+		//2.3 BBS 인증정보
 		@NotNull
 		private String diegoClientCert;
 		@NotNull
@@ -131,13 +135,7 @@ public class DiegoParam {
 		private String subnetId;
 		@NotNull
 		private String cloudSecurityGroups;	
-		//3.2 프록시 정보
-		@NotNull
-		private String diegoHostKey;
-		@NotNull
-		private String diegoServers;
-		@NotNull
-		private String diegoUaaSecret;
+		
 	}
 	
 	@Data
@@ -164,13 +162,6 @@ public class DiegoParam {
 		private String cloudNetId;
 		@NotNull
 		private String cloudSecurityGroups;	
-		//3.2 프록시 정보
-		@NotNull
-		private String diegoHostKey;
-		@NotNull
-		private String diegoServers;
-		@NotNull
-		private String diegoUaaSecret;
 	}
 	
 	@Data
@@ -189,7 +180,6 @@ public class DiegoParam {
 		// Deploy 정보
 		private String deploymentFile;
 		private String deployStatus;
-		private String deployLog;
 	}
 	@Data
 	public static class Deployment{

@@ -254,18 +254,15 @@ public class DirectorRestHelper {
 
 				// Task 완료 여부 확인
 				if (taskInfo.getState().equalsIgnoreCase("done")) {
-					sendTaskOutput(messageTemplate, messageEndpoint, "done",
-							Arrays.asList("", "Task " + taskId + " done"));
+					sendTaskOutput(messageTemplate, messageEndpoint, "done", Arrays.asList("", "Task " + taskId + " done"));
 					status = "done";
 					break;
 				} else if (taskInfo.getState().equalsIgnoreCase("error")) {
-					sendTaskOutput(messageTemplate, messageEndpoint, "error",
-							Arrays.asList("", "An error occurred while executing the task " + taskId));
+					sendTaskOutput(messageTemplate, messageEndpoint, "error", Arrays.asList("", "An error occurred while executing the task " + taskId));
 					status = "error";
 					break;
 				} else if (taskInfo.getState().equalsIgnoreCase("cancelled")) {
-					sendTaskOutput(messageTemplate, messageEndpoint, "cancelled",
-							Arrays.asList("", "Canceled Task " + taskId));
+					sendTaskOutput(messageTemplate, messageEndpoint, "cancelled", Arrays.asList("", "Canceled Task " + taskId));
 					status = "cancelled";
 					break;
 				}
