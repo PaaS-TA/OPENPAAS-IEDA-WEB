@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @WebAppConfiguration
 @Transactional
 public class CfControllerTest {
-	final String VIEW_URL = "/deploy/cfList";
+	final String VIEW_URL = "/deploy/cf";
 	final String LIST_URL = "/deploy/cfList";
 	final String AWS_DETAIL_URL = "/cf/aws/1";
 	final String OPENSTACK_DETAIL_URL = "/cf/openstack/1";

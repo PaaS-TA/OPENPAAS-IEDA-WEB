@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Transactional
 @IntegrationTest
 public class DiegoControllerTest {
-	final String VIEW_URL = "/deploy/diegoList";
+	final String VIEW_URL = "/deploy/diego";
 	final String LIST_URL = "/deploy/diegoList";
 	final String AWS_DETAIL_URL = "/diego/aws/1";
 	final String OPENSTACK_DETAIL_URL = "/diego/openstack/1";
