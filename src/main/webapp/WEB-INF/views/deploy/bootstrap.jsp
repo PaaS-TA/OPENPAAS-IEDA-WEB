@@ -168,15 +168,21 @@ $(function() {
 				}
 				else{
 					var record = w2ui['config_bootstrapGrid'].get(selected);
-					console.log(record.iaas);
-					if(record.iaas == "AWS") {
-						getBootstrapAwsData(record);
+					//if( record.deployStatus != 'done' ){
+						if(record.iaas == "AWS") {
+							getBootstrapAwsData(record);
+							return;
+						}
+						else{
+							getBootstrapOpenstackData(record);
+							return;
+						}
+					//}
+					/* else{
+						w2alert("배포 중인 경우 수정할 수 없습니다.", "BOOTSTRAP 수정");
 						return;
-					}
-					else{
-						getBootstrapOpenstackData(record);
-						return;
-					}
+					} */
+					
 				}
 			},
 			no_text : "취소"
@@ -487,8 +493,8 @@ function iaasSelectPopup() {
 //AWS Info Setting Popup
 function awsPopup(){
 	$("#awsDiv").w2popup({
-		width : 670,
-		height : 580,
+		width : 720,
+		height : 520,
 		onClose : popupClose,
 		modal	: true,
 		onOpen:function(event){
@@ -640,7 +646,7 @@ function keyPathFileUpload(iaas){
 				awsDefaultPopup();
 			}
 			else if(iaas.toUpperCase() == "OPENSTACK") {
-				osBoshInfoPop();
+				openstackDefaultInfoPop();
 			}
 		},
 		error : function( e, status ) {
@@ -651,7 +657,7 @@ function keyPathFileUpload(iaas){
 
 function awsDefaultPopup(){
 	$("#awsDefaultDiv").w2popup({
-		width : 670,
+		width : 720,
 		height : 420,
 		modal	: true,
 		onClose : popupClose,
@@ -775,8 +781,8 @@ function saveAwsDefaultInfo(type){
 //Network Info Setting Popup
 function awsNetworkPopup(){
 	$("#awsNetworkInfoDiv").w2popup({
-		width : 670,
-		height : 600,
+		width : 720,
+		height : 520,
 		modal	: true,
 		onClose : popupClose,
 		onOpen : function(event){
@@ -836,8 +842,8 @@ function saveAwsNetworkInfo(type){
 function awsResourcePopup(){
 	console.log("resorce POPUP!!");
 	$("#awsResourceInfoDiv").w2popup({
-		width : 670,
-		height : 430,
+		width : 720,
+		height : 400,
 		modal	: true,
 		onOpen : function(event){
 			event.onComplete = function(){	
@@ -906,15 +912,15 @@ function saveResourceInfo(type){
 				error : function( e, status ) {
 					w2alert("리소스 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
 				}
-			});
+			});6
 		}
 	}
 }
 
 function deployPopup(){
-	var deployDiv = (iaas == "AWS") ? $("#deployManifestDiv") : $("#osDeployManifestDiv");
+	var deployDiv = (iaas == "AWS") ? $("#deployManifestDiv") : $("#openstackDeployDiv");
 	deployDiv.w2popup({
-		width 	: 670,
+		width 	: 720,
 		height 	: 500,
 		modal	: true,
 		showMax : true,
@@ -969,7 +975,7 @@ function confirmDeploy(type){
 
 var bootstrapInstallSocket = null;
 function installPopup(){
-	var installDiv = (iaas == 'AWS') ? $("#installDiv") : $("#osInstallDiv");
+	var installDiv = (iaas == 'AWS') ? $("#awsInstallDiv") : $("#openstackInstallDiv");
 	var message = "BOOTSTRAP ";
 	
 	var requestParameter = {
@@ -978,7 +984,7 @@ function installPopup(){
 	};
 	
 	installDiv.w2popup({
-		width : 700,
+		width : 720,
 		height : 490,
 		modal	: true,
 		showMax : true,		
@@ -1090,8 +1096,8 @@ function setPrivateKeyPathFileName(fileInput){
 // Openstack Info Popup
 function openstackPopup(){
 	$("#openstackInfoDiv").w2popup({
-		width : 670,
-		height : 600,
+		width : 720,
+		height : 540,
 		onClose : popupClose,
 		modal	: true,
 		onOpen:function(event){
@@ -1147,10 +1153,10 @@ function saveOpenstackInfo(){
 	}
 }
 
-function osBoshInfoPop(){
-	$("#osBoshInfoDiv").w2popup({
-		width : 670,
-		height : 430,
+function openstackDefaultInfoPop(){
+	$("#openstackDefaultInfoDiv").w2popup({
+		width : 720,
+		height : 410,
 		onClose : popupClose,
 		modal	: true,
 		onOpen:function(event){
@@ -1169,7 +1175,7 @@ function osBoshInfoPop(){
 }
 
 //Openstack Bosh Info Save
-function saveOsBoshInfo(type){
+function saveOpenstackDefaultInfo(type){
 	console.log("!!!! "+ bootstrapId);
 	osBoshInfo = {
 			id				: bootstrapId,
@@ -1194,7 +1200,7 @@ function saveOsBoshInfo(type){
 				async : true,
 				data : JSON.stringify(osBoshInfo),
 				success : function(data, status) {
-					osNetworkInfoPopup();					
+					openstackNetworkInfoPopup();					
 				},
 				error : function( e, status ) {
 					w2alert("오픈스택 기본정보 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
@@ -1206,10 +1212,10 @@ function saveOsBoshInfo(type){
 
 
 // Openstack Network Info Popup
-function osNetworkInfoPopup(){
-	$("#osNetworkInfoDiv").w2popup({
-		width : 670,
-		height : 600,
+function openstackNetworkInfoPopup(){
+	$("#openstackNetworkInfoDiv").w2popup({
+		width : 720,
+		height : 520,
 		onClose : popupClose,
 		modal	: true,
 		onOpen:function(event){
@@ -1229,7 +1235,7 @@ function osNetworkInfoPopup(){
 	});	
 }
 
-function saveOsNetworkInfo(type){
+function saveOpenstackNetworkInfo(type){
 	networkInfo = {
 			id				: bootstrapId,
 			subnetId		: $(".w2ui-msg-body input[name='subnetId']").val(),
@@ -1241,7 +1247,7 @@ function saveOsNetworkInfo(type){
 			ntp				: $(".w2ui-msg-body input[name='ntp']").val()
 	}
 	if( type == "before") {
-		osBoshInfoPop();
+		openstackDefaultInfoPop();
 		return;
 	}
 	else{
@@ -1265,8 +1271,8 @@ function saveOsNetworkInfo(type){
 
 //Openstack Resource Info Popup
 function osResourceInfoPopup(){
-	$("#osResourceInfoDiv").w2popup({
-		width : 670,
+	$("#openstackResourceInfoDiv").w2popup({
+		width : 720,
 		height : 400,
 		onClose : popupClose,
 		modal	: true,
@@ -1278,7 +1284,7 @@ function osResourceInfoPopup(){
 	});	
 }
 
-function saveOsResourceInfo(type){
+function saveOpenstackResourceInfo(type){
 	resourceInfo = {
 			id					: bootstrapId,
 			stemcell			: $(".w2ui-msg-body input[name='stemcell']").val(),
@@ -1287,7 +1293,7 @@ function saveOsResourceInfo(type){
 	}
 	
 	if( type == "before"){
-		osNetworkInfoPopup();
+		openstackNetworkInfoPopup();
 		return;
 	}
 	else{
@@ -1311,7 +1317,7 @@ function saveOsResourceInfo(type){
 }
 
 function osDeployPopup(){
-	$("#osDeployManifestDiv").w2popup({
+	$("#openstackDeployDiv").w2popup({
 		width 	: 670,
 		height 	: 470,
 		modal	: true,
@@ -1377,7 +1383,7 @@ function osDeployPopup(){
 	<div id="awsDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:3%;display:inline-block;width:97%;">
+			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
 		            <li class="active">AWS 정보</li>
 		            <li class="before">기본 정보</li>
@@ -1387,66 +1393,70 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; AWS 정보 설정</div>
-		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<form id="keyForm" data-toggle="validator" >
-			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Access Key ID</label>
-			            <div>
-			                <input name="accessKeyId" type="text"  style="float:left;width:60%;"  required placeholder="AWS Access Key를 입력하세요."/>
-			                <div class="isMessage"></div>			                
-			            </div>
+	        <div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
+				<div class="panel panel-info">	
+					<div class="panel-heading"><b>AWS 정보</b></div>
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
+				    	<form id="keyForm" data-toggle="validator" >
+					        <div class="w2ui-field">
+					            <label style="text-align: left;width:40%;font-size:11px;">Access Key ID</label>
+					            <div>
+					                <input name="accessKeyId" type="text"  style="float:left;width:60%;"  required placeholder="AWS Access Key를 입력하세요."/>
+					                <div class="isMessage"></div>			                
+					            </div>
+					        </div>
+					        <div class="w2ui-field">
+					            <label style="text-align: left;width:40%;font-size:11px;">Secret Access Key</label>
+					            <div>
+					                <input name="secretAccessId" type="text"  style="float:left;width:60%;"  required placeholder="AWS Secret Access Key를 입력하세요."/>
+					                <div class="isMessage"></div>
+					            </div>
+					        </div>
+					        <div class="w2ui-field">
+					            <label style="text-align: left;width:40%;font-size:11px;">Security Group</label>
+					            <div>
+					                <input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;"  required placeholder="시큐리티 그룹을 입력하세요."/>
+					                <div class="isMessage"></div>
+					            </div>
+					        </div>
+					        <div class="w2ui-field">
+					            <label style="text-align: left;width:40%;font-size:11px;">Region</label>
+					            <div>
+					                <input name="region" type="text"  style="float:left;width:60%;"  required placeholder="설치할 Region을 입력하세요.(예: us-east-1)"/>
+					                <div class="isMessage"></div>
+					            </div>
+					        </div>
+					        <div class="w2ui-field">
+					            <label style="text-align: left;width:40%;font-size:11px;">Availability Zone</label>
+					            <div>
+					                <input name="availabilityZone" type="text" style="display: inline-block;float:left;width:60%;" required placeholder="Availability Zone을 입력하세요."/>
+					                <div class="isMessage"></div>
+					            </div>
+					        </div>
+					        <div class="w2ui-field">
+					            <label style="text-align: left;width:40%;font-size:11px;">Private Key Name</label>
+					            <div>
+					                <input name="privateKeyName" type="text"  style="display: inline-block;float:left;width:60%;"  required placeholder="Key Pair 이름을 입력하세요."/>
+					                <div class="isMessage"></div>
+					            </div>
+					        </div>
+					        
+					        <div class="w2ui-field">
+					            <label style="text-align: left;width:40%;font-size:11px;">Private Key File</label>
+				                <div >
+			  						<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" />&nbsp;파일업로드</label></span>
+									&nbsp;&nbsp;
+									<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" />&nbsp;목록에서 선택</label></span>
+								</div>
+					        </div>
+					        <div class="w2ui-field">			         	
+				                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();"/>
+					            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
+								<div id="keyPathDiv" ></div>
+					        </div>
+				        </form>
 			        </div>
-			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Secret Access Key</label>
-			            <div>
-			                <input name="secretAccessId" type="text"  style="float:left;width:60%;"  required placeholder="AWS Secret Access Key를 입력하세요."/>
-			                <div class="isMessage"></div>
-			            </div>
-			        </div>
-			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Security Group</label>
-			            <div>
-			                <input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;"  required placeholder="시큐리티 그룹을 입력하세요."/>
-			                <div class="isMessage"></div>
-			            </div>
-			        </div>
-			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Region</label>
-			            <div>
-			                <input name="region" type="text"  style="float:left;width:60%;"  required placeholder="설치할 Region을 입력하세요.(예: us-east-1)"/>
-			                <div class="isMessage"></div>
-			            </div>
-			        </div>
-			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Availability Zone</label>
-			            <div>
-			                <input name="availabilityZone" type="text" style="display: inline-block;float:left;width:60%;" required placeholder="Availability Zone을 입력하세요."/>
-			                <div class="isMessage"></div>
-			            </div>
-			        </div>
-			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Name</label>
-			            <div>
-			                <input name="privateKeyName" type="text"  style="display: inline-block;float:left;width:60%;"  required placeholder="Key Pair 이름을 입력하세요."/>
-			                <div class="isMessage"></div>
-			            </div>
-			        </div>
-			        
-			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key File</label>
-		                <div >
-	  						<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" />&nbsp;파일업로드</label></span>
-							&nbsp;&nbsp;
-							<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" />&nbsp;목록에서 선택</label></span>
-						</div>
-			        </div>
-			        <div class="w2ui-field">			         	
-		                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();"/>
-			            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
-						<div id="keyPathDiv" ></div>
-			        </div>
-		        </form>
+		        </div>
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1458,7 +1468,7 @@ function osDeployPopup(){
 	<div id="awsDefaultDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:3%;display:inline-block;width:97%;">
+			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">AWS 정보</li>
 		            <li class="active">기본 정보</li>
@@ -1468,39 +1478,43 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 기본 정보 설정</div>
-		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<form id="awsDefaultForm" data-toggle="validator" >
-			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;배포명</label>
-			            <div>
-			                <input name="deploymentName" type="text"  style="float:left;width:60%;"  required placeholder="배포명을 입력하세요."/>
-			                <div class="isMessage"></div>
-			            </div>
+	        <div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
+				<div class="panel panel-info">	
+					<div class="panel-heading"><b>기본 정보</b></div>
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
+				    	<form id="awsDefaultForm" data-toggle="validator" >
+					        <div class="w2ui-field">
+					            <label style="text-align: left;width:40%;font-size:11px;">배포명</label>
+					            <div>
+					                <input name="deploymentName" type="text"  style="float:left;width:60%;"  required placeholder="배포명을 입력하세요."/>
+					                <div class="isMessage"></div>
+					            </div>
+					        </div>
+					        <div class="w2ui-field">
+					            <label style="text-align: left;width:40%;font-size:11px;">디렉터 명</label>
+					            <div>
+					                <input name="directorName" type="text"  style="float:left;width:60%;"  required placeholder="디렉터 명을 입력하세요."/>
+					                <div class="isMessage"></div>
+					            </div>
+					        </div>
+					        <div class="w2ui-field">
+					            <label style="text-align: left;width:40%;font-size:11px;">BOSH 릴리즈</label>
+					            <div>
+					                <input name="boshRelease" type="list"  style="float:left;width:60%;"  required placeholder="BOSH 릴리즈를 선택하세요"/>
+					                <!-- <br/>
+					                <div class="isMessage"></div> -->
+					            </div>
+					        </div>
+					        <div class="w2ui-field">
+					            <label style="text-align: left;width:40%;font-size:11px;">BOSH CPI 릴리즈</label>
+					            <div>
+					                <input name="boshCpiRelease" type="list"  style="float:left;width:60%;"  required placeholder="BOSH CPI 릴리즈를 선택하세요"/>
+					                <!-- <div class="isMessage"></div> -->
+					            </div>
+					        </div>			        
+				        </form>
 			        </div>
-			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 명</label>
-			            <div>
-			                <input name="directorName" type="text"  style="float:left;width:60%;"  required placeholder="디렉터 명을 입력하세요."/>
-			                <div class="isMessage"></div>
-			            </div>
-			        </div>
-			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;BOSH 릴리즈</label>
-			            <div>
-			                <input name="boshRelease" type="list"  style="float:left;width:60%;"  required placeholder="BOSH 릴리즈를 선택하세요"/>
-			                <!-- <br/>
-			                <div class="isMessage"></div> -->
-			            </div>
-			        </div>
-			        <div class="w2ui-field">
-			            <label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;BOSH CPI 릴리즈</label>
-			            <div>
-			                <input name="boshCpiRelease" type="list"  style="float:left;width:60%;"  required placeholder="BOSH CPI 릴리즈를 선택하세요"/>
-			                <!-- <div class="isMessage"></div> -->
-			            </div>
-			        </div>			        
-		        </form>
+		        </div>
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1514,7 +1528,7 @@ function osDeployPopup(){
 	<div id="awsNetworkInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:3%;display:inline-block;width:97%;">
+			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6">
 		            <li class="pass">AWS 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1524,55 +1538,59 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp;네트워크 정보 설정</div>
-			<div class="w2ui-page page-0" style="padding-left: 5%;">
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;서브넷 ID</label>
-					<div>
-						<input name="subnetId" type="text"  style="float:left;width:330px;"  placeholder="서브넷 ID를 입력하세요."/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 내부 IP</label>
-					<div>
-						<input name="privateStaticIp" type="text"  style="float:left;width:330px;" placeholder="디렉터 내부 IP를 입력하세요."/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 공인 IP</label>
-					<div>
-						<input name="publicStaticIp" type="text"  style="float:left;width:330px;" required placeholder="디렉터 공인 IP를 입력하세요."/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;서브넷 범위</label>
-					<div>
-						<input name="subnetRange" type="text"  style="float:left;width:330px;" placeholder="예) 10.0.0.0/24"/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;게이트웨이</label>
-					<div>
-						<input name="subnetGateway" type="text"  style="float:left;width:330px;" placeholder="예) 10.0.0.1"/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;DNS</label>
-					<div>
-						<input name="subnetDns" type="text"  style="float:left;width:330px;" placeholder="예) 8.8.8.8"/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;NTP</label>
-					<div>
-						<input name="ntp" type="text"  style="float:left;width:330px;" placeholder="예) 10.0.0.2"/>
-						<div class="isMessage"></div>
+	        <div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
+				<div class="panel panel-info">	
+					<div class="panel-heading"><b>네트워크 정보</b></div>
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">서브넷 ID</label>
+							<div>
+								<input name="subnetId" type="text"  style="float:left;width:60%;"  placeholder="서브넷 ID를 입력하세요."/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">디렉터 내부 IP</label>
+							<div>
+								<input name="privateStaticIp" type="text"  style="float:left;width:60%;" placeholder="디렉터 내부 IP를 입력하세요."/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">디렉터 공인 IP</label>
+							<div>
+								<input name="publicStaticIp" type="text"  style="float:left;width:60%;" required placeholder="디렉터 공인 IP를 입력하세요."/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">서브넷 범위</label>
+							<div>
+								<input name="subnetRange" type="text"  style="float:left;width:60%;" placeholder="예) 10.0.0.0/24"/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">게이트웨이</label>
+							<div>
+								<input name="subnetGateway" type="text"  style="float:left;width:60%;" placeholder="예) 10.0.0.1"/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">DNS</label>
+							<div>
+								<input name="subnetDns" type="text"  style="float:left;width:60%;" placeholder="예) 8.8.8.8"/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">NTP</label>
+							<div>
+								<input name="ntp" type="text"  style="float:left;width:60%;" placeholder="예) 10.0.0.2"/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -1588,7 +1606,7 @@ function osDeployPopup(){
 	<div id="awsResourceInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:3%;display:inline-block;width:97%;">
+			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6">
 		            <li class="pass">AWS 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1598,28 +1616,32 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 리소스 정보 설정</div>
-			<div class="w2ui-page page-0" style="padding-left: 5%;">
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;스템셀</label>
-					<div>
-						<div>
-							<input type="list" name="stemcell" style="float: left;width:330px;margin-top:1.5px;"  required placeholder="스템셀을 선택하세요.">
+	        <div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
+				<div class="panel panel-info">	
+					<div class="panel-heading"><b>네트워크 정보</b></div>
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">스템셀</label>
+							<div>
+								<div>
+									<input type="list" name="stemcell" style="float: left;width:60%;margin-top:1.5px;"  required placeholder="스템셀을 선택하세요.">
+								</div>
+							</div>
 						</div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;인스턴스 유형</label>
-					<div>
-						<input name="cloudInstanceType" type="text"  style="float:left;width:330px;" required placeholder="인스턴스 유형을 입력하세요."/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM 비밀번호</label>
-					<div>
-						<input name="boshPassword" type="text"  style="float:left;width:330px;"  required placeholder="VM 비밀번호를 입력하세요."/>
-						<div class="isMessage"></div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">인스턴스 유형</label>
+							<div>
+								<input name="cloudInstanceType" type="text"  style="float:left;width:60%;" required placeholder="인스턴스 유형을 입력하세요."/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">VM 비밀번호</label>
+							<div>
+								<input name="boshPassword" type="text"  style="float:left;width:60%;"  required placeholder="VM 비밀번호를 입력하세요."/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -1635,7 +1657,7 @@ function osDeployPopup(){
 	<div id="deployManifestDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:3%;display:inline-block;width:97%;">
+			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6">
 		            <li class="pass">AWS 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1645,8 +1667,8 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="width:95%;height:84%;float: left;display: inline-block;">
-				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
+			<div style="width:93%;height:84%;float: left;display: inline-block;margin-left:1%;">
+				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:3%;" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1656,10 +1678,10 @@ function osDeployPopup(){
 	</div>
 	
 	<!-- AWS Install DIV -->
-	<div id="installDiv" style="width:100%;height:100%;" hidden="true">
+	<div id="awsInstallDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:3%;display:inline-block;width:97%;">
+			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6">
 		            <li class="pass">AWS 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1669,8 +1691,8 @@ function osDeployPopup(){
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>
-			<div style="width:95%;height:84%;float: left;display: inline-block;">
-				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
+			<div style="width:93%;height:84%;float: left;display: inline-block;margin-left:1%;">
+				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:3%;" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1684,7 +1706,7 @@ function osDeployPopup(){
 	<div id="openstackInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:3%;display:inline-block;width:97%;">
+			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
 		            <li class="active">오픈스텍 정보</li>
 		            <li class="before">기본 정보</li>
@@ -1694,66 +1716,70 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; OPENSTACK 정보 설정</div>
-		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<form id="keyForm" data-toggle="validator" >
-					<div class="w2ui-field">
-						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Identify API Tokens URL</label>
-						<div>
-							<input name="authUrl" type="text"  style="float:left;width:60%;"  required placeholder="Identify API Tokens URL을 입력하세요."/>
-							<div class="isMessage"></div>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Tenant</label>
-						<div>
-							<input name="tenant" type="text"  style="float:left;width:60%;"  required placeholder="Tenant명을 입력하세요."/>
-							<div class="isMessage"></div>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Username</label>
-						<div>
-							<input name="userName" type="text"  style="float:left;width:60%;" required placeholder="계정명을 입력하세요."/>
-							<div class="isMessage"></div>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Password</label>
-						<div>
-							<input name="apiKey" type="text"  style="float:left;width:60%;"   required placeholder="계정 비밀번호를 입력하세요."/>
-							<div class="isMessage"></div>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Security Group</label>
-						<div>
-							<input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;"  required placeholder="시큐리티 그룹을 입력하세요."/>
-							<div class="isMessage"></div>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key Name</label>
-						<div>
-							<input name="privateKeyName" type="text"  style="float:left;width:60%;"  required placeholder="Key Pair명을 입력하세요."/>
-							<div class="isMessage"></div>
-						</div>
-					</div>
-					<!-- privateKeyPath -->
-			        <div class="w2ui-field">
-			        	<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;Private Key File</label>
-		                <div >
-		 					<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" />&nbsp;파일업로드</label></span>
-							&nbsp;&nbsp;
-							<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" />&nbsp;목록에서 선택</label></span>
-						</div>
+	        <div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
+				<div class="panel panel-info">	
+					<div class="panel-heading"><b>OPENSTACK 정보</b></div>
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
+				    	<form id="keyForm" data-toggle="validator" >
+							<div class="w2ui-field">
+								<label style="text-align: left;width:40%;font-size:11px;">Identify API Tokens URL</label>
+								<div>
+									<input name="authUrl" type="text"  style="float:left;width:60%;"  required placeholder="Identify API Tokens URL을 입력하세요."/>
+									<div class="isMessage"></div>
+								</div>
+							</div>
+							<div class="w2ui-field">
+								<label style="text-align: left;width:40%;font-size:11px;">Tenant</label>
+								<div>
+									<input name="tenant" type="text"  style="float:left;width:60%;"  required placeholder="Tenant명을 입력하세요."/>
+									<div class="isMessage"></div>
+								</div>
+							</div>
+							<div class="w2ui-field">
+								<label style="text-align: left;width:40%;font-size:11px;">Username</label>
+								<div>
+									<input name="userName" type="text"  style="float:left;width:60%;" required placeholder="계정명을 입력하세요."/>
+									<div class="isMessage"></div>
+								</div>
+							</div>
+							<div class="w2ui-field">
+								<label style="text-align: left;width:40%;font-size:11px;">Password</label>
+								<div>
+									<input name="apiKey" type="text"  style="float:left;width:60%;"   required placeholder="계정 비밀번호를 입력하세요."/>
+									<div class="isMessage"></div>
+								</div>
+							</div>
+							<div class="w2ui-field">
+								<label style="text-align: left;width:40%;font-size:11px;">Security Group</label>
+								<div>
+									<input name="defaultSecurityGroups" type="text"  style="float:left;width:60%;"  required placeholder="시큐리티 그룹을 입력하세요."/>
+									<div class="isMessage"></div>
+								</div>
+							</div>
+							<div class="w2ui-field">
+								<label style="text-align: left;width:40%;font-size:11px;">Private Key Name</label>
+								<div>
+									<input name="privateKeyName" type="text"  style="float:left;width:60%;"  required placeholder="Key Pair명을 입력하세요."/>
+									<div class="isMessage"></div>
+								</div>
+							</div>
+							<!-- privateKeyPath -->
+					        <div class="w2ui-field">
+					        	<label style="text-align: left;width:40%;font-size:11px;">Private Key File</label>
+				                <div >
+				 					<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" />&nbsp;파일업로드</label></span>
+									&nbsp;&nbsp;
+									<span onclick="changeKeyPathType('list');" style="width:30%;"><label><input type="radio" name="keyPathType" value="list" />&nbsp;목록에서 선택</label></span>
+								</div>
+					        </div>
+					        <div class="w2ui-field">			         	
+				                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();"/>
+					            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
+								<div id="keyPathDiv" ></div>
+					        </div>
+				        </form>
 			        </div>
-			        <div class="w2ui-field">			         	
-		                <input name="privateKeyPath" type="text" style="width:200px;" hidden="true" onclick="openBrowse();"/>
-			            <label style="text-align: left;width:40%;font-size:11px;" class="control-label"></label>
-						<div id="keyPathDiv" ></div>
-			        </div>
-		        </form>
+		        </div>
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1762,10 +1788,10 @@ function osDeployPopup(){
 		</div>
 	</div>
 	
-	<div id="osBoshInfoDiv" style="width:100%;height:100%;" hidden="true">
+	<div id="openstackDefaultInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:3%;display:inline-block;width:97%;">
+			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">오픈스텍 정보</li>
 		            <li class="active">기본 정보</li>
@@ -1775,45 +1801,49 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 기본 정보 설정</div>
-		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;배포명</label>
-					<div>
-						<input name="deploymentName" type="text"  style="float:left;width:60%;" required placeholder="배포명을 입력하세요."/>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 명</label>
-					<div>
-						<input name="directorName" type="text"  style="float:left;width:60%;" required placeholder="디렉터 명을 입력하세요."/>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;BOSH 릴리즈</label>
-					<div>
-						<input name="boshRelease" type="list"  style="float:left;width:60%;"  required placeholder="BOSH 릴리즈를 선택하세요."/>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;BOSH CPI 릴리즈</label>
-					<div>
-						<input name="boshCpiRelease" type="list"  style="float:left;width:60%;" required placeholder="BOSH CPI 릴리즈를 선택하세요."/>
+	        <div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
+				<div class="panel panel-info">	
+					<div class="panel-heading"><b>기본 정보</b></div>
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
+				    	<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">배포명</label>
+							<div>
+								<input name="deploymentName" type="text"  style="float:left;width:60%;" required placeholder="배포명을 입력하세요."/>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">디렉터 명</label>
+							<div>
+								<input name="directorName" type="text"  style="float:left;width:60%;" required placeholder="디렉터 명을 입력하세요."/>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">BOSH 릴리즈</label>
+							<div>
+								<input name="boshRelease" type="list"  style="float:left;width:60%;"  required placeholder="BOSH 릴리즈를 선택하세요."/>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">BOSH CPI 릴리즈</label>
+							<div>
+								<input name="boshCpiRelease" type="list"  style="float:left;width:60%;" required placeholder="BOSH CPI 릴리즈를 선택하세요."/>
+							</div>
+						</div>
 					</div>
 				</div>
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-		    	<button class="btn" style="float: left;" onclick="saveOsBoshInfo('before');">이전</button>
-		        <button class="btn" style="float: right;padding-right:15%" onclick="saveOsBoshInfo('after');" >다음>></button>
+		    	<button class="btn" style="float: left;" onclick="saveOpenstackDefaultInfo('before');">이전</button>
+		        <button class="btn" style="float: right;padding-right:15%" onclick="saveOpenstackDefaultInfo('after');" >다음>></button>
 		    </div>
 		</div>
 	</div>	
 	
-	<div id="osNetworkInfoDiv" style="width:100%;height:100%;" hidden="true">
+	<div id="openstackNetworkInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:3%;display:inline-block;width:97%;">
+			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">오픈스텍 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1823,70 +1853,74 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 네트워크 정보 설정</div>
-		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;네트워크 ID</label>
-					<div>
-						<input name="subnetId" type="text"  style="float:left;width:330px;" required placeholder="네트워크 ID를 입력하세요."/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 내부 IP</label>
-					<div>
-						<input name="privateStaticIp" type="text"  style="float:left;width:330px;" required placeholder="디렉터 내부 IP를 입력하세요."/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;디렉터 공인 IP</label>
-					<div>
-						<input name="publicStaticIp" type="text"  style="float:left;width:330px;"  required placeholder="디렉터 공인 IP를 입력하세요."/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;서브넷 범위</label>
-					<div>
-						<input name="subnetRange" type="text"  style="float:left;width:330px;"  required placeholder="예) 10.0.0.0/24"/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;게이트웨이</label>
-					<div>
-						<input name="subnetGateway" type="text"  style="float:left;width:330px;"  required placeholder="예) 10.0.0.1"/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;DNS</label>
-					<div>
-						<input name="subnetDns" type="text"  style="float:left;width:330px;" required placeholder="예) 8.8.8.8"/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;NTP</label>
-					<div>
-						<input name="ntp" type="text"  style="float:left;width:330px;"  required placeholder="예) 10.0.0.2"/>
-						<div class="isMessage"></div>
+	        <div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
+				<div class="panel panel-info">	
+					<div class="panel-heading"><b>네트워크 정보</b></div>
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
+				    	<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">네트워크 ID</label>
+							<div>
+								<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 ID를 입력하세요."/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">디렉터 내부 IP</label>
+							<div>
+								<input name="privateStaticIp" type="text"  style="float:left;width:60%;" required placeholder="디렉터 내부 IP를 입력하세요."/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">디렉터 공인 IP</label>
+							<div>
+								<input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="디렉터 공인 IP를 입력하세요."/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">서브넷 범위</label>
+							<div>
+								<input name="subnetRange" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.0/24"/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">게이트웨이</label>
+							<div>
+								<input name="subnetGateway" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.1"/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">DNS</label>
+							<div>
+								<input name="subnetDns" type="text"  style="float:left;width:60%;" required placeholder="예) 8.8.8.8"/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">NTP</label>
+							<div>
+								<input name="ntp" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.2"/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
 					</div>
 				</div>
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-		        <button class="btn" style="float: left;" onclick="saveOsNetworkInfo('before');" >이전</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOsNetworkInfo('after');" >다음>></button>
+		        <button class="btn" style="float: left;" onclick="saveOpenstackNetworkInfo('before');" >이전</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOpenstackNetworkInfo('after');" >다음>></button>
 		    </div>
 		</div>
 	</div>
 	
-	<div id="osResourceInfoDiv" style="width:100%;height:100%;" hidden="true">
+	<div id="openstackResourceInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:3%;display:inline-block;width:97%;">
+			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">오픈스텍 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1896,44 +1930,48 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="margin:15px 1.5%;"><span class="glyphicon glyphicon-stop"></span>&nbsp; 리소스 정보 설정</div>
-		    <div class="w2ui-page page-0" style="padding-left:5%;">
-		    	<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;스템셀</label>
-					<div>
-						<div>
-							<input type="list" name="stemcell" style="float: left;width:330px;margin-top:1.5px;"  required placeholder="스템셀을 선택하세요."/>
+	        <div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
+				<div class="panel panel-info">	
+					<div class="panel-heading"><b>리소스 정보</b></div>
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
+				    	<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">스템셀</label>
+							<div>
+								<div>
+									<input type="list" name="stemcell" style="float: left;width:60%;margin-top:1.5px;"  required placeholder="스템셀을 선택하세요."/>
+								</div>
+							</div>
 						</div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;인스턴스 유형</label>
-					<div>
-						<input name="cloudInstanceType" type="text"  style="float:left;width:330px;"  required placeholder="인스턴스 유형을 입력하세요."/>
-						<div class="isMessage"></div>
-					</div>
-				</div>
-				<div class="w2ui-field">
-					<label style="text-align: left;width:40%;font-size:11px;">&bull;&nbsp;VM 비밀번호</label>
-					<div>
-						<input name="boshPassword" type="text"  style="float:left;width:330px;"  required placeholder="VM 비밀번호를 입력하세요."/>
-						<div class="isMessage"></div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">인스턴스 유형</label>
+							<div>
+								<input name="cloudInstanceType" type="text"  style="float:left;width:60%;"  required placeholder="인스턴스 유형을 입력하세요."/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">VM 비밀번호</label>
+							<div>
+								<input name="boshPassword" type="text"  style="float:left;width:60%;"  required placeholder="VM 비밀번호를 입력하세요."/>
+								<div class="isMessage"></div>
+							</div>
+						</div>
 					</div>
 				</div>
 		    </div>
 			<br/>
 		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-		        <button class="btn" style="float: left;" onclick="saveOsResourceInfo('before');" >이전</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOsResourceInfo('after');" >다음>></button>
+		        <button class="btn" style="float: left;" onclick="saveOpenstackResourceInfo('before');" >이전</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOpenstackResourceInfo('after');" >다음>></button>
 		    </div>
 		</div>
 	</div>
 	
 	<!-- OPENSTACK Deploy DIV -->
-	<div id="osDeployManifestDiv" style="width:100%;height:100%;" hidden="true">
+	<div id="openstackDeployDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:3%;display:inline-block;width:97%;">
+			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">오픈스텍 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1943,8 +1981,8 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="width:95%;height:84%;float: left;display: inline-block;">
-				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
+			<div style="width:93%;height:84%;float: left;display: inline-block;margin-left:1%;">
+				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:3%;" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1955,10 +1993,10 @@ function osDeployPopup(){
 	</div>
 	
 	<!-- OPENSTACK Install DIV -->
-	<div id="osInstallDiv" style="width:100%;height:100%;" hidden="true">
+	<div id="openstackInstallDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:3%;display:inline-block;width:97%;">
+			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
 		            <li class="pass">오픈스텍 정보</li>
 		            <li class="pass">기본 정보</li>
@@ -1968,8 +2006,8 @@ function osDeployPopup(){
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>
-	        <div style="width:95%;height:84%;float: left;display: inline-block;">
-				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:2%" readonly="readonly"></textarea>
+	        <div style="width:93%;height:84%;float: left;display: inline-block;margin-left:1%;">
+				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:3%;" readonly="readonly"></textarea>
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">

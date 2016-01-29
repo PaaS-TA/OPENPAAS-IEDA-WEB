@@ -707,7 +707,7 @@ function saveNetworkInfo(type){
 function awsResourcePopup(){
 	$("#awsResourceInfoDiv").w2popup({
 		width 	: 700,
-		height	: 350,
+		height	: 380,
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){
@@ -1535,7 +1535,7 @@ $( window ).resize(function() {
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float: left;" onclick="deployPopup();">이전</button>
+			<button class="btn" id="deployPopupBtn" style="float: left;" onclick="deployPopup();" disabled>이전</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">닫기</button>
 		</div>		
 	</div>	
@@ -1844,7 +1844,7 @@ $( window ).resize(function() {
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float: left;" onclick="deployPopup()">이전</button>
+			<button class="btn" id="deployPopupBtn" style="float: left;" onclick="deployPopup()" disabled>이전</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">닫기</button>
 		</div>
 	</div>	

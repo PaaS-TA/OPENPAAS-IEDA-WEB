@@ -1840,7 +1840,7 @@
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float: left;" onclick="deployPopup()">이전</button>
+			<button class="btn" id="deployPopupBtn" style="float: left;" onclick="deployPopup()" disabled>이전</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">닫기</button>
 		</div>
 	</div>
@@ -2261,7 +2261,7 @@
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float: left;" onclick="deployPopup()">이전</button>
+			<button class="btn" id="deployPopupBtn" style="float: left;" onclick="deployPopup()" disabled>이전</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">닫기</button>
 		</div>
 	</div>

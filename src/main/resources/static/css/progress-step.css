@@ -147,7 +147,7 @@ ul.progressStep_6 {
 
 ul.progressStep_6 li{
     float: left;
-    padding: 18px 12px;    /***  [내부영역 Padding] 내부 글자 크기에 따라 조절**/
+    padding: 18px 5px 18px 15px;
     color: #fff;
     position: relative;
     border-top: 1px solid #666;
