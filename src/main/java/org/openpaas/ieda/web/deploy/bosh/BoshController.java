@@ -97,7 +97,7 @@ public class BoshController extends BaseController {
 		return new ResponseEntity<>(awsInfo.getId(), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/bosh/saveAwsBoshInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/bosh/saveAwsDefaultInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveBoshInfo(@RequestBody BoshParam.AwsBosh dto){
 		IEDABoshAwsConfig content = awsService.saveBoshInfo(dto);
 			
@@ -135,7 +135,7 @@ public class BoshController extends BaseController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 
-	@RequestMapping(value="/bosh/saveOsBoshInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/bosh/saveOpenstackDefaultInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveOpenstackBoshInfo(@RequestBody @Valid BoshParam.OsBosh dto){
 
 		IEDABoshOpenstackConfig config = openstackService.saveBoshInfo(dto);	
@@ -144,7 +144,7 @@ public class BoshController extends BaseController {
 	}
 	
 	
-	@RequestMapping(value="/bosh/saveOsNetworkInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/bosh/saveOpenstackNetworkInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveOsNetworkInfo(@RequestBody @Valid BoshParam.OsNetwork dto){
 		
 		IEDABoshOpenstackConfig config = openstackService.saveOsNetworkInfo(dto);	
@@ -152,7 +152,7 @@ public class BoshController extends BaseController {
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/bosh/saveOsResourceInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/bosh/saveOpenstackResourceInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveOsResourceInfo(@RequestBody @Valid BoshParam.OsResource dto){
 		
 		//IEDABoshOpenstackConfig config = openstackService.saveOsResourceInfo(dto);

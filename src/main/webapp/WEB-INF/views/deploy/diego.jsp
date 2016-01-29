@@ -1675,10 +1675,10 @@ Diego
 							</div>
 						</div>
 						<div class="w2ui-field">
-							<label style="text-align:left; width:40%; font-size:11px;">서버 공개키</label>
+							<label style="text-align:left; width:40%; font-size:11px;">서버 개인키</label>
 							<div>
 								<textarea name="diegoServerKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="서버 공개키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="서버 개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 							</div>
 						</div>
 					</div>
@@ -1734,10 +1734,10 @@ Diego
 							</div>
 						</div>
 						<div class="w2ui-field">
-							<label style="text-align:left; width:40%; font-size:11px;">서버 공개키</label>
+							<label style="text-align:left; width:40%; font-size:11px;">서버 개인키</label>
 							<div>
 								<textarea name="etcdServerKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="서버 공개키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="서버 개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
 							</div>
 						</div>
 					</div>
