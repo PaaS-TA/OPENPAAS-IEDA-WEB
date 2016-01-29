@@ -918,7 +918,7 @@ function saveResourceInfo(type){
 }
 
 function deployPopup(){
-	var deployDiv = (iaas == "AWS") ? $("#deployManifestDiv") : $("#openstackDeployDiv");
+	var deployDiv = (iaas == "AWS") ? $("#awsDeployDiv") : $("#openstackDeployDiv");
 	deployDiv.w2popup({
 		width 	: 720,
 		height 	: 500,
@@ -1381,7 +1381,7 @@ function osDeployPopup(){
 
 	<!-- AWS  설정 DIV -->
 	<div id="awsDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(AWS)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
@@ -1466,7 +1466,7 @@ function osDeployPopup(){
 	</div>
 	
 	<div id="awsDefaultDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(AWS)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
@@ -1526,7 +1526,7 @@ function osDeployPopup(){
 	
 	<!-- 네트워크  설정 DIV -->
 	<div id="awsNetworkInfoDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(AWS)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6">
@@ -1543,9 +1543,9 @@ function osDeployPopup(){
 					<div class="panel-heading"><b>네트워크 정보</b></div>
 					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field">
-							<label style="text-align: left;width:40%;font-size:11px;">서브넷 ID</label>
+							<label style="text-align: left;width:40%;font-size:11px;">디렉터 공인 IP</label>
 							<div>
-								<input name="subnetId" type="text"  style="float:left;width:60%;"  placeholder="서브넷 ID를 입력하세요."/>
+								<input name="publicStaticIp" type="text"  style="float:left;width:60%;" required placeholder="디렉터 공인 IP를 입력하세요."/>
 								<div class="isMessage"></div>
 							</div>
 						</div>
@@ -1557,9 +1557,9 @@ function osDeployPopup(){
 							</div>
 						</div>
 						<div class="w2ui-field">
-							<label style="text-align: left;width:40%;font-size:11px;">디렉터 공인 IP</label>
+							<label style="text-align: left;width:40%;font-size:11px;">서브넷 ID</label>
 							<div>
-								<input name="publicStaticIp" type="text"  style="float:left;width:60%;" required placeholder="디렉터 공인 IP를 입력하세요."/>
+								<input name="subnetId" type="text"  style="float:left;width:60%;"  placeholder="서브넷 ID를 입력하세요."/>
 								<div class="isMessage"></div>
 							</div>
 						</div>
@@ -1604,7 +1604,7 @@ function osDeployPopup(){
 	
 	<!-- Resource  설정 DIV -->
 	<div id="awsResourceInfoDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(AWS)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6">
@@ -1618,7 +1618,7 @@ function osDeployPopup(){
 	        </div>
 	        <div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
 				<div class="panel panel-info">	
-					<div class="panel-heading"><b>네트워크 정보</b></div>
+					<div class="panel-heading"><b>리소스 정보</b></div>
 					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field">
 							<label style="text-align: left;width:40%;font-size:11px;">스템셀</label>
@@ -1654,8 +1654,8 @@ function osDeployPopup(){
 	</div>
 	
 	<!-- AWS Deploy DIV -->
-	<div id="deployManifestDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+	<div id="awsDeployDiv" style="width:100%;height:100%;" hidden="true">
+		<div rel="title"><b>BOOTSTRAP 설치(AWS)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6">
@@ -1667,7 +1667,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="width:93%;height:84%;float: left;display: inline-block;margin-left:1%;">
+			<div style="width:93%;height:84%;float: left;display: inline-block;margin:10px 0 0 1%;">
 				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:3%;" readonly="readonly"></textarea>
 			</div>
 		</div>
@@ -1679,7 +1679,7 @@ function osDeployPopup(){
 	
 	<!-- AWS Install DIV -->
 	<div id="awsInstallDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(AWS)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6">
@@ -1691,7 +1691,7 @@ function osDeployPopup(){
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>
-			<div style="width:93%;height:84%;float: left;display: inline-block;margin-left:1%;">
+			<div style="width:93%;height:84%;float: left;display: inline-block;margin:10px 0 0 1%;">
 				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:3%;" readonly="readonly"></textarea>
 			</div>
 		</div>
@@ -1704,7 +1704,7 @@ function osDeployPopup(){
 
 <!-- Start OPENSTACK POPUP  -->
 	<div id="openstackInfoDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(오픈스텍)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
@@ -1718,7 +1718,7 @@ function osDeployPopup(){
 	        </div>
 	        <div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
 				<div class="panel panel-info">	
-					<div class="panel-heading"><b>OPENSTACK 정보</b></div>
+					<div class="panel-heading"><b>오픈스텍 정보</b></div>
 					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 				    	<form id="keyForm" data-toggle="validator" >
 							<div class="w2ui-field">
@@ -1789,7 +1789,7 @@ function osDeployPopup(){
 	</div>
 	
 	<div id="openstackDefaultInfoDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(오픈스텍)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
@@ -1841,7 +1841,7 @@ function osDeployPopup(){
 	</div>	
 	
 	<div id="openstackNetworkInfoDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(오픈스텍)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
@@ -1857,10 +1857,10 @@ function osDeployPopup(){
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>네트워크 정보</b></div>
 					<div class="panel-body" style="padding:5px 5% 10px 5%;">
-				    	<div class="w2ui-field">
-							<label style="text-align: left;width:40%;font-size:11px;">네트워크 ID</label>
+						<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">디렉터 공인 IP</label>
 							<div>
-								<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 ID를 입력하세요."/>
+								<input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="디렉터 공인 IP를 입력하세요."/>
 								<div class="isMessage"></div>
 							</div>
 						</div>
@@ -1871,10 +1871,10 @@ function osDeployPopup(){
 								<div class="isMessage"></div>
 							</div>
 						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left;width:40%;font-size:11px;">디렉터 공인 IP</label>
+				    	<div class="w2ui-field">
+							<label style="text-align: left;width:40%;font-size:11px;">네트워크 ID</label>
 							<div>
-								<input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="디렉터 공인 IP를 입력하세요."/>
+								<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 ID를 입력하세요."/>
 								<div class="isMessage"></div>
 							</div>
 						</div>
@@ -1918,7 +1918,7 @@ function osDeployPopup(){
 	</div>
 	
 	<div id="openstackResourceInfoDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(오픈스텍)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
@@ -1969,7 +1969,7 @@ function osDeployPopup(){
 	
 	<!-- OPENSTACK Deploy DIV -->
 	<div id="openstackDeployDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(오픈스텍)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
@@ -1981,7 +1981,7 @@ function osDeployPopup(){
 		            <li class="before">설치</li>
 	            </ul>
 	        </div>
-			<div style="width:93%;height:84%;float: left;display: inline-block;margin-left:1%;">
+			<div style="width:93%;height:84%;float: left;display: inline-block;margin:10px 0 0 1%;">
 				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:3%;" readonly="readonly"></textarea>
 			</div>
 		</div>
@@ -1994,7 +1994,7 @@ function osDeployPopup(){
 	
 	<!-- OPENSTACK Install DIV -->
 	<div id="openstackInstallDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(오픈스텍)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
@@ -2006,7 +2006,7 @@ function osDeployPopup(){
 		            <li class="active">설치</li>
 	            </ul>
 	        </div>
-	        <div style="width:93%;height:84%;float: left;display: inline-block;margin-left:1%;">
+	        <div style="width:93%;height:84%;float: left;display: inline-block;margin:10px 0 0 1%;">
 				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:3%;" readonly="readonly"></textarea>
 			</div>
 		</div>

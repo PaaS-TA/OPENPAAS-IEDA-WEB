@@ -19,7 +19,7 @@ $(function() {
        	   , {field: 'stemcellInfo', caption: '스템셀 정보', size: '40%', style: 'text-align:left'}
 		       	],
 		onError: function(event) {
-			w2alert("ERROR");
+			//w2alert("ERROR");
 		}
 	});
 	
@@ -40,7 +40,10 @@ $(function() {
 	    	   }
 	       } */
 	       , {field: 'jobNames', caption: 'Job템플릿', size: '55%', style: 'text-align:left'}
-		]
+		],
+		onError: function(event) {
+			//w2alert("ERROR");
+		}
 	});
 	
 	$('#main_stemcellsGrid').w2grid({
@@ -60,7 +63,10 @@ $(function() {
 		    			   return '';
 	        	 	}
 	        	 } */
-		]
+		],
+		onError: function(event) {
+			//w2alert("ERROR");
+		}
 	});	
 	
 	if ( isOk ) doSearch();
@@ -68,9 +74,9 @@ $(function() {
 
 //조회기능
 function doSearch() {
-	w2ui['main_deploymentsGrid'].load("<c:url value='/dashboard/deployments'/>");
-	w2ui['main_releasesGrid'].load("<c:url value='/dashboard/releases'/>");
-	w2ui['main_stemcellsGrid'].load("<c:url value='/dashboard/stemcells'/>");	
+	w2ui['main_deploymentsGrid'].load("<c:url value='/dashboard/deployments'/>","",function(event){});
+	w2ui['main_releasesGrid'].load("<c:url value='/dashboard/releases'/>","",function(event){});
+	w2ui['main_stemcellsGrid'].load("<c:url value='/dashboard/stemcells'/>","",function(event){});	
 }
 
 //다른페이지 이동시 호출

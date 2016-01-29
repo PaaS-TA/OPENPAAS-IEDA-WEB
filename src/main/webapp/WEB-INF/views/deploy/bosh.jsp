@@ -378,7 +378,6 @@ function awsPopup(){
 	$("#awsInfoDiv").w2popup({
 		width 	: 700,
 		height	: 520,
-		title   : "BOSH설치 (AWS)",
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
@@ -874,7 +873,6 @@ function openstackDefaultInfoPopup(){
 	$("#openstackDefaultInfoDiv").w2popup({
 		width 	: 700,
 		height	: 400,
-		title   : "BOSH설치 (OPENSTACK)",
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
@@ -973,7 +971,6 @@ function openstackPopup(){
 	$("#openstackInfoDiv").w2popup({
 		width 	: 700,
 		height	: 550,
-		title   : "BOSH설치 (오픈스택)",
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				
@@ -1210,7 +1207,7 @@ $( window ).resize(function() {
 </script>
 
 <div id="main">
-	<div class="page_site">플랫폼 설치 > <strong>Bosh 설치</strong></div>
+	<div class="page_site">플랫폼 설치 > <strong>BOSH 설치</strong></div>
 	
 	<!-- 설치 관리자 -->
 	<div id="isDefaultDirector"></div>
@@ -1393,12 +1390,6 @@ $( window ).resize(function() {
 					<div class="panel-heading"><b>네트워크 정보</b></div>
 					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field">
-							<label style="text-align: left; width:40%; font-size: 11px;">서브넷 ID</label>
-							<div>
-								<input name="subnetId" type="text"  style="float:left;width:60%;"  required placeholder="서브넷 ID를 입력하세요."/>
-							</div>
-						</div>
-						<div class="w2ui-field">
 				            <label style="text-align: left;width:40%;font-size:11px;">디렉터 공인 IP</label>
 				            <div>
 				                <input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="디렉터 공인 IP를 입력하세요."/>
@@ -1406,13 +1397,9 @@ $( window ).resize(function() {
 				            </div>
 				        </div>
 						<div class="w2ui-field">
-							<label style="text-align:left; width:40%; font-size: 11px;">VM 할당 IP대역</label>
+							<label style="text-align: left; width:40%; font-size: 11px;">서브넷 ID</label>
 							<div>
-								<div style="display:inline-block;width: 60%;">
-									<span style="float:left;width:45%;"><input name="subnetStaticFrom" id="subnetStaticFrom" type="text" style="float:left;width:100%;" placeholder="예) 10.0.0.100"/></span>
-									<span style="float:left;width:10%;text-align: center;">&nbsp; &ndash; &nbsp;</span>
-									<span style="float:left;width:45%;"><input name="subnetStaticTo" id="subnetStaticTo" type="text" style="float:left;width:100%;" placeholder="예) 10.0.0.106"/></span>
-								</div>
+								<input name="subnetId" type="text"  style="float:left;width:60%;"  required placeholder="서브넷 ID를 입력하세요."/>
 							</div>
 						</div>
 						<div class="w2ui-field">
@@ -1431,6 +1418,16 @@ $( window ).resize(function() {
 							<label style="text-align: left; width: 40%; font-size: 11px;">DNS</label>
 							<div>
 								<input name="subnetDns" type="text"  style="float:left;width:60%;"  required placeholder="예) 8.8.8.8"/>
+							</div>
+						</div>
+						<div class="w2ui-field">
+							<label style="text-align:left; width:40%; font-size: 11px;">IP할당 대역</label>
+							<div>
+								<div style="display:inline-block;width: 60%;">
+									<span style="float:left;width:45%;"><input name="subnetStaticFrom" id="subnetStaticFrom" type="text" style="float:left;width:100%;" placeholder="예) 10.0.0.100"/></span>
+									<span style="float:left;width:10%;text-align: center;">&nbsp; &ndash; &nbsp;</span>
+									<span style="float:left;width:45%;"><input name="subnetStaticTo" id="subnetStaticTo" type="text" style="float:left;width:100%;" placeholder="예) 10.0.0.106"/></span>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -1695,17 +1692,17 @@ $( window ).resize(function() {
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>네트워크 정보</b></div>
 					<div class="panel-body" style="padding:5px 5% 10px 5%;">
-				        <div class="w2ui-field">
-				            <label style="text-align: left;width:40%;font-size:11px;">네트워크 ID</label>
-				            <div>
-				                <input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 ID를 입력하세요."/>
-				                <div class="isMessage"></div>
-				            </div>
-				        </div>
 						<div class="w2ui-field">
 				            <label style="text-align: left;width:40%;font-size:11px;">디렉터 공인 IP</label>
 				            <div>
 				                <input name="publicStaticIp" type="text"  style="float:left;width:60%;" required placeholder="디렉터 공인 IP를 입력하세요."/>
+				                <div class="isMessage"></div>
+				            </div>
+				        </div>
+				        <div class="w2ui-field">
+				            <label style="text-align: left;width:40%;font-size:11px;">네트워크 ID</label>
+				            <div>
+				                <input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 ID를 입력하세요."/>
 				                <div class="isMessage"></div>
 				            </div>
 				        </div>

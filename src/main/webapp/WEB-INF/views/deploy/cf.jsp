@@ -15,8 +15,7 @@
 	//private var
 	var iaas = "";
 	var cfId = "";
-	var awsInfo = "";
-	var openstackInfo = "";
+	var defaultInfo = "";
 	var uaaInfo = "";
 	var consulInfo = "";
 	var networkInfo = "";
@@ -144,10 +143,10 @@
 			
 			if (directorName.indexOf("AWS") > 0) {
 				iaas = "AWS";
-				awsPopup();
+				defaultInfoPopup();
 			} else if (directorName.indexOf("OPENSTACK") > 0) {
 				iaas = "OPENSTACk";
-				openstackPopup();
+				defaultInfoPopup();
 			}
 			else{
 				selectIaas();
@@ -233,7 +232,7 @@
 				iaas = $(".w2ui-msg-body input:radio[name='structureType']:checked").val();
 				if (iaas) {
 					if (iaas == "AWS")
-						awsPopup();
+						defaultInfoPopup();
 					else
 						openstackPopup();
 				} else {
@@ -355,7 +354,7 @@
 	function setAwsData(contents) {
 		cfId = contents.id;
 		iaas = "AWS";
-		awsInfo = {
+		defaultInfo = {
 			iaas : "AWS",
 			deploymentName 		: contents.deploymentName,
 			directorUuid 		: contents.directorUuid,
@@ -411,31 +410,30 @@
 			deployStatus 		: contents.deployStatus,
 		}
 		
-		awsPopup();
+		defaultInfoPopup();
 	}
 	 
 	// Aws 팝업
-	function awsPopup() {
-		$("#awsInfoDiv").w2popup({
+	function defaultInfoPopup() {
+		$("#defaultInfoDiv").w2popup({
 			width : 850,
 			height : 760,
-			title : "CF 설치 (AWS)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
 				event.onComplete = function() {
-					if (awsInfo != "" && awsInfo != null) {
-						$(".w2ui-msg-body input[name='deploymentName']").val(awsInfo.deploymentName);
-						$(".w2ui-msg-body input[name='directorUuid']").val(awsInfo.directorUuid);
-						$(".w2ui-msg-body input[name='appSshFingerprint']").val(awsInfo.appSshFingerprint);
+					if ( defaultInfo != "" && defaultInfo != null) {
+						$(".w2ui-msg-body input[name='deploymentName']").val(defaultInfo.deploymentName);
+						$(".w2ui-msg-body input[name='directorUuid']").val(defaultInfo.directorUuid);
+						$(".w2ui-msg-body input[name='appSshFingerprint']").val(defaultInfo.appSshFingerprint);
 						
-						$(".w2ui-msg-body input[name='domain']").val(awsInfo.domain);
-						$(".w2ui-msg-body input[name='description']").val(awsInfo.description);
-						$(".w2ui-msg-body input[name='domainOrganization']").val(awsInfo.domainOrganization);
+						$(".w2ui-msg-body input[name='domain']").val(defaultInfo.domain);
+						$(".w2ui-msg-body input[name='description']").val(defaultInfo.description);
+						$(".w2ui-msg-body input[name='domainOrganization']").val(defaultInfo.domainOrganization);
 
-						$(".w2ui-msg-body input[name='proxyStaticIps']").val(awsInfo.proxyStaticIps);
-						$(".w2ui-msg-body textarea[name='sslPemPub']").val(awsInfo.sslPemPub);
-						$(".w2ui-msg-body textarea[name='sslPemRsa']").val(awsInfo.sslPemRsa);
+						$(".w2ui-msg-body input[name='proxyStaticIps']").val(defaultInfo.proxyStaticIps);
+						$(".w2ui-msg-body textarea[name='sslPemPub']").val(defaultInfo.sslPemPub);
+						$(".w2ui-msg-body textarea[name='sslPemRsa']").val(defaultInfo.sslPemRsa);
 					}
 					else{
 						if( !checkEmpty($("#directorUuid").text()) ){
@@ -455,13 +453,13 @@
 	}
 
 	// AWS POPUP NEXT BUTTON EVENT
-	function saveAwsInfo() {
+	function saveDefaultInfo() {
 		// AWSInfo Save
 		var release = $(".w2ui-msg-body input[name='releases']").val();
 		
-		awsInfo = {
+		defaultInfo = {
 					id 					: (cfId) ? cfId : "",
-					iaas 				: "AWS",
+					iaas 				: iaas.toUpperCase(),
 					deploymentName 		: $(".w2ui-msg-body input[name='deploymentName']").val(),
 					directorUuid 		: $(".w2ui-msg-body input[name='directorUuid']").val(),
 					releaseName 		: release.split("/")[0],
@@ -478,15 +476,15 @@
 		}
 		
 		if (popupValidation()) {
-			//ajax AwsInfo Save
-			$.ajax({
+ 			$.ajax({
 				type : "PUT",
-				url : "/cf/saveAws",
+				url : "/cf/saveDefaultInfo",
 				contentType : "application/json",
-				data : JSON.stringify(awsInfo),
+				data : JSON.stringify(defaultInfo),
 				success : function(data, status) {
-					cfId = data.id;
-					awsUaaPopup();
+					var content = data.content
+					cfId = content.id;
+					uaaInfoPopup();
 				},
 				error : function(e, status) {
 					w2alert("AWS 설정 등록에 실패 하였습니다.", "CF 설치");
@@ -495,12 +493,11 @@
 		}
 	}
 
-	// AWS UAA POPUP
-	function awsUaaPopup(){
-		$("#awsUaaInfoDiv").w2popup({
+	// UAA POPUP
+	function uaaInfoPopup(){
+		$("#uaaInfoDiv").w2popup({
 			width : 850,
 			height : 480,
-			title : "CF 설치 (AWS)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
@@ -521,43 +518,42 @@
 	}
 	
 	// AWS UAA save AwsUaa Info
-	function saveAwsUaaInfo(type){
+	function saveUaaInfo(type){
 		uaaInfo = {
 				id : cfId,
+				iaas : iaas.toUpperCase(),
 				loginSecret : $(".w2ui-msg-body input[name='loginSecret']").val(),
 				signingKey	: $(".w2ui-msg-body textarea[name='signingKey']").val(),
 				verificationKey : $(".w2ui-msg-body textarea[name='verificationKey']").val()
 		}
 		
 		if( type == 'after'){
-			console.log("=====saveAwsUaaInfo====");
 			if (popupValidation()) {
 				//ajax AwsInfo Save
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveAwsUaa",
+					url : "/cf/saveUaaInfo",
 					contentType : "application/json",
 					data : JSON.stringify(uaaInfo),
 					success : function(data, status) {
-						awsConsulPopup();
+						consulInfoPopup();
 					},
 					error : function(e, status) {
-						w2alert("AWS UAA 등록에 실패 하였습니다.", "CF 설치");
+						w2alert("UAA 정보 등록에 실패 하였습니다.", "CF 설치");
 					}
 				});
 			}
 		}
 		else{
-			awsPopup();
+			defaultInfoPopup();
 		}
 	}
 	
-	// AWS CONSUL Popup
-	function awsConsulPopup(){
-		$("#awsConsulInfoDiv").w2popup({
+	// CONSUL Info Popup
+	function consulInfoPopup(){
+		$("#consulInfoDiv").w2popup({
 			width : 850,
 			height : 750,
-			title : "CF 설치 (AWS)",
 			modal : false,
 			showMax : false,
 			onOpen : function(event) {
@@ -581,9 +577,10 @@
 	}
 	
 	// AWS CONSUL save AwsConsul
-	function saveAwsConsulInfo(type){
+	function saveConsulInfo(type){
 		consulInfo = {
 				id 					: cfId,
+				iaas				: iaas.toUpperCase(),
 				agentCert			: $(".w2ui-msg-body textarea[name='agentCert']").val(),
 				agentKey			: $(".w2ui-msg-body textarea[name='agentKey']").val(),
 				caCert				: $(".w2ui-msg-body textarea[name='caCert']").val(),
@@ -597,11 +594,12 @@
 				//ajax AwsInfo Save
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveAwsConsul",
+					url : "/cf/saveConsulInfo",
 					contentType : "application/json",
 					data : JSON.stringify(consulInfo),
 					success : function(data, status) {
-						awsNetworkPopup();
+						if( iaas.toUpperCase() == "AWS" ) awsNetworkPopup();
+						else if( iaas.toUpperCase() == "OPENSTACK" ) openstackNetworkPopup();
 					},
 					error : function(e, status) {
 						w2alert("AWS CONSUL 등록에 실패 하였습니다.", "CF 설치");
@@ -610,7 +608,7 @@
 			}
 		}
 		else{
-			awsUaaPopup();
+			uaaInfoPopup();
 		}
 		
 	}
@@ -620,7 +618,6 @@
 		$("#awsNetworkInfoDiv").w2popup({
 			width : 850,
 			height : 490,
-			title : "CF 설치 (AWS)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
@@ -649,6 +646,7 @@
 	function saveAwsNetworkInfo(type) {
 		networkInfo = {
 				id 					: cfId,
+				iaas				: iaas.toUpperCase(),
 				subnetRange			: $(".w2ui-msg-body input[name='subnetRange']").val(),
 				subnetGateway		: $(".w2ui-msg-body input[name='subnetGateway']").val(),
 				subnetDns			: $(".w2ui-msg-body input[name='subnetDns']").val(),
@@ -665,12 +663,12 @@
 				//Server send Cf Info
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveAwsNetwork",
+					url : "/cf/saveAwsNetworkInfo",
 					contentType : "application/json",
 					async : true,
 					data : JSON.stringify(networkInfo),
 					success : function(data, status) {
-						awsResourcePopup();
+						resourceInfoPopup();
 					},
 					error : function(e, status) {
 						w2alert("Cf Network 등록에 실패 하였습니다.", "Cf 설치");
@@ -678,16 +676,15 @@
 				});
 			}
 		} else if (type == 'before') {
-			awsConsulPopup();
+			consulInfoPopup();
 		}
 	}
 
-	// AWS RESOURCE POPUP
-	function awsResourcePopup() {
-		$("#awsResourceInfoDiv").w2popup({
+	// RESOURCE POPUP
+	function resourceInfoPopup() {
+		$("#resourceInfoDiv").w2popup({
 			width : 850,
 			height : 350,
-			title : "CF 설치 (AWS)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
@@ -708,11 +705,12 @@
 	}
 
 	// AWS RESOURCE save Resource Info
-	function saveAwsResourceInfo(type) {
+	function saveResourceInfo(type) {
 
 		var stemcellInfos = $(".w2ui-msg-body input[name='stemcells']").val().split("/");
 		resourceInfo = {
 				id 					: cfId,
+				iaas				: iaas.toUpperCase(),
 				stemcellName 		: stemcellInfos[0],
 				stemcellVersion 	: stemcellInfos[1],
 				boshPassword 		: $(".w2ui-msg-body input[name='boshPassword']").val()
@@ -723,7 +721,7 @@
 				//Server send Cf Info
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveAwsResource",
+					url : "/cf/saveResourceInfo",
 					contentType : "application/json",
 					async : true,
 					data : JSON.stringify(resourceInfo),
@@ -737,7 +735,8 @@
 				});
 			}
 		} else if (type == 'before') {
-			awsNetworkPopup();
+			if( iaas.toUpperCase() == "AWS" ) awsNetworkPopup();
+			else if( iaas.toUpperCase() == "OPENSTACK" ) openstackNetworkPopup();
 		}
 	}
 	/********************************* AWS END ********************************************/
@@ -750,7 +749,7 @@
 	function setOpenstackData(contents) {
 		cfId = contents.id;
 		iaas = "OPENSTACK";
-		openstackInfo = {
+		defaultInfo = {
 			iaas : "OPENSTACK",
 			deploymentName 		: contents.deploymentName,
 			directorUuid 		: contents.directorUuid,
@@ -805,215 +804,14 @@
 			deployStatus 		: contents.deployStatus,
 		}
 		
-		openstackPopup();
+		defaultInfoPopup();
 	}
 	 
-	// Openstack 팝업
-	function openstackPopup() {
-		$("#openstackInfoDiv").w2popup({
-			width : 850,
-			height : 800,
-			title : "CF 설치 (OPENSTACK)",
-			modal : true,
-			showMax : false,
-			onOpen : function(event) {
-				event.onComplete = function() {
-					if ( openstackInfo != "" && openstackInfo != null ) {
-						$(".w2ui-msg-body input[name='deploymentName']").val(openstackInfo.deploymentName);
-						$(".w2ui-msg-body input[name='directorUuid']").val(openstackInfo.directorUuid);
-						$(".w2ui-msg-body input[name='appSshFingerprint']").val(openstackInfo.appSshFingerprint);
-						
-						$(".w2ui-msg-body input[name='domain']").val(openstackInfo.domain);
-						$(".w2ui-msg-body input[name='description']").val(openstackInfo.description);
-						$(".w2ui-msg-body input[name='domainOrganization']").val(openstackInfo.domainOrganization);
-	
-						$(".w2ui-msg-body input[name='proxyStaticIps']").val(openstackInfo.proxyStaticIps);
-						$(".w2ui-msg-body textarea[name='sslPemPub']").val(openstackInfo.sslPemPub);
-						$(".w2ui-msg-body textarea[name='sslPemRsa']").val(openstackInfo.sslPemRsa);
-					}
-					else{
-						if( !checkEmpty($("#directorUuid").text()) ){
-							$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
-						}
-					}
-					w2popup.lock("릴리즈를 조회 중입니다.", true);
-					getCfRelease();
-				}
-			},
-			onClose : function(event) {
-				event.onComplete = function() {
-					initSetting();
-				}
-			}
-		});
-	}
-	
-	// OPENSTACK POPUP NEXT BUTTON EVENT
-	function saveOpenstackInfo() {
-		// OPENSTACKInfo Save
-		var release = $(".w2ui-msg-body input[name='releases']").val();
-		
-		openstackInfo = {
-					id 					: (cfId) ? cfId : "",
-					iaas 				: "OPENSTACK",
-					deploymentName 		: $(".w2ui-msg-body input[name='deploymentName']").val(),
-					directorUuid 		: $(".w2ui-msg-body input[name='directorUuid']").val(),
-					releaseName 		: release.split("/")[0],
-					releaseVersion 		: release.split("/")[1],
-					appSshFingerprint   : $(".w2ui-msg-body input[name='appSshFingerprint']").val(),
-		
-					domain 				: $(".w2ui-msg-body input[name='domain']").val(),
-					description 		: $(".w2ui-msg-body input[name='description']").val(),
-					domainOrganization 	: $(".w2ui-msg-body input[name='domainOrganization']").val(),
-		
-					proxyStaticIps 		: $(".w2ui-msg-body input[name='proxyStaticIps']").val(),
-					sslPemPub 			: $(".w2ui-msg-body textarea[name='sslPemPub']").val(),
-					sslPemRsa 			: $(".w2ui-msg-body textarea[name='sslPemRsa']").val()
-		}
-		
-		if (popupValidation()) {
-			//ajax OpenstackInfo Save
-			$.ajax({
-				type : "PUT",
-				url : "/cf/saveOpenstack",
-				contentType : "application/json",
-				data : JSON.stringify(openstackInfo),
-				success : function(data, status) {
-					cfId = data.id;
-					openstackUaaPopup();
-				},
-				error : function(e, status) {
-					w2alert("OPENSTACK 설정 등록에 실패 하였습니다.", "CF 설치");
-				}
-			});
-		}
-	}
-	
-	// OPENSTACK UAA POPUP
-	function openstackUaaPopup(){
-		$("#openstackUaaInfoDiv").w2popup({
-			width : 850,
-			height : 480,
-			title : "CF 설치 (OPENSTACK)",
-			modal : true,
-			showMax : false,
-			onOpen : function(event) {
-				event.onComplete = function() {
-					if (uaaInfo != "") {
-						$(".w2ui-msg-body input[name='loginSecret']").val(uaaInfo.loginSecret);
-						$(".w2ui-msg-body textarea[name='signingKey']").val(uaaInfo.signingKey);
-						$(".w2ui-msg-body textarea[name='verificationKey']").val(uaaInfo.verificationKey);
-					}					
-				}
-			},
-			onClose : function(event) {
-				event.onComplete = function() {
-					initSetting();
-				}
-			}
-		});
-	}
-	
-	// OPENSTACK UAA save OpenstackUaa Info
-	function saveOpenstackUaaInfo(type){
-		uaaInfo = {
-				id : cfId,
-				loginSecret : $(".w2ui-msg-body input[name='loginSecret']").val(),
-				signingKey	: $(".w2ui-msg-body textarea[name='signingKey']").val(),
-				verificationKey : $(".w2ui-msg-body textarea[name='verificationKey']").val()
-		}
-		
-		if( type == 'after'){
-			if (popupValidation()) {
-				//ajax OpenstackInfo Save
-				$.ajax({
-					type : "PUT",
-					url : "/cf/saveOpenstackUaa",
-					contentType : "application/json",
-					data : JSON.stringify(uaaInfo),
-					success : function(data, status) {
-						openstackConsulPopup();
-					},
-					error : function(e, status) {
-						w2alert("OPENSTACK UAA 등록에 실패 하였습니다.", "CF 설치");
-					}
-				});
-			}
-		}
-		else{
-			openstackPopup();
-		}
-	}
-	
-	// OPENSTACK CONSUL Popup
-	function openstackConsulPopup(){
-		$("#openstackConsulInfoDiv").w2popup({
-			width : 850,
-			height : 750,
-			title : "CF 설치 (OPENSTACK)",
-			modal : true,
-			showMax : false,
-			onOpen : function(event) {
-				event.onComplete = function() {
-					if (consulInfo != "") {
-						$(".w2ui-msg-body textarea[name='agentCert']").val(consulInfo.agentCert);
-						$(".w2ui-msg-body textarea[name='agentKey']").val(consulInfo.agentKey);
-						$(".w2ui-msg-body textarea[name='caCert']").val(consulInfo.caCert);
-						$(".w2ui-msg-body input[name='encryptKeys']").val(consulInfo.encryptKeys);
-						$(".w2ui-msg-body textarea[name='serverCert']").val(consulInfo.serverCert);
-						$(".w2ui-msg-body textarea[name='serverKey']").val(consulInfo.serverKey);
-					}					
-				}
-			},
-			onClose : function(event) {
-				event.onComplete = function() {
-					initSetting();
-				}
-			}
-		});
-	}
-	
-	// OPENSTACK CONSUL save OpenstackConsul
-	function saveOpenstackConsulInfo(type){
-		consulInfo = {
-				id 					: cfId,
-				agentCert			: $(".w2ui-msg-body textarea[name='agentCert']").val(),
-				agentKey			: $(".w2ui-msg-body textarea[name='agentKey']").val(),
-				caCert				: $(".w2ui-msg-body textarea[name='caCert']").val(),
-				encryptKeys			: $(".w2ui-msg-body input[name='encryptKeys']").val(),
-				serverCert			: $(".w2ui-msg-body textarea[name='serverCert']").val(),
-				serverKey			: $(".w2ui-msg-body textarea[name='serverKey']").val()
-		}
-		
-		if( type == 'after'){
-			if (popupValidation()) {
-				//ajax OpenstackInfo Save
-				$.ajax({
-					type : "PUT",
-					url : "/cf/saveOpenstackConsul",
-					contentType : "application/json",
-					data : JSON.stringify(consulInfo),
-					success : function(data, status) {
-						openstackNetworkPopup();
-					},
-					error : function(e, status) {
-						w2alert("OPENSTACK CONSUL 등록에 실패 하였습니다.", "CF 설치");
-					}
-				});
-			}
-		}
-		else{
-			openstackUaaPopup();
-		}
-		
-	}
-	
 	// OPENSTACK NETWORK POPUP
 	function openstackNetworkPopup(){
 		$("#openstackNetworkInfoDiv").w2popup({
 			width : 850,
 			height : 490,
-			title : "CF 설치 (OPENSTACK)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
@@ -1042,6 +840,7 @@
 	function saveOpenstackNetworkInfo(type) {
 		networkInfo = {
 				id 					: cfId,
+				iaas				: iaas.toUpperCase(),
 				subnetRange			: $(".w2ui-msg-body input[name='subnetRange']").val(),
 				subnetGateway		: $(".w2ui-msg-body input[name='subnetGateway']").val(),
 				subnetDns			: $(".w2ui-msg-body input[name='subnetDns']").val(),
@@ -1058,12 +857,12 @@
 				//Server send Cf Info
 				$.ajax({
 					type : "PUT",
-					url : "/cf/saveOpenstackNetwork",
+					url : "/cf/saveOpenstackNetworkInfo",
 					contentType : "application/json",
 					async : true,
 					data : JSON.stringify(networkInfo),
 					success : function(data, status) {
-						openstackResourcePopup();
+						resourceInfoPopup();
 					},
 					error : function(e, status) {
 						w2alert("Cf Network 등록에 실패 하였습니다.", "Cf 설치");
@@ -1071,7 +870,7 @@
 				});
 			}
 		} else if (type == 'before') {
-			openstackConsulPopup();
+			consulPopup();
 		}
 	}
 	
@@ -1080,7 +879,6 @@
 		$("#openstackResourceInfoDiv").w2popup({
 			width : 850,
 			height : 350,
-			title : "CF 설치 (OPENSTACK)",
 			modal : true,
 			showMax : false,
 			onOpen : function(event) {
@@ -1142,7 +940,7 @@
 		//Deploy 단에서 저장할 데이터가 있는지 확인 필요
 		//Confirm 설치하시겠습니까?
 		if (type == 'before' && iaas == "AWS") {
-			awsResourcePopup();
+			resourceInfoPopup();
 			return;
 		} else if (type == 'before' && iaas == "OPENSTACK") {
 			openstackResourcePopup();
@@ -1160,8 +958,7 @@
 	
 	// DEPLOY POPUP
 	function deployPopup() {
-		var deployDiv = (iaas == "AWS") ? $("#awsDeployDiv"):$("#openstackDeployDiv");
-		deployDiv.w2popup({
+		$("#deployDiv").w2popup({
 			width : 850,
 			height : 550,
 			modal : true,
@@ -1199,8 +996,7 @@
 	// INSTALL POPUP
 	function installPopup(){
 		
-		var installDiv = (iaas == 'AWS') ? $("#awsInstallDiv") : $("#openstackInstallDiv");
-		var deploymentName = (iaas == 'AWS') ? awsInfo.deploymentName : openstackInfo.deploymentName;
+		var deploymentName =  defaultInfo.deploymentName;
 		var message = "CF(배포명:" + deploymentName +  ") ";
 		
 		var requestParameter = {
@@ -1208,7 +1004,7 @@
 				iaas: iaas
 		};
 		
-		installDiv.w2popup({
+		$("#installDiv").w2popup({
 			width : 850,
 			height : 550,
 			modal	: true,
@@ -1283,11 +1079,8 @@
 	
 	// RELEASE release value setgting
 	function setReleaseData(){
-		if( iaas.toUpperCase() == "AWS" && !checkEmpty(awsInfo.releaseName) && !checkEmpty(awsInfo.releaseVersion) ){
-			$(".w2ui-msg-body input[name='releases']").data('selected',{text : awsInfo.releaseName + "/"+ awsInfo.releaseVersion});
-		}
-		else if( iaas.toUpperCase() == "OPENSTACK" &&  !checkEmpty(openstackInfo.releaseName) &&  !checkEmpty(openstackInfo.releaseVersion) ){
-			$(".w2ui-msg-body input[name='releases']").data('selected',{text : openstackInfo.releaseName + "/"+ openstackInfo.releaseVersion});
+		if( !checkEmpty(defaultInfo.releaseName) && !checkEmpty(defaultInfo.releaseVersion) ){
+			$(".w2ui-msg-body input[name='releases']").data('selected',{text : defaultInfo.releaseName + "/"+ defaultInfo.releaseVersion});
 		}
 		w2popup.unlock();
 	}
@@ -1333,8 +1126,7 @@
 	function initSetting() {
 		iaas = "";
 		cfId = "";
-		awsInfo = "";
-		openstackInfo = "";
+		defaultInfo = "";
 		uaaInfo = "";
 		consulInfo = "";
 		networkInfo = "";
@@ -1426,10 +1218,8 @@
 	</div>
 </div>
 
-<!-- Start AWS Popup  -->
-
-	<!-- AWS  설정 DIV -->
-	<div id="awsInfoDiv" style="width: 100%; height: 100%;" hidden="true">
+	<!-- Default 정보 DIV -->
+	<div id="defaultInfoDiv" style="width: 100%; height: 100%;" hidden="true">
 		<div rel="title"><b>CF 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 2%;display:inline-block;width: 98%;">
@@ -1531,13 +1321,13 @@
 			</div>
 			<br/>
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveAwsInfo();">다음>></button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveDefaultInfo();">다음>></button>
 			</div>
 		</div>
 	</div>
 	
 	<!-- AWS UAA 설정 DIV -->
-	<div id="awsUaaInfoDiv" style="width: 100%; height: 100%;" hidden="true">
+	<div id="uaaInfoDiv" style="width: 100%; height: 100%;" hidden="true">
 		<div rel="title"><b>CF 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 2%;display:inline-block;width: 98%;">
@@ -1580,14 +1370,14 @@
 			</div>
 			<br/>
 			<div class="w2ui-buttons" rel="buttons" hidden="true"> 
-				<button class="btn" style="float: left;" onclick="saveAwsUaaInfo('before');">이전</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveAwsUaaInfo('after');">다음>></button>
+				<button class="btn" style="float: left;" onclick="saveUaaInfo('before');">이전</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveUaaInfo('after');">다음>></button>
 			</div>
 		</div>
 	</div>
 	
 	<!-- AWS CONSUL 설정 DIV -->
-	<div id="awsConsulInfoDiv" style="width: 100%; height: 100%;" hidden="true">
+	<div id="consulInfoDiv" style="width: 100%; height: 100%;" hidden="true">
 		<div rel="title"><b>CF 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 2%;display:inline-block;width: 98%;">
@@ -1651,8 +1441,8 @@
 			</div>
 			<br/>
 			<div class="w2ui-buttons" rel="buttons" hidden="true"> 
-				<button class="btn" style="float: left;" onclick="saveAwsConsulInfo('before');">이전</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveAwsConsulInfo('after');">다음>></button>
+				<button class="btn" style="float: left;" onclick="saveConsulInfo('before');">이전</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveConsulInfo('after');">다음>></button>
 			</div>
 		</div>
 	</div>
@@ -1751,8 +1541,8 @@
 		</div>
 	</div>
 	
-	<!-- Aws Resource  설정 DIV -->
-	<div id="awsResourceInfoDiv" style="width: 100%; height: 100%;" hidden="true">
+	<!-- Resource  설정 DIV -->
+	<div id="resourceInfoDiv" style="width: 100%; height: 100%;" hidden="true">
 		<div rel="title"><b>CF 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 2%;display:inline-block;width: 98%;">
@@ -1789,14 +1579,14 @@
 				</div>
 			</div>
 			<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveAwsResourceInfo('before');">이전</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveAwsResourceInfo('after');">다음>></button>
+				<button class="btn" style="float: left;" onclick="saveResourceInfo('before');">이전</button>
+				<button class="btn" style="float: right; padding-right: 15%" onclick="saveResourceInfo('after');">다음>></button>
 			</div>
 		</div>
 	</div>
 	
-	<!-- AWS 배포파일 정보 -->
-	<div id="awsDeployDiv" style="width: 100%; height: 100%;" hidden="true">
+	<!-- 배포파일 정보 -->
+	<div id="deployDiv" style="width: 100%; height: 100%;" hidden="true">
 		<div rel="title"><b>CF 설치</b></div>
 		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 			<div style="margin-left: 2%;display:inline-block;width: 98%;">
@@ -1815,13 +1605,13 @@
 			</div>
 		</div>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float: left;" onclick="awsResourcePopup();">이전</button>
+			<button class="btn" style="float: left;" onclick="resourceInfoPopup();">이전</button>
 			<button class="btn" style="float: right; padding-right: 15%" onclick="cfDeploy('after');">다음>></button>
 		</div>
 	</div>
 	
-	<!-- AWS 설치화면 -->
-	<div id="awsInstallDiv" style="width: 100%; height: 100%;" hidden="true">
+	<!-- 설치화면 -->
+	<div id="installDiv" style="width: 100%; height: 100%;" hidden="true">
 		<div rel="title"><b>CF 설치</b></div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left: 2%;display:inline-block;width: 98%;">
@@ -1847,235 +1637,6 @@
 	<!-- End AWS Popup -->
 
 	<!-- Start Cf OPENSTACK POP -->
-	<!-- 오픈스택 정보 -->
-	<div id="openstackInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
-		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
-			<div style="margin-left: 2%;display:inline-block;width: 98%;">
-				<ul class="progressStep_7">
-					<li class="active">기본 정보</li>
-					<li class="before">UAA 정보</li>
-					<li class="before">CONSUL 정보</li>
-					<li class="before">네트워크 정보</li>
-					<li class="before">리소스 정보</li>
-					<li class="before">배포파일 정보</li>
-					<li class="before">설치</li>
-				</ul>
-			</div>
-			<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
-				<div class="panel panel-info">	
-					<div class="panel-heading"><b>기본 정보</b></div>
-					<div class="panel-body" style="padding:5px 5% 10px 5%;">
-						<div class="w2ui-field" style="display: inline-block;">
-							<label style="text-align: left; width: 100%; font-size: 13px;" >기본 정보</label>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">설치관리자 UUID</label>
-							<div>
-								<input name="directorUuid" type="text" style="float: left; width: 60%;" required placeholder="설치관리자 UUID를 입력하세요." />
-								<div class="isMessage"></div>
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">배포 명</label>
-							<div>
-								<input name="deploymentName" type="text" style="float: left; width: 60%;" required placeholder="배포 명을 입력하세요." />
-								<div class="isMessage"></div>
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">CF 릴리즈</label>
-							<div>
-								<input name="releases" type="list" style="float: left; width: 60%;" required placeholder="CF 릴리즈를 선택하세요." />
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">SSH 핑거프린트</label>
-							<div>
-								<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="Diego SSH 핑거프린트를 입력하세요." />
-								<div class="isMessage"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="panel panel-info">	
-					<div class="panel-heading"><b>도메인 정보</b></div>
-					<div class="panel-body" style="padding:5px 5% 10px 5%;">
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">도메인</label>
-							<div>
-								<input name="domain" type="text" style="float: left; width: 60%;" required placeholder="도메인을 입력하세요. 예)cfdoamin.com" />
-								<div class="isMessage"></div>
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">도메인 설명</label>
-							<div>
-								<input name="description" type="text" style="float: left; width: 60%;" required placeholder="도메인에 대한 설명을 입력하세요." />
-								<div class="isMessage"></div>
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">도메인 그룹</label>
-							<div>
-								<input name="domainOrganization" type="text" style="float: left; width: 60%;" required placeholder="도메인 그룹명을 입력하세요." />
-								<div class="isMessage"></div>
-							</div>
-						</div>
-						<div class="w2ui-field" style="display: inline-block;">
-							<label style="text-align: left; width: 100%; font-size: 13px;" >HAProxy 정보</label>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">HAProxy 공인 IP</label>
-							<div>
-								<input name="proxyStaticIps" type="text" style="float: left; width: 60%;" required placeholder="프록시 서버 공인 IP를 입력하세요." />
-								<div class="isMessage"></div>
-							</div>
-						</div>	
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">HAProxy 인증서</label>
-							<div>
-								<textarea name="sslPemPub" style="float: left; width: 60%; height: 60px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-									required placeholder="프록시 서버 인증서를 입력하세요." ></textarea>
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">HAProxy 개인키</label>
-							<div>
-								<textarea name="sslPemRsa" style="float: left; width: 60%; height: 60px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-									required placeholder="프록시 서버 개인키를 입력하세요." ></textarea>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<br/>
-			<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOpenstackInfo();">다음>></button>
-			</div>
-		</div>
-	</div>
-
-	<!-- 오픈스텍 UAA 정보 -->
-	<div id="openstackUaaInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
-		<div rel="body"	style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
-			<div style="margin-left: 2%;display:inline-block;width: 98%;">
-				<ul class="progressStep_7">
-					<li class="pass">기본 정보</li>
-					<li class="active">UAA 정보</li>
-					<li class="before">CONSUL 정보</li>
-					<li class="before">네트워크 정보</li>
-					<li class="before">리소스 정보</li>
-					<li class="before">배포파일 정보</li>
-					<li class="before">설치</li>
-				</ul>
-			</div>
-			<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
-				<div class="panel panel-info">	
-					<div class="panel-heading"><b>UAA 정보</b></div>
-					<div class="panel-body" style="padding:5px 5% 10px 5%;">
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">로그인 비밀번호</label>
-							<div>
-								<input name="loginSecret" type="text" style="float: left; width: 60%;" required placeholder="로그인 비밀번호를 입력하세요." />
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">개인키</label>
-							<div>
-								<textarea name="signingKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-									required placeholder="개인키를 입력하세요." ></textarea>
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">공개키</label>
-							<div>
-								<textarea name="verificationKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-									required placeholder="공개키를 입력하세요." ></textarea>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<br/>
-			<div class="w2ui-buttons" rel="buttons" hidden="true"> 
-				<button class="btn" style="float: left;" onclick="saveOpenstackUaaInfo('before');">이전</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOpenstackUaaInfo('after');">다음>></button>
-			</div>
-		</div>
-	</div>
-
-	<!-- 오픈스텍 CONSUL 설정 DIV -->
-	<div id="openstackConsulInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
-		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
-			<div style="margin-left: 2%;display:inline-block;width: 98%;">
-				<ul class="progressStep_7">
-					<li class="pass">기본 정보</li>
-					<li class="pass">UAA 정보</li>
-					<li class="active">CONSUL 정보</li>
-					<li class="before">네트워크 정보</li>
-					<li class="before">리소스 정보</li>
-					<li class="before">배포파일 정보</li>
-					<li class="before">설치</li>
-				</ul>
-			</div>
-			<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
-				<div class="panel panel-info">	
-					<div class="panel-heading"><b>CONSUL 정보</b></div>
-					<div class="panel-body" style="padding:5px 5% 10px 5%;">
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">암호화 키</label>
-							<div>
-								<input name="encryptKeys" type="text" style="float: left; width: 60%;" required placeholder="암호화 키를 입력하세요." />
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">에이전트 인증서</label>
-							<div>
-								<textarea name="agentCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-									required placeholder="에이전트 인증서를 입력하세요." ></textarea>
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">에이전트 개인키</label>
-							<div>
-								<textarea name="agentKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-									required placeholder="에이전트 개인키를 입력하세요." ></textarea>
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">서버 CA 인증서</label>
-							<div>
-								<textarea name="caCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-									required placeholder="서버 CA 인증서를 입력하세요." ></textarea>
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">서버 인증서</label>
-							<div>
-								<textarea name="serverCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-									required placeholder="서버 인증서를 입력하세요." ></textarea>
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">서버 개인키</label>
-							<div>
-								<textarea name="serverKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-									required placeholder="서버 개인키를 입력하세요." ></textarea>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<br/>
-			<div class="w2ui-buttons" rel="buttons" hidden="true"> 
-				<button class="btn" style="float: left;" onclick="saveOpenstackConsulInfo('before');">이전</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOpenstackConsulInfo('after');">다음>></button>
-			</div>
-		</div>
-	</div>
 	
 	<!-- 네트워크 정보 -->
 	<div id="openstackNetworkInfoDiv" style="width: 100%; height: 100%;" hidden="true">
@@ -2171,97 +1732,4 @@
 			</div>
 		</div>
 	</div>
-
-	<!-- 리소스 정보 -->
-	<div id="openstackResourceInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
-		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
-			<div style="margin-left: 2%;display:inline-block;width: 98%;">
-				<ul class="progressStep_7">
-					<li class="pass">기본 정보</li>
-					<li class="pass">UAA 정보</li>
-					<li class="pass">CONSUL 정보</li>
-					<li class="pass">네트워크 정보</li>
-					<li class="active">리소스 정보</li>
-					<li class="before">배포파일 정보</li>
-					<li class="before">설치</li>
-				</ul>
-			</div>
-			<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
-				<div class="panel panel-info">	
-					<div class="panel-heading"><b>리소스 정보</b></div>
-					<div class="panel-body" style="padding:5px 5% 10px 5%;">
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">스템셀</label>
-							<div>
-								<div>
-									<input type="list" name="stemcells" style="float: left; width:60%; margin-top: 1.5px;" placeholder="스템셀을 선택하세요.">
-								</div>
-							</div>
-						</div>
-						<div class="w2ui-field">
-							<label style="text-align: left; width: 40%; font-size: 11px;">VM 비밀번호</label>
-							<div>
-								<input name="boshPassword" type="text" style="float: left; width: 60%;" required placeholder="VM 비밀번호를 입력하세요." />
-								<div class="isMessage"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="w2ui-buttons" rel="buttons" hidden="true">
-				<button class="btn" style="float: left;" onclick="saveOpenstackResourceInfo('before');">이전</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveOpenstackResourceInfo('after');">다음>></button>
-			</div>
-		</div>
-	</div>
-
-	<!-- 배포파일 정보 -->
-	<div id="openstackDeployDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
-		<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
-			<div style="margin-left: 2%;display:inline-block;width: 98%;">
-				<ul class="progressStep_7">
-					<li class="pass">기본 정보</li>
-					<li class="pass">UAA 정보</li>
-					<li class="pass">CONSUL 정보</li>
-					<li class="pass">네트워크 정보</li>
-					<li class="pass">리소스 정보</li>
-					<li class="active">배포파일 정보</li>
-					<li class="before">설치</li>
-				</ul>
-			</div>
-			<div style="width:95%;height:84%;float: left;display: inline-block;margin-top:1%;">
-				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:3%;" readonly="readonly"></textarea>
-			</div>
-		</div>
-		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float: left;" onclick="openstackResourcePopup();">이전</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="cfDeploy('after');">다음>></button>
-		</div>
-	</div>
-	
-	<!-- 오픈스택 설치화면 -->
-	<div id="openstackInstallDiv" style="width: 100%; height: 100%;" hidden="true">
-		<div rel="title"><b>CF 설치</b></div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left: 2%;display:inline-block;width: 98%;">
-				<ul class="progressStep_7">
-					<li class="pass">기본 정보</li>
-					<li class="pass">UAA 정보</li>
-					<li class="pass">CONSUL 정보</li>
-					<li class="pass">네트워크 정보</li>
-					<li class="pass">리소스 정보</li>
-					<li class="pass">배포파일 정보</li>
-					<li class="active">설치</li>
-				</ul>
-			</div>
-			<div style="width:95%;height:84%;float: left;display: inline-block;margin-top:1%;">
-				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color: #FFF;margin-left:3%;" readonly="readonly"></textarea>
-			</div>
-		</div>
-		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" id="deployPopupBtn" style="float: left;" onclick="deployPopup()" disabled>이전</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="popupComplete();">닫기</button>
-		</div>
-	</div>
+	<!-- END -->

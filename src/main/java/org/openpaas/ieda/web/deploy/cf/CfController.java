@@ -73,50 +73,6 @@ public class CfController extends BaseController{
 		result.put("contents", config);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
-
-	@RequestMapping(value="/cf/saveAws", method=RequestMethod.PUT)
-	public ResponseEntity saveAwsCfInfo(@RequestBody @Valid CfParam.Default dto){
-		
-		IEDACfAwsConfig config = cfAwsService.saveAwsCfInfo(dto);
-		
-		return new ResponseEntity<>(config, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/cf/saveAwsUaa", method=RequestMethod.PUT)
-	public ResponseEntity saveAwsUaaCfInfo(@RequestBody @Valid CfParam.Uaa dto){
-		
-		IEDACfAwsConfig config = cfAwsService.saveAwsUaaCfInfo(dto);
-		
-		return new ResponseEntity<>(config, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/cf/saveAwsConsul", method=RequestMethod.PUT)
-	public ResponseEntity saveAwsConsulCfInfo(@RequestBody @Valid CfParam.Consul dto){
-		
-		IEDACfAwsConfig config = cfAwsService.saveAwsConsulCfInfo(dto);
-		
-		return new ResponseEntity<>(config, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/cf/saveAwsNetwork", method=RequestMethod.PUT)
-	public ResponseEntity saveAwsNetworkCfInfo(@RequestBody @Valid CfParam.AwsNetwork dto){
-		
-		IEDACfAwsConfig config = cfAwsService.saveAwsNetworkInfo(dto);
-		
-		return new ResponseEntity<>(config, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/cf/saveAwsResource", method=RequestMethod.PUT)
-	public ResponseEntity saveAwsResourceCfInfo(@RequestBody @Valid CfParam.Resource dto){
-		
-		IEDACfAwsConfig config = cfAwsService.saveAwsResourceInfo(dto);
-		HttpStatus status = HttpStatus.OK;
-		Map<String, Object> result = new HashMap<>();
-		result.put("content", config);
-		if( result.get("content") == null) status = HttpStatus.NO_CONTENT;
-		return new ResponseEntity<>(result, status);
-	}
-	
 	
 	// ====== OPENSTACK
 	@RequestMapping(value="/cf/openstack/{id}", method=RequestMethod.GET)
@@ -129,49 +85,124 @@ public class CfController extends BaseController{
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
-	
-	@RequestMapping(value="/cf/saveOpenstack", method=RequestMethod.PUT)
-	public ResponseEntity saveOpenstackCfInfo(@RequestBody @Valid CfParam.Default dto){
+	@RequestMapping(value="/cf/saveDefaultInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveDefaultInfo(@RequestBody @Valid CfParam.Default dto){
 		
-		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackCfInfo(dto);
+		Map<String, Object> result  = new HashMap<>();
+		System.out.println(dto.getIaas().toUpperCase() + " ::: 0000 ::: " + dto);
+		if( "AWS".equals(dto.getIaas().toUpperCase()) ){
+			System.out.println("AAAA ::: ");
+			IEDACfAwsConfig config = cfAwsService.saveAwsCfInfo(dto);
+			System.out.println("AAAA ::: " + config);
+			result.put("content", config);
+		}
+		else if( "OPENSTACK".equals(dto.getIaas().toUpperCase()) ){
+			System.out.println("BBB ::: ");
+			IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackCfInfo(dto);
+			System.out.println("BBB ::: " + config);
+			result.put("content", config);
+		}
 		
-		return new ResponseEntity<>(config, HttpStatus.OK);
+		System.out.println("CCC ::: " + result.get("content"));
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/cf/saveOpenstackUaa", method=RequestMethod.PUT)
-	public ResponseEntity saveOpenstackUaaCfInfo(@RequestBody @Valid CfParam.Uaa dto){
-		
-		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackUaaCfInfo(dto);
-		
-		return new ResponseEntity<>(config, HttpStatus.OK);
+	@RequestMapping(value="/cf/saveUaaInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveUaaCfInfo(@RequestBody @Valid CfParam.Uaa dto){
+		Map<String, Object> result  = new HashMap<>();
+		if( "AWS".equals(dto.getIaas().toUpperCase()) ){
+			IEDACfAwsConfig config = cfAwsService.saveAwsUaaCfInfo(dto);
+			result.put("content", config);
+		}
+		else if( "OPENSTACK".equals(dto.getIaas().toUpperCase()) ){
+			IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackUaaCfInfo(dto);
+			result.put("content", config);
+		}
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/cf/saveOpenstackConsul", method=RequestMethod.PUT)
-	public ResponseEntity saveOpenstackConsulCfInfo(@RequestBody @Valid CfParam.Consul dto){
+	@RequestMapping(value="/cf/saveConsulInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveConsulCfInfo(@RequestBody @Valid CfParam.Consul dto){
+		Map<String, Object> result  = new HashMap<>();
+		if( "AWS".equals(dto.getIaas().toUpperCase()) ){
+			IEDACfAwsConfig config = cfAwsService.saveAwsConsulCfInfo(dto);
+			result.put("content", config);
+		}
+		else if( "OPENSTACK".equals(dto.getIaas().toUpperCase()) ){
+			IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackConsulCfInfo(dto);
+			result.put("content", config);
+		}
 		
-		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackConsulCfInfo(dto);
-		
-		return new ResponseEntity<>(config, HttpStatus.OK);
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/cf/saveOpenstackNetwork", method=RequestMethod.PUT)
-	public ResponseEntity saveOpenstackNetworkCfInfo(@RequestBody @Valid CfParam.OpenstackNetwork dto){
-		
-		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackNetworkInfo(dto);
-		
-		return new ResponseEntity<>(config, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/cf/saveOpenstackResource", method=RequestMethod.PUT)
-	public ResponseEntity saveOpenstackResourceCfInfo(@RequestBody @Valid CfParam.Resource dto){
-		
-		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackResourceInfo(dto);
-		HttpStatus status = HttpStatus.OK;
-		Map<String, Object> result = new HashMap<>();
+	@RequestMapping(value="/cf/saveAwsNetworkInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveAwsNetworkCfInfo(@RequestBody @Valid CfParam.AwsNetwork dto){
+		Map<String, Object> result  = new HashMap<>();
+		IEDACfAwsConfig config = cfAwsService.saveAwsNetworkInfo(dto);
 		result.put("content", config);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/cf/saveOpenstackNetworkInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveOpenstackNetworkCfInfo(@RequestBody @Valid CfParam.OpenstackNetwork dto){
+		Map<String, Object> result  = new HashMap<>();
+		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackNetworkInfo(dto);
+		result.put("content", config);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/cf/saveResourceInfo", method=RequestMethod.PUT)
+	public ResponseEntity saveResourceCfInfo(@RequestBody @Valid CfParam.Resource dto){
+		Map<String, Object> result = new HashMap<>();
+		HttpStatus status = HttpStatus.OK;
+		
+		if( "AWS".equals(dto.getIaas().toUpperCase()) ){
+			IEDACfAwsConfig config = cfAwsService.saveAwsResourceInfo(dto);
+			result.put("content", config);
+		}else if( "OPENSTACK".equals(dto.getIaas().toUpperCase()) ){
+			IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackResourceInfo(dto);
+			result.put("content", config);
+		}
 		if( result.get("content") == null) status = HttpStatus.NO_CONTENT;
 		return new ResponseEntity<>(result, status);
 	}
+	
+
+	
+//	@RequestMapping(value="/cf/saveOpenstack", method=RequestMethod.PUT)
+//	public ResponseEntity saveOpenstackCfInfo(@RequestBody @Valid CfParam.Default dto){
+//		
+//		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackCfInfo(dto);
+//		
+//		return new ResponseEntity<>(config, HttpStatus.OK);
+//	}
+	
+//	@RequestMapping(value="/cf/saveOpenstackUaa", method=RequestMethod.PUT)
+//	public ResponseEntity saveOpenstackUaaCfInfo(@RequestBody @Valid CfParam.Uaa dto){
+//		
+//		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackUaaCfInfo(dto);
+//		
+//		return new ResponseEntity<>(config, HttpStatus.OK);
+//	}
+//	
+//	@RequestMapping(value="/cf/saveOpenstackConsul", method=RequestMethod.PUT)
+//	public ResponseEntity saveOpenstackConsulCfInfo(@RequestBody @Valid CfParam.Consul dto){
+//		
+//		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackConsulCfInfo(dto);
+//		
+//		return new ResponseEntity<>(config, HttpStatus.OK);
+//	}
+//	@RequestMapping(value="/cf/saveOpenstackResource", method=RequestMethod.PUT)
+//	public ResponseEntity saveOpenstackResourceCfInfo(@RequestBody @Valid CfParam.Resource dto){
+//		
+//		IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackResourceInfo(dto);
+//		HttpStatus status = HttpStatus.OK;
+//		Map<String, Object> result = new HashMap<>();
+//		result.put("content", config);
+//		if( result.get("content") == null) status = HttpStatus.NO_CONTENT;
+//		return new ResponseEntity<>(result, status);
+//	}
 	
 	@MessageMapping("/cfInstall")
 	@SendTo("/cf/cfInstall")

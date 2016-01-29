@@ -9,6 +9,9 @@ public class CfParam {
 	@Data
 	public static class Default{
 		private String id;
+		
+		@NotNull
+		private String iaas;
 		// 1.1 Deployment 정보
 		@NotNull
 		private String deploymentName;
@@ -42,6 +45,8 @@ public class CfParam {
 		@NotNull
 		private String id;
 		@NotNull
+		private String iaas;
+		@NotNull
 		private String loginSecret;
 		@NotNull
 		private String signingKey;
@@ -53,6 +58,8 @@ public class CfParam {
 	public static class Consul{
 		@NotNull
 		private String id;
+		@NotNull
+		private String iaas;
 		@NotNull
 		private String agentCert;
 		@NotNull
@@ -119,6 +126,8 @@ public class CfParam {
 	public static class Resource{
 		@NotNull
 		private String id;
+		@NotNull
+		private String iaas;
 		// 5. 리소스 정보
 		@NotNull
 		private String stemcellName;

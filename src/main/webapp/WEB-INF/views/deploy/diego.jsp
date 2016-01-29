@@ -465,7 +465,6 @@ Diego
 		$("#defaultInfoDiv").w2popup({
 			width : 950,
 			height :470,
-			title :"DIEGO 설치 (" + iaas + ")",
 			modal :true,
 			showMax :false,
 			onOpen :function(event) {
@@ -535,7 +534,6 @@ Diego
 		$("#cfInfoDiv").w2popup({
 			width  : 950,
 			height	:800,
-			title 	:"DIEGO 설치 (" + iaas.toUpperCase() + ")",
 			modal 	:true,
 			showMax :false,
 			onOpen 	:function(event) {
@@ -610,7 +608,6 @@ Diego
 		$("#diegoInfoDiv").w2popup({
 			width  : 950,
 			height 	:780,
-			title 	:"DIEGO 설치 ("+iaas.toUpperCase()+")",
 			modal 	:true,
 			showMax :false,
 			onOpen :function(event) {
@@ -677,7 +674,6 @@ Diego
 		$("#etcdInfoDiv").w2popup({
 			width  : 950,
 			height 	:770,
-			title 	:"DIEGO 설치 ("+iaas.toUpperCase()+")",
 			modal 	:false,
 			showMax :false,
 			onOpen 	:function(event) {
@@ -746,7 +742,6 @@ Diego
 		$("#awsNetworkInfoDiv").w2popup({
 			width  : 950,
 			height 	:500,
-			title 	:"DIEGO 설치 (AWS)",
 			modal 	:true,
 			showMax :false,
 			onOpen 	:function(event) {
@@ -815,7 +810,6 @@ Diego
 		$("#resourceInfoDiv").w2popup({
 			width  : 950,
 			height	:370,
-			title 	:"DIEGO 설치 ("+iaas.toUpperCase()+")",
 			modal 	:true,
 			showMax :false,
 			onOpen :function(event) {
@@ -968,7 +962,6 @@ Diego
 		$("#openstackNetworkInfoDiv").w2popup({
 			width  : 950,
 			height 	:500,
-			title 	:"DIEGO 설치 (OPENSTACK)",
 			modal 	:true,
 			showMax :false,
 			onOpen 	:function(event) {
@@ -1057,8 +1050,7 @@ Diego
 	
 	// DEPLOY POPUP
 	function deployPopup() {
-		var deployDiv = (iaas.toLocaleUpperCase() == "AWS") ? $("#awsDeployDiv"):$("#openstackDeployDiv");
-		deployDiv.w2popup({
+		$("#deployDiv").w2popup({
 			width : 950,
 			height :520,
 			modal :true,
@@ -1103,9 +1095,8 @@ Diego
 				id :diegoId,
 				iaas:iaas
 		};
-		var installDiv = (iaas.toLocaleUpperCase() == "AWS") ? $("#awsInstallDiv"):$("#openstackInstallDiv");
 		
-		installDiv.w2popup({
+		$("#installDiv").w2popup({
 			width 	: 950,
 			height 	: 520,
 			modal	:true,
@@ -1781,7 +1772,7 @@ Diego
 	
 	<!-- AWS Network 설정 DIV -->
 	<div id="awsNetworkInfoDiv" style="width:100%; height:100%;" hidden="true">
-		<div rel="title"><b>DIEGO 설치</b></div>AWS
+		<div rel="title"><b>DIEGO 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 				<ul class="progressStep_8">
@@ -1923,8 +1914,8 @@ Diego
 	</div>
 	
 	<!-- 배포파일 정보 -->
-	<div id="awsDeployDiv" style="width:100%; height:100%;" hidden="true">
-		<div rel="title">DIEGO 설치(AWS)</div>
+	<div id="deployDiv" style="width:100%; height:100%;" hidden="true">
+		<div rel="title">DIEGO 설치</div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 				<ul class="progressStep_8">
@@ -1949,8 +1940,8 @@ Diego
 	</div>
 	
 	<!-- 설치화면 -->
-	<div id="awsInstallDiv" style="width:100%; height:100%;" hidden="true">
-		<div rel="title">DIEGO 설치(AWS)</div>
+	<div id="installDiv" style="width:100%; height:100%;" hidden="true">
+		<div rel="title">DIEGO 설치</div>
 		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 				<ul class="progressStep_8">
@@ -2072,56 +2063,3 @@ Diego
 			</div>
 		</div>
 	</div>
-	
-	<!-- 배포파일 정보 -->
-	<div id="openstackDeployDiv" style="width:100%; height:100%;" hidden="true">
-		<div rel="title">DIEGO 설치(OPENSTACK)</div>
-		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-			<div style="margin-left:2%;display:inline-block;width:97%;">
-				<ul class="progressStep_8">
-					<li class="pass">기본 정보</li>
-					<li class="pass">CF 정보</li>
-					<li class="pass">DIEGO 정보</li>
-					<li class="pass">ETCD 정보</li>
-					<li class="pass">네트워크 정보</li>
-					<li class="pass">리소스 정보</li>
-					<li class="active">배포파일 정보</li>
-					<li class="before">설치</li>
-				</ul>
-			</div>
-			<div style="width:95%;height:84%;float:left;display:inline-block;margin-top: 10px;">
-				<textarea id="deployInfo" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color:#FFF;margin-left:2%" readonly="readonly"></textarea>
-			</div>
-		</div>
-		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" style="float:left;" onclick="resourcePopup();">이전</button>
-			<button class="btn" style="float:right; padding-right:15%" onclick="diegoDeploy('after');">다음>></button>
-		</div>
-	</div>
-	
-	<!-- 설치화면 -->
-	<div id="openstackInstallDiv" style="width:100%; height:100%;" hidden="true">
-		<div rel="title">DIEGO 설치(OPENSTACK)</div>
-		<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
-			<div style="margin-left:2%;display:inline-block;width:97%;">
-				<ul class="progressStep_8">
-					<li class="pass">기본 정보</li>
-					<li class="pass">CF 정보</li>
-					<li class="pass">DIEGO 정보</li>
-					<li class="pass">ETCD 정보</li>
-					<li class="pass">네트워크 정보</li>
-					<li class="pass">리소스 정보</li>
-					<li class="pass">배포파일 정보</li>
-					<li class="active">설치</li>
-				</ul>
-			</div>
-			<div style="width:95%;height:84%;float:left;display:inline-block;margin-top: 10px;">
-				<textarea id="installLogs" style="width:100%;height:99%;overflow-y:visible;resize:none;background-color:#FFF;margin-left:1%" readonly="readonly"></textarea>
-			</div>
-		</div>
-		<div class="w2ui-buttons" rel="buttons" hidden="true">
-			<button class="btn" id="deployPopupBtn" style="float:left;" onclick="deployPopup()" disabled>이전</button>
-			<button class="btn" style="float:right; padding-right:15%" onclick="popupComplete();">닫기</button>
-		</div>
-	</div>
-	<!-- End Openstack Popup -->
