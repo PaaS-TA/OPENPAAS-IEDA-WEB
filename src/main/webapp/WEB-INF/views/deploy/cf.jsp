@@ -1805,7 +1805,7 @@
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="pass">네트워크 정보</li>
-					<li class="pass">리소스 설정</li>
+					<li class="pass">리소스 정보</li>
 					<li class="active">배포파일 정보</li>
 					<li class="before">설치</li>
 				</ul>
@@ -1830,7 +1830,7 @@
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="pass">네트워크 정보</li>
-					<li class="pass">리소스 설정</li>
+					<li class="pass">리소스 정보</li>
 					<li class="pass">배포파일 정보</li>
 					<li class="active">설치</li>
 				</ul>
@@ -1857,7 +1857,7 @@
 					<li class="before">UAA 정보</li>
 					<li class="before">CONSUL 정보</li>
 					<li class="before">네트워크 정보</li>
-					<li class="before">리소스 설정</li>
+					<li class="before">리소스 정보</li>
 					<li class="before">배포파일 정보</li>
 					<li class="before">설치</li>
 				</ul>
@@ -1966,7 +1966,7 @@
 					<li class="active">UAA 정보</li>
 					<li class="before">CONSUL 정보</li>
 					<li class="before">네트워크 정보</li>
-					<li class="before">리소스 설정</li>
+					<li class="before">리소스 정보</li>
 					<li class="before">배포파일 정보</li>
 					<li class="before">설치</li>
 				</ul>
@@ -2087,7 +2087,7 @@
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="active">네트워크 정보</li>
-					<li class="before">리소스 설정</li>
+					<li class="before">리소스 정보</li>
 					<li class="before">배포파일 정보</li>
 					<li class="before">설치</li>
 				</ul>
@@ -2182,7 +2182,7 @@
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="pass">네트워크 정보</li>
-					<li class="active">리소스 설정</li>
+					<li class="active">리소스 정보</li>
 					<li class="before">배포파일 정보</li>
 					<li class="before">설치</li>
 				</ul>
@@ -2226,7 +2226,7 @@
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="pass">네트워크 정보</li>
-					<li class="pass">리소스 설정</li>
+					<li class="pass">리소스 정보</li>
 					<li class="active">배포파일 정보</li>
 					<li class="before">설치</li>
 				</ul>
@@ -2251,7 +2251,7 @@
 					<li class="pass">UAA 정보</li>
 					<li class="pass">CONSUL 정보</li>
 					<li class="pass">네트워크 정보</li>
-					<li class="pass">리소스 설정</li>
+					<li class="pass">리소스 정보</li>
 					<li class="pass">배포파일 정보</li>
 					<li class="active">설치</li>
 				</ul>
