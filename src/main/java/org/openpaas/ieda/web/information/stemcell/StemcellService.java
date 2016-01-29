@@ -101,6 +101,8 @@ public class StemcellService {
 			throw new IEDACommonException("notfound.stemcell.exception", " 스템셀 정보 조회중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
 		
+		log.info("## Stemcell list = " + stemcellInfoList.size());
+		
 		return stemcellInfoList;
 	}
 
