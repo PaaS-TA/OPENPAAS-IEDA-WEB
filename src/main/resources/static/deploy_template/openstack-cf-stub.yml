@@ -551,7 +551,7 @@ properties:
     default_staging_security_groups:
     - public_networks
     - dns
-    default_to_diego_backend: false
+    default_to_diego_backend: true
     development_mode: false
     directories: null
     disable_custom_buildpacks: false
@@ -705,7 +705,7 @@ properties:
         restart_if_above_mb: null
         restart_if_consistently_above_mb: null
     user_buildpacks: []
-    users_can_select_backend: true
+    users_can_select_backend: false
   ccdb:
     address: (( jobs.postgres.networks.op_private.static_ips.[0] ))
     databases:
