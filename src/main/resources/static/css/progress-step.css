@@ -232,12 +232,12 @@ ul.progressStep_7 {
 
 ul.progressStep_7 li{
     float: left;
-    padding: 18px 10px 18px 18px;    /***  [내부영역 Padding] 내부 글자 크기에 따라 조절**/
+    padding: 18px 5px 18px 18px;    /***  [내부영역 Padding] 내부 글자 크기에 따라 조절**/
     color: #fff;
     position: relative;
     border-top: 1px solid #666;
     border-bottom: 1px solid #666;
-    width: 13%;				/***  [Step비율] 갯수에 따라 조정 **/
+    width: 13.6%;				/***  [Step비율] 갯수에 따라 조정 **/
     height:48px;			/***  [Step 높이] ***/
     margin: 0 1.1px;
 }
