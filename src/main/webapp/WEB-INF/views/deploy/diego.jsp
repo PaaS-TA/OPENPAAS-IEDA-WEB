@@ -464,7 +464,7 @@ Diego
 		//var defaultIaas = (checkEmpty(iaas)) ? defaultInfo.iaas.toUpperCase():iaas.toUpperCase(); 
 		$("#defaultInfoDiv").w2popup({
 			width : 950,
-			height :490,
+			height :470,
 			title :"DIEGO 설치 (" + iaas + ")",
 			modal :true,
 			showMax :false,
@@ -676,7 +676,7 @@ Diego
 	function etcdPopup(){
 		$("#etcdInfoDiv").w2popup({
 			width  : 950,
-			height 	:750,
+			height 	:770,
 			title 	:"DIEGO 설치 ("+iaas.toUpperCase()+")",
 			modal 	:false,
 			showMax :false,
@@ -1437,7 +1437,7 @@ Diego
 			<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>기본 정보</b></div>
-					<div class="panel-body" style="padding:0 5%;">
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field" >
 							<label style="text-align:left; width:40%; font-size:11px;">설치관리자 UUID</label>
 							<div>
@@ -1506,7 +1506,7 @@ Diego
 			<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>CF 정보</b></div>
-					<div class="panel-body" style="padding:0 5%;">
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">도메인</label>
 							<div>
@@ -1546,7 +1546,7 @@ Diego
 				</div>
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>CONSUL 정보</b></div>
-					<div class="panel-body" style="padding:0 5%;">
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">서버 IP</label>
 							<div>
@@ -1626,7 +1626,7 @@ Diego
 			<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>DIEGO 인증정보</b></div>
-					<div class="panel-body" style="padding:0 5%;">
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">CA 인증서</label>
 							<div>
@@ -1645,7 +1645,7 @@ Diego
 				</div>
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>BBS 인증정보</b></div>
-					<div class="panel-body" style="padding:0 5%;">
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">암호화키</label>
 							<div>
@@ -1711,7 +1711,7 @@ Diego
 			<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>ETCD 인증정보</b></div>
-					<div class="panel-body" style="padding:0 5%;">
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">클라이언트 인증서</label>
 							<div>
@@ -1744,7 +1744,7 @@ Diego
 				</div>
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>PEER 인증정보</b></div>
-					<div class="panel-body" style="padding:0 5%;">
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">CA 인증서</label>
 							<div>
@@ -1797,7 +1797,7 @@ Diego
 			<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>네트워크 정보</b></div>
-					<div class="panel-body" style="padding:0 5%;">
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">시큐리티 그룹명</label>
 							<div>
@@ -1894,7 +1894,7 @@ Diego
 			<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>리소스 정보</b></div>
-					<div class="panel-body" style="padding:0 5%;">
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">스템셀</label>
 							<div>
@@ -1994,7 +1994,7 @@ Diego
 			<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>네트워크 정보</b></div>
-					<div class="panel-body" style="padding:0 5%;">
+					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">시큐리티 그룹명</label>
 							<div>

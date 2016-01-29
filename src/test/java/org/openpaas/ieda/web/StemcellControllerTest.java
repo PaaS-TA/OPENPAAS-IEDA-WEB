@@ -85,22 +85,22 @@ public class StemcellControllerTest {
 //		fail("Not yet implemented");
 //	}
 
-	@Test
-	public void testLocalAwsStemcells() throws Exception {
-		ResultActions result = mockMvc.perform(get(LOCAL_AWS_STEMCELL_LIST_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
-
-	@Test
-	public void testLocalOpenstackStemcells() throws Exception {
-		ResultActions result = mockMvc.perform(get(LOCAL_OPENSTACK_STEMCELL_LIST_URL)
-				.contentType(MediaType.APPLICATION_JSON));
-
-		result.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+//	@Test
+//	public void testLocalAwsStemcells() throws Exception {
+//		ResultActions result = mockMvc.perform(get(LOCAL_AWS_STEMCELL_LIST_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
+//
+//	@Test
+//	public void testLocalOpenstackStemcells() throws Exception {
+//		ResultActions result = mockMvc.perform(get(LOCAL_OPENSTACK_STEMCELL_LIST_URL)
+//				.contentType(MediaType.APPLICATION_JSON));
+//
+//		result.andDo(MockMvcResultHandlers.print())
+//		.andExpect(MockMvcResultMatchers.status().isOk());
+//	}
 
 }
