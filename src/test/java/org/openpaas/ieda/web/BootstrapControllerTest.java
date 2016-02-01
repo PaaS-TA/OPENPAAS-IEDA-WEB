@@ -63,7 +63,7 @@ public class BootstrapControllerTest {
 			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 	
-	@Test
+/*	@Test
 	public void testListBootstrap() throws Exception{
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(LIST_URL)
 				.contentType(MediaType.APPLICATION_JSON));
@@ -89,7 +89,7 @@ public class BootstrapControllerTest {
 		result.andDo(MockMvcResultHandlers.print())
 		.andExpect(MockMvcResultMatchers.status().isOk());
 	}
-
+*/
 //	@Test
 //	public void testDoBootstrapAwsSave() {
 //		fail("Not yet implemented");
