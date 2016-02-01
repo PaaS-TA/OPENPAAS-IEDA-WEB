@@ -23,12 +23,12 @@
 	var releases = "";
 	var stemcells = "";
 	var deploymentFile = "";
-
+	var bDefaultDirector = "";
 	//Main View Event
 	$(function() {
 
 		// 기본 설치 관리자 정보 조회
-		var bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");
+		bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");
 
 		$('#config_cfGrid').w2grid({
 			name: 'config_cfGrid',
@@ -203,7 +203,6 @@
 						no_text : "취소"
 					});
 		});
-		
 		doSearch();
 	});
 
@@ -1156,9 +1155,16 @@
 
 	//버튼 스타일 변경
 	function doButtonStyle() {
-		//Button Style init
-		$('#modifyBtn').attr('disabled', true);
-		$('#deleteBtn').attr('disabled', true);
+		if ( !bDefaultDirector ) {
+			$('#installBtn').attr('disabled', true);
+			$('#modifyBtn').attr('disabled', true);
+			$('#deleteBtn').attr('disabled', true);
+		} 
+		else {
+			$('#installBtn').removeAttr("disabled"); 
+			$('#modifyBtn').attr('disabled', true);
+			$('#deleteBtn').attr('disabled', true);
+		}
 	}
 
 	// 그리드 재조회

@@ -38,12 +38,12 @@ Diego
 	
 	var stemcells = "";
 	var deploymentFile = "";
-
+	var bDefaultDirector = "";
 	//Main View Event
 	$(function() {
 
 		// 기본 설치 관리자 정보 조회
-		var bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");
+		bDefaultDirector = getDefaultDirector("<c:url value='/directors/default'/>");
 
 		$('#config_diegoGrid').w2grid({
 			name:'config_diegoGrid',
@@ -1340,9 +1340,16 @@ Diego
 
 	//버튼 스타일 변경
 	function doButtonStyle() {
-		//Button Style init
-		$('#modifyBtn').attr('disabled', true);
-		$('#deleteBtn').attr('disabled', true);
+		if ( !bDefaultDirector ) {
+			$('#installBtn').attr('disabled', true);
+			$('#modifyBtn').attr('disabled', true);
+			$('#deleteBtn').attr('disabled', true);
+		} 
+		else {
+			$('#installBtn').removeAttr("disabled"); 
+			$('#modifyBtn').attr('disabled', true);
+			$('#deleteBtn').attr('disabled', true);
+		}
 	}
 
 	// 그리드 재조회

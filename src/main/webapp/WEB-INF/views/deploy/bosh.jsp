@@ -1177,13 +1177,11 @@ function doButtonStyle(){
 	//Button Style init
 	
 	if ( !bDefaultDirector ) {
-		console.log("AAAA");
 		$('#installBtn').attr('disabled', true);
 		$('#modifyBtn').attr('disabled', true);
 		$('#deleteBtn').attr('disabled', true);
 	} 
 	else {
-		console.log("HHHHH");
 		$('#installBtn').removeAttr("disabled"); 
 		$('#modifyBtn').attr('disabled', true);
 		$('#deleteBtn').attr('disabled', true);
