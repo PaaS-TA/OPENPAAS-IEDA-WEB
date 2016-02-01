@@ -3,6 +3,9 @@
 
 <style type="text/css">
 .w2ui-popup .w2ui-msg-body{background-color: #FFF; }
+w2ui-box1{margin:0;padding: 0;}
+.w2ui-msg-body {margin:0;padding: 0;}
+.pannel{margin:0;padding: 0;}
 </style>
 <script type="text/javascript">
 
@@ -118,7 +121,7 @@ $(function() {
 		w2popup.open({
 			title 	: "<b>설치관리자 설정추가</b>",
 			width 	: 500,
-			height	: 330,
+			height	: 300,
 			modal	: true,
 			body	: $("#regPopupDiv").html(),
 			buttons : $("#regPopupBtnDiv").html()
@@ -354,7 +357,7 @@ function updateDirectorConfigPopup(record) {
  			w2popup.open({
 				title 	: "<b>설치관리자 정보수정</b>",
 				width 	: 500,
-				height	: 330,
+				height	: 300,
 				modal	: true,
 				body	: $("#regPopupDiv").html(),
 				buttons : $("#updatePopupBtnDiv").html(),
@@ -470,43 +473,39 @@ function lock (msg) {
 
 <!-- 설치관리자 정보추가/수정 팝업 -->
 <div id="regPopupDiv" hidden="true">
-	<form id="settingForm" action="POST">
-		<div class="w2ui-page page-0" style="width: 100%">
-			<br>
-			<label>●&nbsp;설치관리자 정보</label>
-			<br>
-			
-			<input name="seq" type="hidden"/>
-			
-			<div class="w2ui-field">
-				<label style="width:30%;text-align: left;padding-left: 20px;">디렉터 IP</label>
-				<div style="width: 70%;">
-					<input name="ip" type="url" maxlength="100" style="width: 250px" required="required" placeholder="xxx.xx.xx.xxx" onchange="validateInputField('ip', this.value)"/>
-					<span id="ipSuccMsg"></span><BR><span id="ipErrMsg"></span>
+	<form id="settingForm" action="POST" style="padding:5px 0 5px 0;margin:0;">
+		<div class="panel panel-info" >	
+			<div class="panel-heading"><b>설치관리자 정보</b></div>
+			<div class="panel-body" style="padding:5px 5% 10px 5%;">
+				<div class="w2ui-field">
+					<label style="width:30%;text-align: left;padding-left: 20px;">디렉터 IP</label>
+					<div style="width: 70%;">
+						<input name="ip" type="url" maxlength="100" style="width: 250px" required="required" placeholder="xxx.xx.xx.xxx" onchange="validateInputField('ip', this.value)"/>
+						<span id="ipSuccMsg"></span><BR><span id="ipErrMsg"></span>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="width:30%;text-align: left;padding-left: 20px;">포트번호</label>
+					<div style="width: 70%;">
+						<input name="port" type="number" maxlength="100" style="width: 250px" required="required" min="50" placeholder="25555" onchange="validateInputField('port', this.value)"/>
+						<span id="portSuccMsg"></span><BR><span id="portErrMsg"></span>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="width:30%;text-align: left;padding-left: 20px;">계정</label>
+					<div style="width: 70%">
+						<input name="user" type="text" maxlength="100" style="width: 250px" required="required" placeholder="admin" onchange="validateInputField('user', this.value)"/>
+						<span id="userSuccMsg"></span><BR><span id="userErrMsg" style="color:'red'"></span>
+					</div>
+				</div>
+				<div class="w2ui-field">
+					<label style="width:30%;text-align: left;padding-left: 20px;">비밀번호</label>
+					<div style="width: 70%;">
+						<input name="pwd" type="password" maxlength="100" style="width: 250px" required="required" placeholder="admin" onchange="validateInputField('pwd', this.value)"/>
+						<span id="pwdSuccMsg"></span><BR><span id="pwdErrMsg"></span>
+					</div>
 				</div>
 			</div>
-			<div class="w2ui-field">
-				<label style="width:30%;text-align: left;padding-left: 20px;">포트번호</label>
-				<div style="width: 70%;">
-					<input name="port" type="number" maxlength="100" style="width: 250px" required="required" min="50" placeholder="25555" onchange="validateInputField('port', this.value)"/>
-					<span id="portSuccMsg"></span><BR><span id="portErrMsg"></span>
-				</div>
-			</div>
-			<div class="w2ui-field">
-				<label style="width:30%;text-align: left;padding-left: 20px;">계정</label>
-				<div style="width: 70%">
-					<input name="user" type="text" maxlength="100" style="width: 250px" required="required" placeholder="admin" onchange="validateInputField('user', this.value)"/>
-					<span id="userSuccMsg"></span><BR><span id="userErrMsg" style="color:'red'"></span>
-				</div>
-			</div>
-			<div class="w2ui-field">
-				<label style="width:30%;text-align: left;padding-left: 20px;">비밀번호</label>
-				<div style="width: 70%;">
-					<input name="pwd" type="password" maxlength="100" style="width: 250px" required="required" placeholder="admin" onchange="validateInputField('pwd', this.value)"/>
-					<span id="pwdSuccMsg"></span><BR><span id="pwdErrMsg"></span>
-				</div>
-			</div>
-			
 		</div>
 	</form>	
 </div>
