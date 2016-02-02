@@ -113,7 +113,7 @@ public class ReleaseService {
 			if ( localReleaseList == null )
 				localReleaseList = new ArrayList<ReleaseFile>();
 			
-			if(!fileInfo.getName().endsWith(".tgz") && !fileInfo.getName().endsWith(".TGZ")) continue;
+			if( !fileInfo.getName().toLowerCase().endsWith(".tgz") ) continue;
 			
 			ReleaseFile releaseFile = new ReleaseFile();
 			releaseFile.setRecid(idx++);

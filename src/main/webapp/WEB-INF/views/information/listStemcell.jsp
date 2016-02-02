@@ -51,6 +51,7 @@ $(function() {
 	
  	$('#us_localStemcellsGrid').w2grid({
 		name: 'us_localStemcellsGrid',
+		header: '<b>Local Stemcell 목록</b>',
 		show: {selectColumn: true, footer: true},
 		multiSelect: false,
 		method: 'GET',
@@ -99,15 +100,10 @@ $(function() {
 
 
 function initView(bDefaultDirector) {
+	// 업로드된 스템셀 조회
 	if ( bDefaultDirector ) {
-		// 업로드된 스템셀 조회
 	 	doSearchUploadedStemcells();
 	}
-	
-/* 	w2ui['us_localStemcellsGrid'].handler('error', function(target, eventData) {
-		console.log(JSON.parse(eventData.xhr.responseText).exception);
-		console.log("### ==> " + eventData);
-	}); */
 	
 	// 로컬에 다운로드된 스템셀 조회
 	doSearchLocalStemcells();
@@ -128,7 +124,7 @@ function doSearchUploadedStemcells() {
 
 //로컬에 다운로드된 스템셀 조회
 function doSearchLocalStemcells() {
-	w2ui['us_localStemcellsGrid'].load("<c:url value='/localStemcells'/>");
+	w2ui['us_localStemcellsGrid'].load("<c:url value='/localStemcells'/>", "");
 }
 
 //다른페이지 이동시 호출
@@ -150,19 +146,14 @@ function doDeleteStemcell() {
 			version  : record.version
 		};
 	
-	
-	
 	w2confirm( { msg : record.version + '버전의 스템셀 <br>' + record.name + '<br>을 삭제하시겠습니까?'
 		, title : '스템셀 삭제'
 		, yes_text:'확인'
 		, no_text:'취소'
-	})
-	.yes(function() {
-		deleteLogPopup(requestParameter);
-	})
-	.no(function() {
-		// do nothing
-	});
+		, yes_callBack : function (){
+				deleteLogPopup(requestParameter);	
+			}
+	});	
 }
 
 //스템셀 업로드
@@ -182,13 +173,10 @@ function doUploadStemcell() {
 		, title : '스템셀 업로드'
 		, yes_text:'확인'
 		, no_text:'취소'
-		})
-		.yes(function() {
+		, yes_callBack : function (){
 			uploadLogPopup(requestParameter);
-		})
-		.no(function() {
-			// do nothing
-		});	
+			}
+	});
 }
 
 //Log Popup Create

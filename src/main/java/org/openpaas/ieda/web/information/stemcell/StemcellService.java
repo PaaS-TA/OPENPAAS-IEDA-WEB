@@ -19,6 +19,7 @@ import org.openpaas.ieda.api.director.DirectorRestHelper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfig;
+import org.openpaas.ieda.web.config.setting.IEDADirectorConfigRepository;
 import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.openpaas.ieda.web.config.stemcell.IEDAStemcellManagementRepository;
 import org.openpaas.ieda.web.config.stemcell.StemcellManagementConfig;
@@ -44,6 +45,8 @@ public class StemcellService {
 
 	@Autowired
 	private IEDADirectorConfigService directorConfigService;
+	@Autowired
+	private IEDADirectorConfigRepository directorConfigRepository;
 
 	private String filterString = null;
 
@@ -108,12 +111,12 @@ public class StemcellService {
 
 	public List<StemcellManagementConfig> listLocalStemcells() {
 
-		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
-
-		if ( defaultDirector != null ) {
+		IEDADirectorConfig directorConfig = directorConfigRepository.findOneByDefaultYn("Y");
+		
+		if ( directorConfig != null ) {
 			// 디럭터의 CPI에 맞는 로컬 스템셀 목록만 출력
-			if ( defaultDirector.getDirectorCpi().toUpperCase().contains("AWS") ) filterString = "AWS";
-			if ( defaultDirector.getDirectorCpi().toUpperCase().contains("OPENSTACK") ) filterString = "OPENSTACK";
+			if ( directorConfig.getDirectorCpi().toUpperCase().contains("AWS") ) filterString = "AWS";
+			if ( directorConfig.getDirectorCpi().toUpperCase().contains("OPENSTACK") ) filterString = "OPENSTACK";
 		}
 
 		List<StemcellManagementConfig> returnList = null;

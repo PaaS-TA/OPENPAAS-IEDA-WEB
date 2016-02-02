@@ -431,7 +431,7 @@ function changeKeyPathType(type){
 		
 	}else{
 		keyPathDiv.html(fileUploadInput);
-		$(".w2ui-msg-body input[name='keyPathFile']").hide();		
+		$(".w2ui-msg-body input[name='keyPathFile']").hide();
 	}
 }
 
