@@ -364,6 +364,7 @@ function deletePopup(record){
 			onClose : function (event){
 				event.onComplete= function(){
 					$("textarea").text("");
+					initSetting();
 					w2ui['config_boshGrid'].reset();
 					deleteClient.disconnect();
 					deleteClient = "";
@@ -418,7 +419,7 @@ function getKeyPathFileList(){
 function changeKeyPathType(type){
 	var keyPathDiv = $('.w2ui-msg-body #keyPathDiv');
 	var fileUploadInput = '<span><input type="file" name="keyPathFile" onchange="setPrivateKeyPathFileName(this);" hidden="true"/>';
-	fileUploadInput += '<input type="text" id="keyPathFileName" style="width:45%;" readonly  onClick="openBrowse();" placeholder="Key File을 선택해주세요."/>';
+	fileUploadInput += '<input type="text" id="keyPathFileName" style="width:45%;" readonly  onClick="openBrowse();" placeholder="Private Key File을 선택해주세요."/>';
 	fileUploadInput += '<a href="#" id="browse" onClick="openBrowse();">Browse </a></span>';
 	var selectInput = '<input type="list" name="keyPathList" style="float: left;width:60%;" onchange="setPrivateKeyPath(this.value);"/>';
 	
@@ -987,7 +988,9 @@ function openstackPopup(){
 				getKeyPathFileList();
 			}
 		},
-		onClose : initSetting
+		onClose : function(event) {
+			initSetting();
+		}
 	});
 }
 
@@ -1160,11 +1163,17 @@ function saveOpenstackResourceInfo(type){
 }
 
 function initSetting(){
+	iaas = "";
 	boshId = "";
 	awsInfo = "";
+	openstackInfo = "";
 	boshInfo = "";
 	networkInfo = "";
 	resourceInfo = "";
+	keyPathFileList = "";
+	releasest = "";
+	stemcellst = "";
+	deploymentFilet = "";
 }
 
 function popupComplete(){
@@ -1598,7 +1607,7 @@ $( window ).resize(function() {
 					            </div>
 					        </div>
 					        <div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">Private Key Path</label>
+								<label style="text-align: left;width:40%;font-size:11px;">Private Key File</label>
 								<div >
 									<span onclick="changeKeyPathType('file');" style="width:30%;"><label><input type="radio" name="keyPathType" value="file" />&nbsp;파일업로드</label></span>
 									&nbsp;&nbsp;

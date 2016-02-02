@@ -336,6 +336,7 @@
 					event.onComplete= function(){
 						$("textarea").text("");
 						w2ui['config_cfGrid'].reset();
+						initSetting();
 						deleteClient.disconnect();
 						deleteClient = "";
 						doSearch();
@@ -1133,7 +1134,7 @@
 		releases = "";
 		stemcells = "";
 		deploymentFile = "";
-
+		//bDefaultDirector = "";
 		//grid Reload
 		gridReload();
 	}

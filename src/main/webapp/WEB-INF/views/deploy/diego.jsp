@@ -361,6 +361,7 @@ Diego
 				onClose :function (event){
 					event.onComplete= function(){
 						$("textarea").text("");
+						initSetting();
 						w2ui['config_diegoGrid'].reset();
 						deleteClient.disconnect();
 						deleteClient = "";
@@ -1319,6 +1320,7 @@ Diego
 		
 		stemcells = "";
 		deploymentFile = "";
+		bDefaultDirector = "";
 		//grid Reload
 		gridReload();
 	}
