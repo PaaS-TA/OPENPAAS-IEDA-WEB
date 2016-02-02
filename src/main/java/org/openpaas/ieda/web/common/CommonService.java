@@ -1,14 +1,23 @@
 package org.openpaas.ieda.web.common;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.IOUtils;
@@ -17,17 +26,11 @@ import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsConfig;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsRepository;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapOpenstackConfig;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapOpenstackRepository;
-import org.openpaas.ieda.web.deploy.bosh.IEDABoshAwsConfig;
 import org.openpaas.ieda.web.deploy.bosh.IEDABoshAwsRepository;
-import org.openpaas.ieda.web.deploy.bosh.IEDABoshOpenstackConfig;
 import org.openpaas.ieda.web.deploy.bosh.IEDABoshOpenstackRepository;
-import org.openpaas.ieda.web.deploy.cf.IEDACfAwsConfig;
 import org.openpaas.ieda.web.deploy.cf.IEDACfAwsRepository;
-import org.openpaas.ieda.web.deploy.cf.IEDACfOpenstackConfig;
 import org.openpaas.ieda.web.deploy.cf.IEDACfOpenstackRepository;
-import org.openpaas.ieda.web.deploy.diego.IEDADiegoAwsConfig;
 import org.openpaas.ieda.web.deploy.diego.IEDADiegoAwsRepository;
-import org.openpaas.ieda.web.deploy.diego.IEDADiegoOpenstackConfig;
 import org.openpaas.ieda.web.deploy.diego.IEDADiegoOpenstackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,13 +79,14 @@ public class CommonService {
 						new BufferedOutputStream(new FileOutputStream(isKeyFile));
 				stream.write(bytes);
 				stream.close();
-
-				isKeyFile.setReadOnly();
-				//isKeyFile.setReadable(true, true);
-				//isKeyFile.setWritable(false, false);
-				//isKeyFile.canRead();
-				log.debug("keyFilePath : " + keyFilePath);
-
+				
+				isKeyFile.setWritable(false, false);
+				isKeyFile.setExecutable(false, false);
+				isKeyFile.setReadable(false, true);
+				Set<PosixFilePermission> pfp = new HashSet<>();
+				pfp.add(PosixFilePermission.OWNER_READ);
+				Files.setPosixFilePermissions(Paths.get(keyFilePath), pfp);
+				
 			} catch (IOException e) {
 				log.debug(e.getMessage());
 				e.printStackTrace();
@@ -143,23 +147,38 @@ public class CommonService {
 		return deployLog;
 	}
 
-	//	public FileInputStream downloadDeploymentFile(String deploymentFileName) {
-	////		InputStream is = new FileInputStream(LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName);
-	////		IOUtils.copy(is);
-	//		File file = null;
-	//		FileInputStream fis = null; 
-	//		
-	//		try {
-	//			file = new File(LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName);
-	//			
-	//			//fis = new FileInputStream(file);
-	//		}
-	//		catch (FileNotFoundException e) {
-	//			// TODO Auto-generated catch block
-	//			e.printStackTrace();
-	//		}
-	//		
-	//		return fis;
-	//	}
+	public void downloadDeploymentFile(String deploymentFileName, HttpServletResponse response) {
+	
+		URL downloadUrl = null;
+		String localFilePath = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
+		
+		BufferedInputStream bis = null;
+		try {
+			//downloadUrl =
+			
+			bis = new BufferedInputStream(downloadUrl.openStream());
+			
+			byte readByte[] = new byte[8192];
+	
+	        response.setContentType("application/octet-stream");
+			response.setHeader(
+					"Content-disposition",
+					"attachment;filename=" + deploymentFileName);
+	
+	        OutputStream os = response.getOutputStream();
+	        
+			int read;
+			while ((read = bis.read(readByte, 0, 4096)) != -1){
+				os.write(readByte, 0, read);
+			}
+			os.flush();
+			os.close();
+			bis.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }
