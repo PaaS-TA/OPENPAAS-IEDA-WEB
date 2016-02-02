@@ -54,7 +54,6 @@ public class CfController extends BaseController{
 	@RequestMapping(value="/deploy/cfList", method=RequestMethod.GET)
 	public ResponseEntity listCfs() {
 		List<CfInfo> content = cfService.listCfs();
-		System.out.println("#####\n" + content);
 		Map<String, Object> result = new HashMap<>();
 		
 		result.put("total", (content == null) ? 0:content.size());
@@ -89,21 +88,15 @@ public class CfController extends BaseController{
 	public ResponseEntity saveDefaultInfo(@RequestBody @Valid CfParam.Default dto){
 		
 		Map<String, Object> result  = new HashMap<>();
-		System.out.println(dto.getIaas().toUpperCase() + " ::: 0000 ::: " + dto);
 		if( "AWS".equals(dto.getIaas().toUpperCase()) ){
-			System.out.println("AAAA ::: ");
 			IEDACfAwsConfig config = cfAwsService.saveAwsCfInfo(dto);
-			System.out.println("AAAA ::: " + config);
 			result.put("content", config);
 		}
 		else if( "OPENSTACK".equals(dto.getIaas().toUpperCase()) ){
-			System.out.println("BBB ::: ");
 			IEDACfOpenstackConfig config = cfOpenstackService.saveOpenstackCfInfo(dto);
-			System.out.println("BBB ::: " + config);
 			result.put("content", config);
 		}
 		
-		System.out.println("CCC ::: " + result.get("content"));
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	

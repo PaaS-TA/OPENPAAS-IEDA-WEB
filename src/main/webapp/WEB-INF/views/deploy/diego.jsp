@@ -987,7 +987,7 @@ Diego
 		});
 	}
 	
-	//오픈스텍 NETWORK 정보 저장
+	//오픈스택 NETWORK 정보 저장
 	function saveOpenstackNetworkInfo(type) {
 		networkInfo = {
 				id 					: diegoId,
@@ -1974,7 +1974,7 @@ Diego
 	<!-- End AWS Popup -->
 
 	<!-- Start Diego OPENSTACK POP -->	
-	<!-- 오픈스텍 네트워크 정보 -->
+	<!-- 오픈스택 네트워크 정보 -->
 	<div id="openstackNetworkInfoDiv" style="width:100%; height:100%;" hidden="true">
 		<div rel="title">DIEGO 설치</div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">

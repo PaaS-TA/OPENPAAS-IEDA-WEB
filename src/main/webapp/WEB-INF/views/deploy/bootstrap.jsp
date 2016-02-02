@@ -119,7 +119,15 @@ $(function() {
 					render: function(record) {
 						if ( record.deploymentFile != null ) {
 		       				//return '<a style="color:#333;" onClick="getDownloadDeploymentFile(\''+record.deploymentFile+'\')">' + record.deploymentFile + '</a>';
-		       				//return '<a style="color:#333;" href="/common/downloadDeploymentFile/'+record.deploymentFile+'">' + record.deploymentFile + '</a>';
+		       				var deplymentParam = {
+		       						  service	: "bootstrap"
+		       						, iaas		: record.iaas
+		       						, id		: record.id
+		       				} 
+		       				
+		       				//return '<a style="color:#333;" href="/common/downloadDeploymentFile?'+JSON.stringify(deplymentParam) +'>' + record.deploymentFile + '</a>';
+		       				
+		       				//return window.location.href = "/common/downloadDeploymentFile?" + JSON.stringify(deplymentParam);
 							return record.deploymentFile;
 						}
 		    			else {
@@ -1704,11 +1712,11 @@ function osDeployPopup(){
 
 <!-- Start OPENSTACK POPUP  -->
 	<div id="openstackInfoDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치(오픈스텍)</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(오픈스택)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
-		            <li class="active">오픈스텍 정보</li>
+		            <li class="active">오픈스택 정보</li>
 		            <li class="before">기본 정보</li>
 		            <li class="before">네트워크 정보</li>
 		            <li class="before">리소스 정보</li>		            
@@ -1718,7 +1726,7 @@ function osDeployPopup(){
 	        </div>
 	        <div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
 				<div class="panel panel-info">	
-					<div class="panel-heading"><b>오픈스텍 정보</b></div>
+					<div class="panel-heading"><b>오픈스택 정보</b></div>
 					<div class="panel-body" style="padding:5px 5% 10px 5%;">
 				    	<form id="keyForm" data-toggle="validator" >
 							<div class="w2ui-field">
@@ -1789,11 +1797,11 @@ function osDeployPopup(){
 	</div>
 	
 	<div id="openstackDefaultInfoDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치(오픈스텍)</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(오픈스택)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">오픈스텍 정보</li>
+		            <li class="pass">오픈스택 정보</li>
 		            <li class="active">기본 정보</li>
 		            <li class="before">네트워크 정보</li>
 		            <li class="before">리소스 정보</li>		            
@@ -1841,11 +1849,11 @@ function osDeployPopup(){
 	</div>	
 	
 	<div id="openstackNetworkInfoDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치(오픈스텍)</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(오픈스택)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">오픈스텍 정보</li>
+		            <li class="pass">오픈스택 정보</li>
 		            <li class="pass">기본 정보</li>
 		            <li class="active">네트워크 정보</li>
 		            <li class="before">리소스 정보</li>		            
@@ -1918,11 +1926,11 @@ function osDeployPopup(){
 	</div>
 	
 	<div id="openstackResourceInfoDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치(오픈스텍)</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(오픈스택)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">오픈스텍 정보</li>
+		            <li class="pass">오픈스택 정보</li>
 		            <li class="pass">기본 정보</li>
 		            <li class="pass">네트워크 정보</li>
 		            <li class="active">리소스 정보</li>		            
@@ -1969,11 +1977,11 @@ function osDeployPopup(){
 	
 	<!-- OPENSTACK Deploy DIV -->
 	<div id="openstackDeployDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치(오픈스텍)</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(오픈스택)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">오픈스텍 정보</li>
+		            <li class="pass">오픈스택 정보</li>
 		            <li class="pass">기본 정보</li>
 		            <li class="pass">네트워크 정보</li>
 		            <li class="pass">리소스 정보</li>		            
@@ -1994,11 +2002,11 @@ function osDeployPopup(){
 	
 	<!-- OPENSTACK Install DIV -->
 	<div id="openstackInstallDiv" style="width:100%;height:100%;" hidden="true">
-		<div rel="title"><b>BOOTSTRAP 설치(오픈스텍)</b></div>
+		<div rel="title"><b>BOOTSTRAP 설치(오픈스택)</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 			<div style="margin-left:2%;display:inline-block;width:97%;">
 	            <ul class="progressStep_6" >
-		            <li class="pass">오픈스텍 정보</li>
+		            <li class="pass">오픈스택 정보</li>
 		            <li class="pass">기본 정보</li>
 		            <li class="pass">네트워크 정보</li>
 		            <li class="pass">리소스 정보</li>		            

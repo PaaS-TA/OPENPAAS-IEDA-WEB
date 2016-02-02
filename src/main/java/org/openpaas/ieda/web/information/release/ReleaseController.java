@@ -93,7 +93,6 @@ public class ReleaseController extends BaseController {
 	
 	@RequestMapping( value="/release/getReleaseList/{filterName}", method =RequestMethod.GET)
 	public ResponseEntity listLocalFilterReleaseList(@PathVariable  String filterName){
-		System.out.println("@@@@@@@@ : " + filterName);
 		List<ReleaseInfo> contents = releaseService.getReleasesFilter(filterName);
 		Map<String, Object> result = new HashMap<>();
 		result.put("records", contents);

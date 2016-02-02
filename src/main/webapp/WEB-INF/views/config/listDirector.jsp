@@ -121,7 +121,7 @@ $(function() {
 		w2popup.open({
 			title 	: "<b>설치관리자 설정추가</b>",
 			width 	: 500,
-			height	: 300,
+			height	: 320,
 			modal	: true,
 			body	: $("#regPopupDiv").html(),
 			buttons : $("#regPopupBtnDiv").html()
@@ -357,7 +357,7 @@ function updateDirectorConfigPopup(record) {
  			w2popup.open({
 				title 	: "<b>설치관리자 정보수정</b>",
 				width 	: 500,
-				height	: 300,
+				height	: 320,
 				modal	: true,
 				body	: $("#regPopupDiv").html(),
 				buttons : $("#updatePopupBtnDiv").html(),

@@ -35,16 +35,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class StemcellService {
-	
+
 	@Autowired
 	private IEDAStemcellManagementRepository stemcellContentRepository;
 
 	@Autowired
 	private StemcellManagementService stemcellManagementService;
-	
+
 	@Autowired
 	private IEDADirectorConfigService directorConfigService;
-	
+
 	private String filterString = null;
 
 	public List<StemcellInfo> listStemcell() {
@@ -59,34 +59,34 @@ public class StemcellService {
 			get = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)get);
 
 			client.executeMethod(get);
-		
+
 			if ( !StringUtils.isEmpty(get.getResponseBodyAsString()) ) {
-			
+
 				ObjectMapper mapper = new ObjectMapper();
 				Stemcell[] stemcells = mapper.readValue(get.getResponseBodyAsString(), Stemcell[].class);
-				
+
 				int idx = 0;
 				for ( Stemcell stemcell : stemcells ) {
 					if ( stemcellInfoList == null ) 
 						stemcellInfoList = new ArrayList<StemcellInfo>();
-					
+
 					StemcellInfo stemcellInfo = new StemcellInfo();
-					
+
 					stemcellInfo.setRecid(idx++);
 					stemcellInfo.setName(stemcell.getName());
 					stemcellInfo.setOperatingSystem(stemcell.getOperatingSystem());
 					stemcellInfo.setVersion(stemcell.getVersion());
 					stemcellInfo.setCid(stemcell.getCid());
-					
+
 					String deploymentInfo = "";
 					for ( HashMap<String, String> deployment : stemcell.getDeployments() ) {
 						deploymentInfo = deploymentInfo + deployment.get("name") + "<br>";
 					}
 					stemcellInfo.setDeploymentInfo(deploymentInfo);
-					
+
 					stemcellInfoList.add(stemcellInfo);
 				}
-				
+
 				// 스템셀 버전 역순으로 정렬
 				if ( stemcellInfoList != null && stemcellInfoList.size() > 0 ) {
 					Comparator<StemcellInfo> byStemcellVersion = Collections.reverseOrder(Comparator.comparing(StemcellInfo::getVersion));
@@ -100,37 +100,38 @@ public class StemcellService {
 			e.printStackTrace();
 			throw new IEDACommonException("notfound.stemcell.exception", " 스템셀 정보 조회중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
-		
-		log.info("## Stemcell list = " + stemcellInfoList.size());
-		
+
+		log.debug("## Stemcell list = " + stemcellInfoList.size());
+
 		return stemcellInfoList;
 	}
 
 	public List<StemcellManagementConfig> listLocalStemcells() {
-		
+
 		IEDADirectorConfig defaultDirector = directorConfigService.getDefaultDirector();
-		
+
 		if ( defaultDirector != null ) {
 			// 디럭터의 CPI에 맞는 로컬 스템셀 목록만 출력
 			if ( defaultDirector.getDirectorCpi().toUpperCase().contains("AWS") ) filterString = "AWS";
 			if ( defaultDirector.getDirectorCpi().toUpperCase().contains("OPENSTACK") ) filterString = "OPENSTACK";
 		}
-		
+
 		List<StemcellManagementConfig> returnList = null;
 		List<String> localStemcellList = stemcellManagementService.getLocalStemcellList();
 
-		if ( filterString != null && filterString.length() > 0 )
+		if ( filterString != null && filterString.length() > 0 ){
 			returnList = stemcellContentRepository.findByStemcellFileNameInOrderByStemcellVersionDesc(localStemcellList).stream()
-			.filter(t -> t.getIaas().equalsIgnoreCase(filterString))
-			.collect(Collectors.toList());
-		else
+					.filter(t -> t.getIaas().equalsIgnoreCase(filterString))
+					.collect(Collectors.toList());
+		}
+		else{
 			returnList = stemcellContentRepository.findByStemcellFileNameInOrderByStemcellVersionDesc(localStemcellList);
-
+		}
 		filterString = null;
-					
+
 		return returnList;
 	}
-	
+
 	public List<String> localAwsStemcells(){
 		File file = new File(LocalDirectoryConfiguration.getStemcellDir());
 		File[] localFiles = file.listFiles();
@@ -146,49 +147,49 @@ public class StemcellService {
 		else if( type.equals("boshOpenstackUbuntu") ){
 			regx = "\\A(bosh-stemcell-)\\d{4}(-openstack-kvm-ubuntu)";
 		}
-		
+
 		for (File fileInfo : localFiles) {
 			if ( localStemcells == null )
 				localStemcells = new ArrayList<String>();
-			
+
 			Pattern pattern = Pattern.compile(regx);
-	        Matcher matcher = pattern.matcher(fileInfo.getName().toLowerCase());
-	        if(matcher.find()){
-	        	localStemcells.add(fileInfo.getName());
-	        }
+			Matcher matcher = pattern.matcher(fileInfo.getName().toLowerCase());
+			if(matcher.find()){
+				localStemcells.add(fileInfo.getName());
+			}
 		}		
-		
+
 		return localStemcells;
 	}
 
-	public java.util.List<String> localOpenstackStemcells() {
+	public List<String> localOpenstackStemcells() {
 		File file = new File(LocalDirectoryConfiguration.getStemcellDir());
 		File[] localFiles = file.listFiles();
 		//String type= "boshOpenstackUbuntu";
 		List<String> localStemcells = null; 
 		String regx = "\\A(bosh-stemcell-)\\d{4}(-openstack-kvm-ubuntu)";
-//		if( type.equals("lightAwsHvm") ){
-//			regx = "\\A(light-bosh-stemcell-)\\d{4}(-aws-xen-hvm)";
-//		}
-//		else if( type.equals("lightAws") ){
-//			regx = "\\A(light-bosh-stemcell-)\\d{4}(-aws)";
-//		}
-//		else if( type.equals("boshOpenstackUbuntu") ){
-//			regx = "\\A(bosh-stemcell-)\\d{4}(-openstack-kvm-ubuntu)";
-//		}
-		
+		//		if( type.equals("lightAwsHvm") ){
+		//			regx = "\\A(light-bosh-stemcell-)\\d{4}(-aws-xen-hvm)";
+		//		}
+		//		else if( type.equals("lightAws") ){
+		//			regx = "\\A(light-bosh-stemcell-)\\d{4}(-aws)";
+		//		}
+		//		else if( type.equals("boshOpenstackUbuntu") ){
+		//			regx = "\\A(bosh-stemcell-)\\d{4}(-openstack-kvm-ubuntu)";
+		//		}
+
 		for (File fileInfo : localFiles) {
 			if ( localStemcells == null )
 				localStemcells = new ArrayList<String>();
-			
+
 			Pattern pattern = Pattern.compile(regx);
-	        Matcher matcher = pattern.matcher(fileInfo.getName().toLowerCase());
-	        if(matcher.find()){
-	        	localStemcells.add(fileInfo.getName());
-	        }
+			Matcher matcher = pattern.matcher(fileInfo.getName().toLowerCase());
+			if(matcher.find()){
+				localStemcells.add(fileInfo.getName());
+			}
 		}		
-		
+
 		return localStemcells;
 	}
-	
+
 }
