@@ -421,7 +421,7 @@ function changeKeyPathType(type){
 	var fileUploadInput = '<span><input type="file" name="keyPathFile" onchange="setPrivateKeyPathFileName(this);" hidden="true"/>';
 	fileUploadInput += '<input type="text" id="keyPathFileName" style="width:45%;" readonly  onClick="openBrowse();" placeholder="Private Key File을 선택해주세요."/>';
 	fileUploadInput += '<a href="#" id="browse" onClick="openBrowse();">Browse </a></span>';
-	var selectInput = '<input type="list" name="keyPathList" style="float: left;width:60%;" onchange="setPrivateKeyPath(this.value);"/>';
+	var selectInput = '<input type="list" name="keyPathList" style="float: left;width:60%;" onchange="setPrivateKeyPath(this.value);" placeholder="Private Key File을 선택해주세요./>';
 	
 	if(type == "list") {
 		keyPathDiv.html(selectInput);
