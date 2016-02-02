@@ -54,7 +54,7 @@ public class StemcellManagementControllerTest {
 		.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
-	@Test
+/*	@Test
 	public void testGetPublicStemcells() throws Exception {
 		ResultActions result = mockMvc.perform(get(PUBLIC_STEMCELL_URL)
 				.param("os", "Ubuntu")
@@ -64,7 +64,7 @@ public class StemcellManagementControllerTest {
 
 		result.andDo(MockMvcResultHandlers.print())
 		.andExpect(MockMvcResultMatchers.status().isOk());
-	}
+	}*/
 
 	/*@Test
 	public void testDoDownloadStemcell()  throws Exception{
