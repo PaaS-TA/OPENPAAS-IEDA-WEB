@@ -4,16 +4,13 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URLConnection;
 import java.util.List;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.apache.commons.io.IOUtils;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,11 +33,10 @@ public class CommonController {
 	@Autowired
 	private CommonService commonService;
 
-
 	@RequestMapping(value="/common/keyPathFileUpload", method=RequestMethod.POST)
 	public ResponseEntity doBootstrapKeyPathFileUpload( MultipartHttpServletRequest request){
 		commonService.uploadKeyFile(request);
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@RequestMapping(value="/common/getKeyPathFileList" , method=RequestMethod.GET)
@@ -63,7 +59,7 @@ public class CommonController {
 	@RequestMapping(value="/common/getDeployLogMsg", method=RequestMethod.POST)
 	public ResponseEntity getDeployLogMsg(@RequestBody @Valid CommonParam.DeployLog param){
 		String deployLogMsg = commonService.getDeployMsg(param);
-		return new ResponseEntity(deployLogMsg, HttpStatus.OK);
+		return new ResponseEntity<>(deployLogMsg, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/common/downloadDeploymentFile/{fileName}", method = RequestMethod.GET)
@@ -75,13 +71,10 @@ public class CommonController {
 	        File file = new File(LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") +fileName +".yml");
 	        
 	        if( file.exists() ){
-	        	byte readByte[] = new byte[8192];
-	
 		        String mimeType= URLConnection.guessContentTypeFromName(file.getName());
 		        if( StringUtils.isEmpty(mimeType) ){
 		        	mimeType = "application/octet-stream";
 		        }
-		        System.out.println("mimetype : " + mimeType);
 	
 		        response.setContentType(mimeType);
 		        response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".yml"); 

@@ -4,17 +4,16 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.openpaas.ieda.api.Task;
 import org.openpaas.ieda.web.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -27,10 +26,6 @@ public class TaskController extends BaseController {
 	@Autowired
 	private TaskService taskService;
 
-	@Autowired
-	private TaskAsyncService taskAsyncservice;
-
-	
 	@RequestMapping(value="/information/listTaskHistory", method=RequestMethod.GET)
 	public String List() {
 		return "/information/listTaskHistory";
@@ -51,7 +46,7 @@ public class TaskController extends BaseController {
 		result.put("total", contents.size());
 		result.put("records", contents);
 		
-		return new ResponseEntity(result, HttpStatus.OK);
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 /*
 	@RequestMapping( value="/tasks/{taskId}", method =RequestMethod.GET)
@@ -60,14 +55,22 @@ public class TaskController extends BaseController {
 		return new ResponseEntity(HttpStatus.OK);
 	}*/
 	
-	@MessageMapping("/task")
-    @SendTo("/socket/task")
-	public ResponseEntity doGetTaskLog(@RequestBody @Valid TaskDto.GetLog dto) {
+	@RequestMapping( value="/task/debugLog/{id}", method =RequestMethod.GET)
+	public void doDownloadTaskLog(
+			@PathVariable("id") String taskId
+			, HttpServletRequest request, HttpServletResponse response) {
 		
-		taskAsyncservice.doGetTaskLogAsync(dto.getLogType(), dto.getTaskId());
-		
-		return new ResponseEntity<>(HttpStatus.OK);
+		//taskAsyncservice.doGetTaskLogAsync(dto.getLogType(), dto.getTaskId());
+		taskService.getDownloadDebugLogFile(taskId, request, response);
 	}
 	
+//	@MessageMapping("/task")
+//    @SendTo("/socket/task")
+//	public ResponseEntity doGetTaskLog(@RequestBody @Valid TaskDto.GetLog dto) {
+//		
+//		taskAsyncservice.doGetTaskLogAsync(dto.getLogType(), dto.getTaskId());
+//		
+//		return new ResponseEntity<>(HttpStatus.OK);
+//	}
 
 }

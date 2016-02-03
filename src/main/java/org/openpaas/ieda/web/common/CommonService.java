@@ -1,13 +1,10 @@
 package org.openpaas.ieda.web.common;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
@@ -17,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.IOUtils;
@@ -26,12 +22,6 @@ import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsConfig;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsRepository;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapOpenstackConfig;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapOpenstackRepository;
-import org.openpaas.ieda.web.deploy.bosh.IEDABoshAwsRepository;
-import org.openpaas.ieda.web.deploy.bosh.IEDABoshOpenstackRepository;
-import org.openpaas.ieda.web.deploy.cf.IEDACfAwsRepository;
-import org.openpaas.ieda.web.deploy.cf.IEDACfOpenstackRepository;
-import org.openpaas.ieda.web.deploy.diego.IEDADiegoAwsRepository;
-import org.openpaas.ieda.web.deploy.diego.IEDADiegoOpenstackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,18 +37,6 @@ public class CommonService {
 	private IEDABootstrapAwsRepository bootstrapAwsRepository;
 	@Autowired
 	private IEDABootstrapOpenstackRepository bootstrapOpenstackRepository;
-	@Autowired
-	private IEDABoshAwsRepository boshAwsRepository;
-	@Autowired
-	private IEDABoshOpenstackRepository boshOpenstackRepository;
-	@Autowired
-	private IEDACfAwsRepository cfAwsRepository;
-	@Autowired
-	private IEDACfOpenstackRepository cfOpenstackRepository;
-	@Autowired
-	private IEDADiegoAwsRepository diegoAwsRepository;
-	@Autowired
-	private IEDADiegoOpenstackRepository diegoOpenstackRepository;
 
 	public void uploadKeyFile(MultipartHttpServletRequest request) {
 		Iterator<String> itr =  request.getFileNames();
@@ -145,40 +123,6 @@ public class CommonService {
 			}
 		}
 		return deployLog;
-	}
-
-	public void downloadDeploymentFile(String deploymentFileName, HttpServletResponse response) {
-	
-		URL downloadUrl = null;
-		String localFilePath = LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFileName;
-		
-		BufferedInputStream bis = null;
-		try {
-			//downloadUrl =
-			
-			bis = new BufferedInputStream(downloadUrl.openStream());
-			
-			byte readByte[] = new byte[8192];
-	
-	        response.setContentType("application/octet-stream");
-			response.setHeader(
-					"Content-disposition",
-					"attachment;filename=" + deploymentFileName);
-	
-	        OutputStream os = response.getOutputStream();
-	        
-			int read;
-			while ((read = bis.read(readByte, 0, 4096)) != -1){
-				os.write(readByte, 0, read);
-			}
-			os.flush();
-			os.close();
-			bis.close();
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 }

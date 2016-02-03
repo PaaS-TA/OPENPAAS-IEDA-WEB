@@ -13,10 +13,8 @@ import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.common.CommonUtils;
 import org.openpaas.ieda.web.common.ReplaceItem;
 import org.openpaas.ieda.web.common.Sha512Crypt;
-import org.openpaas.ieda.web.information.deploy.DeploymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -32,15 +30,9 @@ public class IEDABoshService {
 	@Autowired
 	private IEDABoshOpenstackRepository openstackRepository;
 	
-	@Autowired
-	private DeploymentService deploymentService;
-	
-	@Autowired
-	private SimpMessagingTemplate messagingTemplate;
-
 	public List<BoshInfo> getBoshList(){
 		
-		List<BoshInfo> boshList = new ArrayList();
+		List<BoshInfo> boshList = new ArrayList<>();
 		List<IEDABoshAwsConfig> boshAwsList = awsRepository.findAll();
 		List<IEDABoshOpenstackConfig> boshOpenstackList = openstackRepository.findAll();
 		
@@ -49,8 +41,6 @@ public class IEDABoshService {
 					"Bosh 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 		
-		//List<DeploymentInfo> deployedList = deploymentService.listDeployment();
-
 		int recid = 0;
 		if( boshAwsList.size() > 0 ){
 			for(IEDABoshAwsConfig config : boshAwsList){

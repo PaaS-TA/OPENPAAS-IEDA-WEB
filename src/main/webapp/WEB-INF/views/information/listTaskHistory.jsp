@@ -34,13 +34,16 @@ $(function() {
 		],
 		onSelect: function(event) {
 			event.onComplete = function() {
-				setDisable($('#showDebugLogBtn'), false);
+				downDebugLogBtn
+				setDisable($('#downDebugLogBtn'), false);
+				//setDisable($('#showDebugLogBtn'), false);
 				setDisable($('#showEventLogBtn'), false);
 			}
 		},
 		onUnselect: function(event) {
 			event.onComplete = function() {
-				setDisable($('#showDebugLogBtn'), true);
+				setDisable($('#downDebugLogBtn'), true);
+				//setDisable($('#showDebugLogBtn'), true);
 				setDisable($('#showEventLogBtn'), true);
 			}
 		},
@@ -52,10 +55,26 @@ $(function() {
 	
 	initView(bDefaultDirector)
 	
- 	//릴리즈 삭제
- 	$("#showDebugLogBtn").click(function(){
+ 	//Task DebugLog File download
+ 	$("#downDebugLogBtn").click(function(){
+ 		//showTaskLog("debug");
+ 		
+ 		var selected = w2ui['sq_taskHistoryGrid'].getSelection();
+		if ( selected == "" || selected == null) return;
+		
+		var record = w2ui['sq_taskHistoryGrid'].get(selected);
+		if ( record == "" || record == null) return;
+		
+ 		var debugLogdownUrl = "/task/debugLog/"+ record.id;
+ 		
+ 		window.open(debugLogdownUrl, '', ''); 
+ 		return false;
+    });
+	
+	$("#showDebugLogBtn").click(function(){
  		showTaskLog("debug");
     });
+	
 	
  	$("#showEventLogBtn").click(function(){
  		showTaskLog("event");
@@ -70,7 +89,8 @@ function initView(bDefaultDirector) {
 	}
 
 	// 컨트롤 
-	setDisable($('#showDebugLogBtn'), true);
+	setDisable($('#downDebugLogBtn'), true);
+	//setDisable($('#showDebugLogBtn'), true);
 	setDisable($('#showEventLogBtn'), true);
 }
 
@@ -96,12 +116,9 @@ function showTaskLog(type) {
 		, title : typeName + ' 로그'
 		, yes_text:'확인'
 		, no_text:'취소'
-	})
-	.yes(function() {
-		appendLogPopup(type, typeName, requestParameter);
-	})
-	.no(function() {
-		// do nothing
+		, yes_callBack : function(event){
+			appendLogPopup(type, typeName, requestParameter);	
+		}
 	});	
 }
 
@@ -201,7 +218,8 @@ $( window ).resize(function() {
 		<div class="fr"> 
 			<!-- Btn -->
 			<!-- <span class="boardBtn" id="showTaskDebugLogBtn" ><a href="#" class="btn btn-primary" style="width:150px"><span></span></a></span> -->
-			<span class="btn btn-primary" style="width:120px" id="showDebugLogBtn">디버그 로그</span>
+			<span class="btn btn-primary" style="width:180px" id="downDebugLogBtn">디버그 로그 다운로드</span>
+			<!-- <span class="btn btn-primary" style="width:120px" id="showDebugLogBtn">디버그 로그</span> -->
 			<span class="btn btn-primary" style="width:120px" id="showEventLogBtn">이벤트 로그</span>
 			<!-- //Btn -->
 		</div>
