@@ -131,11 +131,15 @@ Diego
 				, {field: 'createdDate', caption: '생성일자', size: '100px', hidden: true}
 				, {field: 'updatedDate', caption: '수정일자', size: '100px', hidden: true}
 				, {field: 'deploymentFile', caption: '배포파일명', size: '180px',
-					render: function(record) {
+						render: function(record) {
 							if ( record.deploymentFile != null ) {
-			       				//return '<a style="color:#333;" onClick="getDownloadDeploymentFile(\''+record.deploymentFile+'\')">' + record.deploymentFile + '</a>';
-			       				//return '<a style="color:#333;" href="/common/downloadDeploymentFile/'+record.deploymentFile+'">' + record.deploymentFile + '</a>';
-								return record.deploymentFile;
+			       				var deplymentParam = {
+			       						  service	: "bootstrap"
+			       						, iaas		: record.iaas
+			       						, id		: record.id
+			       				} 
+			       				var fileName = record.deploymentFile;
+			       				return '<a style="color:#333;" href="/common/downloadDeploymentFile/' + fileName +'" onclick="window.open(this.href); return false;">' + record.deploymentFile + '</a>';
 							}
 			    			else {
 			    				return 'N/A';

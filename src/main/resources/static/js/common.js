@@ -257,30 +257,3 @@ function deployLogMsgPopup(service, iaas, msg){
 		}
 	});	
 }
-
-//한글입력 방지
-//var popupBodySelector = document.getElement('w2ui-msg-body');
-
-//DeploymentFile Download
-function getDownloadDeploymentFile( fileName ){
-	
-	var requestParameter = {
-			deployFileName : fileName
-	}
-	$.ajax({
-		type : "POST",
-		url : "/common/downloadDeploymentFile",///"+ fileName.split(".")[0]
-        contentType : 'application/json;charset=UTF-8',
-        data : JSON.stringify(requestParameter),
-		success : function(data) {
-			console.log(" in sucess");
-			window.open(data);
-			//window.location.href = data;
-		},
-		error:function (xhr, ajaxOptions, thrownError){
-			console.log(" in error"+ xhr);
-			console.log(" in error"+ ajaxOptions);
-			console.log(" in error"+ thrownError);
-		}
-	});	
-}

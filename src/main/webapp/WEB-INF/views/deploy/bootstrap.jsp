@@ -118,17 +118,13 @@ $(function() {
 			, {field: 'deploymentFile', caption: '배포파일명', size: '180px',
 					render: function(record) {
 						if ( record.deploymentFile != null ) {
-		       				//return '<a style="color:#333;" onClick="getDownloadDeploymentFile(\''+record.deploymentFile+'\')">' + record.deploymentFile + '</a>';
 		       				var deplymentParam = {
 		       						  service	: "bootstrap"
 		       						, iaas		: record.iaas
 		       						, id		: record.id
 		       				} 
-		       				
-		       				//return '<a style="color:#333;" href="/common/downloadDeploymentFile?'+JSON.stringify(deplymentParam) +'>' + record.deploymentFile + '</a>';
-		       				
-		       				//return window.location.href = "/common/downloadDeploymentFile?" + JSON.stringify(deplymentParam);
-							return record.deploymentFile;
+		       				var fileName = record.deploymentFile;
+		       				return '<a style="color:#333;" href="/common/downloadDeploymentFile/' + fileName +'" onclick="window.open(this.href); return false;">' + record.deploymentFile + '</a>';
 						}
 		    			else {
 		    				return 'N/A';
