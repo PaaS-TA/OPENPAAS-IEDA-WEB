@@ -68,7 +68,7 @@ Diego
 			    			else	if ( record.deployStatus == 'deploying' )
 			    				return '<span class="btn btn-primary" style="width:60px">배포중</span>';
 							else
-			    				return 'N/A';
+			    				return '&ndash;';
 			    	   }
 					}
 				, {field: 'taskId', caption: 'TASK ID', size: '100px', hidden: true}
@@ -142,7 +142,7 @@ Diego
 			       				return '<a style="color:#333;" href="/common/downloadDeploymentFile/' + fileName +'" onclick="window.open(this.href); return false;">' + record.deploymentFile + '</a>';
 							}
 			    			else {
-			    				return 'N/A';
+			    				return '&ndash;';
 							}
 						}
 					}

@@ -87,7 +87,7 @@ $(function() {
 		    			else	if ( record.deployStatus == 'deleteing' )
 		    				return '<span class="btn btn-primary" style="width:60px">삭제중</span>';
 						else
-		    				return 'N/A';
+		    				return '&ndash;';
 		    	   }
 				}
 			, {field: 'deployLog', caption: '배포로그', size: '100px',
@@ -96,7 +96,7 @@ $(function() {
 		       				return '<span id="" class="btn btn-primary" style="width:60px" onClick="getDeployLogMsg( \'bootstrap\', \''+record.iaas+'\', \''+record.id+'\');">로그보기</span>';
 						}
 		    			else {
-		    				return 'N/A';
+		    				return '&ndash;';
 						}
 					}
 				}
@@ -127,7 +127,7 @@ $(function() {
 		       				return '<a style="color:#333;" href="/common/downloadDeploymentFile/' + fileName +'" onclick="window.open(this.href); return false;">' + record.deploymentFile + '</a>';
 						}
 		    			else {
-		    				return 'N/A';
+		    				return '&ndash;';
 						}
 					}
 				}

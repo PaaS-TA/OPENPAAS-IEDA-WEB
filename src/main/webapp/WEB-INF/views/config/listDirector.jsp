@@ -120,8 +120,8 @@ $(function() {
 	$("#addSetting").click(function(){
 		w2popup.open({
 			title 	: "<b>설치관리자 설정추가</b>",
-			width 	: 500,
-			height	: 320,
+			width 	: 550,
+			height	: 380,
 			modal	: true,
 			body	: $("#regPopupDiv").html(),
 			buttons : $("#regPopupBtnDiv").html()
@@ -356,8 +356,8 @@ function updateDirectorConfigPopup(record) {
 			
  			w2popup.open({
 				title 	: "<b>설치관리자 정보수정</b>",
-				width 	: 500,
-				height	: 320,
+				width 	: 550,
+				height	: 380,
 				modal	: true,
 				body	: $("#regPopupDiv").html(),
 				buttons : $("#updatePopupBtnDiv").html(),
@@ -476,7 +476,7 @@ function lock (msg) {
 	<form id="settingForm" action="POST" style="padding:5px 0 5px 0;margin:0;">
 		<div class="panel panel-info" >	
 			<div class="panel-heading"><b>설치관리자 정보</b></div>
-			<div class="panel-body" style="padding:5px 5% 10px 5%;">
+			<div class="panel-body" style="padding:5px 5% 10px 5%;height:210px;">
 				<div class="w2ui-field">
 					<label style="width:30%;text-align: left;padding-left: 20px;">디렉터 IP</label>
 					<div style="width: 70%;">

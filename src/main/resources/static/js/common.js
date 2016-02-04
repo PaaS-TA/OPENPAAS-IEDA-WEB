@@ -180,7 +180,6 @@ function popupValidation(){
 					else if( inputType == 'file'){
 						console("keyPathFilekeyPathFile");
 						if($(this).attr('name') == "keyPathFile"){
-							console("PPPPPPPPPPPPPPPPPPPP");
 							if($.inArray($(this).val().split('.').pop().toLowerCase(), ['pem']) == -1) {
 								console("YYYYYYYY");
 								emptyFieldLabels.push("Empty Key File");
