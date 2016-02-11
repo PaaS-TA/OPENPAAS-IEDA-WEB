@@ -604,6 +604,7 @@ Diego
 			}
 		}
 		else{
+			w2popup.clear();
 			defaultPopup();
 		}
 	}
@@ -661,6 +662,7 @@ Diego
 					contentType :"application/json",
 					data :JSON.stringify(diegoInfo),
 					success :function(data, status) {
+						w2popup.clear();
 						etcdPopup();
 					},
 					error :function(e, status) {
@@ -670,6 +672,7 @@ Diego
 			}
 		}
 		else{
+			w2popup.clear();
 			cfPopup();
 		}
 	}
@@ -724,6 +727,7 @@ Diego
 					contentType :"application/json",
 					data :JSON.stringify(etcdInfo),
 					success :function(data, status) {
+						w2popup.clear();
 						if(iaas.toUpperCase() == "AWS"){
 							awsNetworkPopup();
 						}
@@ -738,6 +742,7 @@ Diego
 			}
 		}
 		else{
+			w2popup.clear();
 			diegoPopup();
 		}
 	}
@@ -798,6 +803,7 @@ Diego
 					async :true,
 					data :JSON.stringify(networkInfo),
 					success :function(data, status) {
+						w2popup.clear();
 						resourcePopup();
 					},
 					error :function(e, status) {
@@ -806,6 +812,7 @@ Diego
 				});
 			}
 		} else if (type == 'before') {
+			w2popup.clear();
 			etcdPopup();
 		}
 	}
@@ -856,6 +863,7 @@ Diego
 					data 		:JSON.stringify(resourceInfo),
 					success 	:function(data, status) {
 						deploymentFile = data.deploymentFile;
+						w2popup.clear();
 						deployPopup();
 					},
 					error :function(e, status) {
@@ -864,10 +872,14 @@ Diego
 				});
 			}
 		} else if (type == 'before') {
-			if( iaas.toUpperCase() == "AWS") 
+			if( iaas.toUpperCase() == "AWS"){
+				w2popup.clear();
 				awsNetworkPopup();
-			else if( iaas.toUpperCase() == "OPENSTACK")
+			}
+			else if( iaas.toUpperCase() == "OPENSTACK"){
+				w2popup.clear();
 				openstackNetworkPopup();
+			}
 		}
 	}
 	/********************************* AWS END ********************************************/
@@ -1018,6 +1030,7 @@ Diego
 					async :true,
 					data :JSON.stringify(networkInfo),
 					success :function(data, status) {
+						w2popup.clear();
 						resourcePopup();
 					},
 					error :function(e, status) {
@@ -1026,6 +1039,7 @@ Diego
 				});
 			}
 		} else if (type == 'before') {
+			w2popup.clear();
 			etcdPopup();
 		}
 	}

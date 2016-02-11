@@ -647,9 +647,11 @@ function keyPathFileUpload(iaas){
 		data : formData,  
 		success : function(data, status) {
 			if( iaas.toUpperCase() == "AWS"){
+				w2popup.clear();
 				awsDefaultPopup();
 			}
 			else if(iaas.toUpperCase() == "OPENSTACK") {
+				w2popup.clear();
 				openstackDefaultInfoPop();
 			}
 		},
@@ -769,6 +771,7 @@ function saveAwsDefaultInfo(type){
 				async : true,
 				data : JSON.stringify(defaultInfo), 
 				success : function(data, status) {
+					w2popup.clear();
 					awsNetworkPopup();
 				},
 				error : function( e, status ) {
@@ -778,6 +781,7 @@ function saveAwsDefaultInfo(type){
 		}
 	}
 	else if(type == 'before'){
+		w2popup.clear();
 		awsPopup();
 	}
 }
@@ -821,6 +825,7 @@ function saveAwsNetworkInfo(type){
 	}
 	
 	if(type == 'before'){
+		w2popup.clear();
 		awsDefaultPopup();
 		return;
 	}
@@ -833,7 +838,8 @@ function saveAwsNetworkInfo(type){
 				async : true,
 				data : JSON.stringify(networkInfo), 
 				success : function(data, status) {
-					 awsResourcePopup();
+					w2popup.clear();
+					awsResourcePopup();
 				},
 				error : function( e, status ) {
 					w2alert("네트워크 설정 등록에 실패 하였습니다.", "BOOTSTRAP 설치");
@@ -896,6 +902,7 @@ function saveResourceInfo(type){
 	}
 	
 	if( type == 'before') {
+		w2popup.clear();
 		awsNetworkPopup();
 		return;
 	}else {
@@ -908,9 +915,10 @@ function saveResourceInfo(type){
 				async : true,
 				data : JSON.stringify(resourceInfo), 
 				success : function(data, status) {
-					if( data){
+					if( data ){
 						deployFileName = data.deploymentFile;	
 					}
+					w2popup.clear();
 					deployPopup();				
 				},
 				error : function( e, status ) {
@@ -972,8 +980,14 @@ function confirmDeploy(type){
 		});
 	}
 	else{
-		 if( iaas=="AWS" ) awsResourcePopup();
-		 else osResourceInfoPopup();
+		 if( iaas=="AWS" ){
+			 w2popup.clear();
+			 awsResourcePopup();
+		 }
+		 else{
+			 w2popup.clear();
+			 osResourceInfoPopup();
+		 }
 	}
 }
 
@@ -1191,6 +1205,7 @@ function saveOpenstackDefaultInfo(type){
 	}
 	
 	if(type == 'before'){
+		w2popup.clear();
 		openstackPopup();
 		return;
 	}
@@ -1204,6 +1219,7 @@ function saveOpenstackDefaultInfo(type){
 				async : true,
 				data : JSON.stringify(osBoshInfo),
 				success : function(data, status) {
+					w2popup.clear();
 					openstackNetworkInfoPopup();					
 				},
 				error : function( e, status ) {
@@ -1263,6 +1279,7 @@ function saveOpenstackNetworkInfo(type){
 				async : true,
 				data : JSON.stringify(networkInfo),
 				success : function(data, status) {
+					w2popup.clear();
 					osResourceInfoPopup();
 				},
 				error : function( e, status ) {
@@ -1297,6 +1314,7 @@ function saveOpenstackResourceInfo(type){
 	}
 	
 	if( type == "before"){
+		w2popup.clear();
 		openstackNetworkInfoPopup();
 		return;
 	}
@@ -1310,6 +1328,7 @@ function saveOpenstackResourceInfo(type){
 				data : JSON.stringify(resourceInfo),
 				success : function(data, status) {
 					deployFileName = data.deploymentFile;
+					w2popup.clear();
 					deployPopup();
 				},
 				error : function( e, status ) {

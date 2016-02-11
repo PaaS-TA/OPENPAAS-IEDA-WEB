@@ -488,6 +488,7 @@
 				success : function(data, status) {
 					var content = data.content
 					cfId = content.id;
+					w2popup.clear();
 					uaaInfoPopup();
 				},
 				error : function(e, status) {
@@ -540,6 +541,7 @@
 					contentType : "application/json",
 					data : JSON.stringify(uaaInfo),
 					success : function(data, status) {
+						w2popup.clear();
 						consulInfoPopup();
 					},
 					error : function(e, status) {
@@ -549,6 +551,7 @@
 			}
 		}
 		else{
+			w2popup.clear();
 			defaultInfoPopup();
 		}
 	}
@@ -602,8 +605,14 @@
 					contentType : "application/json",
 					data : JSON.stringify(consulInfo),
 					success : function(data, status) {
-						if( iaas.toUpperCase() == "AWS" ) awsNetworkPopup();
-						else if( iaas.toUpperCase() == "OPENSTACK" ) openstackNetworkPopup();
+						if( iaas.toUpperCase() == "AWS" ){
+							w2popup.clear();
+							awsNetworkPopup();
+						}
+						else if( iaas.toUpperCase() == "OPENSTACK" ) {
+							w2popup.clear();
+							openstackNetworkPopup();
+						}
 					},
 					error : function(e, status) {
 						w2alert("AWS CONSUL 등록에 실패 하였습니다.", "CF 설치");
@@ -612,6 +621,7 @@
 			}
 		}
 		else{
+			w2popup.clear();
 			uaaInfoPopup();
 		}
 		
@@ -672,6 +682,7 @@
 					async : true,
 					data : JSON.stringify(networkInfo),
 					success : function(data, status) {
+						w2popup.clear();
 						resourceInfoPopup();
 					},
 					error : function(e, status) {
@@ -679,7 +690,9 @@
 					}
 				});
 			}
-		} else if (type == 'before') {
+		}
+		else if (type == 'before') {
+			w2popup.clear();
 			consulInfoPopup();
 		}
 	}
@@ -731,6 +744,7 @@
 					data : JSON.stringify(resourceInfo),
 					success : function(data, status) {
 						deploymentFile = data.content.deploymentFile;
+						w2popup.clear();
 						deployPopup();
 					},
 					error : function(e, status) {
@@ -739,8 +753,14 @@
 				});
 			}
 		} else if (type == 'before') {
-			if( iaas.toUpperCase() == "AWS" ) awsNetworkPopup();
-			else if( iaas.toUpperCase() == "OPENSTACK" ) openstackNetworkPopup();
+			if( iaas.toUpperCase() == "AWS" ){
+				w2popup.clear();
+				awsNetworkPopup();
+			}
+			else if( iaas.toUpperCase() == "OPENSTACK" ){
+				w2popup.clear();
+				openstackNetworkPopup();
+			}
 		}
 	}
 	/********************************* AWS END ********************************************/
@@ -866,6 +886,7 @@
 					async : true,
 					data : JSON.stringify(networkInfo),
 					success : function(data, status) {
+						w2popup.clear();
 						resourceInfoPopup();
 					},
 					error : function(e, status) {
@@ -874,6 +895,7 @@
 				});
 			}
 		} else if (type == 'before') {
+			w2popup.clear();
 			consulPopup();
 		}
 	}
@@ -925,6 +947,7 @@
 					success : function(data, status) {
 						console.log("++++ :" + data.content.deploymentFile);
 						deploymentFile = data.content.deploymentFile;
+						w2popup.clear();
 						deployPopup();
 					},
 					error : function(e, status) {
@@ -933,6 +956,7 @@
 				});
 			}
 		} else if (type == 'before') {
+			w2popup.clear();
 			openstackNetworkPopup();
 		}
 	}
@@ -944,9 +968,11 @@
 		//Deploy 단에서 저장할 데이터가 있는지 확인 필요
 		//Confirm 설치하시겠습니까?
 		if (type == 'before' && iaas == "AWS") {
+			w2popup.clear();
 			resourceInfoPopup();
 			return;
 		} else if (type == 'before' && iaas == "OPENSTACK") {
+			w2popup.clear();
 			openstackResourcePopup();
 			return;
 		}
