@@ -45,46 +45,4 @@ public class IEDACommonCodeService {
 		
 		return list;
 	}
-	
-	
-	/*	public IEDACommonCode createCode(IEDACommonCodeDto.Create dto) {
-	
-	// 유일한 코드키가 아닌 경우 
-	String codename = dto.getCodeName();
-	if (repository.findByCodeKey(dto.getCodeKey()) != null ) {
-		log.debug("code duplicated exception {}", codename);
-		throw new IEDACommonException("duplicated.code.exception",
-				"코드키 [" + dto.getCodeKey() + "]가 이미 등록되어 있습니다.");
-	}
-	
-	// TODO: 코드 추가 시 정렬 순서 로직 추가
-	IEDACommonCode commonCode = new IEDACommonCode();
-	commonCode.setCodeKey(dto.getCodeKey());
-	commonCode.setCodeName(dto.getCodeName());
-	commonCode.setCodeValue(dto.getCodeValue());
-	commonCode.setCodeDescription(dto.getCodeDescription());
-	commonCode.setParentCodeKey(dto.getParentCodeKey());
-	
-	IEDACommonCode commonCode1 = modelMapper.map(dto, IEDACommonCode.class);
-			
-	return repository.save(commonCode1);
-}*/
-
-/*	public IEDACommonCode updateCode(String codeKey, IEDACommonCodeDto.Update updateDto ) {
-	
-	IEDACommonCode commonCode = repository.findByCodeKey(codeKey);
-	
-	commonCode.setCodeName(updateDto.getCodeName());
-	commonCode.setCodeValue(updateDto.getCodeValue());
-	commonCode.setCodeDescription(updateDto.getCodeDescription());
-	commonCode.setSortOrder(updateDto.getSortOrder());
-	commonCode.setParentCodeKey(updateDto.getParentCodeKey());
-	
-	return repository.save(commonCode); 
-}*/
-	
-/*	public void deleteCode(String codeKey) {
-		repository.delete(getCode(codeKey));
-	}*/
-
 }

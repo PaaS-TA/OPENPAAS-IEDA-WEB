@@ -52,6 +52,6 @@ public class StemcellManagementConfig {
 	@Transient
 	private String isDose;
 	
-	@Column(name="DOWNLOAD_STATUS")  // NULL, DOWNLOADING, DOWNLOADED
+	@Column(name="DOWNLOAD_STATUS")
 	private String downloadStatus; 
 }

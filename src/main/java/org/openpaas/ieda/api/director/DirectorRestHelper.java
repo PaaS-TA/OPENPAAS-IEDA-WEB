@@ -45,13 +45,11 @@ public class DirectorRestHelper {
 		return methodBase;
 	}
 
-	// info
 	public static String getInfoURI(String host, int port) {
 		return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).path("info").build().toUri()
 				.toString();
 	}
 
-	// stemcell
 	public static String getStemcellsURI(String host, int port) {
 		return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).path("stemcells").build()
 				.toUri().toString();
@@ -68,7 +66,6 @@ public class DirectorRestHelper {
 				.expand(stemcellName, stemcellVersion).toUri().toString();
 	}
 
-	// release
 	public static String getReleaseListURI(String host, int port) {
 		return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).path("releases").build().toUri()
 				.toString();
@@ -84,12 +81,9 @@ public class DirectorRestHelper {
 				.queryParam("force", "true").queryParam("version", releaseVersion).build().expand(releaseName).toUri().toString();
 	}
 
-	// deploy
 	public static String getDeployURI(String host, int port) {
 		return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).path("deployments")
 				.build().toUri().toString();
-/*		return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).path("deployments")
-				.queryParam("recreate", "true").build().toUri().toString();*/
 	}
 
 	public static String getDeleteDeploymentURI(String host, int port, String deploymentName) {
@@ -145,23 +139,21 @@ public class DirectorRestHelper {
 			String lastStage = null;
 			int offset = 0;
 			while (true) {
-				// Task 상태 조회
 				GetMethod getTaskStausMethod = new GetMethod(DirectorRestHelper
 						.getTaskStatusURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), taskId));
 				getTaskStausMethod = (GetMethod) DirectorRestHelper.setAuthorization(defaultDirector.getUserId(),
 						defaultDirector.getUserPassword(), (HttpMethodBase) getTaskStausMethod);
+				
 				int statusCode = client.executeMethod(getTaskStausMethod);
-				log.debug("#### status code(" + messageEndpoint + ") : " + statusCode);
+				
 				if (HttpStatus.valueOf(statusCode) != HttpStatus.OK) {
 					sendTaskOutput(messageTemplate, messageEndpoint, "error",
 							Arrays.asList("Task " + taskId + " : 상태 조회 중 오류가 발생하였습니다."));
 					break;
 				}
 
-				// Convert Json to TaskInfo Object
 				TaskInfo taskInfo = mapper.readValue(getTaskStausMethod.getResponseBodyAsString(), TaskInfo.class);
 
-				// Task Output 조회
 				GetMethod getTaskOutputMethod = new GetMethod(DirectorRestHelper.getTaskOutputURI(
 						defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), taskId, logType));
 				getTaskOutputMethod = (GetMethod) DirectorRestHelper.setAuthorization(defaultDirector.getUserId(),
@@ -187,12 +179,12 @@ public class DirectorRestHelper {
 						Thread.sleep(THREAD_SLEEP_TIME);
 						continue;
 					}
+					
 					if ( !StringUtils.isEmpty(contentRange) ) {
 						String[] splited = contentRange.getValue().split("/");
 						offset = Integer.parseInt(splited[1]);
 					}
 
-					// fetch debug Log
 					if ( logType.equals("debug") ) {
 						String[] outputs = getTaskOutputMethod.getResponseBodyAsString().split("\n");
 						
@@ -201,15 +193,12 @@ public class DirectorRestHelper {
 							sendTaskOutput(messageTemplate, messageEndpoint, "started", Arrays.asList(output));
 						}
 					}
-					// fetch event log
 					else {
 						String outputs = getTaskOutputMethod.getResponseBodyAsString();
 	
-						// Convert output to JSON Format
 						outputs = outputs.substring(0, outputs.length() - 1).replace("\n", ",");
 						outputs = "[" + outputs + "]";
 	
-						// Convert Json to TaskOutput Object
 						List<TaskOutput> taskOutputList = mapper.readValue(outputs, new TypeReference<List<TaskOutput>>() {
 						});
 	
@@ -242,7 +231,6 @@ public class DirectorRestHelper {
 											"  Error Code : " + error.get("code") + ", Message :" + error.get("message"));
 								}
 							}
-	
 							lastStage = output.getStage();
 						}
 	
@@ -250,18 +238,17 @@ public class DirectorRestHelper {
 					}
 				}
 
-				log.debug("### task info : " + taskInfo.getState());
-
-				// Task 완료 여부 확인
 				if (taskInfo.getState().equalsIgnoreCase("done")) {
 					sendTaskOutput(messageTemplate, messageEndpoint, "done", Arrays.asList("", "Task " + taskId + " done"));
 					status = "done";
 					break;
-				} else if (taskInfo.getState().equalsIgnoreCase("error")) {
+				} 
+				else if (taskInfo.getState().equalsIgnoreCase("error")) {
 					sendTaskOutput(messageTemplate, messageEndpoint, "error", Arrays.asList("", "An error occurred while executing the task " + taskId));
 					status = "error";
 					break;
-				} else if (taskInfo.getState().equalsIgnoreCase("cancelled")) {
+				} 
+				else if (taskInfo.getState().equalsIgnoreCase("cancelled")) {
 					sendTaskOutput(messageTemplate, messageEndpoint, "cancelled", Arrays.asList("", "Canceled Task " + taskId));
 					status = "cancelled";
 					break;
@@ -269,7 +256,8 @@ public class DirectorRestHelper {
 
 				Thread.sleep(THREAD_SLEEP_TIME);
 			}
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 			e.printStackTrace();
 			sendTaskOutput(messageTemplate, messageEndpoint, "error",
 					Arrays.asList("", "An exception occurred while executing the task " + taskId));
@@ -292,7 +280,6 @@ public class DirectorRestHelper {
 			String lastStage = null;
 			int offset = 0;
 			while (true) {
-				// Task 상태 조회
 				GetMethod getTaskStausMethod = new GetMethod(DirectorRestHelper
 						.getTaskStatusURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), taskId));
 				getTaskStausMethod = (GetMethod) DirectorRestHelper.setAuthorization(defaultDirector.getUserId(),
@@ -305,10 +292,8 @@ public class DirectorRestHelper {
 					break;
 				}
 
-				// Convert Json to TaskInfo Object
 				TaskInfo taskInfo = mapper.readValue(getTaskStausMethod.getResponseBodyAsString(), TaskInfo.class);
 
-				// Task Output 조회
 				GetMethod getTaskOutputMethod = new GetMethod(DirectorRestHelper.getTaskOutputURI(
 						defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), taskId, logType));
 				getTaskOutputMethod = (GetMethod) DirectorRestHelper.setAuthorization(defaultDirector.getUserId(),
@@ -339,7 +324,6 @@ public class DirectorRestHelper {
 						offset = Integer.parseInt(splited[1]);
 					}
 
-					// fetch debug Log
 					if ( logType.equals("debug") ) {
 						String[] outputs = getTaskOutputMethod.getResponseBodyAsString().split("\n");
 						
@@ -348,15 +332,12 @@ public class DirectorRestHelper {
 							sendTaskOutputWithTag(messageTemplate, messageEndpoint, "started", tag, Arrays.asList(output));
 						}
 					}
-					// fetch event log
 					else {
 						String outputs = getTaskOutputMethod.getResponseBodyAsString();
 	
-						// Convert output to JSON Format
 						outputs = outputs.substring(0, outputs.length() - 1).replace("\n", ",");
 						outputs = "[" + outputs + "]";
 	
-						// Convert Json to TaskOutput Object
 						List<TaskOutput> taskOutputList = mapper.readValue(outputs, new TypeReference<List<TaskOutput>>() {
 						});
 	
@@ -397,19 +378,19 @@ public class DirectorRestHelper {
 					}
 				}
 
-				log.debug("### task info : " + taskInfo.getState());
-				// Task 완료 여부 확인
 				if (taskInfo.getState().equalsIgnoreCase("done")) {
 					sendTaskOutputWithTag(messageTemplate, messageEndpoint, "done", tag,
 							Arrays.asList("", "Task " + taskId + " done"));
 					status = "done";
 					break;
-				} else if (taskInfo.getState().equalsIgnoreCase("error")) {
+				}
+				else if (taskInfo.getState().equalsIgnoreCase("error")) {
 					sendTaskOutputWithTag(messageTemplate, messageEndpoint, "error", tag, 
 							Arrays.asList("", "An error occurred while executing the task " + taskId));
 					status = "error";
 					break;
-				} else if (taskInfo.getState().equalsIgnoreCase("cancelled")) {
+				}
+				else if (taskInfo.getState().equalsIgnoreCase("cancelled")) {
 					sendTaskOutputWithTag(messageTemplate, messageEndpoint, "cancelled", tag, 
 							Arrays.asList("", "Canceled Task " + taskId));
 					status = "cancelled";
@@ -418,7 +399,8 @@ public class DirectorRestHelper {
 
 				Thread.sleep(THREAD_SLEEP_TIME);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			sendTaskOutputWithTag(messageTemplate, messageEndpoint, "error", tag,
 					Arrays.asList("", "An exception occurred while executing the task " + taskId));

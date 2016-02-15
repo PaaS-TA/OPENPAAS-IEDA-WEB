@@ -14,6 +14,7 @@ import lombok.Data;
 @Entity(name="IEDA_DIEGO_AWS")
 @Data
 public class IEDADiegoAwsConfig {
+	
 	@Id @GeneratedValue
 	private Integer id;
 	

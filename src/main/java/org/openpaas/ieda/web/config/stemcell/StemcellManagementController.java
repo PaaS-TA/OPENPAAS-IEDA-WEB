@@ -40,11 +40,6 @@ public class StemcellManagementController extends BaseController {
 		return "/config/stemcellManagement";
 	}
 	
-	/**
-	 * 스템셀 목록조회
-	 * @param requestMap
-	 * @return
-	 */
 	@RequestMapping(value="/publicStemcells", method=RequestMethod.GET)
 	public ResponseEntity getPublicStemcells(@RequestParam  HashMap<String, String> requestMap) {
 		
@@ -59,11 +54,6 @@ public class StemcellManagementController extends BaseController {
 		return new ResponseEntity<>(d, HttpStatus.OK);
 	}
 	
-	/**
-	 * 스템셀 다운로드	
-	 * @param dto
-	 * @return
-	 */
 	@MessageMapping("/stemcellDownloading")
 	@SendTo("/stemcell/downloadStemcell")
 	public ResponseEntity doDownloadStemcell(@RequestBody @Valid StemcellManagementParam.Download dto) {
@@ -73,17 +63,14 @@ public class StemcellManagementController extends BaseController {
 		log.debug("doDownload fileSize : " + new BigDecimal(dto.getFileSize()));
 		
 		stemcellDownloadService.doDownload(dto);
-		//stemcellDownloadService.stemcellDownloading(dto);
 		
+		// 오류가 발생한 경우라도 레코드는 삭제하자.
+/*		if ( aws != null ) awsRepository.delete(aws);
+		if ( openstack != null ) openstackRepository.delete(openstack);*/
+
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	/**
-	 * 스템셀 삭제
-	 * @param requestMap
-	 * @param result
-	 * @return
-	 */
 	@RequestMapping(value="/deletePublicStemcell", method=RequestMethod.DELETE)
 	public ResponseEntity doDeleteStemcell(@RequestBody HashMap<String, String> requestMap, BindingResult result) {
 		if ( result.hasErrors() ) {

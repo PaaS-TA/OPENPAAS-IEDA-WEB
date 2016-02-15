@@ -59,7 +59,6 @@ public class TaskService {
 	}
 
 	public void getDownloadDebugLogFile(String taskId, HttpServletRequest request, HttpServletResponse response) {
-		ObjectMapper mapper = new ObjectMapper();
 		String content = "";
 		String fileName = "";
 		int statusCode = 0;
@@ -69,7 +68,6 @@ public class TaskService {
 			
 			HttpClient httpClient = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
 			
-			// Task Output 조회
 			GetMethod getTaskOutputMethod = new GetMethod(DirectorRestHelper.getTaskOutputURI(
 					defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), taskId, "debug"));
 			getTaskOutputMethod = (GetMethod) DirectorRestHelper.setAuthorization(defaultDirector.getUserId(),

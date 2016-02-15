@@ -1,6 +1,3 @@
-/**
- * @Author Cheolho Moon
- */
 package org.openpaas.ieda.web.config.setting;
 
 import java.util.Date;
@@ -12,11 +9,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import lombok.Data;
-
-/**
- * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
- *
- */
 
 @Entity(name="IEDA_DIRECTOR_CONFIG")
 @Data

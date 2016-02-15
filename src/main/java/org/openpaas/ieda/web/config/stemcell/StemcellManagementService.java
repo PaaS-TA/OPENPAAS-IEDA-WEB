@@ -22,10 +22,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.modelmapper.ModelMapper;
 import org.openpaas.ieda.common.IEDACommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
-import org.openpaas.ieda.web.config.setting.IEDADirectorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -44,13 +42,7 @@ public class StemcellManagementService {
 	final private String PUBLIC_STEMCELLS_BASE_URL = "https://bosh-jenkins-artifacts.s3.amazonaws.com";
 
 	@Autowired
-	private IEDADirectorConfigService directorConfigService;
-	
-	@Autowired
 	private IEDAStemcellManagementRepository repository;
-
-	@Autowired
-	private ModelMapper modelMapper;
 
 	private String key;
 	
@@ -99,8 +91,6 @@ public class StemcellManagementService {
 			String isTruncated = "true";
 			publicStemcells = new ArrayList<StemcellManagementConfig>();
 
-			int idx = 1;
-
 			DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
 			DocumentBuilder b = f.newDocumentBuilder();
 
@@ -134,17 +124,10 @@ public class StemcellManagementService {
 		return publicStemcells;
 	}
 
-	/**
-	 * # Public Stemcell 목록 동기화
-	 * . IEDA_PUBLIC_STEMCELL 전체 데이터 삭제 
-	 * . Make PUBLIC STEMCELL LIST
-	 * . IEDA_PUBLIC_STEMCELL 저장
-	 */
 	public void syncPublicStemcell() {
 		
 		repository.deleteAll();
 		
-		// AWS S3로부터 스템셀 목록 조회
 		List<StemcellManagementConfig> publicStemcells = getAllPublicStemcell();
 
 		for (StemcellManagementConfig stemcell : publicStemcells) {
@@ -172,17 +155,14 @@ public class StemcellManagementService {
 			if (splited.length >= 6)
 				stemcellVersion = splited[splited.length - 5];
 
-			// Stemcell 이름과 버전
 			stemcell.setStemcellFileName(stemcellName);
 			stemcell.setStemcellVersion(stemcellVersion);
 
-			// OS 구분
 			if (replaceStemcellName.contains("ubuntu"))
 				stemcell.setOs("Ubuntu");
 			if (replaceStemcellName.contains("centos"))
 				stemcell.setOs("CentOS");
 
-			// OS 버전 구분
 			if (replaceStemcellName.contains("centos7"))
 				stemcell.setOsVersion("7.x");
 			if (!replaceStemcellName.contains("centos7") && replaceStemcellName.contains("centos"))
@@ -193,7 +173,6 @@ public class StemcellManagementService {
 			if (replaceStemcellName.contains("lucid"))
 				stemcell.setOsVersion("Lucid");
 
-			// IaaS 구분
 			if (replaceStemcellName.contains("aws"))
 				stemcell.setIaas("AWS");
 			if (replaceStemcellName.contains("openstack"))
@@ -201,15 +180,8 @@ public class StemcellManagementService {
 			if (replaceStemcellName.contains("vsphere"))
 				stemcell.setIaas("vSphere");
 		}
-
 		repository.save(publicStemcells);
-		
-		
 
-/*		return publicStemcells.stream().filter(t -> t.getOs() != null && t.getOs().length() > 0)
-				.filter(t -> t.getOsVersion() != null && t.getOsVersion().length() > 0)
-				.filter(t -> t.getIaas() != null && t.getIaas().length() > 0).sorted(byLastModified)
-				.collect(Collectors.toList());*/
 	}
 	
 	public List<StemcellManagementConfig> getStemcellList(String os, String osVersion, String iaas) {
@@ -219,22 +191,18 @@ public class StemcellManagementService {
 		
 		List<StemcellManagementConfig> stemcellList = repository.findByOsAndOsVersionAndIaasAllIgnoreCaseOrderByOsVersionDesc(os, osVersion, iaas);
 		
-		// 다운로드 받은 스템셀
 		List<String> localStemcells = getLocalStemcellList();
 		List<Map<String, String>> localStemcellFileInfos = getLocalStemcellFileList();
 
-		// 로컬에 스템셀 파일이 존재하는 여부 표시
 		for (StemcellManagementConfig stemcell : stemcellList) {
 			stemcell.setIsExisted((existStemcells(localStemcells, (t) -> t.equals(stemcell.getStemcellFileName()))) ? "Y" : "N");
 			stemcell.setIsDose((doseStemcells(localStemcellFileInfos, (t) -> t.equals(stemcell.getStemcellFileName()), (x) -> x.equals(stemcell.getSize()) )) ? "Y" : "N");
 		}
 		
-		// 스템셀 버전 역순으로 정렬
 		Comparator<StemcellManagementConfig> byStemcellVersion = Collections.reverseOrder(Comparator.comparing(StemcellManagementConfig::getStemcellVersion));
 		return stemcellList.stream().sorted(byStemcellVersion).collect(Collectors.toList());
 	}
 	
-	//  로컬(웹서버)내에 스템셀 파일 존재 여부 판단
 	public boolean existStemcells(List<String> localStemcells, Predicate<String> predicate) {
 		for ( String localStemcell : localStemcells) {
 			if ( predicate.test(localStemcell) ) {
@@ -254,8 +222,6 @@ public class StemcellManagementService {
 		return false;
 	}
 	
-
-	// 다운로드 스템셀
 	public List<String> doDownloadStemcell(String subLink, String stemcellFile, BigDecimal fileSize) {
 		log.debug("stemcell Dir     : " + LocalDirectoryConfiguration.getStemcellDir());
 		log.debug("Stemcell Name    : " + PUBLIC_STEMCELLS_BASE_URL + "/"  + stemcellFile);
@@ -307,64 +273,9 @@ public class StemcellManagementService {
 	        }
 	    }		
 
-/*		Runtime r = Runtime.getRuntime();
-
-		InputStream inputStream = null;
-		BufferedReader bufferedReader = null;
-		String command = "D:/ieda_workspace/stemcell/bosh_status.bat ";
-		command += iedaConfiguration.getStemcellDir() + " ";
-		command += stemcell;
-		
-		try {
-			Process process = r.exec(command);
-			process.getInputStream();
-			inputStream = process.getInputStream();
-			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-			String info = null;
-			while ((info = bufferedReader.readLine()) != null) {
-				//String ;
-				//if (info == null || info.equals("")) {
-//				if (info == null ) {
-//					break;
-//				}
-			}
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inputStream != null)
-					inputStream.close();
-			} catch (Exception e) {
-			}
-			try {
-				if (bufferedReader != null)
-					bufferedReader.close();
-			} catch (Exception e) {
-			}
-		}	
-*/
-		/*
-		 * try { // 디렉토리 변경 
-		 * PUBLIC_STEMCELLS_BASE_URL + "/" + stemcell);
-		 * 
-		 * // 스템셀 다운로드 //Runtime.getRuntime().exec(
-		 * "bosh download public stemcells"); } catch (IOException e) { // TODO
-		 * Auto-generated catch block e.printStackTrace(); }
-		 */
-
-		/*
-		 * 디렉토리 뷰어 File dir = new File(iedaConfiguration.getStemcellDir());
-		 * File[] files = dir.listFiles();
-		 * 
-		 * ArrayList filPaths = new ArrayList(); for (File file : files) {
-		 * filPaths.add(file.getAbsolutePath()); }
-		 */
 		return null;
 	}
 	
-	// 스템셀 삭제
 	public void doDeleteStemcell(String stemcellFile) {
 		final String stemcellToDelete = LocalDirectoryConfiguration.getStemcellDir() + System.getProperty("file.separator")  + stemcellFile;
 		try {

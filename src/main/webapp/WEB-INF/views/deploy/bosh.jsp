@@ -1428,7 +1428,7 @@ $( window ).resize(function() {
 						<div class="w2ui-field">
 							<label style="text-align: left; width:40%; font-size: 11px;">서브넷 ID</label>
 							<div>
-								<input name="subnetId" type="text"  style="float:left;width:60%;"  required placeholder="서브넷 ID를 입력하세요."/>
+								<input name="subnetId" type="text"  style="float:left;width:60%;"  required placeholder="예) subnet-XXXXXX" />
 							</div>
 						</div>
 						<div class="w2ui-field">

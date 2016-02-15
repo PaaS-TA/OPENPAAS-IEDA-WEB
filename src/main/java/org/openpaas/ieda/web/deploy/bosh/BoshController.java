@@ -9,7 +9,6 @@ import javax.validation.Valid;
 
 import org.openpaas.ieda.api.ReleaseInfo;
 import org.openpaas.ieda.web.common.BaseController;
-import org.openpaas.ieda.web.information.deploy.DeploymentService;
 import org.openpaas.ieda.web.information.release.ReleaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,12 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 public class BoshController extends BaseController {
 	
 	@Autowired
-	private IEDABoshAwsRepository awsRepository;
-
-	@Autowired
-	private IEDABoshOpenstackRepository openstackRepository;
-
-	@Autowired
 	private IEDABoshAwsService awsService;
 	
 	@Autowired
@@ -48,9 +41,6 @@ public class BoshController extends BaseController {
 	
 	@Autowired
 	private BoshDeleteDeployAsyncService boshDeleteDeployAsyncService;
-	
-	@Autowired
-	private DeploymentService deploymentService;
 	
 	@Autowired
 	private ReleaseService releaseService;
@@ -155,15 +145,13 @@ public class BoshController extends BaseController {
 	@RequestMapping(value="/bosh/saveOpenstackResourceInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveOsResourceInfo(@RequestBody @Valid BoshParam.OsResource dto){
 		
-		//IEDABoshOpenstackConfig config = openstackService.saveOsResourceInfo(dto);
-		
 		HttpStatus status = HttpStatus.OK;
 		Map<String, Object> result = new HashMap<>();
 		result.put("content", openstackService.saveOsResourceInfo(dto));			
 			
 		if( result.get("content") == null) status = HttpStatus.NO_CONTENT;
 		
-		return new ResponseEntity<>(result, HttpStatus.OK);
+		return new ResponseEntity<>(result, status);
 	}
 	
 	@MessageMapping("/boshInstall")
@@ -171,7 +159,7 @@ public class BoshController extends BaseController {
 	public ResponseEntity doBoshInstall(@RequestBody @Valid BoshParam.Install dto){
 		
 		boshDeployAsyncService.deployAsync(dto);
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@RequestMapping( value="/bosh/delete", method=RequestMethod.DELETE)
@@ -185,35 +173,6 @@ public class BoshController extends BaseController {
 	public ResponseEntity deleteBosh(@RequestBody @Valid BoshParam.Delete dto){
 		
 		boshDeleteDeployAsyncService.deleteDeployAsync(dto);
-		
-/*		IEDABoshAwsConfig aws = null;
-		IEDABoshOpenstackConfig openstack = null;
-		String deploymentName = "";
-		
-		if( "AWS".equals(dto.getIaas())) { 
-			aws = awsRepository.findOne(Integer.parseInt(dto.getId()));
-			if ( aws != null ) deploymentName = aws.getDeploymentName();
-
-		} else {
-			openstack = openstackRepository.findOne(Integer.parseInt(dto.getId()));
-			if ( openstack != null ) deploymentName = openstack.getDeploymentName();
-		}
-		
-		boolean bDeployed = false;
-		List<DeploymentInfo> deploymentList = deploymentService.listDeployment();
-		if ( deploymentList != null && deploymentList.size() > 0 ) {
-			for ( DeploymentInfo deploymentInfo : deploymentList ) {
-				if ( deploymentInfo.getName().equals(deploymentName) ) {
-					bDeployed = true;
-					break;
-				}
-			}
-		}
-		
-		if ( bDeployed )
-			boshDeleteDeployAsyncService.deleteDeployAsync(dto);
-		else
-			boshService.deleteBoshInfoRecord(dto);*/
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -238,7 +197,7 @@ public class BoshController extends BaseController {
 		} else
 			result.put("total", 0);
 		
-		return new ResponseEntity( result, HttpStatus.OK);
+		return new ResponseEntity<>( result, HttpStatus.OK);
 	}
 	
 }

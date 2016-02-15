@@ -45,14 +45,11 @@ public class IEDACommonCodeController {
 	}
 	
 	@RequestMapping(value="/codes/{codeIdx}", method=RequestMethod.GET)
-	//@ResponseStatus(HttpStatus.OK)
-	//public IEDACommonCodeDto.Response getCode(@PathVariable int codeIdx) {
 	public ResponseEntity getCode(@PathVariable int codeIdx) {
 		
 		IEDACommonCode content = service.getCode(codeIdx);
 
-		return new ResponseEntity(content, HttpStatus.OK);
-		//modelMapper.map(commonCode, IEDACommonCodeDto.Response.class);
+		return new ResponseEntity<>(content, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/codes/child/{parentCodeIdx}", method=RequestMethod.GET)
@@ -63,44 +60,5 @@ public class IEDACommonCodeController {
 		return new ResponseEntity<>(contents, HttpStatus.OK);
 	}
 	 
-
-	/*	@RequestMapping(value="/codes", method=RequestMethod.POST)
-	public ResponseEntity createCode(@RequestBody @Valid IEDACommonCodeDto.Create commonCode,
-									BindingResult result) {
-		if (result.hasFieldErrors()) {
-			ErrorResponse errorResponse = new ErrorResponse();
-			errorResponse.setCode("bad.request");
-			errorResponse.setMessage("잘못된 요청입니다.");
-			
-			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-		}
-		
-		IEDACommonCode newCommonCode = service.createCode(commonCode);
-		log.debug("==> Code Name : " + commonCode.getCodeName());
-		
-		return new ResponseEntity<>(modelMapper.map(newCommonCode, IEDACommonCodeDto.Response.class), HttpStatus.CREATED);
-	}*/	
-	
-/*	// 전체 업데이트(PUT) vs 부분 업데이트(PATCH) rest api best practice
-	@RequestMapping(value="/codes/{codeKey}", method=RequestMethod.PUT)
-	public ResponseEntity updateCode(@PathVariable String codeKey,
-										@RequestBody @Valid IEDACommonCodeDto.Update updateDto,
-										BindingResult result) {
-		if ( result.hasErrors() ) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
-		IEDACommonCode updatedCode = service.updateCode(codeKey, updateDto);
-		
-		return new ResponseEntity<>(modelMapper.map(updatedCode, IEDACommonCodeDto.Response.class), HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/codes/{codeKey}", method=RequestMethod.DELETE)
-	public ResponseEntity deleteCode(@PathVariable String codeKey) {
-		service.deleteCode(codeKey);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}*/
-
-
 }
 

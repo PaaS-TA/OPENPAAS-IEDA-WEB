@@ -1,6 +1,3 @@
-/**
- * @Author Cheolho Moon
- */
 package org.openpaas.ieda.web.dashboard;
 
 import java.util.HashMap;
@@ -23,10 +20,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
- *
- */
 @Slf4j
 @Controller
 public class DashboardController extends BaseController {
@@ -55,7 +48,7 @@ public class DashboardController extends BaseController {
 		} else
 			result.put("total", 0);
 		
-		return new ResponseEntity( result, HttpStatus.OK);
+		return new ResponseEntity<>( result, HttpStatus.OK);
 	}
 
 	@RequestMapping( value="/dashboard/releases", method =RequestMethod.GET)
@@ -69,7 +62,7 @@ public class DashboardController extends BaseController {
 		} else
 			result.put("total", 0);
 		
-		return new ResponseEntity( result, HttpStatus.OK);
+		return new ResponseEntity<>( result, HttpStatus.OK);
 	}
 
 	// 스템셀 목록조회
@@ -84,7 +77,7 @@ public class DashboardController extends BaseController {
 		} else
 			result.put("total", 0);
 		
-		return new ResponseEntity(result, HttpStatus.OK);
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
 }

@@ -1,6 +1,5 @@
 package org.openpaas.ieda.web.code;
 
-
 import lombok.Data;
 
 import org.hibernate.validator.constraints.NotBlank;

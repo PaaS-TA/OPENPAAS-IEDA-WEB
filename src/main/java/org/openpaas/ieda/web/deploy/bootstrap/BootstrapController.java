@@ -81,20 +81,20 @@ public class BootstrapController extends BaseController {
 	public ResponseEntity doBootstrapAwsSave(@RequestBody @Valid BootStrapDto.Aws dto){
 		IEDABootstrapAwsConfig config = awsService.saveAwsInfo(dto);
 		
-		return new ResponseEntity(config, HttpStatus.OK);
+		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/bootstrap/awsDefault", method=RequestMethod.PUT)
 	public ResponseEntity doBootstrapAwsDefaultSave(@RequestBody @Valid BootStrapDto.AwsDefault dto){
 		IEDABootstrapAwsConfig config = awsService.saveAwsDefaultInfo(dto);
 		
-		return new ResponseEntity(config, HttpStatus.OK);
+		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/bootstrap/awsNetwork", method=RequestMethod.PUT)
 	public ResponseEntity doBootstrapNetworkSave(@RequestBody @Valid  BootStrapDto.AwsNetwork dto){
 		awsService.saveAwsNetworkInfos(dto);
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/bootstrap/awsResource", method=RequestMethod.PUT)

@@ -56,10 +56,7 @@ public class IEDADirectorConfigService {
 		
 		List<IEDADirectorConfig> directorConfigList = directorConfigRepository.findAll();
 		
-		// 스템셀 버전 역순으로 정렬
 		Comparator<IEDADirectorConfig> byDefaultYN = Collections.reverseOrder(Comparator.comparing(IEDADirectorConfig::getDefaultYn));
-		//return stemcellList.stream().sorted(byStemcellVersion).collect(Collectors.toList());
-
 		
 		if ( directorConfigList.size() == 0 ) {
 			throw new IEDACommonException("nocontent.director.exception",
@@ -69,7 +66,6 @@ public class IEDADirectorConfigService {
 		return directorConfigList.stream().sorted(byDefaultYN).collect(Collectors.toList());
 	}
 	
-	//  map to api --> /info
 	public Info getDirectorInfo(String directorUrl, int port, String userId, String password) {
 		Info info = null;
 		
@@ -82,14 +78,12 @@ public class IEDADirectorConfigService {
 			
 			ObjectMapper mapper = new ObjectMapper();
 			info = mapper.readValue(get.getResponseBodyAsString(), Info.class);
-		} catch (ResourceAccessException e) {
+		}
+		catch (ResourceAccessException e) {
 			e.printStackTrace();
-/*			throw new IEDACommonException("notfound.director.exception", "["
-					+ directorUrl + "] 디렉터를 찾을 수 없습니다.", HttpStatus.NOT_FOUND); */
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
-/*			throw new IEDACommonException("notfound.director.exception",
-					"요청정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);*/
 		}
 		
 		return info;
@@ -97,7 +91,6 @@ public class IEDADirectorConfigService {
 
 	public IEDADirectorConfig createDirector(IEDADirectorConfigDto.Create createDto) {
 
-		// 추가할 디렉터가 이미 존재하는지 여부 확인
 		List<IEDADirectorConfig> directorConfigList = directorConfigRepository
 				.findByDirectorUrl(createDto.getDirectorUrl());
 		
@@ -137,7 +130,6 @@ public class IEDADirectorConfigService {
 		director.setUpdatedDate(now);
 		director.setCreatedDate(now);
 		
-		// Target 설정
 		if( director.getDefaultYn().equals("Y") ) {
 			setBoshConfigFile(director);
 		}	
@@ -177,7 +169,6 @@ public class IEDADirectorConfigService {
 		directorConfig.setUserPassword(updateDto.getUserPassword());
 		directorConfig = directorConfigRepository.save(directorConfig);
 
-		// .bosh_config 수정
 		setBoshConfigFile(directorConfig);
 
 		return directorConfig;
@@ -192,26 +183,21 @@ public class IEDADirectorConfigService {
 		}
 		
 		try {
-			// bosh_config의 인증정보 초기화
-			// set target
 			String directorLink = "https://" + directorConfig.getDirectorUrl() + ":" + directorConfig.getDirectorPort();
 			
 			InputStream input = new FileInputStream(new File(getBoshConfigLocation()));
 			Yaml yaml = new Yaml();
 			Map<String, Object> object = (Map<String, Object>)yaml.load(input);
 
-			// set auth
 			Map<String, Object> authMap = (Map<String,Object>)object.get("auth");
 			authMap.put(directorLink, null);
 			
-			// write file
 			FileWriter fileWriter = new FileWriter(getBoshConfigLocation());
 			StringWriter stringWriter = new StringWriter();
 			yaml.dump(object, stringWriter);
 			fileWriter.write(stringWriter.toString());
 			fileWriter.close();
 			
-			// 모델 데이터 삭제
 			directorConfigRepository.delete(seq);
 			
 		} catch (Exception e) {
@@ -228,21 +214,18 @@ public class IEDADirectorConfigService {
 					"해당하는 설치관리자 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 		
-		// 디렉터 연결 여부 확인
 		Info info = getDirectorInfo(directorConfig.getDirectorUrl(), directorConfig.getDirectorPort(), directorConfig.getUserId(), directorConfig.getUserPassword());
 		if ( info == null || StringUtils.isEmpty(info.getUser()) ) {
 			throw new IEDACommonException("unauthenticated.director.exception",
 					"해당 디렉터에 로그인 실패하였습니다.", HttpStatus.BAD_REQUEST);
 		}
 		
-		// 이전 디렉터에 대한 기본 디렉터 설정 변경
 		IEDADirectorConfig oldDefaultDiretor = directorConfigRepository.findOneByDefaultYn("Y");
 		if (oldDefaultDiretor != null) {
 			oldDefaultDiretor.setDefaultYn("N");
 			directorConfigRepository.save(oldDefaultDiretor);
 		}
 		
-		// 새로운 디렉터에 대한 기본 디렉터 설정 변경
 		directorConfig.setDefaultYn("Y");
 		directorConfig.setDirectorName(info.getName());
 		directorConfig.setDirectorUuid(info.getUuid());
@@ -250,30 +233,21 @@ public class IEDADirectorConfigService {
 		directorConfig.setDirectorVersion(info.getVersion());
 		directorConfig= directorConfigRepository.save(directorConfig);
 		
-		// target 설정 (.bosh_config 설정 변경)
 		setBoshConfigFile(directorConfig);
 		
 		return directorConfig;
 	}
 
-	/**
-	 * Bosh 타겟 설정
-	 * @param url
-	 * @param port
-	 */
 	public void setBoshConfigFile(IEDADirectorConfig directorConfig) {
 		
 		String directorLink = "https://" + directorConfig.getDirectorUrl() + ":" + directorConfig.getDirectorPort();
 
-		// Config File이 존재하느냐?
 		if ( isExistBoshConfigFile() ) {
-			// 읽어서 수정
 			try {
 				InputStream input = new FileInputStream(new File(getBoshConfigLocation()));
 				Yaml yaml = new Yaml();
 				Map<String, Object> object = (Map<String, Object>)yaml.load(input);
 				
-				// set target
 				if ( directorConfig.getDefaultYn().equals("Y")) {
 					object.put("target", directorLink);
 					object.put("target_name", directorConfig.getDirectorName());
@@ -281,16 +255,13 @@ public class IEDADirectorConfigService {
 					object.put("target_uuid", directorConfig.getDirectorUuid());
 				}
 				
-				// set ca_cert
 				Map<String, String> certMap = (Map<String,String>)object.get("ca_cert");
 				certMap.put(directorLink, null);
 				
-				// set aliases
 				Map<String, Object> aliasMap = (Map<String,Object>)object.get("aliases");
 				Map<String, Object> targetMap = (Map<String,Object>)aliasMap.get("target");
 				targetMap.put(directorConfig.getDirectorUuid(), directorLink);
 				
-				// set auth
 				Map<String, String> accountMap = new HashMap<String, String>();
 				accountMap.put("username", directorConfig.getUserId());
 				accountMap.put("password", directorConfig.getUserPassword());
@@ -298,7 +269,6 @@ public class IEDADirectorConfigService {
 				Map<String, Object> authMap = (Map<String,Object>)object.get("auth");
 				authMap.put(directorLink, accountMap);
 				
-				// write file
 				FileWriter fileWriter = new FileWriter(getBoshConfigLocation());
 				StringWriter stringWriter = new StringWriter();
 				yaml.dump(object, stringWriter);
@@ -312,10 +282,8 @@ public class IEDADirectorConfigService {
 		}
 		else {
 			try {
-				// 생성
 				Map<String, Object> newConfig = new HashMap<String, Object>();
 				
-				// set target
 				if ( directorConfig.getDefaultYn().equals("Y")) {
 					newConfig.put("target", directorLink);
 					newConfig.put("target_name", directorConfig.getDirectorName());
@@ -330,12 +298,10 @@ public class IEDADirectorConfigService {
 					newConfig.put("target_uuid", defaultDirectorConfig.getDirectorUuid());
 				}
 				
-				// set ca_cert
 				Map<String, Object> certMap = new HashMap<String, Object>();
 				certMap.put(directorLink, null);
 				newConfig.put("ca_cert", certMap);
 				
-				// set aliases
 				Map<String, Object> aliasesMap = new HashMap<String, Object>();
 				aliasesMap.put(directorConfig.getDirectorUuid(), directorLink);
 	
@@ -344,7 +310,6 @@ public class IEDADirectorConfigService {
 				
 				newConfig.put("aliases", targetMap);
 				
-				// set auth
 				Map<String, String> accountInfo = new HashMap<String, String>();
 				accountInfo.put("username", directorConfig.getUserId());
 				accountInfo.put("password", directorConfig.getUserPassword());
@@ -355,7 +320,6 @@ public class IEDADirectorConfigService {
 				
 				Yaml yaml = new Yaml();
 				
-				// write file
 				FileWriter fileWriter = new FileWriter(getBoshConfigLocation());
 				StringWriter stringWriter = new StringWriter();
 				yaml.dump(newConfig, stringWriter);

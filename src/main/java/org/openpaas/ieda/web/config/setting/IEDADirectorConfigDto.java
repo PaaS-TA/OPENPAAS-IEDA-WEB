@@ -1,6 +1,3 @@
-/**
- * @Author Cheolho Moon
- */
 package org.openpaas.ieda.web.config.setting;
 
 import java.util.Date;
@@ -9,16 +6,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
 import org.hibernate.validator.constraints.NotBlank;
-
 import lombok.Data;
 
-
-/**
- * @author "Cheolho, Moon <chmoon93@gmail.com / Cloud4U, Inc>"
- *
- */
 public class IEDADirectorConfigDto {
 	
 	@Data

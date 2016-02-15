@@ -19,7 +19,6 @@ import org.openpaas.ieda.web.common.Sha512Crypt;
 import org.openpaas.ieda.web.deploy.bootstrap.BootStrapDto.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,10 +32,6 @@ public class IEDABootstrapService {
 	
 	@Autowired
 	private IEDABootstrapOpenstackRepository openstackRepository;
-	
-	
-	@Autowired
-	private SimpMessagingTemplate messagingTemplate;
 	
 	final private String PRIVATE_KEY_PATH = System.getProperty("user.home") + System.getProperty("file.separator") + ".ssh" + System.getProperty("file.separator");
 	

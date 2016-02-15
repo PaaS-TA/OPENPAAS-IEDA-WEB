@@ -1,6 +1,3 @@
-/**
- * @Author Cheolho Moon
- */
 package org.openpaas.ieda.web.information.release;
 
 import java.util.HashMap;
@@ -25,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import lombok.extern.slf4j.Slf4j;
-
 
 @Slf4j
 @Controller
@@ -56,7 +52,7 @@ public class ReleaseController extends BaseController {
 		} else
 			result.put("total", 0);
 		
-		return new ResponseEntity( result, HttpStatus.OK);
+		return new ResponseEntity<>( result, HttpStatus.OK);
 	}
 	
 	@RequestMapping( value="/localReleases", method =RequestMethod.GET)
@@ -70,25 +66,25 @@ public class ReleaseController extends BaseController {
 		} else
 			result.put("total", 0);
 		
-		return new ResponseEntity( result, HttpStatus.OK);
+		return new ResponseEntity<>( result, HttpStatus.OK);
 	}
 	
 	@RequestMapping( value="/release/localBoshList", method =RequestMethod.GET)
 	public ResponseEntity listLocalBoshRelease(){
 		List<String> contents = releaseService.listLocalBoshRelease();
-		return new ResponseEntity( contents, HttpStatus.OK);
+		return new ResponseEntity<>( contents, HttpStatus.OK);
 	}
 	
 	@RequestMapping( value="/release/localBoshAwsCpiList", method =RequestMethod.GET)
 	public ResponseEntity listLocalBoshAwsCpiRelease(){
 		List<String> contents = releaseService.listLocalBoshAwsCpiRelease();
-		return new ResponseEntity( contents, HttpStatus.OK);
+		return new ResponseEntity<>( contents, HttpStatus.OK);
 	}
 	
 	@RequestMapping( value="/release/localBoshOpenstackCpiList", method =RequestMethod.GET)
 	public ResponseEntity listLocalBoshOpenstackCpiRelease(){
 		List<String> contents = releaseService.listLocalBoshOpenstackCpiRelease();
-		return new ResponseEntity( contents, HttpStatus.OK);
+		return new ResponseEntity<>( contents, HttpStatus.OK);
 	}
 	
 	@RequestMapping( value="/release/getReleaseList/{filterName}", method =RequestMethod.GET)
@@ -97,44 +93,29 @@ public class ReleaseController extends BaseController {
 		Map<String, Object> result = new HashMap<>();
 		result.put("records", contents);
 		result.put("total", (contents == null) ? 0:contents.size());
-		return new ResponseEntity( result, HttpStatus.OK);
+		return new ResponseEntity<>( result, HttpStatus.OK);
 	}
 	
-	/**
-	 * 릴리즈 업로드
-	 * @param dto
-	 * @return
-	 */
 	@MessageMapping("/releaseUploading")
 	@SendTo("/socket/uploadRelease")
 	public ResponseEntity doUploadRelease(@RequestBody @Valid ReleaseContentDto.Upload dto) {
 		releaseUploadService.uploadReleaseAsync(LocalDirectoryConfiguration.getReleaseDir(), dto.getFileName());
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	/**
-	 * 릴리즈 삭제
-	 * @param dto
-	 * @return
-	 */
 	@MessageMapping("/releaseDelete")
 	@SendTo("/socket/deleteRelease")
 	public ResponseEntity doDeleteRelease(@RequestBody @Valid ReleaseContentDto.Delete dto) {
 		
 		releaseDeleteService.deleteReleaseAsync(dto.getFileName(), dto.getVersion());
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	/**
-	 * 릴리즈 삭제
-	 * @param dto
-	 * @return
-	 */
 	@RequestMapping( value="/deleteLocalRelease", method=RequestMethod.DELETE)
 	public ResponseEntity doDeleteLocalRelease(@RequestBody @Valid ReleaseContentDto.DeleteLocal dto) {
 		
 		releaseService.deleteLocalRelease(dto.getFileName());
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 }

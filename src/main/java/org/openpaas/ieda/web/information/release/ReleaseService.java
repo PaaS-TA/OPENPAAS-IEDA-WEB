@@ -101,7 +101,6 @@ public class ReleaseService {
 	 * Get Local Release File List 
 	 * @return List<ReleaseConfig>
 	 */
-	
 	public List<ReleaseFile> listLocalRelease() {
 		File file = new File(LocalDirectoryConfiguration.getReleaseDir());
 		File[] localFiles = file.listFiles();

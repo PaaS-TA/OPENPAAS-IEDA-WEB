@@ -52,10 +52,9 @@ public class StemcellController extends BaseController {
 		} else
 			result.put("total", 0);
 		
-		return new ResponseEntity(result, HttpStatus.OK);
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
-	// 다운로드받은 로컬 스템셀 목록 조회
 	@RequestMapping(value = "/localStemcells", method = RequestMethod.GET)
 	public ResponseEntity listLocalStemcells() {
 		List<StemcellManagementConfig> contents = service.listLocalStemcells();
@@ -71,7 +70,6 @@ public class StemcellController extends BaseController {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
-	// 스템셀 업로드
 	@MessageMapping("/stemcellUploading")
     @SendTo("/socket/uploadStemcell")
 	public ResponseEntity doUploadStemcell(@RequestBody @Valid StemcellParam.Upload dto) {
@@ -79,12 +77,6 @@ public class StemcellController extends BaseController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	/**
-	 * 스템셀 삭제
-	 * @param StemcellContentDto.Delete
-	 * @param result
-	 * @return
-	 */
 	@MessageMapping("/stemcellDelete")
     @SendTo("/socket/deleteStemcell")
 	public ResponseEntity doDeleteStemcell(@RequestBody @Valid StemcellParam.Delete dto) {
@@ -92,7 +84,6 @@ public class StemcellController extends BaseController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	// 다운로드받은 로컬 스템셀 목록 조회
 	@RequestMapping(value = "/information/localAwsStemcells", method = RequestMethod.GET)
 	public ResponseEntity localAwsStemcells() {
 		List<String> contents = service.localAwsStemcells();
@@ -103,7 +94,6 @@ public class StemcellController extends BaseController {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
-	// 다운로드받은 로컬 스템셀 목록 조회
 	@RequestMapping(value = "/information/localOpenstackStemcells", method = RequestMethod.GET)
 	public ResponseEntity localOpenstackStemcells() {
 		List<String> contents = service.localOpenstackStemcells();
@@ -113,6 +103,4 @@ public class StemcellController extends BaseController {
 		result.put("records", contents);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
-	
-	
 }

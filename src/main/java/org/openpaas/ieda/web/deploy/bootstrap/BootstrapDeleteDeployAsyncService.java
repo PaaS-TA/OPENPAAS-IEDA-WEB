@@ -102,9 +102,8 @@ public class BootstrapDeleteDeployAsyncService {
 			DirectorRestHelper.sendTaskOutput(messagingTemplate, messageEndpoint, status, Arrays.asList("배포 중 Exception이 발생하였습니다."));
 		}
 		
-		// 오류가 발생한 경우라도 레코드는 삭제하자.
-/*		if ( aws != null ) awsRepository.delete(aws);
-		if ( openstack != null ) openstackRepository.delete(openstack);*/
+		if ( aws != null ) awsRepository.delete(aws);
+		if ( openstack != null ) openstackRepository.delete(openstack);
 	}
 	
 	public IEDABootstrapAwsConfig saveAWSDeployStatus(IEDABootstrapAwsConfig aws, String status) {
