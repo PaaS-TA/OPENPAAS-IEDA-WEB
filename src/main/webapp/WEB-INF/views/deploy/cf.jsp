@@ -924,43 +924,6 @@
 		});
 	}
 	
-	// OPENSTACK RESOURCE save Resource Info
-	function saveOpenstackResourceInfo(type) {
-	
-		var stemcellInfos = $(".w2ui-msg-body input[name='stemcells']").val().split("/");
-		resourceInfo = {
-				id 					: cfId,
-				stemcellName 		: stemcellInfos[0],
-				stemcellVersion 	: stemcellInfos[1],
-				boshPassword 		: $(".w2ui-msg-body input[name='boshPassword']").val()
-		}
-	
-		if (type == 'after') {
-			if(popupValidation()){		
-				//Server send Cf Info
-				$.ajax({
-					type : "PUT",
-					url : "/cf/saveOpenstackResource",
-					contentType : "application/json",
-					async : true,
-					data : JSON.stringify(resourceInfo),
-					success : function(data, status) {
-						console.log("++++ :" + data.content.deploymentFile);
-						deploymentFile = data.content.deploymentFile;
-						w2popup.clear();
-						deployPopup();
-					},
-					error : function(e, status) {
-						w2alert("Cf Resource 등록에 실패 하였습니다.", "Cf 설치");
-					}
-				});
-			}
-		} else if (type == 'before') {
-			w2popup.clear();
-			openstackNetworkPopup();
-		}
-	}
-
 	/*******************************  OPENSTACK END  ****************************************/
 	
 	// DEPLOY Confirm

@@ -1,6 +1,3 @@
-<!--
-Diego
--->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -31,12 +28,12 @@ Diego
 	var networkInfo = "";
 	var resourceInfo = "";
 	
-	var diegoReleases = "";
-	var cfReleases = "";
-	var gardenLinuxReleases = "";
-	var etcdReleases = "";
+	var diegoReleases = new Array();
+	var cfReleases = new Array();
+	var gardenLinuxReleases = new Array();
+	var etcdReleases = new Array();
 	
-	var stemcells = "";
+	var stemcells = new Array();
 	var deploymentFile = "";
 	var bDefaultDirector = "";
 	//Main View Event
@@ -169,8 +166,7 @@ Diego
 			var directorName = $("#directorName").text().toUpperCase();
 			
 			if (directorName.indexOf("AWS") > 0) {
-				iaas = "OPENSTACk";
-				//iaas = "AWS";
+				iaas = "AWS";
 				defaultPopup();
 			} else if (directorName.indexOf("OPENSTACK") > 0) {
 				iaas = "OPENSTACk";
@@ -1159,6 +1155,11 @@ Diego
 	}
 
 	function getReleases(){
+		cfReleases = new Array();
+		etcdReleases = new Array();
+		gardenLinuxReleases = new Array();
+		diegoReleases = new Array();
+		stemcells = new Array();
 		//화면 LOCK
 		w2popup.lock("릴리즈를 조회 중입니다.", true);
 		getDiegoRelease(); //순차적으로 조회
@@ -1285,38 +1286,46 @@ Diego
 	// 스템셀 조회
 	function getStamcellList() {
 		$.ajax({
-			type :"GET",
-			url :"/stemcells",
-			contentType :"application/json",
-			success :function(data, status) {
+			type : "GET",
+			url : "/stemcells",
+			contentType : "application/json",
+			success : function(data, status) {
 				console.log("Stemcell List");
 				stemcells = new Array();
-				if(data.records){
+				console.log("#1 Stemcells ::: " + stemcells.length);
+				if(data.records != null ){
 					data.records.map(function(obj) {
 						stemcells.push(obj.name + "/" + obj.version);
 					});
 				}
+				console.log("#2 Stemcells ::: " + stemcells.length);
 				setStemcellList();
 			},
-			error :function(e, status) {
+			error : function(e, status) {
 				w2popup.unlock();
-				w2alert("Stemcell List 를 가져오는데 실패하였습니다.", "DIEGO 설치");
+				w2alert("Stemcell List 를 가져오는데 실패하였습니다.", "CF 설치");
 			}
 		});
 	}
-	//스템셀 List W2Field 적용
+	
+	// 스템셀 List W2Field 적용
 	function setStemcellList(){
+		console.log("#3 Stemcells ::: " + stemcells.length);
 		$(".w2ui-msg-body input[name='stemcells']").w2field('list', {items : stemcells,maxDropHeight : 200,width : 250});
+		console.log("#4 Stemcells ::: " + stemcells.length);
 		setStemcellData();
 	}
 	
-	// 스템셀 release value setgting
+	// 스템셀 value setgting
 	function setStemcellData(){
+		console.log("#5 Stemcells ::: " + stemcells.length);
 		if( !checkEmpty(resourceInfo.stemcellName) && !checkEmpty(resourceInfo.stemcellVersion) ){
 			$(".w2ui-msg-body input[name='stemcells']").data('selected',{text : resourceInfo.stemcellName + "/"+ resourceInfo.stemcellVersion});
 		}
+		console.log("#6 Stemcells ::: " + stemcells.length);
 		w2popup.unlock();
 	}
+	
 	
 	//전역변수 초기화
 	function initSetting() {
@@ -1584,35 +1593,35 @@ Diego
 							<label style="text-align:left; width:40%; font-size:11px;">에이전트 인증서</label>
 							<div>
 								<textarea name="consulAgentCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="CONSUL 에이전트 인증서를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="CONSUL 에이전트 인증서를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">에이전트 개인키</label>
 							<div>
 								<textarea name="consulAgentKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="CONSUL 에이전트 개인키(Agent Private Key)를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="CONSUL 에이전트 개인키(Agent Private Key)를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">서버 CA 인증서</label>
 							<div>
 								<textarea name="consulCaCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="서버 CA 인증서(Server CA Certificate)를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="서버 CA 인증서(Server CA Certificate)를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">서버 인증서</label>
 							<div>
 								<textarea name="consulServerCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="CONSUL 서버 인증서(Server Certificate)를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="CONSUL 서버 인증서(Server Certificate)를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">서버 개인키</label>
 							<div>
 								<textarea name="consulServerKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="CONSUL 서버 개인키(Server Private Key)를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="CONSUL 서버 개인키(Server Private Key)를 입력하세요." ></textarea>
 							</div>
 						</div>
 					</div>
@@ -1650,14 +1659,14 @@ Diego
 							<label style="text-align:left; width:40%; font-size:11px;">CA 인증서</label>
 							<div>
 								<textarea name="diegoCaCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="CA 인증서를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="CA 인증서를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">SSH Proxy 개인키</label>
 							<div>
 								<textarea name="diegoHostKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="개인키를 입력하세요." ></textarea>
 							</div>
 						</div>
 					</div>
@@ -1676,28 +1685,28 @@ Diego
 							<label style="text-align:left; width:40%; font-size:11px;">클라이언트 인증서</label>
 							<div>
 								<textarea name="diegoClientCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="클라이언트 인증서를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="클라이언트 인증서를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">클라이언트 개인키</label>
 							<div>
 								<textarea name="diegoClientKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="클라이언트 개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="클라이언트 개인키를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">서버 인증서</label>
 							<div>
 								<textarea name="diegoServerCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="서버 인증서를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="서버 인증서를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">서버 개인키</label>
 							<div>
 								<textarea name="diegoServerKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="서버 개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="서버 개인키를 입력하세요." ></textarea>
 							</div>
 						</div>
 					</div>
@@ -1735,28 +1744,28 @@ Diego
 							<label style="text-align:left; width:40%; font-size:11px;">클라이언트 인증서</label>
 							<div>
 								<textarea name="etcdClientCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="클라이언트 인증서를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="클라이언트 인증서를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">클라이언트 개인키</label>
 							<div>
 								<textarea name="etcdClientKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="클라이언트 개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="클라이언트 개인키를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">서버 인증서</label>
 							<div>
 								<textarea name="etcdServerCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="서버 인증서를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="서버 인증서를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">서버 개인키</label>
 							<div>
 								<textarea name="etcdServerKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="서버 개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="서버 개인키를 입력하세요." ></textarea>
 							</div>
 						</div>
 					</div>
@@ -1768,21 +1777,21 @@ Diego
 							<label style="text-align:left; width:40%; font-size:11px;">CA 인증서</label>
 							<div>
 								<textarea name="etcdPeerCaCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="CA 인증서를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="CA 인증서를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">인증서</label>
 							<div>
 								<textarea name="etcdPeerCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="인증서를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="인증서를 입력하세요." ></textarea>
 							</div>
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align:left; width:40%; font-size:11px;">개인키</label>
 							<div>
 								<textarea name="etcdPeerKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-									required placeholder="개인키를 입력하세요." onblur="overlay($(this).val());"></textarea>
+									required placeholder="개인키를 입력하세요." ></textarea>
 							</div>
 						</div>
 					</div>
