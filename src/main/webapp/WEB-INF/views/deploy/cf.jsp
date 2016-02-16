@@ -329,8 +329,7 @@
 							    		deleteClient.disconnect();
 										w2alert(message, "CF 삭제");
 							       	}
-					        	}
-					        	
+					        	}					        	
 					        });
 							deleteClient.send('/send/cfDelete', {}, JSON.stringify(requestParameter));
 					    });
@@ -896,7 +895,7 @@
 			}
 		} else if (type == 'before') {
 			w2popup.clear();
-			consulPopup();
+			consulInfoPopup();
 		}
 	}
 	
