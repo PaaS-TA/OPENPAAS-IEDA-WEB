@@ -58,46 +58,46 @@ public class IEDADiegoAwsConfig {
 	private String natsMachines;
 	@Column(length = 100)
 	private String consulServersLan;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String consulAgentCert;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String consulAgentKey;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String consulCaCert;
 	@Column(length = 200)
 	private String consulEncryptKeys;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String consulServerCert;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String consulServerKey;
 	
 	//2.1 Diego 정보	
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String diegoCaCert;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String diegoClientCert;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String diegoClientKey;
 	@Column(length = 200)
 	private String diegoEncryptionKeys;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String diegoServerCert;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String diegoServerKey;
 	//2.2 ETCD 정보	
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String etcdClientCert;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String etcdClientKey;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String etcdPeerCaCert;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String etcdPeerCert;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String etcdPeerKey;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String etcdServerCert;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String etcdServerKey;
 	
 	//3.1 네트워크 정보	
@@ -120,7 +120,7 @@ public class IEDADiegoAwsConfig {
 	@Column(length = 100)
 	private String cloudSecurityGroups;	
 	//3.2 프록시 정보
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String diegoHostKey;
 	
 	//4 리소스 정보	

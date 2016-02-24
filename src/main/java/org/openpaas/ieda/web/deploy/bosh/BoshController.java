@@ -126,28 +126,28 @@ public class BoshController extends BaseController {
 	}
 
 	@RequestMapping(value="/bosh/saveOpenstackDefaultInfo", method=RequestMethod.PUT)
-	public ResponseEntity saveOpenstackBoshInfo(@RequestBody @Valid BoshParam.OsBosh dto){
+	public ResponseEntity saveOpenstackBoshInfo(@RequestBody @Valid BoshParam.OpenstackBosh dto){
 
-		IEDABoshOpenstackConfig config = openstackService.saveBoshInfo(dto);	
+		IEDABoshOpenstackConfig config = openstackService.saveOpenstackBoshInfo(dto);	
 		
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 	
 	
 	@RequestMapping(value="/bosh/saveOpenstackNetworkInfo", method=RequestMethod.PUT)
-	public ResponseEntity saveOsNetworkInfo(@RequestBody @Valid BoshParam.OsNetwork dto){
+	public ResponseEntity saveOsNetworkInfo(@RequestBody @Valid BoshParam.OpenstackNetwork dto){
 		
-		IEDABoshOpenstackConfig config = openstackService.saveOsNetworkInfo(dto);	
+		IEDABoshOpenstackConfig config = openstackService.saveOpenstackNetworkInfo(dto);	
 		
 		return new ResponseEntity<>(config, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/bosh/saveOpenstackResourceInfo", method=RequestMethod.PUT)
-	public ResponseEntity saveOsResourceInfo(@RequestBody @Valid BoshParam.OsResource dto){
+	public ResponseEntity saveOsResourceInfo(@RequestBody @Valid BoshParam.OpenstackResource dto){
 		
 		HttpStatus status = HttpStatus.OK;
 		Map<String, Object> result = new HashMap<>();
-		result.put("content", openstackService.saveOsResourceInfo(dto));			
+		result.put("content", openstackService.saveOpenstackResourceInfo(dto));			
 			
 		if( result.get("content") == null) status = HttpStatus.NO_CONTENT;
 		

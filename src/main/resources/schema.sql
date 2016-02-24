@@ -77,7 +77,7 @@ CREATE TABLE ieda_bootstrap_aws (
 	
 	deployment_file VARCHAR(100) NULL,
 	deploy_status varchar(100)  NULL,
-	deploy_log TEXT NULL,
+	deploy_log LONGTEXT NULL,
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED CHARSET=utf8;
 
@@ -118,7 +118,7 @@ CREATE TABLE ieda_bootstrap_openstack (
 	
 	deployment_file VARCHAR(100) NULL,
 	deploy_status varchar(100)  NULL,
-	deploy_log TEXT NULL,
+	deploy_log LONGTEXT NULL,
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED CHARSET=utf8;
 
@@ -210,19 +210,19 @@ CREATE TABLE ieda_cf_aws (
 	domain_organization VARCHAR(100) NULL,
 	-- 1.3 프록시 정보
 	proxy_static_ips VARCHAR(100) NULL,
-	ssl_pem_pub TEXT NULL,
-	ssl_pem_rsa TEXT NULL,
+	ssl_pem_pub LONGTEXT NULL,
+	ssl_pem_rsa LONGTEXT NULL,
 	-- 2. UAA 정보	
 	login_secret VARCHAR(100) NULL,
-	signing_key TEXT NULL,
-	verification_key TEXT NULL,
+	signing_key LONGTEXT NULL,
+	verification_key LONGTEXT NULL,
 	-- 3. Consul 정보	
-	agent_cert TEXT NULL,
-	agent_key TEXT NULL,
-	ca_cert TEXT NULL,
+	agent_cert LONGTEXT NULL,
+	agent_key LONGTEXT NULL,
+	ca_cert LONGTEXT NULL,
 	encrypt_keys VARCHAR(200) NULL,
-	server_cert TEXT NULL,
-	server_key TEXT NULL,
+	server_cert LONGTEXT NULL,
+	server_key LONGTEXT NULL,
 	-- 4. 네트워크 정보	
 	subnet_static_from VARCHAR(100) NULL,
 	subnet_static_to VARCHAR(100) NULL,
@@ -260,19 +260,19 @@ CREATE TABLE ieda_cf_openstack (
 	domain_organization VARCHAR(100) NULL,
 	-- 1.3 프록시 정보
 	proxy_static_ips VARCHAR(100) NULL,
-	ssl_pem_pub TEXT NULL,
-	ssl_pem_rsa TEXT NULL,
+	ssl_pem_pub LONGTEXT NULL,
+	ssl_pem_rsa LONGTEXT NULL,
 	-- 2. UAA 정보	
 	login_secret VARCHAR(100) NULL,
-	signing_key TEXT NULL,
-	verification_key TEXT NULL,
+	signing_key LONGTEXT NULL,
+	verification_key LONGTEXT NULL,
 	-- 3. Consul 정보	
-	agent_cert TEXT NULL,
-	agent_key TEXT NULL,
-	ca_cert TEXT NULL,
+	agent_cert LONGTEXT NULL,
+	agent_key LONGTEXT NULL,
+	ca_cert LONGTEXT NULL,
 	encrypt_keys VARCHAR(200) NULL,
-	server_cert TEXT NULL,
-	server_key TEXT NULL,
+	server_cert LONGTEXT NULL,
+	server_key LONGTEXT NULL,
 	-- 4. 네트워크 정보	
 	subnet_static_from VARCHAR(100) NULL,
 	subnet_static_to VARCHAR(100) NULL,
@@ -317,28 +317,28 @@ CREATE TABLE ieda_diego_aws (
 	etcd_machines VARCHAR(100) NULL,
 	nats_machines VARCHAR(100) NULL,
 	consul_servers_lan VARCHAR(100) NULL,
-	consul_agent_cert TEXT NULL,
-	consul_agent_key TEXT NULL,
-	consul_ca_cert TEXT NULL,
+	consul_agent_cert LONGTEXT NULL,
+	consul_agent_key LONGTEXT NULL,
+	consul_ca_cert LONGTEXT NULL,
 	consul_encrypt_keys VARCHAR(200) NULL,
-	consul_server_cert TEXT NULL,
-	consul_server_key TEXT NULL,
+	consul_server_cert LONGTEXT NULL,
+	consul_server_key LONGTEXT NULL,
 	
 	-- 2.1 Diego 정보
-	diego_ca_cert TEXT NULL,
-	diego_client_cert TEXT NULL,
-	diego_client_key TEXT NULL,
+	diego_ca_cert LONGTEXT NULL,
+	diego_client_cert LONGTEXT NULL,
+	diego_client_key LONGTEXT NULL,
 	diego_encryption_keys VARCHAR(200) NULL,
-	diego_server_cert TEXT NULL,
-	diego_server_key TEXT NULL,
+	diego_server_cert LONGTEXT NULL,
+	diego_server_key LONGTEXT NULL,
 	-- 2.2 ETCD 정보
-	etcd_client_cert TEXT NULL,
-	etcd_client_key TEXT NULL,
-	etcd_peer_ca_cert TEXT NULL,
-	etcd_peer_cert TEXT NULL,
-	etcd_peer_key TEXT NULL,
-	etcd_server_cert TEXT NULL,
-	etcd_server_key TEXT NULL,
+	etcd_client_cert LONGTEXT NULL,
+	etcd_client_key LONGTEXT NULL,
+	etcd_peer_ca_cert LONGTEXT NULL,
+	etcd_peer_cert LONGTEXT NULL,
+	etcd_peer_key LONGTEXT NULL,
+	etcd_server_cert LONGTEXT NULL,
+	etcd_server_key LONGTEXT NULL,
 	
 	-- 3.1 네트워크 정보
 	subnet_static_from VARCHAR(100) NULL,
@@ -351,7 +351,7 @@ CREATE TABLE ieda_diego_aws (
 	subnet_id VARCHAR(100) NULL,
 	cloud_security_groups VARCHAR(100) NULL,
 	-- 3.2 프록시 정보
-	diego_host_key TEXT NULL,
+	diego_host_key LONGTEXT NULL,
 	diego_servers VARCHAR(100) NULL,
 	diego_uaa_secret VARCHAR(100) NULL,
 	
@@ -390,28 +390,28 @@ CREATE TABLE ieda_diego_openstack (
 	etcd_machines VARCHAR(100) NULL,
 	nats_machines VARCHAR(100) NULL,
 	consul_servers_lan VARCHAR(100) NULL,
-	consul_agent_cert TEXT NULL,
-	consul_agent_key TEXT NULL,
-	consul_ca_cert TEXT NULL,
+	consul_agent_cert LONGTEXT NULL,
+	consul_agent_key LONGTEXT NULL,
+	consul_ca_cert LONGTEXT NULL,
 	consul_encrypt_keys VARCHAR(200) NULL,
-	consul_server_cert TEXT NULL,
-	consul_server_key TEXT NULL,
+	consul_server_cert LONGTEXT NULL,
+	consul_server_key LONGTEXT NULL,
 	
 	-- 2.1 Diego 정보
-	diego_ca_cert TEXT NULL,
-	diego_client_cert TEXT NULL,
-	diego_client_key TEXT NULL,
+	diego_ca_cert LONGTEXT NULL,
+	diego_client_cert LONGTEXT NULL,
+	diego_client_key LONGTEXT NULL,
 	diego_encryption_keys VARCHAR(200) NULL,
-	diego_server_cert TEXT NULL,
-	diego_server_key TEXT NULL,
+	diego_server_cert LONGTEXT NULL,
+	diego_server_key LONGTEXT NULL,
 	-- 2.2 ETCD 정보
-	etcd_client_cert TEXT NULL,
-	etcd_client_key TEXT NULL,
-	etcd_peer_ca_cert TEXT NULL,
-	etcd_peer_cert TEXT NULL,
-	etcd_peer_key TEXT NULL,
-	etcd_server_cert TEXT NULL,
-	etcd_server_key TEXT NULL,
+	etcd_client_cert LONGTEXT NULL,
+	etcd_client_key LONGTEXT NULL,
+	etcd_peer_ca_cert LONGTEXT NULL,
+	etcd_peer_cert LONGTEXT NULL,
+	etcd_peer_key LONGTEXT NULL,
+	etcd_server_cert LONGTEXT NULL,
+	etcd_server_key LONGTEXT NULL,
 	
 	-- 3.1 네트워크 정보
 	subnet_static_from VARCHAR(100) NULL,
@@ -424,7 +424,7 @@ CREATE TABLE ieda_diego_openstack (
 	cloud_net_id VARCHAR(100) NULL,
 	cloud_security_groups VARCHAR(100) NULL,
 	-- 3.2 프록시 정보
-	diego_host_key TEXT NULL,
+	diego_host_key LONGTEXT NULL,
 	diego_servers VARCHAR(100) NULL,
 	diego_uaa_secret VARCHAR(100) NULL,
 	

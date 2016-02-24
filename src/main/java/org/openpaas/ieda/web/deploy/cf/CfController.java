@@ -86,6 +86,7 @@ public class CfController extends BaseController{
 	
 	@RequestMapping(value="/cf/saveDefaultInfo", method=RequestMethod.PUT)
 	public ResponseEntity saveDefaultInfo(@RequestBody @Valid CfParam.Default dto){
+		System.out.println("&&&&& : " + dto.toString());
 		
 		Map<String, Object> result  = new HashMap<>();
 		if( "AWS".equals(dto.getIaas().toUpperCase()) ){

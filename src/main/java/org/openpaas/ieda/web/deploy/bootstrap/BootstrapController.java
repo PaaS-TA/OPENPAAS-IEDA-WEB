@@ -126,25 +126,25 @@ public class BootstrapController extends BaseController {
 	
 		
 	@RequestMapping(value="/bootstrap/setOpenstackInfo", method=RequestMethod.PUT)
-	public ResponseEntity doOpenstackInfoSave(@RequestBody @Valid BootStrapDto.OpenStack dto){
+	public ResponseEntity doOpenstackInfoSave(@RequestBody @Valid BootStrapDto.Openstack dto){
 		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackInfoSave(dto);
 		return new ResponseEntity(config, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/bootstrap/setOsBoshInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/bootstrap/setOpenstackDefaultInfo", method=RequestMethod.PUT)
 	public ResponseEntity doOpenstackBoshInfoSave(@RequestBody @Valid BootStrapDto.OpenstackDefault dto){
 		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackDefaultInfoSave(dto);
 		return new ResponseEntity(config, HttpStatus.OK);
 	}
 
 	
-	@RequestMapping(value="/bootstrap/setOsNetworkInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/bootstrap/setOpenstackNetworkInfo", method=RequestMethod.PUT)
 	public ResponseEntity doOpenstackNetworkInfoSave(@RequestBody @Valid BootStrapDto.OpenstackNetwork dto){
 		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackNetworkInfoSave(dto);
 		return new ResponseEntity(config, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/bootstrap/setOsResourceInfo", method=RequestMethod.PUT)
+	@RequestMapping(value="/bootstrap/setOpenstackResourceInfo", method=RequestMethod.PUT)
 	public ResponseEntity doOpenstackResourcesInfoSave(@RequestBody @Valid BootStrapDto.OpenstackResource dto){
 		IEDABootstrapOpenstackConfig config = openstackService.saveOpenstackResourcesInfoSave(dto);
 		return new ResponseEntity(config, HttpStatus.OK);

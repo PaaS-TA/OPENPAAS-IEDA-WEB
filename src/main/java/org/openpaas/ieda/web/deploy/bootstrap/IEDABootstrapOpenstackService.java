@@ -32,7 +32,7 @@ public class IEDABootstrapOpenstackService {
 		return config;
 	}
 
-	public IEDABootstrapOpenstackConfig saveOpenstackInfoSave(BootStrapDto.OpenStack dto) {
+	public IEDABootstrapOpenstackConfig saveOpenstackInfoSave(BootStrapDto.Openstack dto) {
 		IEDABootstrapOpenstackConfig config;
 		Date now = new Date();
 		if( StringUtils.isEmpty(dto.getId())){

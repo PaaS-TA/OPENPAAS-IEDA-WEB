@@ -129,7 +129,7 @@ public class DiegoController extends BaseController{
 
 
 	@RequestMapping(value="/diego/saveOpenstack", method=RequestMethod.PUT)
-	public ResponseEntity saveOpenstackDiegoInfo(@RequestBody @Valid DiegoParam.Default dto){
+	public ResponseEntity saveOpenstackInfo(@RequestBody @Valid DiegoParam.Default dto){
 
 		IEDADiegoOpenstackConfig config = openstackService.saveDefaultInfo(dto);
 

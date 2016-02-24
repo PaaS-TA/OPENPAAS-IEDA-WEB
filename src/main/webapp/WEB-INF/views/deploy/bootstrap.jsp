@@ -1214,7 +1214,7 @@ function saveOpenstackDefaultInfo(type){
 			//osBOshInfo SAVE
 			$.ajax({
 				type : "PUT",
-				url : "/bootstrap/setOsBoshInfo",
+				url : "/bootstrap/setOpenstackDefaultInfo",
 				contentType : "application/json",
 				async : true,
 				data : JSON.stringify(osBoshInfo),
@@ -1274,7 +1274,7 @@ function saveOpenstackNetworkInfo(type){
 		if(popupValidation()){		
 			$.ajax({
 				type : "PUT",
-				url : "/bootstrap/setOsNetworkInfo",
+				url : "/bootstrap/setOpenstackNetworkInfo",
 				contentType : "application/json",
 				async : true,
 				data : JSON.stringify(networkInfo),
@@ -1322,7 +1322,7 @@ function saveOpenstackResourceInfo(type){
 		if(popupValidation()){
 			$.ajax({
 				type : "PUT",
-				url : "/bootstrap/setOsResourceInfo",
+				url : "/bootstrap/setOpenstackResourceInfo",
 				contentType : "application/json",
 				async : true,
 				data : JSON.stringify(resourceInfo),

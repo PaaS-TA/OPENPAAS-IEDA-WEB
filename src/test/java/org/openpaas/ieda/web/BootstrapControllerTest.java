@@ -1,10 +1,28 @@
 package org.openpaas.ieda.web;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+
+import javax.validation.constraints.NotNull;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
+import org.neo4j.cypher.internal.compiler.v2_1.perty.printToString;
+import org.openpaas.ieda.web.deploy.bootstrap.BootStrapDto.AwsDefault;
+import org.openpaas.ieda.web.deploy.bootstrap.BootStrapDto.OpenstackDefault;
+import org.openpaas.ieda.web.deploy.bootstrap.BootstrapListDto;
+import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsConfig;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsRepository;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapAwsService;
+import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapOpenstackConfig;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapOpenstackRepository;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapOpenstackService;
 import org.openpaas.ieda.web.deploy.bootstrap.IEDABootstrapService;
@@ -33,7 +51,8 @@ public class BootstrapControllerTest {
 	final String LIST_URL = "/bootstraps";
 	final String AWS_DETAIL_URL = "/bootstrap/aws/1";
 	final String OPENSTACK_DETAIL_URL = "/bootstrap/openstack/1";
-	
+	final String SAVE_AWS_DEFAULT_URL= "/bootstrap/awsDefault";
+	final String SAVE_OPENSTACK_DEFAULT_URL = "/bootstrap/setOpenstackDefaultInfo";
 	@Autowired
 	WebApplicationContext wac;
 
@@ -52,6 +71,7 @@ public class BootstrapControllerTest {
 	@Before
 	public void setUp() throws Exception {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+		objectMapper = new ObjectMapper();
 	}
 
 	@Test
@@ -63,17 +83,25 @@ public class BootstrapControllerTest {
 			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 	
-/*	@Test
+	@Test
 	public void testListBootstrap() throws Exception{
-		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(LIST_URL)
+		IEDABootstrapAwsConfig awsConfig = setBootstrapAwsInfo();
+		IEDABootstrapOpenstackConfig openstackConfig = setBootstrapOpenstackInfo();
+		awsRepository.save(awsConfig);
+		openstackRepository.save(openstackConfig);
+				
+		ResultActions result = mockMvc.perform(get(LIST_URL)
 				.contentType(MediaType.APPLICATION_JSON));
 		
-		result.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isOk());
+		result.andDo(print())
+			.andExpect(status().isOk());
 	}
-
+	
 	@Test
 	public void testGetAwsInfo() throws Exception{
+		IEDABootstrapAwsConfig awsConfig = setBootstrapAwsInfo();
+		awsRepository.save(awsConfig);
+		
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(AWS_DETAIL_URL)
 				.contentType(MediaType.APPLICATION_JSON));
 		
@@ -83,66 +111,82 @@ public class BootstrapControllerTest {
 
 	@Test
 	public void testGetOpenstackInfo() throws Exception{
+		IEDABootstrapOpenstackConfig openstackConfig = setBootstrapOpenstackInfo();
+		openstackRepository.save(openstackConfig);
+		
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(OPENSTACK_DETAIL_URL)
 				.contentType(MediaType.APPLICATION_JSON));
 		
 		result.andDo(MockMvcResultHandlers.print())
 		.andExpect(MockMvcResultMatchers.status().isOk());
 	}
-*/
-//	@Test
-//	public void testDoBootstrapAwsSave() {
-//		fail("Not yet implemented");
-//	}
-//
-//	@Test
-//	public void testDoBootstrapAwsDefaultSave() {
-//		fail("Not yet implemented");
-//	}
-//
-//	@Test
-//	public void testDoBootstrapNetworkSave() {
-//		fail("Not yet implemented");
-//	}
-//
-//	@Test
-//	public void testDoBootstrapResourcesSave() {
-//		fail("Not yet implemented");
-//	}
-//
-//	@Test
-//	public void testDoInstallBootstrap() {
-//		fail("Not yet implemented");
-//	}
-//
-//	@Test
-//	public void testDeleteBootstrap() {
-//		fail("Not yet implemented");
-//	}
-//
-//	@Test
-//	public void testDeleteJustOnlyBootstrapRecord() {
-//		fail("Not yet implemented");
-//	}
-//
-//	@Test
-//	public void testDoOpenstackInfoSave() {
-//		fail("Not yet implemented");
-//	}
-//
-//	@Test
-//	public void testDoOpenstackBoshInfoSave() {
-//		fail("Not yet implemented");
-//	}
-//
-//	@Test
-//	public void testDoOpenstackNetworkInfoSave() {
-//		fail("Not yet implemented");
-//	}
-//
-//	@Test
-//	public void testDoOpenstackResourcesInfoSave() {
-//		fail("Not yet implemented");
-//	}
+
+	@Test
+	public void testDoBootstrapAwsDefaultSave() throws Exception{
+		IEDABootstrapAwsConfig awsConfig = setBootstrapAwsInfo();
+		awsRepository.save(awsConfig);
+		
+		AwsDefault awsDefaultInfo = new AwsDefault();
+		awsDefaultInfo.setId("1");
+		awsDefaultInfo.setDeploymentName("bosh");
+		awsDefaultInfo.setDirectorName("myBosh");
+		awsDefaultInfo.setBoshRelease("bosh-release");
+		awsDefaultInfo.setBoshCpiRelease("bosh-cpi-release");
+		
+		
+		ResultActions result = mockMvc.perform(put(SAVE_AWS_DEFAULT_URL)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(awsDefaultInfo))
+				);
+		
+		result.andDo(MockMvcResultHandlers.print())
+		.andExpect(MockMvcResultMatchers.status().isOk());	
+	}
+	
+	@Test
+	public void testDoOpenstackDefaultInfoSave() throws Exception{
+		IEDABootstrapOpenstackConfig openstackConfig = setBootstrapOpenstackInfo();
+		openstackRepository.save(openstackConfig);
+		
+		OpenstackDefault openstackDefaultInfo = new OpenstackDefault();
+		openstackDefaultInfo.setId("1");
+		openstackDefaultInfo.setDeploymentName("bosh");
+		openstackDefaultInfo.setDirectorName("myBosh");
+		openstackDefaultInfo.setBoshRelease("bosh-release");
+		openstackDefaultInfo.setBoshCpiRelease("bosh-cpi-release");
+		
+		
+		ResultActions result = mockMvc.perform(put(SAVE_OPENSTACK_DEFAULT_URL)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(openstackDefaultInfo))
+				);
+		
+		result.andDo(MockMvcResultHandlers.print())
+		.andExpect(MockMvcResultMatchers.status().isOk());	
+	}
+	
+	public IEDABootstrapAwsConfig setBootstrapAwsInfo(){
+		IEDABootstrapAwsConfig config = new IEDABootstrapAwsConfig();
+		config.setAccessKeyId("bootstrap-aws");
+		config.setSecretAccessId("bootstrap-aws-secret");
+		config.setDefaultSecurityGroups("bosh");
+		config.setRegion("m.east_1");
+		config.setAvailabilityZone("bosh");;
+		config.setPrivateKeyName("bosh-key");
+		config.setPrivateKeyPath("./ssh/bosh.pem");
+		return config;
+	}
+	
+	public IEDABootstrapOpenstackConfig setBootstrapOpenstackInfo(){
+		IEDABootstrapOpenstackConfig config = new IEDABootstrapOpenstackConfig();
+		config.setAuthUrl("bootstrap-aws-authUrl");
+		config.setTenant("bootstrap-aws-tenant");
+		config.setUserName("bootstrap-aws-userName");
+		config.setApiKey("bootstrap-aws-apiKey");
+		config.setDefaultSecurityGroups("bosh");;
+		config.setPrivateKeyName("bosh-key");
+		config.setPrivateKeyPath("./ssh/bosh.pem");
+		return config;
+	}
 
 }

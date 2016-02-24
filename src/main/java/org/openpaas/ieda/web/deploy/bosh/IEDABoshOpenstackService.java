@@ -48,7 +48,7 @@ public class IEDABoshOpenstackService {
 		return opentstackRepository.save(config);
 	}
 	
-	public IEDABoshOpenstackConfig saveBoshInfo(BoshParam.OsBosh dto){
+	public IEDABoshOpenstackConfig saveOpenstackBoshInfo(BoshParam.OpenstackBosh dto){
 		IEDABoshOpenstackConfig config = opentstackRepository.findOne(Integer.parseInt(dto.getId()));
 		
 		config.setDeploymentName(dto.getDeploymentName());
@@ -61,7 +61,7 @@ public class IEDABoshOpenstackService {
 		return opentstackRepository.save(config);
 	}
 	
-	public IEDABoshOpenstackConfig saveOsNetworkInfo(BoshParam.OsNetwork dto){
+	public IEDABoshOpenstackConfig saveOpenstackNetworkInfo(BoshParam.OpenstackNetwork dto){
 		IEDABoshOpenstackConfig config = opentstackRepository.findOne(Integer.parseInt(dto.getId()));
 		
 		config.setPublicStaticIp(dto.getPublicStaticIp());
@@ -78,7 +78,7 @@ public class IEDABoshOpenstackService {
 		return opentstackRepository.save(config);
 	}
 	
-	public IEDABoshOpenstackConfig saveOsResourceInfo(BoshParam.OsResource dto){
+	public IEDABoshOpenstackConfig saveOpenstackResourceInfo(BoshParam.OpenstackResource dto){
 		
 		IEDABoshOpenstackConfig config = opentstackRepository.findOne(Integer.parseInt(dto.getId()));
 		

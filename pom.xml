@@ -79,10 +79,10 @@
 			<scope>runtime</scope>
 		</dependency>
 		<!-- H2DB -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-		</dependency> -->
+		</dependency>
 				
 		<!-- JUnit Test -->
 		<dependency>
@@ -208,6 +208,11 @@
 			<artifactId>
 				spring-boot-starter-cloud-connectors
 			</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-cypher-compiler-2.1</artifactId>
+			<version>2.1.5</version>
 		</dependency>
 	</dependencies>
 

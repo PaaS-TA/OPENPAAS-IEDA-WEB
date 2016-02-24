@@ -46,31 +46,31 @@ public class IEDACfAwsConfig {
 	// 1.3 프록시 정보
 	@Column(length = 100)
 	private String proxyStaticIps;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String sslPemPub; //Big
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String sslPemRsa; //Big
 	
 	// 2. UAA 정보
 	@Column(length = 100)
 	private String loginSecret;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String signingKey;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String verificationKey;
 	
 	// 3. Consul 정보
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String agentCert;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String agentKey;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String caCert;
 	@Column(length = 200)
 	private String encryptKeys;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String serverCert;
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 2000)
 	private String serverKey;
 
 	// 4. 네트워크 정보

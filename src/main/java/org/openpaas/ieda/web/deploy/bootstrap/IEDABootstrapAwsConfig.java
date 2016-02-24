@@ -73,11 +73,11 @@ public class IEDABootstrapAwsConfig {
 	@Column(length = 200)
 	private String boshPassword;
 	
-	@Column(length = 100)
+	@Column(length = 100) 
 	private String deploymentFile;
 	@Column(length = 100)
 	private String deployStatus;
 	
-	@Column(columnDefinition = "TEXT")
+	@Column(length = 100000)
 	private String deployLog;
 }

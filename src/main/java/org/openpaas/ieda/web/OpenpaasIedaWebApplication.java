@@ -5,6 +5,7 @@ import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 
@@ -26,6 +27,11 @@ public class OpenpaasIedaWebApplication {
     @Bean
     public ModelMapper modelMapper() {
     	return new ModelMapper();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+    	return new ObjectMapper();
     }
 
 }

@@ -74,7 +74,7 @@ public class BootStrapDto{
 	}
 	
 	@Data 
-	public static class OpenStack{
+	public static class Openstack{
 		private String id;
 		@NotNull
 		private String authUrl;

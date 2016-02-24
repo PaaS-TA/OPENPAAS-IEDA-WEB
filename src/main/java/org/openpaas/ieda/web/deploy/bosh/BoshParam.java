@@ -86,7 +86,7 @@ public class BoshParam {
 	}
 	
 	@Data
-	public static class OsBosh{
+	public static class OpenstackBosh{
 		private String id;
 		@NotNull
 		private String deploymentName;
@@ -97,7 +97,7 @@ public class BoshParam {
 	}
 	
 	@Data
-	public static class OsNetwork{
+	public static class OpenstackNetwork{
 		@NotNull
 		private String id;
 		@NotNull
@@ -117,7 +117,7 @@ public class BoshParam {
 	}
 	
 	@Data
-	public static class OsResource{
+	public static class OpenstackResource{
 		private String id;
 		private String stemcellName;
 		private String stemcellVersion;
