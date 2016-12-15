@@ -1,0 +1,102 @@
+## 배포명
+name: [deploymentName]
+
+## director UUID
+director_uuid: [directorUuid]
+
+meta:
+  ## Stemcell
+  stemcell:
+    name: [stemcellName]
+    version: [stemcellVersion]
+
+  ## Release
+  bosh-release:
+    name: [releaseName]
+    version: [releaseVersion]
+
+  ## VM 비밀번호
+  vcap-password: [boshPassword]
+  
+  ## vSphere private 네트워크명
+  private-network-name: [networkName]
+  
+  ## BootStrap에 할당할 private 네트워크 대역
+  private-network-range: [subnetRange]
+  
+  ## private 네트워크 게이트웨이
+  private-network-gateway: [subnetGateway]
+  
+  ## private 네트워크 DNS
+  private-network-dns: [[subnetDns]]
+  
+  ## BOSH에 할당할 고정 IP
+  private-network-static: [[subnetStatic]]
+    
+  ## 이미 할당된 IPs
+  private-network-reserved: [[subnetReserved]]
+  
+  ## BOSH에 할당할 public IP
+  public-static-ips: [[publicStaticIp]]
+
+  ## vSphere External 네트워크명
+  public-network-name: [publicNetworkName]
+  
+  ## BOSH에 할당할 External 네트워크 대역
+  public-network-range: [publicSubnetRange]
+  
+  ## External 네트워크 게이트웨이
+  public-network-gateway: [publicSubnetGateway]
+  
+  ## External 네트워크 DNS
+  public-network-dns: [[publicSubnetDns]]
+
+  ## vCenter IP
+  vcenter-address: [vCenterAddress]
+  
+  ## vCenter 로그인 ID
+  vcenter-user: [vCenterUser]
+  
+  ## vCenter 로그인 비밀번호
+  vcenter-password: [vCenterPassword]
+  
+  ## vCenter DataCenter명
+  vcenter-datacenter-0-name: [vCenterName]
+  
+  ## DataCenter VM 폴더명
+  vcenter-datacenter-0-vm-folder: [vCenterVMFolder]
+  
+  ## DataCenter VM 스템셀 폴더명
+  vcenter-datacenter-0-template-folder: [vCenterTemplateFolder]
+  
+  ## DataCenter 데이터 스토어
+  vcenter-datacenter-0-datastore-pattern: [vCenterDatastore]
+  
+  ## DataCenter 영구 데이터 스토어
+  vcenter-datacenter-0-persistent-datastore-pattern: [vCenterPersistentDatastore]
+  
+  ## DataCenter 디스크 경로
+  vcenter-datacenter-0-disk-path: [vCenterDiskPath]
+  
+  ## DataCenter 클러스터명
+  vcenter-datacenter-0-clusters: [[vCenterCluster]]
+  
+  ## NTP
+  ntp: [[ntp]]
+
+  ## VM 리소스 타입
+  small-instance-type:
+   ram: [sInsTypeRAM]
+   disk: [sInsTypeDISK]
+   cpu: [sInsTypeCPU]
+
+  director-instance-type:
+   ram: [dInsTypeRAM]
+   disk: [dInsTypeDISK]
+   cpu: [dInsTypeCPU]
+  
+  ## 스냅샷기능 사용여부
+  enable-snapshots: [enableSnapshot]
+  
+  ## 스냅샷 스케줄
+  snapshot-schedule: [snapshotSchedule]

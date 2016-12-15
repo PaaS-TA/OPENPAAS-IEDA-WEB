@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>
+                ▶ %-5level %d{HH:mm:ss.SSS} [%thread] %logger[%method:%line] - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Application Loggers -->
+    <logger name="org.springframework" level="INFO"/>
+    <!--  Loot Loggers -->
+    <root level = "INFO">
+        <appender-ref ref="console"/>
+    </root>
+    
+    <!-- DEBUG Path -->
+    <logger name="org.openpaas.ieda.web" level="DEBUG"> </logger>
+    <logger name="org.openpaas.ieda.api" level="DEBUG"></logger>
+    
+    <!-- query Loggers -->
+</configuration>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.openpaas.ieda.web.config.systemRelease.dao.ReleaseManagementDAO">
+	<resultMap id="releaseManagement" type="org.openpaas.ieda.web.config.systemRelease.dao.ReleaseManagementVO">
+		<id property="id" column="ID" />
+		<result property="recid" column="ID"/>
+		<result property="releaseName" column ="RELEASE_NAME"/>
+		<result property="releaseType" column ="RELEASE_TYPE"/>
+		<result property="releaseFileName" column ="RELEASE_FILENAME"/>
+		<result property="releaseSize" column ="SIZE"/>
+		<result property="releaseVersion" column ="RELEASE_VERSION"/>
+		<result property="createUserId" column="CREATE_USER_ID"/>
+		<result property="updateUserId" column="UPDATE_USER_ID"/>
+		<result property="downloadStatus" column ="DOWNLOAD_STATUS"/>
+		<result property="createDate" column="CREATE_DATE"/>
+		<result property="updateDate" column="UPDATE_DATE"/>
+	</resultMap>
+	
+	<select id="selectSystemReleaseList" resultMap="releaseManagement">
+		/** ReleaseManagement.findAllOrderByReleaseTypeDesc **/
+		Select 
+			id,
+			id as recid,  
+			release_name, 
+			release_type, 
+			size,
+			download_status,
+			release_filename, 
+			create_user_id,
+			create_date,
+			update_user_id,
+			update_date 
+		From ieda_system_releases 
+		order by release_Type desc
+	</select>
+	
+	<select id="selectSystemRelease" resultMap="releaseManagement">
+		/** ReleaseManagement.findOne **/
+		Select 
+			id,
+			id as recid,  
+			release_name, 
+			release_type, 
+			size,
+			download_status,
+			release_filename, 
+			create_user_id,
+			create_date,
+			update_user_id,
+			update_date 
+		From ieda_system_releases 
+		where release_filename = #{fileName}
+	</select>
+	
+	<select id="selectSystemReleaseById" resultMap="releaseManagement">
+		/** ReleaseManagement.findOneById **/
+		Select 
+			id,
+			id as recid,  
+			release_name, 
+			release_type, 
+			size,
+			download_status,
+			release_filename, 
+			create_user_id,
+			create_date,
+			update_user_id,
+			update_date 
+		From ieda_system_releases 
+		where id = #{id}
+	</select>
+	
+	<insert id="insertSystemRelease" useGeneratedKeys="true" keyColumn="id" keyProperty="release.id">
+		/** ReleaseManagement.systemReleaseSave **/
+		INSERT INTO ieda_system_releases(
+			<if test="release.id != null">
+				id,
+			</if>
+			 release_name
+			,release_type
+			,size
+			,release_filename
+			,download_status
+			,create_user_id
+			,create_date
+			,update_user_id
+			,update_date)
+		VALUES(
+			<if test="release.id != null">
+				#{release.id},
+			</if>
+			 #{release.releaseName}
+			,#{release.releaseType}
+			,#{release.releaseSize}
+			,#{release.releaseFileName}
+			,#{release.downloadStatus}
+			,#{release.createUserId}
+			,now()
+			,#{release.updateUserId}
+			,now())
+			
+		<selectKey keyProperty="release.id" resultType="int" order="AFTER">
+			<if test="release.id != null"> SELECT 1 AS id from dual; </if>
+			<if test="release.id == null"> SELECT LAST_INSERT_ID(); </if>
+		</selectKey>
+	</insert>
+	
+	<update id="updateSystemRelease">
+		/** ReleaseManagement.systemReleaseUpdate **/
+		update ieda_system_releases set
+			 release_name = #{release.releaseName}
+			,release_type = #{release.releaseType}
+			,size = #{release.releaseSize}
+			,release_filename = #{release.releaseFileName}
+			,download_status=#{release.downloadStatus}
+			,update_user_id = #{release.updateUserId}
+			,update_date = now()
+		where id = #{release.id}
+	</update>
+	
+	<update id="updateSystemReleaseById">
+		/** ReleaseManagement.systemReleaseUpdateById **/
+		update ieda_system_releases set
+			<if test="release.releaseSize != null">
+				size = #{release.releaseSize},
+			</if>
+			download_status = #{release.downloadStatus},
+			<if test="release.releaseFileName != null">
+				release_filename = #{release.releaseFileName},
+			</if>
+			update_user_id = #{release.updateUserId},
+			update_date = now()
+		where id = #{release.id}
+	</update>
+	
+	
+	<delete id="deleteSystemRelase">
+		/** ReleaseManagement.systemRelaseDelete **/
+		DELETE FROM ieda_system_releases
+		WHERE id = #{release.id}
+		AND release_filename = #{release.releaseFileName}
+	</delete>
+	
+	<select id="selectLocalReleaseList" resultType="String">
+		/** ReleaseManagement.localReleaseList **/
+		SELECT 
+			release_filename 
+		FROM ieda_system_releases 
+		WHERE release_type = #{type}
+		AND release_filename LIKE CONCAT('%',#{iaas},'%')
+	</select>
+	
+</mapper>

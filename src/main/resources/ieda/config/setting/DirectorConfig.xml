@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.openpaas.ieda.web.config.setting.dao.DirectorConfigDAO">
+	<resultMap id="directorConfigVo" type="org.openpaas.ieda.web.config.setting.dao.DirectorConfigVO">
+		<id property="iedaDirectorConfigSeq" column="ieda_director_config_seq" />
+		<result property="userId" column ="user_id"/>
+		<result property="userPassword" column ="user_password"/>
+		<result property="directorName" column ="director_name"/>
+		<result property="directorVersion" column ="director_version"/>
+		<result property="directorUrl" column ="director_url"/>
+		<result property="directorPort" column ="director_port"/>
+		<result property="directorUuid" column ="director_uuid"/>
+		<result property="directorCpi" column ="director_cpi"/>
+		<result property="currentDeployment" column ="current_deployment"/>
+		<result property="defaultYn" column ="default_yn"/>
+		<result property="createDate" column ="create_date"/>
+		<result property="updateDate" column ="update_date"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="updateUserId" column="update_user_id"/>
+	</resultMap>
+
+	<select id="selectDirectorConfig" resultMap="directorConfigVo">
+		Select 
+			ieda_director_config_seq, 
+			create_date, 
+			current_deployment, 
+			default_yn, 
+			director_cpi, 
+			director_name, 
+			director_port, 
+			director_url, 
+			director_uuid, 
+			director_version, 
+			update_date, 
+			user_id, 
+			user_password 
+		From 
+			ieda_director_config				
+	</select>
+	
+	<select id="selectDirectorConfigByDefaultYn" resultMap="directorConfigVo">
+		Select ieda_director_config_seq,
+			create_date,
+			current_deployment, 
+			default_yn, 
+			director_cpi, 
+			director_name, 
+			director_port, 
+			director_url, 
+			director_uuid, 
+			director_version, 
+			update_date,
+			user_id, 
+			user_password 
+ 		From 
+ 		  	ieda_director_config
+		Where 
+			default_Yn = #{defaultYn}
+	</select>
+	
+	<select id="selectDirectorConfigBySeq" resultMap="directorConfigVo">
+		select 
+			ieda_director_config_seq, 
+			create_date, 
+			current_deployment, 
+			default_yn, 
+			director_cpi, 
+			director_name, 
+			director_port, 
+			director_url, 
+			director_uuid, 
+			director_version, 
+			update_date, 
+			user_id, 
+			user_password
+		From 
+			ieda_director_config 
+		Where 
+			ieda_director_config_seq=#{seq}					
+	</select>
+	
+	<select id="selectDirectorConfigByDirectorUrl" resultMap="directorConfigVo">
+		select 
+			ieda_director_config_seq, 
+			create_date, 
+			current_deployment, 
+			default_yn, 
+			director_cpi, 
+			director_name, 
+			director_port, 
+			director_url, 
+			director_uuid, 
+			director_version, 
+			update_date, 
+			user_id, 
+			user_password
+		From 
+			ieda_director_config 
+		Where 
+			director_url=#{directorUrl}	
+	</select>
+	
+	<insert id="insertDirector">
+		insert into ieda_director_config (
+			ieda_director_config_seq,
+			create_date, 
+			create_user_id,
+			current_deployment, 
+			default_yn, 
+			director_cpi, 
+			director_name, 
+			director_port, 
+			director_url, 
+			director_uuid, 
+			director_version, 
+			update_date, 
+			update_user_id,
+			user_id, 
+			user_password) 
+		Values (
+			#{director.iedaDirectorConfigSeq},
+			now(),
+			#{director.createUserId},
+			#{director.currentDeployment},
+			#{director.defaultYn},
+			#{director.directorCpi},
+			#{director.directorName},
+			#{director.directorPort},
+			#{director.directorUrl},
+			#{director.directorUuid},
+			#{director.directorVersion},
+			now(),
+			#{director.updateUserId},
+			#{director.userId},
+			#{director.userPassword})	
+	</insert>
+	
+	<update id="updateDirector">
+		Update 
+			ieda_director_config 
+		Set  
+			current_deployment=#{director.currentDeployment}, 
+			default_yn=#{director.defaultYn}, 
+			director_cpi=#{director.directorCpi}, 
+			director_name=#{director.directorName}, 
+			director_port=#{director.directorPort}, 
+			director_url=#{director.directorUrl}, 
+			director_uuid=#{director.directorUuid}, 
+			director_version=#{director.directorVersion}, 
+			update_date=now(),
+			update_user_id=#{director.updateUserId},
+			user_id=#{director.userId}, 
+			user_password=#{director.userPassword}
+		Where 
+			ieda_director_config_seq= #{director.iedaDirectorConfigSeq}
+	</update>
+	
+	<delete id="deleteDirecotr">
+		Delete from 
+			ieda_director_config 
+		Where 
+			ieda_director_config_seq=#{seq}		
+	</delete>
+</mapper>

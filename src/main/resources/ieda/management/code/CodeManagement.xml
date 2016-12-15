@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.openpaas.ieda.web.management.code.dao.CommonCodeDAO">
+	<resultMap id="managementCode" type="org.openpaas.ieda.web.management.code.dao.CommonCodeVO">
+		<id property="codeIdx" column="code_idx" />
+		<result property="recid" column="code_idx"/>
+		<result property="codeName" column ="code_name"/>
+		<result property="codeValue" column ="code_value"/>
+		<result property="codeNameKR" column ="code_name_kr"/>
+		<result property="codeDescription" column ="code_description"/>
+		<result property="subGroupCode" column ="sub_group_code"/>
+		<result property="sortOrder" column ="sort_order"/>
+		<result property="parentCode" column ="parent_code"/>
+		<result property="createUserId" column ="create_user_id"/>
+		<result property="createDate" column ="create_date"/>
+		<result property="updateUserId" column ="update_user_id"/>
+		<result property="updateDate" column ="update_date"/>
+	</resultMap>
+	
+	<select id="selectCodeName" resultMap="managementCode">
+		/** CodeManagement.selectCodeName **/
+		Select
+			code_idx, 
+			code_description,
+			code_name, 
+			code_value, 
+			create_date, 
+			create_user_id,
+			parent_code, 
+			code_idx as recid, 
+			sort_order,
+			sub_group_code, 
+			update_date, 
+			update_user_id 
+		From 
+			ieda_common_code
+		Where 
+			code_name = #{codeName}		 
+		Order by 
+			code_idx asc
+	</select>
+	
+	<select id="selectCodeValueCheck" resultType="int">
+		Select
+			count(*)
+		From ieda_common_code
+		Where code_value=#{code.codeValue}
+		<if test="code.parentCode != null">
+			And parent_code = #{code.parentCode}
+		</if>
+		<if test="code.subGroupCode != null">
+			And sub_group_code = #{code.subGroupCode}
+		</if>
+	</select>
+	
+	<select id="selectCodeIdx" resultMap="managementCode">
+		/** CodeManagement.selectCodeIdx **/
+		Select
+			code_idx, 
+			code_description,
+			code_name, 
+			code_value, 
+			create_date, 
+			create_user_id,
+			parent_code, 
+			code_idx as recid, 
+			sort_order,
+			sub_group_code, 
+			update_date, 
+			update_user_id 
+		From 
+			ieda_common_code
+		Where 
+			code_idx = #{CodeIdx}		 
+		Order by 
+			code_idx asc
+	</select>
+	
+	<select id="selectParentCodeIsNull" resultMap="managementCode">
+		/** CodeManagement.selectParentCodeIsNull **/
+		Select
+			code_idx, 
+			code_description,
+			code_name, 
+			code_value, 
+			create_date, 
+			create_user_id,
+			parent_code, 
+			code_idx as recid, 
+			sort_order,
+			sub_group_code, 
+			update_date, 
+			update_user_id 
+		From 
+			ieda_common_code
+		Where 
+			parent_code is null 
+		Order by 
+			sort_order asc
+	</select>
+	
+	<select id="selectMaxSortOrder" resultType="Integer">
+		/** CodeManagement.selectMaxSortOrder **/
+		Select
+			ifnull(max(sort_order),0)+1 as sort_order
+		From 
+			ieda_common_code
+		Where 
+			parent_code = #{parentCode}	 
+		and
+			sub_group_code = #{subGroupCode}
+	</select>
+	<select id="selectParentCodeAndSubGroupCode" resultMap="managementCode">
+		/** CodeManagement.selectParentCodeAndSubGroupCode **/
+		Select
+			code_idx, 
+			code_description,
+			code_name, 
+			code_name_kr,
+			code_value, 
+			create_date, 
+			create_user_id,
+			parent_code, 
+			code_idx as recid, 
+			sort_order,
+			sub_group_code, 
+			update_date, 
+			update_user_id 
+		From 
+			ieda_common_code
+		Where 
+			parent_code = #{parentCode}	
+		<if test="type == 2">
+        	And sub_group_code is null
+        </if>
+        <if test="type == 3">
+        	And sub_group_code = #{subGroupCode}
+        </if>		 
+		Order by 
+			code_value asc, sort_order asc
+	</select>
+	
+	<insert id="insertCode" >
+		/** CodeManagement.createCode **/
+		insert into ieda_common_code (
+			code_idx,
+			code_description, 
+			code_name, 
+			code_value, 
+			code_name_kr,
+			parent_code,  
+			sort_order, 
+			sub_group_code, 
+			create_date,
+			create_user_id,
+			update_date, 
+			update_user_id) 
+		values (
+			#{code.codeIdx},
+			#{code.codeDescription},
+			#{code.codeName}, 
+			#{code.codeValue}, 
+			#{code.codeNameKR}, 
+			#{code.parentCode},  
+			#{code.sortOrder}, 
+			#{code.subGroupCode}, 
+			now(),
+			#{code.createUserId},
+			now(), 
+			#{code.updateUserId})
+	</insert>
+	
+	<update id="updateCode">
+		/** CodeManagement.updateCode **/
+		Update 
+			ieda_common_code 
+		Set 
+			code_description=#{code.codeDescription}, 
+			code_name=#{code.codeName}, 
+			code_value=#{code.codeValue},  
+			code_name_kr = #{code.codeNameKR},
+			parent_code=#{code.parentCode}, 
+			sort_order=#{code.sortOrder}, 
+			sub_group_code=#{code.subGroupCode}, 
+			update_date=now(), 
+			update_user_id=#{code.updateUserId} 
+		Where 
+			code_idx= #{code.codeIdx}
+	</update>
+	
+	<delete id="deleteCode">
+		Delete from 
+			ieda_common_code 
+		Where 
+			code_idx= #{codeIdx}
+	</delete>
+	
+	<select id="selectCommonCodeList" resultMap="managementCode">
+		/** CodeManagement.selectCommonCodeList **/
+		select * 
+		from ieda_common_code 
+		where parent_code = #{parentCode}
+		order by code_value asc, sort_order asc;
+	</select>
+	
+	<select id="selectCommonCodeByCodeName" resultMap="managementCode">
+		/** CodeManagement.selectCommonCodeByCodeName **/
+		Select 
+			 code_idx
+			,code_name
+			,code_value
+			,code_description
+			,code_name_kr
+		  From ieda_common_code
+		Where parent_code = #{parentCode}
+		   And sub_group_code = #{subGroupCode}
+		   And code_name = #{codeName}
+	</select>
+	
+	<select id="selectReleaseTypeList" resultType="String">
+		Select code_name
+		from ieda_common_code 
+		where parent_code  in (select code_value from ieda_common_code where code_name=#{parentCodeName}) ;
+	</select>
+
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.openpaas.ieda.web.deploy.common.dao.network.NetworkDAO">
+	<resultMap id="networks" type="org.openpaas.ieda.web.deploy.common.dao.network.NetworkVO" >
+			<result property="id" column="ID" />
+			<result property="deployType" column="DEPLOY_TYPE"/>
+			<result property="net" column="NET"/>
+			<result property="seq" column="SEQ"/>
+			<result property="subnetStaticFrom" column="SUBNET_STATIC_FROM" />
+			<result property="subnetStaticTo" column="SUBNET_STATIC_TO" />
+			<result property="subnetReservedFrom" column="SUBNET_RESERVED_FROM" />
+			<result property="subnetReservedTo" column="SUBNET_RESERVED_TO" />
+			<result property="subnetRange" column="SUBNET_RANGE" />
+			<result property="subnetGateway" column="SUBNET_GATEWAY" />
+			<result property="subnetDns" column="SUBNET_DNS" />
+			<result property="subnetId" column="SUBNET_ID" />
+			<result property="cloudSecurityGroups" column="CLOUD_SECURITY_GROUPS" />
+			<result property="createUserId" column="CREATE_USER_ID"/>
+			<result property="createDate" column="CREATE_DATE" />
+			<result property="updateUserId" column="UPDATE_USER_ID"/>
+			<result property="updateDate" column="UPDATE_DATE" />
+		</resultMap>
+		
+		<select id="selectNetworkList" resultMap="networks">
+			/**ieda_network.selectNetworkList**/
+			Select 
+				id 
+				,deploy_type
+				,seq
+				,ifnull(net, "") as net
+				,ifnull(subnet_range, "") as subnet_range
+				,ifnull(subnet_gateway, "") as subnet_gateway
+				,ifnull(subnet_reserved_from, "") as subnet_reserved_from
+				,ifnull(subnet_reserved_to, "") as subnet_reserved_to
+				,ifnull(subnet_dns, "") as subnet_dns
+				,ifnull(subnet_static_from, "") as subnet_static_from
+				,ifnull(subnet_static_to, "") as subnet_static_to
+				,ifnull(subnet_id, "") as subnet_id
+				,ifnull(cloud_security_groups, "") as cloud_security_groups
+				,create_user_id
+				,create_date
+				,update_user_id
+				,update_date
+			From ieda_network 
+			Where id = #{id}
+			And deploy_type=#{deployType}
+		</select>
+		
+		<insert id="insertNetworkList">
+			/**ieda_network.insertNetworkList**/
+			insert into ieda_network(
+				id, 
+				deploy_type,
+				net,
+				seq, 
+				subnet_id, 
+				subnet_range, 
+				subnet_gateway, 
+				subnet_dns, 
+				subnet_static_from, 
+				subnet_static_to, 
+				subnet_reserved_from, 
+				subnet_reserved_to, 
+				cloud_security_groups,
+				create_user_id, 
+				create_date, 
+				update_user_id, 
+				update_date
+			)
+			Values
+			<foreach collection="networks" item="item" index="index"   separator="," >
+				( #{item.id}, 
+				#{item.deployType}, 
+				#{item.net},
+				#{index}, 
+				#{item.subnetId}, 
+				#{item.subnetRange},
+				#{item.subnetGateway}, 
+				#{item.subnetDns}, 
+				#{item.subnetStaticFrom}, 
+				#{item.subnetStaticTo},
+				#{item.subnetReservedFrom}, 
+				#{item.subnetReservedTo},
+				#{item.cloudSecurityGroups},
+				#{item.createUserId},
+				 now(), 
+				 #{item.updateUserId}, 
+				 now())
+			</foreach>
+		</insert>
+		
+		<delete id="deleteNetworkInfoRecord">
+		/**ieda_network.deleteNetworkInfoRecord**/
+			DELETE 
+			FROM ieda_network
+			WHERE id=#{id}
+			AND deploy_type=#{deployType}
+	</delete>
+		
+</mapper>

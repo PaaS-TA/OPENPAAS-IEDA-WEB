@@ -1,0 +1,105 @@
+meta: ~
+
+iaas_settings:
+  disk_pools:
+    - name: database_disks
+      <<: (( merge ))
+      cloud_properties:
+        <<: (( merge ))
+  stemcell:
+    name: (( meta.stemcell-name ))
+    version: (( meta.stemcell-version || "latest" ))
+  subnet_configs:
+    - name: diego1
+      subnets:
+      - range: (( meta.network-0-range ))
+        gateway: (( meta.network-0-gateway ))
+        reserved: (( meta.network-0-reserved ))
+        dns: (( meta.network-0-dns ))
+        static: (( meta.network-0-static ))
+        cloud_properties:
+          name: (( meta.network-0-net-name ))
+    - name: diego2
+      subnets: (( merge || iaas_settings.subnet_configs.diego1.subnets ))
+    - name: diego3
+      subnets: (( merge || iaas_settings.subnet_configs.diego1.subnets ))
+    - name: diego-vizzini
+      subnets: (( merge || "nil" ))
+  compilation_cloud_properties:
+    <<: (( merge ))
+    cpu: 2
+    disk: 8192
+    ram: 2048
+  resource_pool_cloud_properties:
+    - name: access_z1
+      cloud_properties: (( meta_resource_pool_cloud_properties.small ))
+    - name: access_z2
+      cloud_properties: (( meta_resource_pool_cloud_properties.small ))
+    - name: access_z3
+      cloud_properties: (( meta_resource_pool_cloud_properties.small ))
+    - name: brain_z1
+      cloud_properties: (( meta_resource_pool_cloud_properties.small ))
+    - name: brain_z2
+      cloud_properties: (( meta_resource_pool_cloud_properties.small ))
+    - name: brain_z3
+      cloud_properties: (( meta_resource_pool_cloud_properties.small ))
+    - name: cc_bridge_z1
+      cloud_properties: (( meta_resource_pool_cloud_properties.small ))
+    - name: cc_bridge_z2
+      cloud_properties: (( meta_resource_pool_cloud_properties.small ))
+    - name: cc_bridge_z3
+      cloud_properties: (( meta_resource_pool_cloud_properties.small ))
+    - name: cell_z1
+      cloud_properties: (( meta_resource_pool_cloud_properties.cell ))
+    - name: cell_z2
+      cloud_properties: (( meta_resource_pool_cloud_properties.cell ))
+    - name: cell_z3
+      cloud_properties: (( meta_resource_pool_cloud_properties.cell ))
+    - name: colocated_z1
+      cloud_properties: (( meta_resource_pool_cloud_properties.medium ))
+    - name: colocated_z2
+      cloud_properties: (( meta_resource_pool_cloud_properties.medium ))
+    - name: colocated_z3
+      cloud_properties: (( meta_resource_pool_cloud_properties.medium ))
+    - name: database_z1
+      cloud_properties: (( meta_resource_pool_cloud_properties.medium ))
+    - name: database_z2
+      cloud_properties: (( meta_resource_pool_cloud_properties.medium ))
+    - name: database_z3
+      cloud_properties: (( meta_resource_pool_cloud_properties.medium ))
+    - name: route_emitter_z1
+      cloud_properties: (( meta_resource_pool_cloud_properties.medium ))
+    - name: route_emitter_z2
+      cloud_properties: (( meta_resource_pool_cloud_properties.medium ))
+    - name: route_emitter_z3
+      cloud_properties: (( meta_resource_pool_cloud_properties.medium ))
+    - name: errand
+      cloud_properties: (( meta_resource_pool_cloud_properties.errand ))
+
+meta_resource_pool_cloud_properties:
+  small:
+    <<: (( merge ))
+    cpu: (( meta.small-instance-type.cpu || 1 ))
+    ram: (( meta.small-instance-type.ram || 1024 ))
+    disk: (( meta.small-instance-type.disk || 4096 ))
+  medium:
+    <<: (( merge ))
+    cpu: (( meta.medium-instance-type.cpu || 1 ))
+    ram: (( meta.medium-instance-type.ram || 1024 ))
+    disk: (( meta.medium-instance-type.disk || 8192 ))
+  large:
+    <<: (( merge ))
+    cpu: (( meta.large-instance-type.cpu || 2 ))
+    ram: (( meta.large-instance-type.ram || 8192 ))
+    disk: (( meta.large-instance-type.disk || 50000 ))
+  cell:
+    <<: (( merge ))
+    cpu: (( meta.cell-instance-type.cpu || 2 ))
+    ram: (( meta.cell-instance-type.ram || 8192 ))
+    disk: (( meta.cell-instance-type.disk || 50000 ))
+  errand:
+    <<: (( merge || nil ))
+    cpu: (( meta.small-instance-type.cpu || 1 ))
+    ram: (( meta.small-instance-type.ram || 1024 ))
+    disk: (( meta.small-instance-type.disk || 4096 ))
+    

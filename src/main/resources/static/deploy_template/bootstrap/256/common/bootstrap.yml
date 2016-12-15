@@ -1,0 +1,96 @@
+meta: ~
+
+releases:
+- name: bosh
+  url: (( meta.bosh-release-url ))
+- name: (( meta.cpi-release ))
+  url: (( meta.bosh-cpi-release-url ))
+
+resource_pools:
+- name: vms
+  network: private
+  stemcell:
+    url: (( meta.stemcell-url ))
+  cloud_properties: (( merge ))
+  env:
+    bosh:
+      # c1oudc0w is a default password for vcap user
+      password: (( meta.vcap-password ))
+
+disk_pools: (( merge ))
+
+networks: (( merge ))
+
+jobs:
+- name: bosh
+  instances: (( auto || 1 ))
+
+  templates:
+  - {name: nats, release: bosh}
+  - {name: postgres, release: bosh}
+  - {name: blobstore, release: bosh}
+  - {name: director, release: bosh}
+  - {name: health_monitor, release: bosh}  
+  - <<: (( merge ))
+
+  resource_pool: vms
+  persistent_disk_pool: disks
+
+  networks: (( merge ))
+
+  properties:
+    nats:
+      address: 127.0.0.1
+      user: nats
+      password: nats-password
+
+    postgres: &db
+      listen_address: 127.0.0.1
+      host: 127.0.0.1
+      user: postgres
+      password: postgres-password
+      database: bosh
+      adapter: postgres
+
+    blobstore:
+      address: (( meta.private-static-ips.[0] ))
+      port: 25250
+      provider: dav
+      director: {user: director, password: director-password}
+      agent: {user: agent, password: agent-password}
+
+    director:
+      <<: (( merge ))
+      address: 127.0.0.1
+      name: (( meta.director-name || "bosh-init" ))
+      db: *db
+      cpi_job: (( meta.cpi-name ))
+      user_management:
+        provider: local
+        local:
+          users:
+          - {name: admin, password: admin}
+          - {name: hm, password: hm-password}
+
+    hm:
+      director_account: {user: hm, password: hm-password}
+      resurrector_enabled: true
+
+    <<: (( merge ))
+
+    agent:
+      mbus: (( "nats://nats:nats-password@" meta.private-static-ips.[0] ":4222" ))
+
+cloud_provider:
+  template:
+    name: (( meta.cpi-name ))
+    release: (( meta.cpi-release ))
+
+  mbus: (( "https://mbus:mbus-password@" meta.public-static-ips.[0] ":6868" ))
+
+  <<: (( merge ))
+
+  properties:
+    <<: (( merge ))
+    agent: {mbus: "https://mbus:mbus-password@0.0.0.0:6868"}
+    blobstore: {provider: local, path: /var/vcap/micro_bosh/data/cache}

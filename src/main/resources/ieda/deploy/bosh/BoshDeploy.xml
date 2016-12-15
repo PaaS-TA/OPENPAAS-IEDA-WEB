@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.openpaas.ieda.web.deploy.bosh.dao.BoshDAO">
+
+	<resultMap id="bosh" type="org.openpaas.ieda.web.deploy.bosh.dao.BoshVO">
+		<id property="id" column="ID" />
+		<result property="iaasType" column="IAAS_TYPE"/>
+		<result property="createUserId" column="CREATE_USER_ID"/>
+		<result property="createDate" column="CREATE_DATE" />
+		<result property="updateUserId" column="UPDATE_USER_ID"/>
+		<result property="updateDate" column="UPDATE_DATE" />
+		<result property="awsAccessKeyId" column="AWS_ACCESS_KEY_ID"/>
+		<result property="awsSecretAccessId" column="AWS_SECRET_ACCESS_ID"/>
+		<result property="awsAvailabilityZone" column="AWS_AVAILABILITY_ZONE"/>
+		<result property="awsRegion" column="AWS_REGION"/>
+		<result property="openstackAuthUrl" column ="OPENSTACK_AUTH_URL"/>
+		<result property="openstackTenant" column ="OPENSTACK_TENANT"/>
+		<result property="openstackUserName" column ="OPENSTACK_USER_NAME"/>
+		<result property="openstackApiKey" column ="OPENSTACK_API_KEY"/>
+		<result property="vCenterAddress" column="VCENTER_ADDRESS"/>
+		<result property="vCenterUser" column="VCENTER_USER"/>
+		<result property="vCenterPassword" column="VCENTER_PASSWORD"/>
+		<result property="vCenterDatacenterName" column="VCENTER_DATACENTER_NAME"/>
+		<result property="vCenterVMFolder" column="VCENTER_VM_FOLDER"/>
+		<result property="vCenterTemplateFolder" column="VCENTER_TEMPLATE_FOLDER"/>
+		<result property="vCenterDatastore" column="VCENTER_DATASTORE"/>
+		<result property="vCenterPersistentDatastore" column="VCENTER_PERSISTENT_DATASTORE"/>
+		<result property="vCenterDiskPath" column="VCENTER_DISK_PATH"/>
+		<result property="vCenterCluster" column="vcenter_clusters"/>
+		<result property="defaultSecurityGroups" column ="DEFAULT_SECURITY_GROUPS"/>
+		<result property="privateKeyName" column ="PRIVATE_KEY_NAME"/>
+		<result property="deploymentName" column ="DEPLOYMENT_NAME"/>
+		<result property="directorName" column ="DIRECTOR_NAME"/>
+		<result property="snapshotSchedule" column ="snapshot_Schedule"/>
+		<result property="enableSnapshots" column ="enable_snapshots"/>
+		<result property="directorUuid" column ="DIRECTOR_UUID"/>
+		<result property="releaseVersion" column ="RELEASE_VERSION"/>
+		<result property="ntp" column ="NTP"/>
+		<result property="deploymentFile" column ="DEPLOYMENT_FILE"/>
+		<result property="deployStatus" column ="DEPLOY_STATUS"/>
+		<result property="taskId" column ="TASK_ID"/>
+		<collection property="resource" ofType="org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO"  javaType="org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO">
+			<result property="id" column="RESOURCE_ID" />
+			<result property="deployType" column="RESOURCE_DEPLOY_TYPE"/>
+			<result property="boshPassword" column="BOSH_PASSWORD" />
+			<result property="stemcellName" column="STEMCELL_NAME" />
+			<result property="stemcellVersion" column="STEMCELL_VERSION" />
+			<result property="smallFlavor" column="SMALL_TYPE_FLAVOR"/>
+			<result property="mediumFlavor" column="MEDIUM_TYPE_FLAVOR" />
+			<result property="smallCpu" column="SMALL_TYPE_CPU" />
+			<result property="smallRam" column="SMALL_TYPE_RAM" />
+			<result property="smallDisk" column="SMALL_TYPE_DISK" />
+			<result property="mediumCpu" column="MEDIUM_TYPE_CPU" />
+			<result property="mediumRam" column="MEDIUM_TYPE_RAM" />
+			<result property="mediumDisk" column="MEDIUM_TYPE_DISK" />
+			<result property="createUserId" column="CREATE_USER_ID"/>
+			<result property="createDate" column="CREATE_DATE" />
+			<result property="updateUserId" column="UPDATE_USER_ID"/>
+			<result property="updateDate" column="UPDATE_DATE" />
+		</collection>
+	</resultMap>
+
+	<select id="selectBoshListByIaasType" resultMap="bosh">
+		/** iedaBoshDeploy.selectBoshListByIaasType  **/
+		SELECT id, 
+			iaas_Type
+			, AES_DECRYPT(UNHEX(openstack_api_key), 'raison')  as openstack_api_key
+			,openstack_auth_url
+			,openstack_user_name
+			,openstack_tenant
+			,aws_access_key_id
+			, AES_DECRYPT(UNHEX(aws_secret_access_id), 'raison')  as aws_secret_access_id
+			,aws_region
+			,vcenter_address
+			,vcenter_user
+			,AES_DECRYPT(UNHEX(vcenter_password), 'raison')  as vcenter_password
+			,vcenter_datacenter_name
+			,vcenter_vm_folder
+			,vcenter_template_folder
+			,vcenter_datastore
+			,vcenter_persistent_datastore
+			,vcenter_disk_path
+			,vcenter_clusters
+			,create_date
+			,default_security_groups
+			,deploy_status
+			,deployment_file
+			,deployment_name
+			,ntp
+			,snapshot_schedule
+			,director_name
+			,enable_snapshots
+			,director_uuid
+			,private_key_name
+			,release_version
+			,task_id
+			,update_date
+			,update_user_id
+			,create_user_id
+		FROM ieda_bosh 
+		WHERE iaas_type= #{iaas}
+	</select>
+	
+	<select id="selectBoshDetailInfo" resultMap="bosh">
+		/** iedaBoshDeploy.selectBoshDetailInfo  **/
+		SELECT id, 
+			iaas_Type,
+			AES_DECRYPT(UNHEX(openstack_api_key), 'raison')  as openstack_api_key, 
+			openstack_auth_url, 
+			openstack_user_name,
+			openstack_tenant,
+			aws_access_key_id,
+			AES_DECRYPT(UNHEX(aws_secret_access_id), 'raison')  as aws_secret_access_id,
+			aws_region,
+			aws_availability_zone,
+			vcenter_address,
+		 	vcenter_user,
+		 	AES_DECRYPT(UNHEX(vcenter_password), 'raison')  as vcenter_password,
+		 	vcenter_datacenter_name,
+		 	vcenter_vm_folder,
+		 	vcenter_template_folder,
+		 	vcenter_datastore,
+		 	vcenter_persistent_datastore,
+		 	vcenter_disk_path,
+		 	vcenter_clusters,
+			create_date, 
+			default_security_groups, 
+			deploy_status, 
+			deployment_file, 
+			deployment_name, 
+			ntp,
+			snapshot_schedule,
+			director_name,
+			enable_snapshots,
+			director_uuid, 
+			private_key_name, 
+			release_version, 
+			task_id, 
+			update_date,
+			update_user_id,
+			create_user_id
+		FROM ieda_bosh
+		WHERE id = #{id}
+	</select>
+	
+	<insert id="saveBoshInfo" useGeneratedKeys="true" keyColumn="id" keyProperty="bosh.id">
+		/** IEDABosh.saveBoshInfo  **/
+		INSERT INTO ieda_bosh (
+			<choose>
+				<when test="bosh.iaasType == 'AWS'">
+					aws_access_key_id
+					,aws_secret_access_id
+					,aws_region
+					,aws_availability_zone
+				</when>
+				<when test="bosh.iaasType == 'OPENSTACK'">
+					openstack_auth_url
+					,openstack_tenant
+					,openstack_user_name
+					,openstack_api_key
+				</when>
+				<when test="bosh.iaasType == 'VSPHERE'">
+					 vcenter_address
+					 ,vcenter_user
+					 ,vcenter_password
+					 ,vcenter_datacenter_name
+					 ,vcenter_vm_folder
+					 ,vcenter_template_folder
+					 ,vcenter_datastore
+					 ,vcenter_persistent_datastore
+					 ,vcenter_disk_path
+					 ,vcenter_clusters
+				</when>
+				<otherwise>
+					aws_access_key_id
+					,aws_secret_access_id
+					,aws_region
+					,openstack_auth_url
+					,openstack_tenant
+					,openstack_user_name
+					,openstack_api_key
+				</otherwise>
+			</choose>
+			,id
+			,iaas_type
+			,default_security_groups
+			,private_key_name
+			,create_date
+			,create_user_id
+			,update_user_id
+			,update_date
+			) 
+		VALUES(
+			<choose>
+				<when test="bosh.iaasType == 'AWS'">
+					#{bosh.awsAccessKeyId}, 
+					HEX(AES_ENCRYPT(#{bosh.awsSecretAccessId}, 'raison')), 
+					#{bosh.awsRegion}, 
+					#{bosh.awsAvailabilityZone},
+				</when>
+				<when test="bosh.iaasType == 'OPENSTACK'">
+					#{bosh.openstackAuthUrl}, 
+					#{bosh.openstackTenant}, 
+					#{bosh.openstackUserName}, 
+					HEX(AES_ENCRYPT(#{bosh.openstackApiKey}, 'raison')),
+				</when>
+				<when test="bosh.iaasType == 'VSPHERE'">
+					#{bosh.vCenterAddress},
+					#{bosh.vCenterUser},
+					HEX(AES_ENCRYPT(#{bosh.vCenterPassword}, 'raison')),
+					#{bosh.vCenterDatacenterName},
+					#{bosh.vCenterVMFolder},
+					#{bosh.vCenterTemplateFolder},
+					#{bosh.vCenterDatastore},
+					#{bosh.vCenterPersistentDatastore},
+					#{bosh.vCenterDiskPath},
+					#{bosh.vCenterCluster},
+				</when>
+				<otherwise>
+					NULL, NULL, NULL, 
+					NULL, NULL, NULL, NULL, 
+				</otherwise>
+			</choose>
+				#{bosh.id},
+				#{bosh.iaasType}, #{bosh.defaultSecurityGroups}, 
+				#{bosh.privateKeyName},
+				now(), #{bosh.createUserId}, 
+				#{bosh.updateUserId}, now())
+		<selectKey keyProperty="bosh.id" resultType="int" order="AFTER">
+				SELECT LAST_INSERT_ID();
+		</selectKey>
+	</insert>
+	
+	<update id="updateBoshInfo">
+	/** IEDABosh.updateBoshInfo **/
+		UPDATE ieda_bosh SET
+		<choose>
+			<when test="bosh.iaasType == 'AWS'">
+				aws_access_key_id = #{bosh.awsAccessKeyId},
+				aws_secret_access_id = HEX(AES_ENCRYPT(#{bosh.awsSecretAccessId}, 'raison')),
+				aws_region = #{bosh.awsRegion},
+				aws_availability_zone = #{bosh.awsAvailabilityZone},
+			</when>
+			<when test="bosh.iaasType == 'OPENSTACK'">
+				openstack_auth_url = #{bosh.openstackAuthUrl},
+				openstack_tenant = #{bosh.openstackTenant},
+				openstack_user_name = #{bosh.openstackUserName},
+				openstack_api_key = HEX(AES_ENCRYPT(#{bosh.openstackApiKey}, 'raison')),
+			</when>
+			<when test="bosh.iaasType == 'VSPHERE'">
+				vcenter_address = #{bosh.vCenterAddress},
+				vcenter_user = #{bosh.vCenterUser},
+				vcenter_password = HEX(AES_ENCRYPT(#{bosh.vCenterPassword}, 'raison')),
+				vcenter_datacenter_name = #{bosh.vCenterDatacenterName},
+				vcenter_vm_folder = #{bosh.vCenterVMFolder},
+				vcenter_template_folder = #{bosh.vCenterTemplateFolder},
+				vcenter_datastore = #{bosh.vCenterDatastore},
+				vcenter_persistent_datastore = #{bosh.vCenterPersistentDatastore},
+				vcenter_disk_path = #{bosh.vCenterDiskPath},
+				vcenter_clusters = #{bosh.vCenterCluster},
+			</when>
+		</choose>
+			default_security_groups =#{bosh.defaultSecurityGroups}, 
+			private_key_name =#{bosh.privateKeyName}, 
+			deployment_name =#{bosh.deploymentName}, 
+			director_name =#{bosh.directorName},
+			director_uuid =#{bosh.directorUuid}, 
+			release_version =#{bosh.releaseVersion}, 
+			enable_Snapshots = #{bosh.enableSnapshots},
+			snapshot_Schedule = #{bosh.snapshotSchedule},
+			ntp = #{bosh.ntp},
+			deployment_file =#{bosh.deploymentFile}, 
+			deploy_status =#{bosh.deployStatus}, 
+			task_id= #{bosh.taskId},
+			update_user_id = #{bosh.updateUserId},
+			update_date = now()
+		WHERE
+		id=#{bosh.id}
+	</update>
+	
+	<delete id="deleteBoshInfoRecord">
+		DELETE 
+		FROM ieda_bosh
+		WHERE id=#{id}
+	</delete>
+	
+	<select id="selectResourceInfoById" resultMap="bosh">
+		SELECT d.id as id 
+			,iaas_type
+			,AES_DECRYPT(UNHEX(openstack_api_key), 'raison')  as openstack_api_key
+			,openstack_auth_url
+			,openstack_user_name
+			,openstack_tenant
+			,aws_access_key_id
+			,AES_DECRYPT(UNHEX(aws_secret_access_id), 'raison')  as aws_secret_access_id
+			,aws_region
+			,aws_availability_zone
+			,vcenter_address
+		 	,vcenter_user
+		 	,AES_DECRYPT(UNHEX(vcenter_password), 'raison')  as vcenter_password
+		 	,vcenter_datacenter_name
+		 	,vcenter_vm_folder
+		 	,vcenter_template_folder
+		 	,vcenter_datastore
+		 	,vcenter_persistent_datastore
+		 	,vcenter_disk_path
+		 	,vcenter_clusters
+			,default_security_groups
+			,deploy_status
+			,deployment_file
+			,deployment_name
+			,ntp
+			,snapshot_schedule
+			,director_name
+			,enable_snapshots
+			,director_uuid
+			,private_key_name
+			,release_version
+			,resource.deploy_type as resource_deploy_type
+			,resource.bosh_password
+			,resource.stemcell_name
+			,resource.stemcell_version
+			,small_type_flavor
+			,small_type_cpu
+			,small_type_ram
+			,small_type_disk
+			,medium_type_flavor
+			,medium_type_cpu
+			,medium_type_ram
+			,medium_type_disk
+			,task_id
+		From (select * from ieda_bosh where id = #{id} ) as d
+			Left Join ieda_resource as resource
+			On d.id = resource.id
+			And resource.deploy_type=#{deployType}
+			And resource.id=#{id}
+	</select>
+	
+	<select id="selectSnapshotInfo" resultType="int">
+		 Select count(if(snapshot_schedule='',null,snapshot_schedule)) as count   
+		   From ieda_bosh 
+		 Where  director_name = (Select director_name 
+		    From ieda_director_config 
+		  Where director_name = #{director.directorName} 
+		      And director_cpi = #{director.directorCpi}
+		      And director_url = #{director.directorUrl})
+	</select>
+</mapper>

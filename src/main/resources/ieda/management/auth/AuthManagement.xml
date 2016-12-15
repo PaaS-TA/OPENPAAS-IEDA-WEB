@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.openpaas.ieda.web.management.auth.dao.AuthManagementDAO">
+	
+	<resultMap id="findByAushMap" type="org.openpaas.ieda.web.management.auth.dao.AuthManagementVO">
+		<id property="roleId" column="role_id" />
+		<result property="recid" column ="role_id"/>
+		<result property="roleName" column ="role_name"/>
+		<result property="roleDescription" column ="role_description"/>
+		<result property="activeYn" column ="auth_code"/>
+		<result property="createUserId" column ="create_user_id"/>
+		<result property="createDate" column ="create_date"/>
+		<result property="updateUserId" column ="update_user_id"/>
+		<result property="updateDate" column ="update_date"/>
+		<result property="authCode" column ="authCode"/>
+		<result property="seq" column ="seq"/>
+	</resultMap> 
+	
+	<resultMap id="findDetailAushMap" type="java.util.HashMap">
+		<id property="codeIdx" column="code_idx" />
+		<result property="recid" column ="code_idx"/>
+		<result property="roleName" column ="code_name_kr"/>
+		<result property="roleDescription" column ="code_description"/>
+		<result property="authCode" column ="auth_code"/>
+	</resultMap>
+	
+	<select id="selectRoleGroupList" resultMap="findByAushMap">
+		select *
+		from ieda_role 
+		order by role_id desc
+	</select>
+		
+	<select id="selectRoleDetailListByRoleId" resultMap="findDetailAushMap">
+		select
+			 c.code_idx, c.code_name_kr, c.code_description, d.auth_code
+		from (
+				select * from ieda_common_code where parent_code= #{parentCode} 
+		  	 ) c 
+	  	LEFT JOIN ieda_role_detail d 
+  		ON d.role_id = #{roleId} 
+  		AND d.auth_code = c.code_value
+  		order by c.code_value asc, c.sort_order asc;
+	</select>
+	
+ 	<select id="selectRoleInfoByRoleName" resultMap="findByAushMap">
+		Select * from ieda_role where role_name = #{roleName}
+	</select>
+	
+	<select id="selectRoleInfoByRoleId" resultMap="findByAushMap">
+		Select * from ieda_role where role_id = #{id}
+	</select>
+	
+	<insert id="insertRoleGroupInfo">
+		insert into ieda_role (
+		role_id,
+		role_name,
+		role_description,
+		create_user_id,
+		create_date,
+		update_user_id,
+		update_date		
+		)
+		values (
+		#{authVO.roleId},
+		#{authVO.roleName},
+		#{authVO.roleDescription},
+		#{authVO.createUserId},
+		now(),
+		#{authVO.updateUserId},
+		now()
+		)
+		<selectKey keyProperty="authVO.roleId" resultType="int" order="AFTER">
+			SELECT LAST_INSERT_ID();
+		</selectKey>
+	</insert>
+	
+	<insert id="insertRoleDetailInfoByRoleId">
+		insert into ieda_role_detail (
+			role_id,
+			seq,
+			auth_code,
+			create_user_id,
+			create_date,
+			update_user_id,
+			update_date
+		)
+		values 
+		<foreach collection="activeYn" item="item" index="index" separator=" , ">
+		(		
+			#{authVO.roleId},
+			#{index}+1,
+			#{item},
+			#{authVO.createUserId},
+			now(),
+			#{authVO.updateUserId},
+			now()
+			)
+		</foreach>
+	</insert>
+	
+	<delete id="deleteRoleGroupInfoByRoleId">
+		delete from ieda_role where role_id  = #{id}
+	</delete>
+	
+	<delete id="deleteRoleDetailInfoByRoleId">
+		delete from ieda_role_detail where role_id  = #{id}
+	</delete>
+	
+	<update id="updateRoleGroupInfoByRoleId">
+		update ieda_role 
+			set 
+				role_name = #{authVO.roleName} ,
+			    role_description = #{authVO.roleDescription},
+			    update_user_id=#{authVO.updateUserId}, 
+			    update_date = now() 
+			where 
+				role_id = #{authVO.roleId};	
+	</update>
+		
+</mapper>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.openpaas.ieda.web.deploy.common.dao.key.KeyDAO">
+	<resultMap id="keys" type="org.openpaas.ieda.web.deploy.common.dao.key.KeyVO" >
+			<result property="id" column="ID" />
+			<result property="deployType" column="DEPLOY_TYPE"/>
+			<result property="keyType" column="KEY_TYPE"/>
+			<result property="caCert" column="CA_CERT" />
+			<result property="serverCert" column="SERVER_CERT" />
+			<result property="serverKey" column="SERVER_KEY" />
+			<result property="clientCert" column="CLIENT_CERT" />
+			<result property="clientKey" column="CLIENT_KEY" />
+			<result property="agentCert" column="AGENT_CERT" />
+			<result property="agentKey" column="AGENT_KEY" />
+			<result property="tlsCert" column="TLS_CERT" />
+			<result property="privateKey" column="PRIVATE_KEY" />
+			<result property="publicKey" column="PUBLIC_KEY"/>
+			<result property="hostKey" column="HOST_KEY" />
+		</resultMap>
+		
+		<select id="selectKeyInfoLIst" resultMap="keys"> 
+			/**KeyInfo.selectKeyInfoLIst**/
+			Select  *
+			  From ieda_key
+		    Where id =#{id}
+		       And deploy_type=#{deployType}
+		       And key_type
+		</select>
+		
+		<insert id="insertKeyInfo">
+			/**KeyInfo.insertKeyInfo**/
+			Insert Into ieda_key(
+				id
+				,deploy_type
+				,key_type
+				,ca_cert
+				,server_cert
+				,server_key
+				,client_cert
+				,client_key
+				,agent_cert
+				,agent_key
+				,tls_cert
+				,private_key
+				,public_key
+				,host_key
+				,create_user_id
+				,create_date
+				,update_user_id
+				,update_date
+			)Values(
+				#{key.id}
+				,#{key.deployType}
+				,#{key.keyType}
+				,#{key.caCert}
+				,#{key.serverCert}
+				,#{key.serverKey}
+				,#{key.clientCert}
+				,#{key.clientKey}
+				,#{key.agentCert}
+				,#{key.agentKey}
+				,#{key.tlsCert}
+				,#{key.privateKey}
+				,#{key.publicKey}
+				,#{key.hostKey}
+				,#{key.createUserId}
+				,now()
+				,#{key.updateUserId}
+				,now()
+			)
+		</insert>
+		
+		<update id="updateKeyInfo">
+			/**KeyInfo.updateKeyInfo**/
+			Update ieda_key Set
+				ca_cert=#{key.caCert},
+				server_cert=#{key.serverCert},
+				server_key=#{key.serverKey},
+				client_cert=#{key.clientCert},
+				client_key=#{key.clientKey},
+				agent_cert=#{key.agentCert},
+				agent_key=#{key.agentKey},
+				tls_cert=#{key.tlsCert},
+				private_key=#{key.privateKey},
+				public_key=#{key.publicKey},
+				host_key=#{key.hostKey},
+				update_user_id=#{key.updateUserId},
+				update_date=now()
+			Where id=#{key.id}
+			    And deploy_type=#{key.deployType}
+			    And key_type=#{key.keyType}
+		</update>
+		
+		<delete id="deleteKeyInfo">
+			/**KeyInfo.deleteKeyInfo**/
+			Delete 
+			  From ieda_key
+			Where id = #{id}
+			    And deploy_type=#{deployType} 
+		</delete>
+</mapper>

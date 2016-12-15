@@ -1,0 +1,71 @@
+## 배포명
+name: [deploymentName]
+
+## director UUID
+director_uuid: [directorUuid]
+
+meta:
+  ## Stemcell
+  stemcell:
+    name: [stemcellName]
+    version: [stemcellVersion]
+
+  ## Release
+  bosh-release:
+    name: [releaseName]
+    version: [releaseVersion]
+
+  ## VM 비밀번호
+  vcap-password: [boshPassword]
+
+  ## openstack 네트워크 ID
+  private-network-id: [subnetId]
+  
+  ## BOSH에 할당할 네트워크 대역
+  private-network-range: [subnetRange]
+  
+  ## 게이트웨이
+  private-network-gateway: [subnetGateway]
+  
+  ## DNS
+  private-network-dns: [[subnetDns]]
+
+  ## BOSH에 할당할 private IP
+  private-network-static: [[subnetStatic]]
+  
+  private-network-reserved: [[subnetReserved]]
+  
+  ## BOSH에 할당할 public IP
+  public-static-ips: [[publicStaticIp]]
+
+  ## OpenStack Token URL
+  auth-url: [authUrl]
+  
+  ## OpenStack 테넌트
+  tenant: [tenant]
+  
+  ## OpenStack 사용자 ID
+  username: [userName]
+  
+  ## OpenStack 사용자 비밀번호
+  api-key: [apiKey]
+  
+  ## OpenStack Key
+  default-key-name: [privateKeyName]
+  
+  ## OpenStack 기본 시큐리티 그룹
+  default-security-groups: [[defaultSecurityGroups]]
+  
+  ## NTP
+  ntp: [[ntp]]
+
+  ## VM 리소스 타입
+  small-instance-type: [smallInstanceType]
+  
+  director-instance-type: [directorInstanceType]
+  
+  ## 스냅샷기능 사용여부
+  enable-snapshots: [enableSnapshot]
+  
+  ## 스냅샷 스케줄
+  snapshot-schedule: [snapshotSchedule]

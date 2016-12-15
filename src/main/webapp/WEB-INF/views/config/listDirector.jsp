@@ -1,32 +1,38 @@
+<%
+/* =================================================================
+ * 작성일 : 
+ * 작성자 : 
+ * 상세설명 : 설치관리자 조회 및 설정
+ * =================================================================
+ * 수정일         작성자             내용     
+ * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ * 2016-08       지향은      설치관리자 설정 화면 개선
+ * =================================================================
+ */ 
+%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
-<style type="text/css">
-.w2ui-popup .w2ui-msg-body{background-color: #FFF; }
-w2ui-box1{margin:0;padding: 0;}
-.w2ui-msg-body {margin:0;padding: 0;}
-.pannel{margin:0;padding: 0;}
-</style>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <script type="text/javascript">
 
 var fadeOutTime = 3000;
-
 $(function() {
-	
+	/********************************************************
+	 * 설명 :  설치관리자 목록 조회
+	 *********************************************************/
   	$('#config_directorGrid').w2grid({
 		name: 'config_directorGrid',
 		header: '<b>설치관리자 목록</b>',
  		method: 'GET',
  		multiSelect: false,
 		show: {	
-				lineNumbers: true,
 				selectColumn: true,
 				footer: true},
 		style: 'text-align: center',
 		columns:[
-				 {field: 'recid', 					caption: 'recid', 		hidden: true},
+				 {field: 'recid', caption: 'recid', hidden: true},
 		         {field: 'iedaDirectorConfigSeq', 	caption: '레코드키', 		hidden: true},
-		         {field: 'defaultYn', 				caption: '기본 관리자',	size: '10%',
+		         {field: 'defaultYn', 	caption: '기본 관리자',	size: '10%',
 			    	   render: function(record) {
 			    		   if ( record.defaultYn == 'Y' )
 			    			   return '<span class="btn btn-primary" style="width:70px">기본</span>';
@@ -66,16 +72,22 @@ $(function() {
 				$('#deleteSetting').attr('disabled', true);
 				$('#updateSetting').attr('disabled', true);
 			}
+		}, 
+		onLoad:function(event){
+			if(event.xhr.status == 403){
+				location.href = "/abuse";
+				event.preventDefault();
+			}
 		},
 		onError: function(event) {
-			this.unlock();
-			gridErrorMsg(event);
+			
 		}
 	});
   	
  	initView();
- 	
- 	// 기본 설치 관리자 설정
+ 	/********************************************************
+ 	 * 설명 :  기본 설치 관리자 설정
+ 	 *********************************************************/
  	$("#setDefaultDirector").click(function(){
  		if($("#setDefaultDirector").attr('disabled') == "disabled") return;
  		
@@ -91,7 +103,7 @@ $(function() {
  		else{
  			var record = w2ui['config_directorGrid'].get(selected);
  			if( record.defaultYn == "Y" ){
- 				//클릭시 버튼  Disable 
+ 				//클릭시 버튼  Disable 다른 페이지 호출
  				w2alert("선택한 설치 관리자는 이미 기본 설치 관리자로 설정되어 있습니다.","기본 설치 관리자 설정");
  				return;
  			}
@@ -109,14 +121,17 @@ $(function() {
 	 									w2ui['config_directorGrid'].reset();
 	 									},
 	 				no_callBack		: function(envent){ 
-	 		        						console.log("user clicked NO");
+	 										w2ui['config_directorGrid'].reset();
+	 		        						doSearch();
 	 		    						}
 	 			});
  			}
  		}
 	});
-		 			
-	// 설정 관리자 추가 버튼
+ 	
+ 	/********************************************************
+ 	 * 설명 :  설정 관리자 추가 버튼
+ 	 *********************************************************/
 	$("#addSetting").click(function(){
 		w2popup.open({
 			title 	: "<b>설치관리자 설정추가</b>",
@@ -124,11 +139,16 @@ $(function() {
 			height	: 380,
 			modal	: true,
 			body	: $("#regPopupDiv").html(),
-			buttons : $("#regPopupBtnDiv").html()
+			buttons : $("#regPopupBtnDiv").html(),
+			onClose:function(event){
+				doSearch();
+			}
 		});
 	});
-	
-	// 설정 관리자 수정 버튼
+ 	
+	/********************************************************
+	 * 설명 :  설정 관리자 수정 버튼
+	 *********************************************************/
 	$("#updateSetting").click(function(){
 		if($("#updateSetting").attr('disabled') == "disabled") return;
 		
@@ -138,11 +158,12 @@ $(function() {
 			w2alert("선택된 정보가 없습니다.", "설치 관리자 정보 수정");
 			return;
 		}
-		
 		updateDirectorConfigPopup(w2ui['config_directorGrid'].get(selected));
 	});
 	
-	// 설정관리자 삭제 버튼
+	/********************************************************
+	 * 설명 :  설정관리자 삭제 버튼
+	 *********************************************************/
 	$("#deleteSetting").click(function(){
 		if($("#deleteSetting").attr('disabled') == "disabled") return;
 
@@ -174,7 +195,8 @@ $(function() {
 					initView();
 				},
 				no_callBack	: function(){
-					console.log("user clicked NO");
+					w2ui['config_directorGrid'].reset();
+					doSearch();
 				}
 						
 			});
@@ -182,19 +204,29 @@ $(function() {
 	});// 설정관리자 삭제 버튼 END
 });
 
+/********************************************************
+ * 설명		: 목록 재조회
+ * Function	: initView
+ *********************************************************/
 function initView() {
 	// 기본 설치 관리자 정보 조회
- 	getDefaultDirector("<c:url value='/directors/default'/>");
-
+ 	getDefaultDirector("<c:url value='/common/use/director'/>");
 	// 설치관리자 목록조회
 	doSearch();
 }
 
-//조회기능
+/********************************************************
+ * 설명		: 목록 조회
+ * Function	: doSearch
+ *********************************************************/
 function doSearch() {
-	w2ui['config_directorGrid'].load("<c:url value='/directors'/>", doButtonStyle);
+	w2ui['config_directorGrid'].load("<c:url value='/config/director/list'/>", doButtonStyle);
 }
 
+/********************************************************
+ * 설명		: 버튼 스타일 초기화
+ * Function	: doButtonStyle
+ *********************************************************/
 function doButtonStyle(){
 	var girdTotal = w2ui['config_directorGrid'].records.length;
 	
@@ -203,6 +235,10 @@ function doButtonStyle(){
 	$('#deleteSetting').attr('disabled', true);
 }
 
+/********************************************************
+ * 설명		: 유효성 검사
+ * Function	: validateInputField
+ *********************************************************/
 function validateInputField(inputField, value) {
 	var isOk = true;
 	
@@ -251,14 +287,21 @@ function validateInputField(inputField, value) {
 	return isOk;
 }
 
-function validateIP(input)  
-{
+/********************************************************
+ * 설명		: 유효성 검사 IP
+ * Function	: validateIP
+ *********************************************************/
+function validateIP(input)  {
 	if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(input))  
 		return true;
 	else 
 		return false;  
 }
 
+/********************************************************
+ * 설명		: 유효성 검사
+ * Function	: setGuideMessage
+ *********************************************************/
 function setGuideMessage(successObject, successMessage, errorObject, errorMessage) {
 	if ( successMessage == "" )
 		successObject.html(successMessage);
@@ -271,6 +314,10 @@ function setGuideMessage(successObject, successMessage, errorObject, errorMessag
 	errorObject.html(errorMessage);
 }
 
+/********************************************************
+ * 설명		: 유효성 검사
+ * Function	: validateAllInputField
+ *********************************************************/
 function validateAllInputField() {
 	var isOk = true;
 	if ( !validateInputField('ip', $(".w2ui-msg-body input[name='ip']").val()) )
@@ -285,38 +332,41 @@ function validateAllInputField() {
 	return isOk;
 }
 
-//기본 설치 관리자 설정
+/********************************************************
+ * 설명		: 기본 설치 관리자 설정
+ * Function	: registDefault
+ *********************************************************/
 function registDefault(seq, target){
-	
 	$.ajax({
 		type : "PUT",
-		url : "/director/default/"+seq,
+		url : "/config/director/setDefault/"+seq,
 		contentType : "application/json",
 		success : function(data, status) {
 			w2alert("기본 설치 관리자를 \n" + target +"로 설정하였습니다.",  "기본 설치 관리자 설정", doSearch);
-			
-			getDefaultDirector("<c:url value='/directors/default'/>");
+			getDefaultDirector("<c:url value='/common/use/director'/>");
 		},
 		error : function(request, status, error) {
-
 			var errorResult = JSON.parse(request.responseText);
 			w2alert(errorResult.message, "기본 설치 관리자 설정");
+			doSearch();
 		}
 	});
 }
 
-//설정관리자 등록
+/********************************************************
+ * 설명		: 설정관리자 등록
+ * Function	: registDirectorConfig
+ *********************************************************/
 function registDirectorConfig(){
 	if ( !validateAllInputField() ) {
 		return;
 	}
 	
-	//TODO : Check Field Value
 	lock( '등록 중입니다.', true);
 
 	$.ajax({
 		type : "POST",
-		url : "/directors",
+		url : "/config/director/add",
 		contentType : "application/json",
 		//dataType: "json",
 		async : true,
@@ -327,33 +377,35 @@ function registDirectorConfig(){
 			userPassword : $(".w2ui-msg-body input[name='pwd']").val(),
 		}),
 		success : function(data, status) {
-			// ajax가 성공할때 처리...
+			
 			w2popup.unlock();
 			w2popup.close();
-			
 			doSearch();
 			
 			// 기본 설치 관리자 정보 조회
-		 	getDefaultDirector("<c:url value='/directors/default'/>");
+		 	getDefaultDirector("<c:url value='/common/use/director'/>");
 		},
 		error : function(request, status, error) {
 			// ajax가 실패할때 처리...
 			w2popup.unlock();
 			var errorResult = JSON.parse(request.responseText);
 			w2alert(errorResult.message);
+			doSearch();
 		}
 	});
 }
 
-// 설치관리자 수정팝업
+/********************************************************
+ * 설명		: 설정관리자 수정 팝업
+ * Function	: updateDirectorConfigPopup
+ *********************************************************/
 function updateDirectorConfigPopup(record) {
 	
 	w2confirm({
 		title 	: "설치 관리자 정보 수정",
-		msg		: "설치 관리자 정보를 수정하시겠습니까?",
+		msg		: "설치 관리자("+record.directorName+")를 수정하시겠습니까?",
 		yes_text: "확인",
 		yes_callBack : function(envent){
-			
  			w2popup.open({
 				title 	: "<b>설치관리자 정보수정</b>",
 				width 	: 550,
@@ -371,79 +423,101 @@ function updateDirectorConfigPopup(record) {
 						$(".w2ui-msg-body input[name='user']").val(record.userId);
 						$(".w2ui-msg-body input[name='pwd']").val("");
 					}
+				},onClose : function(event){
+					w2ui['config_directorGrid'].reset();
+					doSearch();
 				}
 			});
 
 		},
-		no_text : "취소"
+		no_text : "취소",
+		no_callBack : function(envent){
+			w2ui['config_directorGrid'].reset();
+			doSearch();
+		}
 	});
 }
 
-//설치관리자 수정
+/********************************************************
+ * 설명		: 설정관리자 수정 
+ * Function	: updateDirectorConfig
+ *********************************************************/
 function updateDirectorConfig() {
-	console.log('updateDirectorConfig');
-	
 	if ( !validateAllInputField() ) {
 		return;
 	}
-	
-	//TODO : Check Field Value
 	lock( '수정 중입니다.', true);
 
 	$.ajax({
 		type : "PUT",
-		url : "/directors/" + $(".w2ui-msg-body input[name='seq']").val(),
+		url : "/config/director/update/" + $(".w2ui-msg-body input[name='seq']").val(),
 		contentType : "application/json",
 		async : true,
 		data : JSON.stringify({
 			iedaDirectorConfigSeq : parseInt($(".w2ui-msg-body input[name='seq']").val()),
 			userId : $(".w2ui-msg-body input[name='user']").val(),
-			userPassword : $(".w2ui-msg-body input[name='pwd']").val(),
+			userPassword : $(".w2ui-msg-body input[name='pwd']").val()
 		}),
 		success : function(data, status) {
 			// ajax가 성공할때 처리...
 			w2popup.unlock();
 			w2popup.close();
-			
 			w2ui['config_directorGrid'].reset();
-			
 			doSearch();
 			
 			// 기본 설치 관리자 정보 조회
-		 	getDefaultDirector("<c:url value='/directors/default'/>");
+		 	getDefaultDirector("<c:url value='/common/use/director'/>");
 		},
 		error : function(request, status, error) {
 			// ajax가 실패할때 처리...
 			w2popup.unlock();
 			var errorResult = JSON.parse(request.responseText);
 			w2alert(errorResult.message);
+			doSearch();
 		}
 	});
 }
 
-//설치관리자 삭제
+/********************************************************
+ * 설명		: 설정관리자 삭제 
+ * Function	: deleteDirector
+ *********************************************************/
 function deleteDirector(seq){
 	$.ajax({
 		type : "DELETE",
-		url : "/director/"+ seq,
+		url : "/config/director/delete/"+ seq,
 		contentType : "application/json",
 		success : function(data, status) {
 			// ajax가 성공할때 처리...
+			doSearch();
 			w2popup.unlock();
 			w2popup.close();
 		},
 		error : function(request, status, error) {
 			var errorResult = JSON.parse(request.responseText);
 			w2alert(errorResult.message, "설치 관리자 삭제");
+			doSearch();
 		}
 	});
 }
 
-//다른페이지 이동시 호출
+function closew2ui(){
+	w2popup.close();
+	doSearch();
+}
+
+/********************************************************
+ * 설명		: 다른 페이지 호출
+ * Function	: clearMainPage
+ *********************************************************/
 function clearMainPage() {
 	$().w2destroy('config_directorGrid');
 }
 
+/********************************************************
+ * 설명		: lock 실행
+ * Function	: lock
+ *********************************************************/
 function lock (msg) {
     w2popup.lock(msg, true);
 }
@@ -452,7 +526,7 @@ function lock (msg) {
 <div id="main">
 	<div class="page_site">환경설정 및 관리 > <strong>설치관리자 설정</strong></div>
 	
-	<!-- 설치 관리자 -->
+	<!-- 설치 관리자 정보 -->
 	<div id="isDefaultDirector"></div>
 	
 	<!-- 설치관리자 목록-->
@@ -460,15 +534,24 @@ function lock (msg) {
 		<div class="title fl">설치관리자 목록</div>
 		<div class="fr"> 
 		<!-- Btn -->
+		<sec:authorize access="hasAuthority('CONFIG_DIRECTOR_SET')">
 		<span id="setDefaultDirector" class="btn btn-primary" style="width:180px" >기본 설치 관리자로 설정</span>
+		</sec:authorize>
+		<sec:authorize access="hasAuthority('CONFIG_DIRECTOR_ADD')">
 		<span id="addSetting" class="btn btn-primary" style="width:130px" >설정 추가</span>
+		</sec:authorize>
+		<sec:authorize access="hasAuthority('CONFIG_DIRECTOR_UPDATE')">
 		<span id="updateSetting" class="btn btn-info" style="width:130px" >설정 수정</span>
+		</sec:authorize>
+		<sec:authorize access="hasAuthority('CONFIG_DIRECTOR_DELETE')">
 		<span id="deleteSetting" class="btn btn-danger" style="width:130px" >설정 삭제</span>
+		</sec:authorize>
 		<!-- //Btn -->
 	    </div>
 	</div>
 	
-	<div id="config_directorGrid" style="width:100%; height:500px"></div>	
+	<!-- 설치관리자 목록 조회-->
+	<div id="config_directorGrid" style="width:100%; height:650px"></div>	
 </div>
 
 <!-- 설치관리자 정보추가/수정 팝업 -->
@@ -505,6 +588,7 @@ function lock (msg) {
 						<span id="pwdSuccMsg"></span><BR><span id="pwdErrMsg"></span>
 					</div>
 				</div>
+				<input name="seq" type="hidden"/>
 			</div>
 		</div>
 	</form>	

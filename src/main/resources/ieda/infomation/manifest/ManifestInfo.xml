@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.openpaas.ieda.web.information.manifest.dao.ManifestDAO">
+
+	<resultMap id="manifest" type="org.openpaas.ieda.web.information.manifest.dao.ManifestVO">
+		<id property="id" column="ID" />
+		<result property="recid" column="RECID"/>
+		<result property="iaas" column="IAAS"/>
+		<result property="fileName" column="MANIFEST_FILE"/>
+		<result property="description" column="DESCRIPTION"/>
+		<result property="path" column="PATH"/>
+		<result property="deploymentName" column="DEPLOYMENT_NAME"/>
+		<result property="deployStatus" column="DEPLOY_STATUS"/>
+		<result property="createUserId" column="CREATE_USER_ID"/>
+		<result property="createDate" column="CREATE_DATE" />
+		<result property="updateUserId" column="UPDATE_USER_ID"/>
+		<result property="updateDate" column="UPDATE_DATE" />
+	</resultMap>
+	
+	<select id="selectManifestList" resultMap="manifest">
+		/**ManifestInfo.selectManifestList **/
+		Select 
+			 id
+			,id as recid
+			,iaas
+			,manifest_file
+			,description
+			,path
+			,deployment_name
+			,deploy_status
+			,create_user_id
+			,create_date
+			,update_user_id
+			,update_date
+			,deploy_status
+		From ieda_manifest
+	</select>
+	
+	<select id="selectManifestInfo" resultMap="manifest">
+		/**ManifestInfo.selectManifestInfo **/
+		Select 
+			 id
+			,iaas
+			,manifest_file
+			,description
+			,path
+			,deployment_name
+			,deploy_status
+			,create_user_id
+			,create_date
+			,update_user_id
+			,update_date
+			,deployment_name
+			,deploy_status
+		From ieda_manifest
+	  Where id = #{id} 
+	</select>
+	
+	<insert id="insertManifestInfo">
+		/**ManifestInfo.insertManifestInfo **/
+		Insert Into ieda_manifest(
+			id
+			,manifest_file
+			,description 
+			,iaas
+			,path
+			,deployment_name
+			,create_user_id
+			,create_date
+			,update_user_id
+			,update_date
+		)Values(
+			#{manifest.id}
+			,#{manifest.fileName}
+			,#{manifest.description}
+			,#{manifest.iaas}
+			,#{manifest.path}
+			,#{manifest.deploymentName}
+			,#{manifest.createUserId}
+			,now()
+			,#{manifest.updateUserId}
+			,now()
+		)
+	</insert>
+	
+	<update id="updateManifestInfo">
+		/**ManifestInfo.updateManifestInfo **/
+		Update ieda_manifest set
+			deployment_name=#{manifest.deploymentName}
+			,deploy_status = #{manifest.deployStatus}
+			,update_user_id = #{manifest.updateUserId}
+			,update_date = now()
+		Where id = #{manifest.id}
+	</update>
+	
+	<delete id="deleteManifestInfo">
+		/**ManifestInfo.deleteManifestInfo **/
+		Delete
+		  From ieda_manifest
+		Where id =  #{id}
+	</delete>
+	
+	<select id="selectManifestInfoByDeployName" resultMap="manifest">
+		/**ManifestInfo.selectManifestInfoByDeployName **/
+		Select 
+			 id
+			,manifest_file
+			,iaas
+			,description
+			,path
+			,create_user_id
+			,create_date
+			,update_user_id
+			,update_date
+			,deployment_name
+			,deploy_status
+		From ieda_manifest
+	  Where deployment_name = #{deploymentName} 
+	</select>
+		
+	<select id="selectManifestSearchList" resultMap="manifest">
+		/**ManifestInfo.selectManifestSearchList **/
+		SELECT 
+			 id
+			,id as recid
+			,iaas
+			,manifest_file
+			,description
+			,path
+			,deployment_name
+			,create_user_id
+			,create_date
+			,update_user_id
+			,update_date
+			,deploy_status
+		FROM
+			ieda_manifest
+		<if test="searchVal != 'ALL' and searchVal != null">
+		WHERE manifest_file LIKE CONCAT('%',#{searchVal},'%') OR deployment_name Like CONCAT('%',#{searchVal},'%') OR manifest_file LIKE CONCAT('%',#{searchVal},'%');
+		</if>
+	</select>
+	
+	<select id="selectManifestInfoByDeployNameANDId" resultMap="manifest">
+		/**ManifestInfo.selectManifestInfoByDeployNameANDId **/
+		Select 
+			 id
+			,iaas
+			,manifest_file
+			,description
+			,path
+			,create_user_id
+			,create_date
+			,update_user_id
+			,update_date
+			,deployment_name
+			,deploy_status
+		From ieda_manifest
+	  Where deployment_name = #{deploymentName}
+	     AND id != #{id}
+	</select>
+</mapper>

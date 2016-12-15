@@ -16,11 +16,10 @@ input.radio{vertical-align:middle}
 body {height:100%;overflow-x:hidden;}
 #wrap {width:1280px;min-height:100%;height:auto;margin:0 auto ; }
 #header,#container,#footer{min-width:1280px;margin:0 auto;text-align:left;}
-#header{width:1280px;height:71px;background:url(../images/top.jpg);}
+#header{width:1280px;height:71px;background:url(../images/top2.jpg);}
 #container{width:1280px;min-height:870px;margin:0 auto;text-align:left;padding-bottom:40px; border-right:1px solid #EDECEC;}
 #footer{width:100%;height:78px;margin:0 auto;text-align:left;clear:both;background:#152934;}
 #wrap1{width:1280px;min-height:100%;height:auto;margin:0 auto ; position:relative;}
-
 .fullBox {width: 100%; height: 100%;}
 #hMargin {padding:10px 10px}
 
@@ -36,21 +35,29 @@ body {height:100%;overflow-x:hidden;}
 .leftMenu_01 {
 	width:235px;
 	height:41px;
-	background:url(../images/left_menu01.jpg);
+	background:url(../images/left_menu1.jpg);
 	margin-top:25px;	
 }
 .leftMenu_02 {
 	width:235px;
 	height:41px;
-	background:url(../images/left_menu02.jpg);
+	background:url(../images/left_menu2.jpg);
 	margin-top:25px;	
 }
 .leftMenu_03 {
 	width:235px;
 	height:41px;
-	background:url(../images/left_menu03.jpg);
+	background:url(../images/left_menu3.jpg);
 	margin-top:25px;	
 }
+
+.leftMenu_04 {
+	width:235px;
+	height:41px;
+	background:url(../images/left_menu4.jpg);
+	margin-top:25px;	
+}
+
 .leftMenu_ti{
 	padding:10px 0 0 56px;
 	font-size:15px;
@@ -76,6 +83,12 @@ body {height:100%;overflow-x:hidden;}
 	margin-top:25px;
 }
 #main{position:absolute;left:10px; 
+	float:right;
+	width:1020px;
+	min-height:800px;
+	margin-top:25px;
+}
+#main2{position:absolute;left:10px; 
 	float:right;
 	width:1020px;
 	min-height:800px;

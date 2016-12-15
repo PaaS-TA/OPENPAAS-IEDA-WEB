@@ -1,0 +1,111 @@
+# The following line helps maintain current documentation at http://docs.cloudfoundry.org.
+# code_snippet cf-stub-openstack start
+---
+meta:
+  stemcell:
+    name: [stemcellName]
+    version: [stemcellVersion]
+
+  cf_release:
+    name: [releaseName]
+    version: [releaseVersion]
+
+  director-uuid: [directorUuid]
+
+  environment: [deploymentName]
+
+  floating_static_ips: [[proxyStaticIps]]
+
+  network-0-range: [subnetRange]
+  network-0-gateway: [subnetGateway]
+  network-0-reserved: [[subnetReserved]]
+  network-0-dns: [[subnetDns]]
+  network-0-static: [[subnetStatic]]
+  network-0-net-id: [cloudNetId]
+  network-0-security-groups: [[cloudSecurityGroups]]
+
+  network-1-range: [subnetRange1]
+  network-1-gateway: [subnetGateway1]
+  network-1-reserved: [[subnetReserved1]]
+  network-1-dns: [[subnetDns1]]
+  network-1-static: [[subnetStatic1]]
+  network-1-net-id: [cloudNetId1]
+  network-1-security-groups: [[cloudSecurityGroups1]]
+
+  system-domain: [domain]
+  description: [description]
+  system-domain-organization: [domainOrganization]
+
+  consul-encrypt-keys: [[encryptKeys]]
+
+  consul-ca-cert: |
+[caCert]
+  consul-server-cert: |
+[serverCert]
+  consul-server-key: |
+[serverKey]
+  consul-agent-cert: |
+[agentCert]
+  consul-agent-key: |
+[agentKey]
+
+  blobstore-tls-cert: |
+[blobstoreTlsCert]
+
+  blobstore-private-key: |
+[blobstorePrivateKey]
+
+  blobstore-ca-cert: |
+[blobstoreCaCert]
+
+  jwt-verification-key: |
+[verificationKey]
+
+  jwt-signing-key: |
+[signingKey]
+
+  hm9000-server-key: |
+[hm9000ServerKey]
+
+  hm9000-server-cert: |
+[hm9000ServerCert]
+
+  hm9000-client-key: |
+[hm9000ClientKey]
+
+  hm9000-client-cert: |
+[hm9000ClientCert]
+
+  hm9000-ca-cert: |
+[hm9000CaCert]
+
+  ha-proxy-ssl-pem: |
+[sslPemPub]
+[sslPemRsa]
+
+  login-password: [loginSecret]
+
+  # Default vcap & root password on deployed VMs (ie c1oudc0w)
+  # Generated using mkpasswd -m sha-512
+  vcap-password: [boshPassword]
+
+  host-key-fingerprint: [appSshFingerprint]
+
+  small-instance-type: [smallInstanceType]
+
+  medium-instance-type: [mediumInstanceType]
+
+  large-instance-type: [largeInstanceType]
+
+  runner-instance-type: [runnerInstanceType]
+
+  dea-next-disk-mb: [deaDiskMB]
+
+  dea-next-memory-mb: [deaMemoryMB]
+
+  ## Don't change
+  default_env:
+    bosh:
+      password: (( vcap-password ))
+
+  admin-password: (( cf-admin-password || "admin" ))

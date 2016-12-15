@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.openpaas.ieda.web.deploy.bootstrap.dao.BootstrapDAO">
+
+	<resultMap id="bootstrap" type="org.openpaas.ieda.web.deploy.bootstrap.dao.BootstrapVO">
+		<id property="id" column="ID" />
+		<result property="iaasType" column="IAAS_TYPE"/>
+		<result property="createUserId" column="CREATE_USER_ID"/>
+		<result property="createDate" column="CREATE_DATE" />
+		<result property="updateUserId" column="UPDATE_USER_ID"/>
+		<result property="updateDate" column="UPDATE_DATE" />
+		<result property="awsAccessKeyId" column="AWS_ACCESS_KEY_ID"/>
+		<result property="awsSecretAccessId" column="AWS_SECRET_ACCESS_ID"/>
+		<result property="awsRegion" column="AWS_REGION"/>
+		<result property="awsAvailabilityZone" column="AWS_AVAILABILITY_ZONE"/>
+		<result property="openstackAuthUrl" column ="OPENSTACK_AUTH_URL"/>
+		<result property="openstackTenant" column ="OPENSTACK_TENANT"/>
+		<result property="openstackUserName" column ="OPENSTACK_USER_NAME"/>
+		<result property="openstackApiKey" column ="OPENSTACK_API_KEY"/>
+		<result property="vCenterAddress" column="VCENTER_ADDRESS"/>
+		<result property="vCenterUser" column="VCENTER_USER"/>
+		<result property="vCenterPassword" column="VCENTER_PASSWORD"/>
+		<result property="vCenterDatacenterName" column="VCENTER_DATACENTER_NAME"/>
+		<result property="vCenterVMFolder" column="VCENTER_VM_FOLDER"/>
+		<result property="vCenterTemplateFolder" column="VCENTER_TEMPLATE_FOLDER"/>
+		<result property="vCenterDatastore" column="VCENTER_DATASTORE"/>
+		<result property="vCenterPersistentDatastore" column="VCENTER_PERSISTENT_DATASTORE"/>
+		<result property="vCenterDiskPath" column="VCENTER_DISK_PATH"/>
+		<result property="vCenterCluster" column="VCENTER_CLUSTERS"/>
+		<result property="defaultSecurityGroups" column ="DEFAULT_SECURITY_GROUPS"/>
+		<result property="privateKeyName" column ="PRIVATE_KEY_NAME"/>
+		<result property="privateKeyPath" column ="PRIVATE_KEY_PATH"/>
+		<result property="deploymentName" column ="DEPLOYMENT_NAME"/>
+		<result property="directorName" column ="DIRECTOR_NAME"/>
+		<result property="boshRelease" column ="BOSH_RELEASE"/>
+		<result property="boshCpiRelease" column ="BOSH_CPI_RELEASE"/>
+		<result property="snapshotSchedule" column ="SNAPSHOT_SCHEDULE"/>
+		<result property="enableSnapshots" column ="ENABLE_SNAPSHOTS"/>
+		<result property="privateStaticIp" column ="PRIVATE_STATIC_IP"/>
+		<result property="subnetId" column ="SUBNET_ID"/>
+		<result property="subnetRange" column ="SUBNET_RANGE"/>
+		<result property="subnetGateway" column ="SUBNET_GATEWAY"/>
+		<result property="subnetDns" column ="SUBNET_DNS"/>
+		<result property="ntp" column ="NTP"/>
+		<result property="publicStaticIp" column ="PUBLIC_STATIC_IP"/>
+		<result property="publicSubnetId" column ="PUBLIC_SUBNET_ID"/>
+		<result property="publicSubnetRange" column ="PUBLIC_SUBNET_RANGE"/>
+		<result property="publicSubnetGateway" column ="PUBLIC_SUBNET_GATEWAY"/>
+		<result property="publicSubnetDns" column ="PUBLIC_SUBNET_DNS"/>
+		<result property="stemcell" column ="STEMCELL"/>
+		<result property="cloudInstanceType" column ="CLOUD_INSTANCE_TYPE"/>
+		<result property="resourcePoolCpu" column ="RESOURCE_POOL_CPU"/>
+		<result property="resourcePoolRam" column ="RESOURCE_POOL_RAM"/>
+		<result property="resourcePoolDisk" column ="RESOURCE_POOL_DISK"/>
+		<result property="boshPassword" column ="BOSH_PASSWORD"/>
+		<result property="deploymentFile" column ="DEPLOYMENT_FILE"/>
+		<result property="deployStatus" column ="DEPLOY_STATUS"/>
+		<result property="deployLog" column ="DEPLOY_LOG"/>
+	</resultMap>
+
+	<select id="selectBootstrapList" resultMap="bootstrap">
+		/** BootstrapDeploy.selectBootstrapList  **/
+		SELECT id
+			, iaas_type
+			, aws_access_key_id
+			, AES_DECRYPT(UNHEX(aws_secret_access_id), 'raison')  as aws_secret_access_id
+			, aws_region
+			, aws_availability_zone
+			, AES_DECRYPT(UNHEX(openstack_api_key), 'raison')  as openstack_api_key
+			, openstack_auth_url 
+			, openstack_tenant
+			, openstack_user_name
+			,vcenter_address
+			,vcenter_user
+			,AES_DECRYPT(UNHEX(vcenter_password), 'raison')  as vcenter_password
+			,vcenter_datacenter_name
+			,vcenter_vm_folder
+			,vcenter_template_folder
+			,vcenter_datastore
+			,vcenter_persistent_datastore
+			,vcenter_disk_path
+			,vcenter_clusters
+			, bosh_cpi_release
+			, bosh_password
+			, bosh_release
+			, cloud_instance_type
+			, default_security_groups 
+			, deploy_log, deploy_status
+			, deployment_file
+			, deployment_name
+			, director_name
+			, ntp 
+			, private_key_name
+			, private_key_path
+			, private_static_ip
+			, public_static_ip
+			, stemcell
+			, subnet_dns 
+			, subnet_gateway
+			, subnet_id
+			, subnet_range
+			, create_date
+			, update_date
+		FROM ieda_bootstrap
+	</select>
+	
+	<select id="selectBootstrapInfo" resultMap="bootstrap">
+		/** BootstrapDeploy.selectBootstrapInfo  **/
+		SELECT id
+			, iaas_type
+			, aws_access_key_id
+			, AES_DECRYPT(UNHEX(aws_secret_access_id), 'raison')  as aws_secret_access_id
+			, aws_region
+			, aws_availability_zone
+			, AES_DECRYPT(UNHEX(openstack_api_key), 'raison')  as openstack_api_key
+			, openstack_auth_url 
+			, openstack_tenant
+			, openstack_user_name
+			, vcenter_address
+		 	, vcenter_user
+		 	, AES_DECRYPT(UNHEX(vcenter_password), 'raison')  as vcenter_password
+		 	, vcenter_datacenter_name
+		 	, vcenter_vm_folder
+		 	, vcenter_template_folder
+		 	, vcenter_datastore
+		 	, vcenter_persistent_datastore
+		 	, vcenter_disk_path
+		 	, vcenter_clusters
+			, bosh_cpi_release
+			, bosh_password
+			, bosh_release
+			, snapshot_schedule
+			, enable_snapshots
+			, default_security_groups 
+			, deploy_log
+			,deploy_status
+			, deployment_file
+			, deployment_name
+			, director_name
+			, private_key_name
+			, private_key_path
+			, private_static_ip
+			, subnet_id
+			, subnet_range
+			, subnet_gateway
+			, subnet_dns 
+			, ntp 
+			, public_static_ip
+			, public_subnet_id
+			, public_subnet_range
+			, public_subnet_gateway
+			, public_subnet_dns 
+			, stemcell
+			, cloud_instance_type
+			, resource_pool_cpu
+			, resource_pool_ram
+			, resource_pool_disk
+			, create_date
+			, update_date
+		FROM ieda_bootstrap
+		where id = #{id}
+	</select>
+	
+	<insert id="insertBootStrapInfo" useGeneratedKeys="true" keyColumn="id" keyProperty="bootstrap.id">
+		/** IEDABootstrap.insertBootStrapInfo  **/
+		INSERT INTO ieda_bootstrap (
+			<choose>
+				<when test="bootstrap.iaasType == 'AWS'">
+					id
+					,aws_access_key_id
+					,aws_secret_access_id
+					,aws_region
+					,aws_availability_zone
+				</when>
+				<when test="bootstrap.iaasType == 'OPENSTACK'">
+					id
+					,openstack_auth_url
+					,openstack_tenant
+					,openstack_user_name
+					,openstack_api_key
+				</when>
+				<when test="bootstrap.iaasType == 'VSPHERE'">
+					 id
+					 ,vcenter_address
+					 ,vcenter_user
+					 ,vcenter_password
+					 ,vcenter_datacenter_name
+					 ,vcenter_vm_folder
+					 ,vcenter_template_folder
+					 ,vcenter_datastore
+					 ,vcenter_persistent_datastore
+					 ,vcenter_disk_path
+					 ,vcenter_clusters
+				</when>
+				<otherwise>
+					id
+					,aws_access_key_id
+					,aws_secret_access_id
+					,aws_region
+					,aws_availability_zone
+					,openstack_auth_url
+					,openstack_tenant
+					,openstack_user_name
+					,openstack_api_key
+				</otherwise>
+			</choose>
+			,iaas_type
+			,default_security_groups
+			,private_key_name
+			,private_key_path
+			,create_date
+			,create_user_id
+			,update_user_id
+			,update_date
+			) 
+		VALUES(
+			<choose>
+				<when test="bootstrap.iaasType == 'AWS'">
+					#{bootstrap.id}
+					,#{bootstrap.awsAccessKeyId}
+					,HEX(AES_ENCRYPT(#{bootstrap.awsSecretAccessId}, 'raison'))
+					,#{bootstrap.awsRegion}
+					,#{bootstrap.awsAvailabilityZone}
+				</when>
+				<when test="bootstrap.iaasType == 'OPENSTACK'">
+					#{bootstrap.id}
+					,#{bootstrap.openstackAuthUrl}
+					,#{bootstrap.openstackTenant} 
+					,#{bootstrap.openstackUserName}
+					,HEX(AES_ENCRYPT(#{bootstrap.openstackApiKey}, 'raison'))
+				</when>
+				<when test="bootstrap.iaasType == 'VSPHERE'">
+					#{bootstrap.id}
+					,#{bootstrap.vCenterAddress}
+					,#{bootstrap.vCenterUser}
+					,HEX(AES_ENCRYPT(#{bootstrap.vCenterPassword}, 'raison'))
+					,#{bootstrap.vCenterDatacenterName}
+					,#{bootstrap.vCenterVMFolder}
+					,#{bootstrap.vCenterTemplateFolder}
+					,#{bootstrap.vCenterDatastore}
+					,#{bootstrap.vCenterPersistentDatastore}
+					,#{bootstrap.vCenterDiskPath}
+					,#{bootstrap.vCenterCluster}
+				</when>
+				<otherwise>
+					NULL, NULL,
+					NULL, NULL, NULL, NULL, 
+					NULL, NULL, NULL, NULL, 
+				</otherwise>
+			</choose>
+				,#{bootstrap.iaasType}
+				,#{bootstrap.defaultSecurityGroups}
+				,#{bootstrap.privateKeyName}
+				,#{bootstrap.privateKeyPath}
+				,now()
+				,#{bootstrap.createUserId}
+				,#{bootstrap.updateUserId}
+				,now())
+			<selectKey keyProperty="bootstrap.id" resultType="int" order="AFTER">
+				<if test="bootstrap.id != 1"> SELECT LAST_INSERT_ID(); </if>
+				<if test="bootstrap.id == 1"> SELECT 1 AS id from dual; </if>
+			</selectKey>
+				
+	</insert>
+	
+	<update id="updateBootStrapInfo">
+	/** IEDABootstrap.updateBootStrapInfo **/
+		UPDATE ieda_bootstrap SET
+			aws_access_key_id= #{bootstrap.awsAccessKeyId}
+			,aws_secret_access_id= HEX(AES_ENCRYPT(#{bootstrap.awsSecretAccessId}, 'raison'))
+			,aws_region=#{bootstrap.awsRegion}
+			,aws_availability_zone=#{bootstrap.awsAvailabilityZone}
+			,openstack_auth_url=#{bootstrap.openstackAuthUrl}
+			,openstack_tenant=#{bootstrap.openstackTenant}
+			,openstack_user_name=#{bootstrap.openstackUserName}
+			,openstack_api_key=HEX(AES_ENCRYPT(#{bootstrap.openstackApiKey}, 'raison'))
+			,vcenter_address=#{bootstrap.vCenterAddress}
+			,vcenter_user=#{bootstrap.vCenterUser}
+			,vcenter_password= HEX(AES_ENCRYPT(#{bootstrap.vCenterPassword}, 'raison'))
+			,vcenter_datacenter_name=#{bootstrap.vCenterDatacenterName}
+			,vcenter_vm_folder=#{bootstrap.vCenterVMFolder}
+			,vcenter_template_folder=#{bootstrap.vCenterTemplateFolder}
+			,vcenter_datastore=#{bootstrap.vCenterDatastore}
+			,vcenter_persistent_datastore=#{bootstrap.vCenterPersistentDatastore}
+			,vcenter_disk_path=#{bootstrap.vCenterDiskPath}
+			,vcenter_clusters=#{bootstrap.vCenterCluster}
+			,bosh_cpi_release = #{bootstrap.boshCpiRelease}
+			,bosh_password = #{bootstrap.boshPassword}
+			,ntp= #{bootstrap.ntp}
+			,bosh_release = #{bootstrap.boshRelease}
+			,snapshot_schedule = #{bootstrap.snapshotSchedule}
+			,enable_snapshots = #{bootstrap.enableSnapshots}
+			,cloud_instance_type = #{bootstrap.cloudInstanceType}
+			,default_security_groups=#{bootstrap.defaultSecurityGroups}
+			,deploy_log = #{bootstrap.deployLog}
+			,deploy_status = #{bootstrap.deployStatus}
+			,deployment_file = #{bootstrap.deploymentFile}
+			,deployment_name = #{bootstrap.deploymentName}
+			,director_name = #{bootstrap.directorName}
+			,private_key_name=#{bootstrap.privateKeyName}
+			,private_key_path=#{bootstrap.privateKeyPath}
+			,stemcell= #{bootstrap.stemcell}
+			,resource_pool_cpu = #{bootstrap.resourcePoolCpu}
+			,resource_pool_ram = #{bootstrap.resourcePoolRam}
+			,resource_pool_disk = #{bootstrap.resourcePoolDisk}
+			,private_static_ip = #{bootstrap.privateStaticIp}
+			,subnet_id= #{bootstrap.subnetId}
+			,subnet_range= #{bootstrap.subnetRange}
+			,subnet_gateway= #{bootstrap.subnetGateway}
+			,subnet_dns= #{bootstrap.subnetDns}
+			,public_static_ip = #{bootstrap.publicStaticIp}
+			,public_subnet_id= #{bootstrap.publicSubnetId}
+			,public_subnet_range= #{bootstrap.publicSubnetRange}
+			,public_subnet_gateway= #{bootstrap.publicSubnetGateway}
+			,public_subnet_dns= #{bootstrap.publicSubnetDns}
+			,update_user_id=#{bootstrap.updateUserId}
+			,update_date= now()
+		WHERE
+		id=#{bootstrap.id}
+	</update>
+	
+	<delete id="deleteBootstrapInfo">
+		DELETE 
+		FROM ieda_bootstrap
+		WHERE id=#{id}
+	</delete>
+	
+	<select id="selectSnapshotInfo" resultType="int">
+		 Select count(if(snapshot_schedule='',null,snapshot_schedule)) as count   
+		   From ieda_bootstrap 
+		 Where public_static_ip = #{director.directorUrl}
+		    And director_name = (Select director_name 
+		    From ieda_director_config 
+		  Where director_name = #{director.directorName} 
+		      And director_cpi = #{director.directorCpi}
+		      And director_url = #{director.directorUrl})
+	</select>
+</mapper>

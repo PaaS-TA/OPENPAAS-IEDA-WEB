@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.openpaas.ieda.web.deploy.cfDiego.dao.CfDiegoDAO">
+	<resultMap id="cfDiego" type="org.openpaas.ieda.web.deploy.cfDiego.dao.CfDiegoVO">
+		<id property="id" column="ID" />
+		<result property="recid" column="RECID"/>
+		<result property="iaasType" column="IAAS_TYPE"/>
+		<result property="createUserId" column="CREATE_USER_ID"/>
+		<result property="createDate" column="CREATE_DATE" />
+		<result property="updateUserId" column="UPDATE_USER_ID"/>
+		<result property="updateDate" column="UPDATE_DATE" />
+		<result property="deployStatus" column="DEPLOY_STATUS" />
+		<collection property="cfVo"  ofType="org.openpaas.ieda.web.deploy.cf.dao.CfVO"  javaType="String" >
+			<id property="id" column="CF_ID" />
+			<result property="iaasType" column="IAAS_TYPE"/>
+			<result property="deploymentName" column="CF_DEPLOYMENT_NAME"/>
+			<result property="directorUuid" column="DIRECTOR_UUID" />
+			<result property="releaseName" column="RELEASE_NAME" />
+			<result property="releaseVersion" column="RELEASE_VERSION" />
+			<result property="appSshFingerprint" column="APP_SSH_FINGERPRINT" />
+			<result property="domain" column="DOMAIN" />
+			<result property="description" column="DESCRIPTION" />
+			<result property="domainOrganization" column="DOMAIN_ORGANIZATION" />
+			<result property="deaMemoryMB" column="DEA_MEMORY_MB" />
+			<result property="deaDiskMB" column="DEA_DISK_MB" />
+			<result property="proxyStaticIps" column="PROXY_STATIC_IPS" />
+			<result property="sslPemPub" column="SSL_PEM_PUB" />
+			<result property="sslPemRsa" column="SSL_PEM_RSA" />
+			<result property="loginSecret" column="LOGIN_SECRET" />
+			<result property="encryptKeys" column="ENCRYPT_KEYS" />
+			<result property="deploymentFile" column="CF_DEPLOYMENT_FILE" />
+			<result property="deployStatus" column="CF_DEPLOY_STATUS" />
+			<result property="taskId" column="CF_TASK_ID" />
+		</collection>
+		<collection property="diegoVo"   ofType="org.openpaas.ieda.web.deploy.diego.dao.DiegoVO"  javaType="String" >
+			<id property="id" column="DIEGO_ID" />
+			<result property="deploymentName" column="DIEGO_DEPLOYMENT_NAME" />
+			<result property="diegoReleaseName" column="DIEGO_RELEASE_NAME" />
+			<result property="diegoReleaseVersion" column="DIEGO_RELEASE_VERSION" />
+			<result property="gardenReleaseName" column="GARDEN_RELEASE_NAME" />
+			<result property="gardenReleaseVersion" column="GARDEN_RELEASE_VERSION" />
+			<result property="etcdReleaseName" column="ETCD_RELEASE_NAME" />
+			<result property="etcdReleaseVersion" column="ETCD_RELEASE_VERSION" />
+			<result property="cflinuxfs2rootfsreleaseName" column="CFLINUXFS2_ROOTFS_RELEASE_NAME" />
+			<result property="cflinuxfs2rootfsreleaseVersion" column="CFLINUXFS2_ROOTFS_RELEASE_VERSION" />
+			<result property="diegoEncryptionKeys" column="DIEGO_ENCRYPTION_KEYS" />
+			<result property="deploymentFile" column="DIEGO_DEPLOYMENT_FILE" />
+			<result property="deployStatus" column="DIEGO_DEPLOY_STATUS" />
+			<result property="taskId" column="DIEGO_TASK_ID" />
+		</collection>
+	</resultMap>
+	
+	<select id="selectCfDiegoList"  resultMap="cfDiego" >
+		/**cfDiegoDeploy.selectCfDiegoList**/
+		Select 
+			 a.id as id
+			,a.id as recid
+			,a.iaas_type as iaas_type
+			,c.id as cf_id 
+			,c.iaas_type as iaas_type 
+			,c.deployment_name as cf_deployment_name 
+			,c.director_uuid as director_uuid 
+			,c.release_name as release_name 
+			,c.release_version as release_version 
+			,c.app_ssh_fingerprint as app_ssh_fingerprint 
+			,c.dea_memory_mb as dea_memory_mb 
+			,c.dea_disk_mb as dea_disk_mb 
+			,c.domain as domain 
+			,c.description as description 
+			,c.domain_organization as domain_organization 
+			,c.proxy_static_ips as proxy_static_ips 
+			,c.ssl_pem_pub as ssl_pem_pub 
+			,c.ssl_pem_rsa as ssl_pem_rsa 
+			,c.login_secret as login_secret 
+			,c.encrypt_keys as encrypt_keys 
+			,c.deployment_file as cf_deployment_file 
+			,c.deploy_status as cf_deploy_status
+			,c.task_id as cf_task_id 
+			,d.id as diego_id 
+			,d.deployment_name as diego_deployment_name 
+			,d.diego_release_name as diego_release_name 
+			,d.diego_release_version as diego_release_version 
+			,d.cflinuxfs2_rootfs_release_name as cflinuxfs2_rootfs_release_name 
+			,d.cflinuxfs2_rootfs_release_version as cflinuxfs2_rootfs_release_version 
+			,d.garden_release_name as garden_release_name 
+			,d.garden_release_version as garden_release_version 
+			,d.etcd_release_name as etcd_release_name 
+			,d.etcd_release_version as etcd_release_version 
+			,d.diego_encryption_keys as diego_encryption_keys 
+			,d.deployment_file as diego_deployment_file 
+			,d.deploy_status as diego_deploy_status
+			,d.task_id as diego_task_id 
+			,a.create_date as create_date 
+			,a.create_user_id as create_user_id 
+			,a.update_date as update_date 
+			,a.update_user_id as update_user_id 
+			,Case 
+				When (c.deploy_status = 'DEPLOY_STATUS_DONE' 	 	 And  d.deploy_status = 'DEPLOY_STATUS_DONE') Then '성공' 
+				When d.deploy_status = 'DEPLOY_STATUS_DELETING' Then 'DIEGO 삭제중' 
+				When d.deploy_status = 'DEPLOY_STATUS_FAILED' 		Then 'DIEGO 오류' 
+				When d.deploy_status = 'DEPLOY_STATUS_CANCELLED' Then 'DIEGO 취소' 
+				When d.deploy_status = 'DEPLOY_STATUS_DONE' 		Then 'DIEGO 성공'
+				When d.deploy_status = 'DEPLOY_STATUS_PROCESSING' Then 'DIEGO 배포중' 
+				When c.deploy_status = 'DEPLOY_STATUS_DELETING' Then 'CF 삭제중' 
+				When c.deploy_status = 'DEPLOY_STATUS_FAILED' 		Then 'CF 오류' 
+				When c.deploy_status = 'DEPLOY_STATUS_CANCELLED' Then 'CF 취소' 
+				When c.deploy_status = 'DEPLOY_STATUS_DONE' 		Then 'CF 성공' 
+				When c.deploy_status = 'DEPLOY_STATUS_PROCESSING'	Then 'CF 배포중' 
+				ELSE NULL 
+			END as deploy_status
+		From ieda_cf_diego a 
+		LEFT OUTER JOIN ieda_cf c	
+			ON a.cf_id = c.id
+		LEFT OUTER JOIN ieda_diego d
+			ON a.diego_id = d.id
+	  Where a.iaas_type = #{iaas}
+	</select>
+	
+	<select id="selectCfDiegoInfoById" resultMap="cfDiego" >
+		/**cfDiegoDeploy.selectCfDiegoInfoById**/
+		Select
+			   id
+			  ,cf_id
+			  ,diego_id
+			  ,iaas_type
+		  From ieda_cf_diego
+		Where id = #{id}
+	</select>
+	
+	<select id="selectCfDiegoInfoByPlaform"  resultMap="cfDiego" >
+		/**cfDiegoDeploy.selectCfDiegoInfoByPlaform**/
+		Select 
+			a.id as id
+			,a.iaas_type as iaas_type
+			<choose>
+				<when test="platform == 'cf' and  platform != null">
+					,c.id as cf_id
+					,c.iaas_type as iaas_type
+					,c.deployment_name as cf_deployment_name
+					,c.director_uuid as director_uuid
+					,c.release_name as release_name
+					,c.release_version as release_version
+					,c.app_ssh_fingerprint as app_ssh_fingerprint
+					,c.dea_memory_mb as dea_memory_mb
+					,c.dea_disk_mb as dea_disk_mb
+					,c.domain as domain
+					,c.description as description
+					,c.domain_organization as domain_organization
+					,c.proxy_static_ips as proxy_static_ips
+					,c.ssl_pem_pub as ssl_pem_pub
+					,c.ssl_pem_rsa as ssl_pem_rsa
+					,c.login_secret as login_secret
+					,c.encrypt_keys as encrypt_keys
+					,c.deployment_file as cf_deployment_file
+					,c.deploy_status as cf_deploy_status
+					,c.task_id as cf_task_id
+				</when>
+				<when test="platform == 'diego' and platform != null">
+					,d.id as diego_id
+					,d.deployment_name as diego_deployment_name
+					,d.diego_release_name as diego_release_name
+					,d.diego_release_version as diego_release_version
+					,d.cflinuxfs2_rootfs_release_name as cflinuxfs2_rootfs_release_name
+					,d.cflinuxfs2_rootfs_release_version as cflinuxfs2_rootfs_release_version
+					,d.garden_release_name as garden_release_name
+					,d.garden_release_version as garden_release_version
+					,d.etcd_release_name as etcd_release_name
+					,d.etcd_release_version as garden_release_version
+					,d.diego_encryption_keys as diego_encryption_keys
+					,d.deployment_file as diego_deployment_file
+					,d.deploy_status as diego_deploy_status
+					,d.task_id as diego_task_id
+				</when>
+			</choose>
+			,a.create_date as create_date
+			,a.create_user_id as create_user_id
+			,a.update_date as update_date
+			,a.update_user_id as update_user_id
+		From ieda_cf_diego a
+		<if test="platform == 'cf' and  platform != null">
+			,ieda_cf c
+		Where c.id = a.cf_id
+	   	And c.id = #{id}
+		</if>
+		<if test="platform == 'diego' and  platform != null">
+			,ieda_diego d
+		Where d.id = a.diego_id
+	    And d.id = #{id}
+		</if>
+	</select>
+	
+	
+	<insert id="insertCfDiegoInfo">
+		/**cfDiegoDeploy.insertCfDiegoInfo**/
+		Insert Into ieda_cf_diego(
+			 id
+			,cf_id
+			,diego_id
+			,iaas_type
+			,create_user_id
+			,create_date
+			,update_user_id
+			,update_date
+		)Values(
+			#{cfDiego.id}
+			,#{cfDiego.cfVo.id}
+			,#{cfDiego.diegoVo.id}
+			,#{cfDiego.iaasType}
+			,#{cfDiego.createUserId}
+			,now()
+			,#{cfDiego.updateUserId}
+			,now()
+		)
+		<selectKey keyProperty="cfDiego.id" resultType="int" order="AFTER">
+				SELECT LAST_INSERT_ID();
+		</selectKey>
+	</insert>
+	
+	<update id="updateCfDiegoInfo">
+		/**cfDiegoDeploy.updateCfDiegoInfo**/
+		Update ieda_cf_diego Set
+			 update_user_id = #{cfDiego.updateUserId}
+			,update_date = now()
+			<if test="cfDiego.diegoVo.id != null">
+				 ,diego_id = #{cfDiego.diegoVo.id}
+			</if>
+		Where id = #{cfDiego.id}
+	</update>
+	
+	<delete id="deleteCfDiegoInfo">
+		/**cfDiegoDeploy.deleteCfDiegoInfo**/
+		Delete From ieda_cf_diego
+		Where id = #{id}
+	</delete>
+
+</mapper>

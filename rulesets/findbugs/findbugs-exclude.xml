@@ -1,0 +1,64 @@
+<FindBugsFilter>
+	<Match>
+		<Bug category="MALICIOUS_CODE"/>
+	</Match>
+	<Match>
+		<Bug pattern="DM_CONVERT_CASE"/>
+		<Bug category="I18N"/>
+	</Match>
+	<!-- DirectorConfigVO Getter Setter name -->
+	<Match>
+		<Class name="org.openpaas.ieda.web.config.setting.dao.DirectorConfigVO"></Class>
+		<Bug pattern="NM_CONFUSING"/>
+		<Bug category="BAD_PRACTICE"/>
+	</Match>
+	<!-- BootstrapVO Getter Setter name -->
+	<Match>
+		<Class name="org.openpaas.ieda.web.deploy.bootstrap.dao.BootstrapVO"></Class>
+		<Bug pattern="NM_CONFUSING"/>
+		<Bug category="BAD_PRACTICE"/>
+	</Match>
+	<!-- 암호화 File-->
+	<Match>
+		<Class name="org.openpaas.ieda.web.common.service.Sha512Crypt"></Class>
+	</Match>
+	<!--  Utility File-->
+	<Match>
+		<Package name="org.openpaas.ieda.api.director.utility.*"></Package>
+	</Match>
+	<!--  SecurityConfig  Problem-->
+	<Match>
+		<Class name="org.openpaas.ieda.api.config.security.SecurityUserDetails"></Class>
+	</Match>
+	<!-- SecurityAuthenticationSuccess Bug skip -->
+	<Match>
+		<Class name="org.openpaas.ieda.api.config.security.SecurityAuthenticationSuccess"></Class>
+		<Bug pattern="RI_REDUNDANT_INTERFACES"/>
+		<Bug category="STYLE"/>
+	</Match>
+	<!--  Principal bug skip -->
+	<Match>
+		<Class name="org.openpaas.ieda.web.common.BaseTestController"></Class>
+		<Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+	</Match>
+	<!--  StringBuffer bug skip -->
+	<Match>
+		<Bug pattern = "SBSC_USE_STRINGBUFFER_CONCATENATION"/>
+	</Match>
+	<!--  Junit Service Test(나중에 지우기)  -->
+	<Match>
+		<Class name="~.*ServiceTest"/>
+	</Match>
+	<!--  Junit Test File delete  -->
+	<Match>
+		<Class name="~.*Test$"/>
+		<Bug pattern = "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+        <Bug category = "BAD_PRACTICE"/>
+	</Match>
+	<!--  Junit DashboardControllerTest => it is initialized in setUp() -->
+	<Match>
+		<Class name="org.openpaas.ieda.web.dashboard.controller.DashboardControllerTest"></Class>
+		<Method name="testGoDashboard"/>
+		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"></Bug>
+	</Match>
+</FindBugsFilter>

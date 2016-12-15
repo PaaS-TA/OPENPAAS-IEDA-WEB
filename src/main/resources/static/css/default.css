@@ -65,15 +65,3 @@ a:hover{text-decoration:none;}
 .pdb15{padding-bottom:15px !important}
 .pdb20{padding-bottom:20px !important}
 
-/* isMessage(validation) 2015.12.28 */
-.w2ui-field div.isMessage{
-	display: inline-block;
-	padding-left:10px;
-	height:10px;
-	font-size: 10px;
-}
-
-/* 팝업창  input, textarea 한글 입력 금지 */
-.w2ui-box1 .w2ui-msg-body .w2ui-field input, textarea{
-	ime-mode:disabled;
-}

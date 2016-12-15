@@ -1,0 +1,56 @@
+@CHARSET "UTF-8";
+
+/*popup  */
+.w2ui-popup .w2ui-msg-body { background-color: #FFF; }
+
+/* 팝업창  input, textarea 한글 입력 금지 */
+.w2ui-box1 .w2ui-msg-body .w2ui-field input, textarea{	ime-mode:disabled; }
+
+/* isMessage(validation) 2015.12.28 */
+.w2ui-field div.isMessage{
+	display: inline-block;
+	padding-left:10px;
+	height:10px;
+	font-size: 10px;
+}
+
+/* File Upload Button ( Bootstrap/Bosh )  */
+#browse {
+	position: relative;
+    display : inline-block;        
+    width : 72px;
+    height : 25px;
+    background : #147ad0;
+    color : #FFF;
+    left: 5px;
+    text-decoration : none;
+    line-height : 25px;
+    text-align : center;
+    vertical-align : middle;
+}
+
+
+/* File Upload Input Style ( Bootstrap/Bosh ) */
+#keyPathFileName{
+	background-color:#fff;
+	text-rendering: auto;
+    color: initial;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    -webkit-writing-mode: horizontal-tb;
+    cursor: auto;
+}
+
+/*common*/
+.display_none { display:none;  }
+.display_block { display:block }
+.w2ui-field-helper {  width:20px;  }
+.addBtn { position:relative; left:85%; }
+.delBtn { position:relative; left:85%; }
+.message { width:75%; text-align:center;  }
+
+

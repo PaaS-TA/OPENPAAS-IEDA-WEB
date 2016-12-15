@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.openpaas.ieda.web.deploy.diego.dao.DiegoDAO">
+
+	<resultMap id="diego" type="org.openpaas.ieda.web.deploy.diego.dao.DiegoVO">
+		<id property="id" column="ID" />
+		<result property="iaasType" column="IAAS_TYPE"/>
+		<result property="createUserId" column="CREATE_USER_ID"/>
+		<result property="createDate" column="CREATE_DATE" />
+		<result property="updateUserId" column="UPDATE_USER_ID"/>
+		<result property="updateDate" column="UPDATE_DATE" />
+		<result property="deploymentName" column="DEPLOYMENT_NAME" />
+		<result property="directorUuid" column="director_uuid" />
+		<result property="diegoReleaseName" column="diego_release_name" />
+		<result property="diegoReleaseVersion" column="diego_release_version" />
+		<result property="gardenReleaseName" column="garden_release_name" />
+		<result property="gardenReleaseVersion" column="garden_release_version" />
+		<result property="etcdReleaseName" column="etcd_release_name" />
+		<result property="etcdReleaseVersion" column="etcd_release_version" />
+		<result property="diegoEncryptionKeys" column="diego_encryption_keys" />
+		<result property="deploymentFile" column="deployment_file" />
+		<result property="deployStatus" column="deploy_status" />
+		<result property="taskId" column="task_id" />
+		<result property="cfDeployment" column="cf_deployment" />
+		<result property="cfName" column="cfName" />
+		<result property="cflinuxfs2rootfsreleaseName" column="cflinuxfs2_rootfs_release_name" />
+		<result property="cflinuxfs2rootfsreleaseVersion" column="cflinuxfs2_rootfs_release_version" />
+		<collection property="keys"   ofType="org.openpaas.ieda.web.deploy.common.dao.key.KeyVO"  javaType="ArrayLIst" >
+			<id property="keyType" column="KEY_TYPE" />
+			<result property="id" column="KEY_ID"/>
+			<result property="caCert" column="CA_CERT" />
+			<result property="serverCert" column="SERVER_CERT" />
+			<result property="serverKey" column="SERVER_KEY" />
+			<result property="clientCert" column="CLIENT_CERT" />
+			<result property="clientKey" column="CLIENT_KEY" />
+			<result property="agentCert" column="AGENT_CERT" />
+			<result property="agentKey" column="AGENT_KEY" />
+			<result property="tlsCert" column="TLS_CERT" />
+			<result property="privateKey" column="PRIVATE_KEY" />
+			<result property="publicKey" column="PUBLIC_KEY"/>
+			<result property="hostKey" column="HOST_KEY" />
+		</collection>
+		<collection property="resource" ofType="org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO"  javaType="org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO">
+			<result property="id" column="RESOURCE_ID" />
+			<result property="deployType" column="RESOURCE_DEPLOY_TYPE"/>
+			<result property="boshPassword" column="BOSH_PASSWORD" />
+			<result property="stemcellName" column="STEMCELL_NAME" />
+			<result property="stemcellVersion" column="STEMCELL_VERSION" />
+			<result property="smallFlavor" column="SMALL_TYPE_FLAVOR"/>
+			<result property="mediumFlavor" column="MEDIUM_TYPE_FLAVOR" />
+			<result property="largeFlavor" column="LARGE_TYPE_FLAVOR" />
+			<result property="runnerFlavor" column="RUNNER_TYPE_FLAVOR" />
+			<result property="smallCpu" column="SMALL_TYPE_CPU" />
+			<result property="smallRam" column="SMALL_TYPE_RAM" />
+			<result property="smallDisk" column="SMALL_TYPE_DISK" />
+			<result property="mediumCpu" column="MEDIUM_TYPE_CPU" />
+			<result property="mediumRam" column="MEDIUM_TYPE_RAM" />
+			<result property="mediumDisk" column="MEDIUM_TYPE_DISK" />
+			<result property="largeCpu" column="LARGE_TYPE_CPU"/>
+			<result property="largeRam" column="LARGE_TYPE_RAM" />
+			<result property="largeDisk" column="LARGE_TYPE_DISK"/>
+			<result property="runnerCpu" column="RUNNER_TYPE_CPU" />
+			<result property="runnerRam" column="RUNNER_TYPE_RAM" />
+			<result property="runnerDisk" column="RUNNER_TYPE_DISK" />
+			<result property="createUserId" column="CREATE_USER_ID"/>
+			<result property="createDate" column="CREATE_DATE" />
+			<result property="updateUserId" column="UPDATE_USER_ID"/>
+			<result property="updateDate" column="UPDATE_DATE" />
+		</collection>
+	</resultMap>
+
+	<select id="selectDiegoListInfo" resultMap="diego">
+		/** DiegoDeploy.selectDiegoListInfo **/
+		Select 
+			 d.id as id
+			,d.iaas_type as iaas_type
+			,deploy_status
+			,cf_deployment
+			,deployment_File
+			,deployment_name
+			,diego_encryption_keys
+			,diego_release_name 
+			,diego_release_version
+			,cflinuxfs2_rootfs_release_name
+			,cflinuxfs2_rootfs_release_version
+			,director_uuid
+			,garden_release_name
+			,garden_release_version
+			,etcd_release_name
+			,etcd_release_version
+			,task_id
+			,d.update_date as update_date
+			,d.create_date as create_date
+		From ieda_diego d
+		LEFT JOIN ieda_cf_diego a
+		ON d.id = a.cf_id
+	 	Where LOWER(d.iaas_type) = #{iaasType}
+		And (a.diego_id is null || d.deploy_status = 'error')
+	</select>
+	
+	<select id="selectDiegoInfo" resultMap="diego">
+		/** DiegoDeploy.selectDiegoInfo **/
+		Select 
+			a.id
+			,a.iaas_type
+			,a.create_date
+			,a.deploy_status
+			,a.deployment_file
+			,a.cf_deployment
+			,a.deployment_name
+			,a.diego_encryption_keys
+			,a.diego_release_name
+			,a.diego_release_version
+			,a.cflinuxfs2_rootfs_release_name
+			,a.cflinuxfs2_rootfs_release_version
+			,a.director_uuid
+			,a.garden_release_name
+			,a.garden_release_version
+			,a.etcd_release_name
+			,a.etcd_release_version
+			,a.task_id
+			,a.update_date
+			,(select c.deployment_name from ieda_diego a, ieda_cf c where c.deployment_file = a.cf_deployment and a.id=#{id}) as cfName
+		From ieda_diego a
+	  Where id = #{id}
+	</select>
+	
+	<insert id="insertDiegoDefaultInfo">
+		/** DiegoDeploy.insertDiegoDefaultInfo **/
+		Insert Into ieda_diego (
+			 id
+			,iaas_type
+			,create_user_id
+			,update_user_id
+			,deployment_name
+			,director_uuid
+			,diego_release_name
+			,diego_release_version
+			,cflinuxfs2_rootfs_release_name
+			,cflinuxfs2_rootfs_release_version
+			,garden_release_name
+			,garden_release_version
+			,etcd_release_name
+			,etcd_release_version
+			,deployment_file
+			,cf_deployment
+			,diego_encryption_keys
+			,create_date
+			,update_date
+		) values (
+			 #{diego.id}
+			,#{diego.iaasType}
+			,#{diego.createUserId}
+			,#{diego.updateUserId}
+			,#{diego.deploymentName}
+			,#{diego.directorUuid}
+			,#{diego.diegoReleaseName}
+			,#{diego.diegoReleaseVersion}
+			,#{diego.cflinuxfs2rootfsreleaseName}
+			,#{diego.cflinuxfs2rootfsreleaseVersion}
+			,#{diego.gardenReleaseName}
+			,#{diego.gardenReleaseVersion}
+			,#{diego.etcdReleaseName}
+			,#{diego.etcdReleaseVersion}
+			,#{diego.deploymentFile}
+			,#{diego.cfDeployment}
+			,#{diego.diegoEncryptionKeys}
+			,now()
+			,now()
+		)
+		<selectKey keyProperty="diego.id" resultType="int" order="AFTER">
+			<if test="diego.id != 1"> SELECT LAST_INSERT_ID(); </if>
+			<if test="diego.id == 1"> SELECT 1 AS id from dual; </if>
+		</selectKey>
+	</insert>
+	
+	
+	<select id="selectDiegoKeyInfoById" resultMap="diego">
+		/** DiegoDeploy.selectDiegoKeyInfoById **/
+		Select 
+			 d.id as id
+			,k.id as key_id
+			,k.key_type as key_type
+			,iaas_type
+			,deploy_status
+			,cf_deployment
+			,deployment_name
+			,diego_encryption_keys
+			,diego_release_name
+			,diego_release_version
+			,cflinuxfs2_rootfs_release_name
+			,cflinuxfs2_rootfs_release_version
+			,director_uuid
+			,garden_release_name
+			,garden_release_version
+			,etcd_release_name
+			,etcd_release_version
+			,task_id
+		From (select * from ieda_diego where id = #{id} ) d
+		Left Join ieda_key k
+		 	On d.id = k.id
+		   And k.deploy_type=#{deployType}
+		   And k.key_type=#{keyType}
+	</select>
+	
+	<select id="selectResourceInfoById" resultMap="diego">
+		/** DiegoDeploy.selectResourceInfoById **/
+		Select 
+			 d.id as id 
+			,iaas_type
+			,deploy_status
+			,cf_deployment
+			,deployment_name
+			,deployment_file
+			,diego_encryption_keys
+			,diego_release_name
+			,diego_release_version
+			,cflinuxfs2_rootfs_release_name
+			,cflinuxfs2_rootfs_release_version
+			,director_uuid
+			,garden_release_name
+			,garden_release_version
+			,etcd_release_name
+			,etcd_release_version
+			,task_id
+			,resource.id as resource_id
+			,resource.deploy_type as resource_deploy_type
+			,resource.bosh_password as bosh_password
+			,resource.stemcell_name as stemcell_name
+			,resource.stemcell_version as stemcell_version
+			,resource.small_type_flavor as small_type_flavor
+			,resource.small_type_cpu as small_type_cpu
+			,resource.small_type_ram as small_type_ram
+			,resource.small_type_disk as small_type_disk
+			,resource.medium_type_flavor as medium_type_flavor
+			,resource.medium_type_cpu as medium_type_cpu
+			,resource.medium_type_ram as medium_type_ram
+			,resource.medium_type_disk as medium_type_disk
+			,resource.large_type_flavor as large_type_flavor
+			,resource.large_type_cpu as large_type_cpu
+			,resource.large_type_ram as large_type_ram
+			,resource.large_type_disk as large_type_disk
+			,resource.runner_type_flavor as runner_type_flavor
+			,resource.runner_type_cpu as runner_type_cpu
+			,resource.runner_type_ram as runner_type_ram
+			,resource.runner_type_disk as runner_type_disk
+		From (select * from ieda_diego where id = #{id} ) as d
+		 Left Join ieda_resource as resource
+		  	 On d.id = resource.id
+		    And resource.deploy_type=#{deployType}
+			And resource.id=#{id}
+	</select>
+	
+	<update id="updateDiegoDefaultInfo">
+		/** DiegoDeploy.updateDiegoDefaultInfo **/
+		Update ieda_diego Set
+			iaas_type=#{diego.iaasType},
+			deployment_name=#{diego.deploymentName},
+			director_uuid=#{diego.directorUuid}, 
+			diego_release_name=#{diego.diegoReleaseName}, 
+			diego_release_version=#{diego.diegoReleaseVersion}, 
+			cflinuxfs2_rootfs_release_name = #{diego.cflinuxfs2rootfsreleaseName},
+			cflinuxfs2_rootfs_release_version =#{diego.cflinuxfs2rootfsreleaseVersion},
+			cf_deployment = #{diego.cfDeployment},
+			garden_release_name=#{diego.gardenReleaseName}, 
+			garden_release_version=#{diego.gardenReleaseVersion}, 
+			etcd_release_name=#{diego.etcdReleaseName}, 
+			etcd_release_version=#{diego.etcdReleaseVersion}, 
+			diego_encryption_keys=#{diego.diegoEncryptionKeys}, 
+			deployment_file=#{diego.deploymentFile}, 
+			deploy_status=#{diego.deployStatus}, 
+			task_id=#{diego.taskId}, 
+			update_date=now() 
+		Where id=#{diego.id}
+	</update>
+	
+	<delete id="deleteDiegoInfoRecord">
+		/** DiegoDeploy.deleteDiegoInfoRecord **/
+		Delete From ieda_diego
+	  	Where id=#{id} 
+	</delete>
+</mapper>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item value="1" key="org.eclipse.egit.ui.internal.clone.GitSelectWizardPageWizardSel"/>
+	<list key="RepositorySelectionPage.UsedUris">
+		<item value="http://scmadmin@172.16.100.108:8080/scm/git/OPENPAAS-IEDA-WEB"/>
+	</list>
+	<section name="GitImportWizard">
+	</section>
+</section>

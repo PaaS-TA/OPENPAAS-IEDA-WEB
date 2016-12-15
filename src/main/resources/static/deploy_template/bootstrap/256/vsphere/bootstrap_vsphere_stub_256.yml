@@ -1,0 +1,68 @@
+meta: ~
+
+resource_pools:
+- name: vms
+  cloud_properties:
+    cpu: (( meta.resource-pool-cpu ))
+    ram: (( meta.resource-pool-ram ))
+    disk: (( meta.resource-pool-disk ))
+
+disk_pools:
+- name: disks
+  disk_size: 20_000
+  <<: (( merge ))
+
+networks:
+- name: private
+  type: manual
+  subnets:
+  - range: (( meta.private-network-range ))
+    gateway: (( meta.private-network-gateway ))
+    dns: (( meta.private-network-dns ))
+    cloud_properties:
+      name: (( meta.private-network-name ))
+- name: public
+  type: manual
+  subnets:
+  - range: (( meta.public-network-range ))
+    gateway: (( meta.public-network-gateway ))
+    dns: (( meta.public-network-dns ))
+    cloud_properties:
+      name: (( meta.public-network-name ))
+
+jobs:
+  bosh:
+  
+    templates:  
+    - {name: (( meta.cpi-name )), release: (( meta.cpi-release ))}
+    
+    networks:
+    - name: private
+      static_ips: (( meta.private-static-ips ))
+    - name: public
+      default: [dns, gateway]
+      static_ips: (( meta.public-static-ips ))
+
+    properties:
+      vcenter: &vcenter
+        address: (( meta.vcenter-address ))
+        user: (( meta.vcenter-user ))
+        password: (( meta.vcenter-password ))
+        datacenters:
+        - name: (( meta.vcenter-datacenter-0-name ))
+          vm_folder: (( meta.vcenter-datacenter-0-vm-folder ))
+          template_folder: (( meta.vcenter-datacenter-0-template-folder ))
+          datastore_pattern: (( meta.vcenter-datacenter-0-datastore-pattern ))
+          persistent_datastore_pattern: (( meta.vcenter-datacenter-0-persistent-datastore-pattern ))
+          disk_path: (( meta.vcenter-datacenter-0-disk-path ))
+          clusters: (( meta.vcenter-datacenter-0-clusters ))
+      ntp: &ntp (( meta.ntp ))
+
+      director:
+        enable_snapshots: (( meta.enable-snapshots || "false" ))
+        snapshot_schedule: (( meta.snapshot-schedule || nil ))
+
+cloud_provider:
+  properties:
+    vcenter: *vcenter
+    ntp: *ntp

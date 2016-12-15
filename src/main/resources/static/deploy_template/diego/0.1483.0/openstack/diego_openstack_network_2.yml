@@ -1,0 +1,31 @@
+iaas_settings:
+  subnet_configs:
+    - name: diego3
+      type: manual
+      subnets:
+      - range: (( meta.network-2-range ))
+        gateway: (( meta.network-2-gateway ))
+        static: (( meta.network-2-static ))
+        reserved: (( meta.network-2-reserved ))
+        dns: (( meta.network-2-dns ))
+        cloud_properties:
+          net_id: (( meta.network-2-net-id ))
+          security_groups: (( meta.network-2-security-groups ))
+
+instance_count_overrides:
+  - name: access_z3
+    instances: 1
+  - name: brain_z3
+    instances: 1
+  - name: cc_bridge_z3
+    instances: 1
+  - name: cell_z3
+    instances: (( meta.cell_z3-instances || 1 ))
+  - name: database_z3
+    instances: 1
+  - name: route_emitter_z3
+    instances: 1
+
+config_from_cf: ~
+
+meta: ~

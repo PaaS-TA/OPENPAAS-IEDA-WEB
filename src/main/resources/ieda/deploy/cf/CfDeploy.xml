@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.openpaas.ieda.web.deploy.cf.dao.CfDAO">
+
+	<resultMap id="cf" type="org.openpaas.ieda.web.deploy.cf.dao.CfVO">
+		<id property="id" column="ID" />
+		<result property="iaasType" column="IAAS_TYPE"/>
+		<result property="diegoYn" column="DIEGO_YN"/>
+		<result property="createUserId" column="CREATE_USER_ID"/>
+		<result property="createDate" column="CREATE_DATE" />
+		<result property="updateUserId" column="UPDATE_USER_ID"/>
+		<result property="updateDate" column="UPDATE_DATE" />
+		<result property="deploymentName" column="DEPLOYMENT_NAME" />
+		<result property="directorUuid" column="DIRECTOR_UUID" />
+		<result property="releaseName" column="RELEASE_NAME" />
+		<result property="releaseVersion" column="RELEASE_VERSION" />
+		<result property="appSshFingerprint" column="APP_SSH_FINGERPRINT" />
+		<result property="domain" column="DOMAIN" />
+		<result property="description" column="DESCRIPTION" />
+		<result property="domainOrganization" column="DOMAIN_ORGANIZATION" />
+		<result property="deaMemoryMB" column="DEA_MEMORY_MB" />
+		<result property="deaDiskMB" column="DEA_DISK_MB" />
+		<result property="proxyStaticIps" column="PROXY_STATIC_IPS" />
+		<result property="sslPemPub" column="SSL_PEM_PUB" />
+		<result property="sslPemRsa" column="SSL_PEM_RSA" />
+		<result property="loginSecret" column="LOGIN_SECRET" />
+		<result property="encryptKeys" column="ENCRYPT_KEYS" />
+		<result property="deploymentFile" column="DEPLOYMENT_FILE" />
+		<result property="deployStatus" column="DEPLOY_STATUS" />
+		<result property="taskId" column="TASK_ID" />
+		<collection property="keys"   ofType="org.openpaas.ieda.web.deploy.common.dao.key.KeyVO"  javaType="ArrayLIst" >
+			<id property="keyType" column="KEY_TYPE" />
+			<result property="id" column="KEY_ID"/>
+			<result property="caCert" column="CA_CERT" />
+			<result property="serverCert" column="SERVER_CERT" />
+			<result property="serverKey" column="SERVER_KEY" />
+			<result property="clientCert" column="CLIENT_CERT" />
+			<result property="clientKey" column="CLIENT_KEY" />
+			<result property="agentCert" column="AGENT_CERT" />
+			<result property="agentKey" column="AGENT_KEY" />
+			<result property="tlsCert" column="TLS_CERT" />
+			<result property="privateKey" column="PRIVATE_KEY" />
+			<result property="publicKey" column="PUBLIC_KEY"/>
+			<result property="hostKey" column="HOST_KEY" />
+		</collection>
+		<collection property="resource" ofType="org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO"  javaType="org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO">
+			<result property="id" column="RESOURCE_ID" />
+			<result property="deployType" column="RESOURCE_DEPLOY_TYPE"/>
+			<result property="boshPassword" column="BOSH_PASSWORD" />
+			<result property="stemcellName" column="STEMCELL_NAME" />
+			<result property="stemcellVersion" column="STEMCELL_VERSION" />
+			<result property="smallFlavor" column="SMALL_TYPE_FLAVOR"/>
+			<result property="mediumFlavor" column="MEDIUM_TYPE_FLAVOR" />
+			<result property="largeFlavor" column="LARGE_TYPE_FLAVOR" />
+			<result property="runnerFlavor" column="RUNNER_TYPE_FLAVOR" />
+			<result property="smallCpu" column="SMALL_TYPE_CPU" />
+			<result property="smallRam" column="SMALL_TYPE_RAM" />
+			<result property="smallDisk" column="SMALL_TYPE_DISK" />
+			<result property="mediumCpu" column="MEDIUM_TYPE_CPU" />
+			<result property="mediumRam" column="MEDIUM_TYPE_RAM" />
+			<result property="mediumDisk" column="MEDIUM_TYPE_DISK" />
+			<result property="largeCpu" column="LARGE_TYPE_CPU"/>
+			<result property="largeRam" column="LARGE_TYPE_RAM" />
+			<result property="largeDisk" column="LARGE_TYPE_DISK"/>
+			<result property="runnerCpu" column="RUNNER_TYPE_CPU" />
+			<result property="runnerRam" column="RUNNER_TYPE_RAM" />
+			<result property="runnerDisk" column="RUNNER_TYPE_DISK" />
+			<result property="createUserId" column="CREATE_USER_ID"/>
+			<result property="createDate" column="CREATE_DATE" />
+			<result property="updateUserId" column="UPDATE_USER_ID"/>
+			<result property="updateDate" column="UPDATE_DATE" />
+		</collection>
+	</resultMap>
+
+	<select id="selectCfList" resultMap="cf">
+		/** cfDeploy.selectCfList  **/
+		Select 
+			 c.id as id 
+			,c.iaas_type as iaas_type
+			,app_ssh_fingerprint
+			,diego_yn
+			,deploy_status
+			,deployment_file
+			,deployment_name
+			,description
+			,director_uuid
+			,domain
+			,domain_organization
+			,encrypt_keys
+			,login_secret
+			,proxy_static_ips
+			,release_name
+			,release_version
+			,ssl_pem_pub
+			,ssl_pem_rsa
+			,task_id
+			,c.create_date as create_date
+			,c.update_date as update_date
+		From ieda_cf c 
+		LEFT JOIN ieda_cf_diego a
+		ON c.id = a.cf_id
+	 	Where LOWER(c.iaas_type) = #{iaas}
+		<if test="platform == 'cf'">
+		 	And (a.cf_id is null || c.deploy_status = 'error')
+		</if>
+	</select>
+	
+	<select id="selectCfInfoById" resultMap="cf">
+		/** cfDeploy.selectCfInfoById  **/
+		Select 
+			 id
+			,iaas_type
+			,dea_memory_mb
+			,dea_disk_mb
+			,diego_yn
+			,app_ssh_fingerprint
+			,deploy_status
+			,deployment_file
+			,deployment_name
+			,description
+			,director_uuid
+			,domain
+			,domain_organization
+			,encrypt_keys
+			,login_secret
+			,proxy_static_ips
+			,release_name
+			,release_version
+			,ssl_pem_pub
+			,ssl_pem_rsa
+			,task_id
+		From ieda_cf
+		where id = #{id}
+	</select>
+	
+	<select id="selectCfKeyInfoById" resultMap="cf">
+		/** cfDeploy.selectCfKeyInfoById  **/
+		Select c.id as id 
+			,k.id as key_id
+			,k.key_type as key_type
+			,iaas_type
+			,dea_memory_mb
+			,dea_disk_mb
+			,diego_yn
+			,agent_cert
+			,agent_key
+			,app_ssh_fingerprint
+			,ca_cert
+			,deploy_status
+			,deployment_file
+			,deployment_name
+			,description
+			,director_uuid
+			,domain
+			,domain_organization
+			,encrypt_keys
+			,login_secret
+			,proxy_static_ips
+			,release_name
+			,release_version
+			,server_cert
+			,server_key
+			,private_key
+			,ssl_pem_pub
+			,ssl_pem_rsa
+			,tls_cert
+			,private_key
+			,ca_cert
+			,public_key
+			,task_id
+		From (select * from ieda_cf where id = #{id} ) c
+		 Left JOIN ieda_key k
+			On c.id = k.id
+		  And k.deploy_type=#{deployType}
+		  And k.key_type=#{keyType}
+	</select>
+	
+	<select id="selectCfResourceInfoById"  resultMap="cf">
+		/** cfDeploy.selectCfResourceInfoById  **/
+		Select 
+			 cf.id as id 
+			,resource.id as resource_id
+			,iaas_type
+			,dea_memory_mb
+			,dea_disk_mb
+			,diego_yn
+			,app_ssh_fingerprint
+			,deploy_status
+			,deployment_file
+			,deployment_name
+			,description
+			,director_uuid
+			,domain
+			,domain_organization
+			,encrypt_keys
+			,login_secret
+			,proxy_static_ips
+			,release_name
+			,release_version
+			,ssl_pem_pub
+			,ssl_pem_rsa
+			,resource.deploy_type as resource_deploy_type
+			,bosh_password
+			,stemcell_name
+			,stemcell_version
+			,small_type_flavor
+			,small_type_cpu
+			,small_type_ram
+			,small_type_disk
+			,medium_type_flavor
+			,medium_type_cpu
+			,medium_type_ram
+			,medium_type_disk
+			,large_type_flavor
+			,large_type_cpu
+			,large_type_ram
+			,large_type_disk
+			,runner_type_flavor
+			,runner_type_cpu
+			,runner_type_ram
+			,runner_type_disk
+			,task_id
+		From (select * from ieda_cf where id = #{id} ) as cf
+		 Left Join ieda_resource as resource
+		  	On cf.id = resource.id
+		   And resource.deploy_type=#{deployType}
+		   And resource.id=#{id}
+	</select>
+	
+	<insert id="insertCfInfo" useGeneratedKeys="true" keyColumn="id" keyProperty="cf.id">
+		/** cfDeploy.insertCfInfo  **/
+		Insert Into ieda_cf (
+			 id
+			,iaas_type 
+			,diego_yn
+			,deployment_name
+			,director_uuid
+			,release_name
+			,release_version
+			,app_ssh_fingerprint
+			,domain
+			,description
+			,domain_organization
+			,dea_memory_mb
+			,dea_disk_mb
+			,proxy_static_ips
+			,ssl_pem_pub
+			,ssl_pem_rsa
+			,login_secret
+			,encrypt_keys
+			,deployment_file
+			,create_date
+			,create_user_id
+			,update_date
+			,update_user_id
+		) 
+		Values(
+			 #{cf.id}
+			,#{cf.iaasType}
+			,#{cf.diegoYn}
+			,#{cf.deploymentName}
+			,#{cf.directorUuid}
+			,#{cf.releaseName}
+			,#{cf.releaseVersion}
+			,#{cf.appSshFingerprint}
+			,#{cf.domain}
+			,#{cf.description}
+			,#{cf.domainOrganization}
+			,#{cf.deaMemoryMB}
+			,#{cf.deaDiskMB}
+			,#{cf.proxyStaticIps}
+			,#{cf.sslPemPub}
+			,#{cf.sslPemRsa}
+			,#{cf.loginSecret}
+			,#{cf.encryptKeys}
+			,#{cf.deploymentFile}
+			,now()
+			,#{cf.createUserId}
+			,now()
+			,#{cf.updateUserId}
+		)
+		<selectKey keyProperty="cf.id" resultType="int" order="AFTER">
+			<if test="cf.id != 1"> SELECT LAST_INSERT_ID(); </if>
+			<if test="cf.id == 1"> SELECT 1 AS id from dual; </if>
+		</selectKey>
+	</insert>
+	
+	<update id="updateCfInfo">
+		/** cfDeploy.updateCfInfo  **/
+		Update ieda_cf Set
+			 deployment_name=#{cf.deploymentName}
+			,director_uuid=#{cf.directorUuid}
+			,release_name=#{cf.releaseName}
+			,release_version=#{cf.releaseVersion}
+			,app_ssh_fingerprint=#{cf.appSshFingerprint}
+			,dea_memory_mb=#{cf.deaMemoryMB}
+			,dea_disk_mb=#{cf.deaDiskMB}
+			,domain=#{cf.domain}
+			,description=#{cf.description}
+			,domain_organization=#{cf.domainOrganization}
+			,proxy_static_ips=#{cf.proxyStaticIps}
+			,ssl_pem_pub=#{cf.sslPemPub}
+			,ssl_pem_rsa=#{cf.sslPemRsa}
+			,login_secret=#{cf.loginSecret}
+			,encrypt_keys=#{cf.encryptKeys}
+			,deployment_file=#{cf.deploymentFile}
+			,deploy_status=#{cf.deployStatus}
+			,task_id=#{cf.taskId}
+			,update_user_id = #{cf.updateUserId}
+			,update_date = now()
+		Where id=#{cf.id}
+	</update>
+	
+	<delete id="deleteCfInfoRecord">
+		/** cfDeploy.deleteCfInfoRecord  **/
+		Delete From ieda_cf
+		Where id=#{id}
+	</delete>
+	
+	<select id="selectDeploymentFilebyDeploymentName" resultMap="cf">
+		/** cfDeploy.selectDeploymentFilebyDeploymentName  **/
+		Select deployment_file  From ieda_cf 
+	    Where deployment_name = #{cfDeploymentName}
+	</select>
+</mapper>

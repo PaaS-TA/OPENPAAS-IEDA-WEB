@@ -1,0 +1,14 @@
+---
+name: (( merge || "bosh" ))
+
+releases: (( merge ))
+
+resource_pools: (( merge ))
+
+disk_pools: (( merge ))
+
+networks: (( merge ))
+
+jobs: (( merge ))
+
+cloud_provider: (( merge ))

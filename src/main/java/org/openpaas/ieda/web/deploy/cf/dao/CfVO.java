@@ -1,0 +1,253 @@
+package org.openpaas.ieda.web.deploy.cf.dao;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.openpaas.ieda.web.deploy.common.dao.key.KeyVO;
+import org.openpaas.ieda.web.deploy.common.dao.network.NetworkVO;
+import org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO;
+
+public class CfVO {
+	
+	private Integer id; //id
+	private String iaasType; //iaas 유형
+	private String diegoYn;//diego 사용 유무
+	
+	private Date createDate; //생성알자
+	private String createUserId;//생성자
+	private String updateUserId;//수정자
+	private Date updateDate; //수정일자
+	
+	// 1.1 Deployment 정보
+	private String deploymentName;//배포명
+	private String directorUuid;//설치관리자 UUID
+	private String releaseName;//릴리즈명
+	private String releaseVersion; //릴리즈 버전
+	private String appSshFingerprint;//SSH 핑거프린트
+	private Integer deaMemoryMB; //deaDiskMB
+	private Integer deaDiskMB; //deaDiskMB
+	
+	// 1.2 기본정보
+	private String domain;//도메인
+	private String description;//도메인 설명
+	private String domainOrganization;//도메인 그룹
+	
+	//2. 네트워크 목록 정보
+	private List<NetworkVO> networks;
+	//2.1 네트워크 정보
+	private NetworkVO network;
+	
+	//3. key List
+	private List<KeyVO> keys;
+	//3.1 key 정보
+	private KeyVO key;
+	
+	// 4. UAA 정보
+	private String loginSecret;//로그인 비밀번호
+	
+	// 4.1 프록시 정보
+	private String proxyStaticIps;//HAProxy 공인 IP
+	private String sslPemPub;//HAProxy 인증서
+	private String sslPemRsa; //HAProxy 개인키
+	
+	// 5. Consul 정보
+	private String encryptKeys;//암호화 키
+	
+	// 6. 리소스 정보
+	ResourceVO resource;
+	
+	// 7. Deploy 정보
+	private String deploymentFile;//배포파일명
+	private String deployStatus;//배포상태
+	private int taskId;//TASK ID
+	
+	public CfVO(){
+		network = new NetworkVO();
+		networks = new ArrayList<NetworkVO>();
+		key = new KeyVO();
+		keys= new ArrayList<KeyVO>();
+		resource = new ResourceVO();
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getIaasType() {
+		return iaasType;
+	}
+	public void setIaasType(String iaasType) {
+		this.iaasType = iaasType;
+	}
+	public String getDiegoYn() {
+		return diegoYn;
+	}
+	public void setDiegoYn(String diegoYn) {
+		this.diegoYn = diegoYn;
+	}
+	public Date getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+	public String getCreateUserId() {
+		return createUserId;
+	}
+	public void setCreateUserId(String createUserId) {
+		this.createUserId = createUserId;
+	}
+	public String getUpdateUserId() {
+		return updateUserId;
+	}
+	public void setUpdateUserId(String updateUserId) {
+		this.updateUserId = updateUserId;
+	}
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
+	}
+	public String getDeploymentName() {
+		return deploymentName;
+	}
+	public void setDeploymentName(String deploymentName) {
+		this.deploymentName = deploymentName;
+	}
+	public String getDirectorUuid() {
+		return directorUuid;
+	}
+	public void setDirectorUuid(String directorUuid) {
+		this.directorUuid = directorUuid;
+	}
+	public String getReleaseName() {
+		return releaseName;
+	}
+	public void setReleaseName(String releaseName) {
+		this.releaseName = releaseName;
+	}
+	public String getReleaseVersion() {
+		return releaseVersion;
+	}
+	public void setReleaseVersion(String releaseVersion) {
+		this.releaseVersion = releaseVersion;
+	}
+	public String getAppSshFingerprint() {
+		return appSshFingerprint;
+	}
+	public void setAppSshFingerprint(String appSshFingerprint) {
+		this.appSshFingerprint = appSshFingerprint;
+	}
+	public Integer getDeaMemoryMB() {
+		return deaMemoryMB;
+	}
+	public void setDeaMemoryMB(Integer deaMemoryMB) {
+		this.deaMemoryMB = deaMemoryMB;
+	}
+	public Integer getDeaDiskMB() {
+		return deaDiskMB;
+	}
+	public void setDeaDiskMB(Integer deaDiskMB) {
+		this.deaDiskMB = deaDiskMB;
+	}
+	public String getDomain() {
+		return domain;
+	}
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public String getDomainOrganization() {
+		return domainOrganization;
+	}
+	public void setDomainOrganization(String domainOrganization) {
+		this.domainOrganization = domainOrganization;
+	}
+	public List<NetworkVO> getNetworks() {
+		return networks;
+	}
+	public void setNetworks(List<NetworkVO> networks) {
+		this.networks = networks;
+	}
+	public NetworkVO getNetwork() {
+		return network;
+	}
+	public void setNetwork(NetworkVO network) {
+		this.network = network;
+	}
+	public List<KeyVO> getKeys() {
+		return keys;
+	}
+	public void setKeys(List<KeyVO> keys) {
+		this.keys = keys;
+	}
+	public KeyVO getKey() {
+		return key;
+	}
+	public void setKey(KeyVO key) {
+		this.key = key;
+	}
+	public String getLoginSecret() {
+		return loginSecret;
+	}
+	public void setLoginSecret(String loginSecret) {
+		this.loginSecret = loginSecret;
+	}
+	public String getProxyStaticIps() {
+		return proxyStaticIps;
+	}
+	public void setProxyStaticIps(String proxyStaticIps) {
+		this.proxyStaticIps = proxyStaticIps;
+	}
+	public String getSslPemPub() {
+		return sslPemPub;
+	}
+	public void setSslPemPub(String sslPemPub) {
+		this.sslPemPub = sslPemPub;
+	}
+	public String getSslPemRsa() {
+		return sslPemRsa;
+	}
+	public void setSslPemRsa(String sslPemRsa) {
+		this.sslPemRsa = sslPemRsa;
+	}
+	public String getEncryptKeys() {
+		return encryptKeys;
+	}
+	public void setEncryptKeys(String encryptKeys) {
+		this.encryptKeys = encryptKeys;
+	}
+	public ResourceVO getResource() {
+		return resource;
+	}
+	public void setResource(ResourceVO resource) {
+		this.resource = resource;
+	}
+	public String getDeploymentFile() {
+		return deploymentFile;
+	}
+	public void setDeploymentFile(String deploymentFile) {
+		this.deploymentFile = deploymentFile;
+	}
+	public String getDeployStatus() {
+		return deployStatus;
+	}
+	public void setDeployStatus(String deployStatus) {
+		this.deployStatus = deployStatus;
+	}
+	public int getTaskId() {
+		return taskId;
+	}
+	public void setTaskId(int taskId) {
+		this.taskId = taskId;
+	}
+}

@@ -1,0 +1,115 @@
+property_overrides:
+  etcd:
+    require_ssl: true
+    peer_require_ssl: true
+    ca_cert: (( meta.etcd-ca-cert ))
+
+    server_cert: (( meta.etcd-server-cert ))
+
+    server_key: (( meta.etcd-server-key ))
+
+    client_cert: (( meta.etcd-client-cert ))
+    
+    client_key: (( meta.etcd-client-key ))
+
+    peer_ca_cert: (( meta.etcd-peer-ca-cert ))
+
+    peer_cert: (( meta.etcd-peer-cert ))
+
+    peer_key: (( meta.etcd-peer-key ))
+
+  bbs:
+    active_key_label: key1
+    encryption_keys:
+      - label: key1
+        passphrase: (( meta.bbs-encryption-keys ))
+    etcd:
+      machines: ["etcd.service.cf.internal"]
+    require_ssl: true
+    ca_cert: (( meta.bbs-ca-cert ))
+
+    server_cert: (( meta.bbs-server-cert ))
+
+    server_key: (( meta.bbs-server-key ))
+
+    client_cert: (( meta.bbs-client-cert ))
+    
+    client_key: (( meta.bbs-client-key ))
+
+  executor:
+    drain_timeout_in_seconds: 0
+    garden:
+      network: tcp
+      address: 127.0.0.1:7777
+    log_level: debug
+  garden:
+    listen_network: tcp
+    listen_address: 0.0.0.0:7777
+    log_level: debug
+  nsync:
+    log_level: debug
+  stager:
+    log_level: debug
+  rep:
+    evacuation_timeout_in_seconds: 60
+    log_level: debug
+  route_emitter:
+    log_level: debug
+  skip_cert_verify: true
+  ssh_proxy:
+    host_key: (( meta.ssh-proxy-host-key ))
+
+    enable_cf_auth: (( meta.enable-cf-auth || true ))
+    enable_diego_auth: (( meta.enable-diego-auth || false ))
+    diego_credentials: null
+
+instance_count_overrides:
+  - name: cell_z1
+    instances: (( meta.cell-z1-instances || 1 ))
+  - name: access_z2
+    instances: 0
+  - name: access_z3
+    instances: 0
+  - name: brain_z2
+    instances: 0
+  - name: cc_bridge_z2
+    instances: 0
+  - name: cell_z2
+    instances: 0
+  - name: database_z2
+    instances: 0
+  - name: database_z3
+    instances: 0
+  - name: route_emitter_z2
+    instances: 0
+
+#sql_overrides:
+#  bbs:
+#    db_connection_string: (( "postgres://diego:admin@" config_from_cf.db_connection_address ":5524/diego" ))
+#    db_driver: postgres
+#    max_open_connections: 500
+
+resource_pool_overrides:
+  base_stemcell_env:
+    # Default vcap & root password on deployed VMs (ie c1oudc0w)
+    # Generated using mkpasswd -m sha-512
+    bosh:
+      password: (( meta.stemcell-password || "$6$4gDD3aV0rdqlrKC$2axHCxGKIObs6tAmMTqYCspcdvQXh3JJcvWOY2WGb4SrdXtnCyNaWlrf3WEqvYR2MYizEGp3kMmbpwBC6jsHt0" ))
+
+release_versions:
+  diego:
+    name: (( meta.diego-release-name ))
+    version: (( meta.diego-release-version ))
+  etcd:
+    name: (( meta.etcd-release-name ))
+    version: (( meta.etcd-release-version ))
+  garden-linux:
+    name: (( meta.garden-linux-release-name ))
+    version: (( meta.garden-linux-release-version ))
+  cflinuxfs2-rootfs:
+    name: (( meta.cflinuxfs2-rootfs-release-name ))
+    version: (( meta.cflinuxfs2-rootfs-release-version ))
+
+config_from_cf: ~
+
+meta: ~

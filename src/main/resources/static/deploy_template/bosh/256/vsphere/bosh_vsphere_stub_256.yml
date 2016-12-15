@@ -1,0 +1,100 @@
+meta: ~
+
+resource_pools:
+  small:
+    cloud_properties:
+      cpu: (( meta.small-instance-type.cpu ))
+      ram: (( meta.small-instance-type.ram ))
+      disk: (( meta.small-instance-type.disk ))
+
+  director:
+    cloud_properties:
+      cpu: (( meta.director-instance-type.cpu ))
+      ram: (( meta.director-instance-type.ram ))
+      disk: (( meta.director-instance-type.disk ))
+
+compilation:
+  cloud_properties: (( merge || resource_pools.director.cloud_properties ))
+
+disk_pools:
+- name: default
+  disk_size: 20_000
+  <<: (( merge ))
+- name: blobstore
+  disk_size: 51_200
+  <<: (( merge ))
+
+networks:
+- name: internal
+  type: manual
+  subnets:
+  - range: (( meta.private-network-range ))
+    gateway: (( meta.private-network-gateway ))
+    dns: (( meta.private-network-dns ))
+    reserved: (( meta.private-network-reserved ))
+    static: (( meta.private-network-static ))
+    cloud_properties:
+      name: (( meta.private-network-name ))
+- name: external
+  type: manual
+  subnets:
+  - range: (( meta.public-network-range ))
+    gateway: (( meta.public-network-gateway ))
+    dns: (( meta.public-network-dns ))
+    static: (( meta.public-static-ips ))
+    cloud_properties:
+      name: (( meta.public-network-name ))
+
+jobs:
+  - name: nats
+    instances: (( merge || 1 ))
+    networks:
+      - name: internal
+        default: [dns, gateway]
+        static_ips: (( static_ips(0) ))
+
+  - name: postgres
+    instances: (( merge || 1 ))
+    networks:
+      - name: internal
+        default: [dns, gateway]
+        static_ips: (( static_ips(2) ))
+
+  - name: blobstore
+    instances: (( merge || 1 ))
+    networks:
+      - name: internal
+        default: [dns, gateway]
+        static_ips: (( static_ips(3) ))
+
+  - name: director
+    instances: (( merge || 1 ))
+    networks:
+      - name: internal        
+        static_ips: (( static_ips(4) ))
+      - name: external
+        default: [dns, gateway]
+        static_ips: (( meta.public-static-ips ))
+    enable_snapshots: (( meta.enable-snapshots || "false" ))
+    snapshot_schedule: (( meta.snapshot-schedule || nil ))
+
+  - name: health_monitor
+    instances: (( merge || 1 ))
+    networks:
+      - name: internal
+        default: [dns, gateway]
+        static_ips: (( static_ips(5) ))
+
+properties:
+  vcenter:
+    address: (( meta.vcenter-address ))
+    user: (( meta.vcenter-user ))
+    password: (( meta.vcenter-password ))
+    datacenters:
+    - name: (( meta.vcenter-datacenter-0-name ))
+      vm_folder: (( meta.vcenter-datacenter-0-vm-folder ))
+      template_folder: (( meta.vcenter-datacenter-0-template-folder ))
+      datastore_pattern: (( meta.vcenter-datacenter-0-datastore-pattern ))
+      persistent_datastore_pattern: (( meta.vcenter-datacenter-0-persistent-datastore-pattern ))
+      disk_path: (( meta.vcenter-datacenter-0-disk-path ))
+      clusters: (( meta.vcenter-datacenter-0-clusters ))

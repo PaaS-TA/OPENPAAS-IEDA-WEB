@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.openpaas.ieda.web.common.dao.CommonDAO">
+
+<select id="getManifetTemplate"  resultType="org.openpaas.ieda.web.common.dao.ManifestTemplateVO">
+/**org.openpaas.ieda.web.common.dao.CommonDAO.getManifetTemplate*/
+ <![CDATA[
+SELECT 
+	id, 
+	deploy_type as deployType,
+	iaas_type as iaasType,
+	release_type as releaseType,
+	template_version as templateVersion,
+	min_release_version as minReleaseVersion,
+	common_base_template as commonBaseTemplate,
+	common_job_template as commonJobTemplate,
+	common_option_template as commonOptionTemplate,
+	iaas_property_template as iaasPropertyTemplate,
+	option_network_template as optionNetworkTemplate,
+	option_resource_template as optionResourceTemplate,
+	option_etc as optionEtc,
+	meta_template as metaTemplate,
+	input_template as inputTemplate,
+	create_user_id as createUserId,
+	create_date as createDate,
+	update_user_id as updateUserId,
+	update_date as updateDate
+FROM 
+	ieda_manifest_template
+WHERE
+	UPPER(deploy_type) = #{deployType}
+AND
+	LOWER(iaas_type) = #{iaas}
+AND
+	release_type=#{releaseType}
+AND
+	min_release_version = (
+			SELECT
+				MAX(min_release_version) as min_release_version
+			FROM
+				ieda_manifest_template
+			WHERE
+				UPPER(deploy_type) = #{deployType}
+			AND
+				LOWER(iaas_type) = #{iaas}
+			AND
+				release_type=#{releaseType}
+			AND
+				min_release_version <= #{releaseVersion}
+	)
+]]>
+</select>	
+
+</mapper>

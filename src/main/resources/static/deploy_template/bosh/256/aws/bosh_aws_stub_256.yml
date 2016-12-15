@@ -1,0 +1,98 @@
+meta: ~
+
+resource_pools:
+  small:
+    cloud_properties:
+      instance_type: (( meta.small-instance-type || "m1.small" ))
+      ephemeral_disk: {size: 3000, type: gp2}
+      availability_zone: (( meta.availability-zone ))
+
+  director:
+    cloud_properties:
+      instance_type: (( meta.director-instance-type || "m1.medium" ))
+      ephemeral_disk: {size: 25000, type: gp2}
+      availability_zone: (( meta.availability-zone ))
+      
+compilation:
+  cloud_properties: (( merge || resource_pools.director.cloud_properties ))
+
+disk_pools:
+- name: default
+  disk_size: 20000
+  cloud_properties: {type: gp2}
+  <<: (( merge ))
+- name: blobstore
+  disk_size: 51200
+  cloud_properties: {type: gp2}
+  <<: (( merge ))
+  
+networks:
+- name: internal
+  type: manual
+  subnets:
+  - range: (( meta.private-network-range ))
+    gateway: (( meta.private-network-gateway ))
+    dns: (( meta.private-network-dns ))
+    static: (( meta.private-network-static ))
+    reserved: (( meta.private-network-reserved ))
+    cloud_properties:
+      subnet: (( meta.private-network-id ))
+- name: external
+  type: vip
+
+jobs:
+  - name: nats
+    instances: (( merge || 1 ))
+    networks:
+      - name: internal
+        default: [dns, gateway]
+        static_ips: (( static_ips(0) ))
+
+  - name: postgres
+    instances: (( merge || 1 ))
+    networks:
+      - name: internal
+        default: [dns, gateway]
+        static_ips: (( static_ips(2) ))
+        
+  - name: blobstore
+    instances: (( merge || 1 ))
+    networks:
+      - name: internal
+        default: [dns, gateway]
+        static_ips: (( static_ips(3) ))
+        
+  - name: director
+    instances: (( merge || 1 ))
+    networks:
+      - name: internal
+        default: [dns, gateway]
+        static_ips: (( static_ips(4) ))
+      - name: external
+        static_ips: (( meta.public-static-ips ))        
+    enable_snapshots: (( meta.enable-snapshots || "false" ))
+    snapshot_schedule: (( meta.snapshot-schedule || nil ))
+
+  - name: health_monitor
+    instances: (( merge || 1 ))
+    networks:
+      - name: internal
+        default: [dns, gateway]
+        static_ips: (( static_ips(5) ))
+        
+  - name: registry
+    template: registry
+    instances: (( merge || 1 ))
+    resource_pool: small
+    networks:
+      - name: internal
+        default: [dns, gateway]
+        static_ips: (( static_ips(6) ))
+
+properties:
+  aws:
+    access_key_id: (( meta.access-key-id ))
+    secret_access_key: (( meta.secret-access-key ))
+    default_key_name: (( meta.default-key-name ))
+    default_security_groups: (( meta.default-security-groups ))
+    region: (( meta.region ))

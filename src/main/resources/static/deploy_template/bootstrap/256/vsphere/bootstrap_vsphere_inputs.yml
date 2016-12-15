@@ -1,0 +1,102 @@
+## 배포명
+name: [deploymentName]
+
+meta:
+  ## BOSH-RELEASE 파일경로 및 파일명
+  bosh-release-url: file:///[boshRelease]
+  
+  ## BOSH-CPI-RELEASE 파일경로 및 파일명
+  bosh-cpi-release-url: file:///[boshCpiRelease]
+  
+  ## STEMCELL 파일경로 및 파일명
+  stemcell-url: file:///[stemcell]
+  
+  ## VM 비밀번호
+  vcap-password: [boshPassword]
+
+  ## vSphere private 네트워크명
+  private-network-name: [networkName]
+  
+  ## BootStrap에 할당할 private 네트워크 대역
+  private-network-range: [subnetRange]
+  
+  ## private 네트워크 게이트웨이
+  private-network-gateway: [subnetGateway]
+  
+  ## private 네트워크 DNS
+  private-network-dns: [[subnetDns]]
+  
+  ## BootStrap에 할당할 고정 IP
+  private-static-ips: [[privateStaticIp]]
+  
+  ## vSphere External 네트워크명
+  public-network-name: [publicNetworkName]
+  
+  ## BootStrap에 할당할 External 네트워크 대역
+  public-network-range: [publicSubnetRange]
+  
+  ## External 네트워크 게이트웨이
+  public-network-gateway: [publicSubnetGateway]
+  
+  ## External 네트워크 DNS
+  public-network-dns: [[publicSubnetDns]]
+
+  ## vCenter IP
+  vcenter-address: [vCenterAddress]
+  
+  ## vCenter 로그인 ID
+  vcenter-user: [vCenterUser]
+  
+  ## vCenter 로그인 비밀번호
+  vcenter-password: [vCenterPassword]
+  
+  ## vCenter DataCenter명
+  vcenter-datacenter-0-name: [vCenterName]
+  
+  ## DataCenter VM 폴더명
+  vcenter-datacenter-0-vm-folder: [vCenterVMFolder]
+  
+  ## DataCenter VM 스템셀 폴더명
+  vcenter-datacenter-0-template-folder: [vCenterTemplateFolder]
+  
+  ## DataCenter 데이터 스토어
+  vcenter-datacenter-0-datastore-pattern: [vCenterDatastore]
+  
+  ## DataCenter 영구 데이터 스토어
+  vcenter-datacenter-0-persistent-datastore-pattern: [vCenterPersistentDatastore]
+  
+  ## DataCenter 디스크 경로
+  vcenter-datacenter-0-disk-path: [vCenterDiskPath]
+  
+  ## DataCenter 클러스터명
+  vcenter-datacenter-0-clusters: [[vCenterCluster]]
+
+  ## NTP
+  ntp: [[ntp]]
+
+  ## BootStrap에 할당할 고정 IP
+  public-static-ips: [[publicStaticIp]]
+
+  ## CPI 명 <-- 사용자 입력은 하지 않는다.
+  cpi-name: [cpiName]
+  
+  ## CPI 릴리즈명 <-- 사용자 입력은 하지 않는다.
+  cpi-release: [cpiReleaseName]
+
+  ## 디렉터명
+  director-name: [directorName]
+  
+  ## 리소스 풀 CPU
+  resource-pool-cpu: [resourcePoolCPU]
+  
+  ## 리소스 풀 RAM
+  resource-pool-ram: [resourcePoolRAM]
+  
+  ## 리소스 풀 DISK
+  resource-pool-disk: [resourcePoolDisk]
+    
+  ## 스냅샷기능 사용여부 <- 화면에서 추가 입력을 받는다.
+  enable-snapshots: [enableSnapshot]
+  
+  ## 스냅샷 스케줄 <- 화면에서 추가 입력을 받는다.
+  snapshot-schedule: [snapshotSchedule]

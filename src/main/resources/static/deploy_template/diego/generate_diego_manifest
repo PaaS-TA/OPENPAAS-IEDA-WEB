@@ -1,0 +1,188 @@
+#!/bin/bash
+ 
+set -e
+ 
+#############################################################################
+# SYNOPSIS:
+#    Generate a manifest for a Diego deployment to accompany an existing CF deployment.
+#
+# USAGE:
+#    generate_diego_manifest $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 $11 $12
+#
+# MANDATORY ARGUMENTS:
+#    $1                 Path to USER home directory ex) /home/ubuntu
+#    $2                 Deployment Version
+#    $3                 Path to BOSH manifest stub file.
+#    $4                 Path to DIEGO stub file.
+#    $5                 Path to DIEGO-version-overrides stub file.
+#    $6                 Path to IaaS-Settings-overrides stub file.
+#    $7                 Path to CF manifest file.
+#    $8                 Path to DIEGO input file.
+#    $9                 Path to DIEGO manifest file.
+# OPTIONAL ARGUMENTS:
+#    $10                 Path to DIEGO Network 1 stub file.
+#    $11                Path to DIEGO Network 2 stub file.
+#    $12                Path to Resource-overrides stub file.
+#
+# EXAMPLE:
+#    generante_diego_manifest \
+#       /path/to/user/home \
+#       236
+#       base_template.yml \
+#       job_template.yml \
+#       meta_template.yml \
+#       option_property_template.yml \
+#       /path/to/openstack-1-cf.yml \
+#       input_template.yml \
+#       openstack-1-diego.yml
+#       optioin_network_template.yml \
+#       option_etc.yml \
+#       option_resource_template.yml
+#############################################################################
+ 
+## INITIALIZE
+## SET BOSH TEMPLATE
+user_home=$1
+deployment_version=$2
+ 
+base_dir="${user_home}/.bosh_plugin"
+deployment_file_dir="${base_dir}/deployment"
+stub_template_dir="${user_home}/OPENPAAS-IEDA-WEB/src/main/resources/static/deploy_template/diego/${deployment_version}"
+template_common_dir="${stub_template_dir}/common"
+ 
+ 
+base_template=""
+diego_jobs=""
+meta_stub=""
+iaas_settings=""
+cf_manifest=""
+diego_inputs=""
+diego_manifest=$9
+network1_override=""
+network2_override=""
+resources_override=""
+ 
+#### MANIFEST COMMON FILES
+## BOSH MANIFEST TEMPLATE
+if [ ! -z "$3" ]; then
+  base_template=${template_common_dir}/$3
+   
+  if [ ! -f "$base_template" ]; then
+    >&2 echo "ERROR: DIEGO-BOSH stub '${base_template}' is not a regular file"
+    argument_error=true
+  fi
+else
+  >&2 echo "ERROR: DIEOG-BOSH manifest file is missing"
+  argument_error=true
+fi
+ 
+## DIEGO MANIFEST TEMPLATE
+if [ ! -z "$4" ]; then
+  diego_jobs=${template_common_dir}/$4
+   
+  if [ ! -f "$diego_jobs" ]; then
+    >&2 echo "ERROR: DIEGO jobs stub '${diego_jobs}' is not a regular file"
+    argument_error=true
+  fi
+fi
+ 
+#### IAAS BASED MANIFEST FILES
+## VERSION-BASED-DIEGO META INFORMATION
+if [ ! -z "$5" ]; then
+  meta_stub=${stub_template_dir}/$5
+   
+  if [ ! -f "$meta_stub" ]; then
+    >&2 echo "ERROR: DIEGO meta stub '${meta_stub}' is not a regular file"
+    argument_error=true
+  fi
+fi
+ 
+## IAAS SETTINGS
+if [ ! -z "$6" ]; then
+  iaas_settings=${stub_template_dir}/$6
+   
+  if [ ! -f "$iaas_settings" ]; then
+    >&2 echo "ERROR: DIEGO IaaS settings stub '${iaas_settings}' is not a regular file"
+    argument_error=true
+  fi
+fi
+ 
+## DEPLOYED CF MANIFEST
+if [[ ! -z "$7" && -f "$7" ]]; then
+  cf_manifest=$7
+else
+  >&2 echo "ERROR: CF manifest file is missing"
+  argument_error=true
+fi
+ 
+## DIEGO DEPLOY PARAMs
+if [ ! -z "$8" ]; then
+  diego_inputs=${base_dir}/temp/$8
+   
+  if [ ! -f "$diego_inputs" ]; then
+    >&2 echo "ERROR: DIEGO deploy inputs '${diego_inputs}' is not a regular file"
+    argument_error=true
+  fi
+else
+  >&2 echo "ERROR: DIEGO input file is missing"
+  argument_error=true
+fi
+ 
+## DIEGO NETWORKS FOR DISTRIBUTED SYSTEM
+if [ ! -z "${10}" ]; then
+  network1_override=${stub_template_dir}/${10}
+   
+  if [ ! -f "$network1_override" ]; then
+    >&2 echo "ERROR: DIEGO network1 inputs '${network1_override}' is not a regular file"
+    argument_error=true
+  fi
+fi
+ 
+## DIEGO NETWORKS FOR DISTRIBUTED SYSTEM
+if [ ! -z "${11}" ]; then
+  network2_override=${stub_template_dir}/${11}
+   
+  if [ ! -f "$network2_override" ]; then
+    >&2 echo "ERROR: DIEGO network2 inputs '${network2_override}' is not a regular file"
+    argument_error=true
+  fi
+fi
+ 
+## ADDITIONAL RESOURCES FOR DIEGO
+if [ ! -z "${12}" ]; then
+  resources_override=${stub_template_dir}/${12}
+   
+  if [ ! -f "$resources_override" ]; then
+    >&2 echo "ERROR: DIEGO resource inputs '${resources_override}' is not a regular file"
+    argument_error=true
+  fi
+fi
+ 
+if [ ! -z $argument_error ]; then
+  exit 1
+fi
+ 
+tmpdir=$(mktemp -d /tmp/diego-manifest.XXXXX)
+ 
+## get cf infomation from the manifest of CF
+spiff merge \
+  ${template_common_dir}/config_from_cf.yml \
+  ${template_common_dir}/config_from_cf_internal.yml \
+  ${cf_manifest} \
+  > ${tmpdir}/config_from_cf.yml
+ 
+## create diego deploy manifest
+spiff merge \
+  ${base_template} \
+  ${diego_jobs} \
+  ${meta_stub} \
+  ${iaas_settings} \
+  ${network1_override} \
+  ${network2_override} \
+  ${resources_override} \
+  ${tmpdir}/config_from_cf.yml \
+  ${diego_inputs} \
+  > ${tmpdir}/${diego_manifest}
+ 
+## move diego.yml to the destination
+mv ${tmpdir}/${diego_manifest} ${deployment_file_dir}/${diego_manifest}

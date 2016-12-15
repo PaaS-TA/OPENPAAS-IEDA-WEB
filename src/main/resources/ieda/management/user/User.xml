@@ -1,0 +1,66 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.openpaas.ieda.web.management.user.dao.UserDAO" >
+<select id="selectUser"  resultType="org.openpaas.ieda.web.management.user.dao.UserVO" >
+  SELECT 
+  		user_id , 
+  		AES_DECRYPT(UNHEX(user_password), 'raison')  as password,
+  		user_name as name,
+  		email ,
+  		role_id  as roleId,
+  		init_pass_yn  as initPassYn
+  	FROM 
+  		ieda_user 
+  	WHERE 
+  		user_id = #{userId}
+  	AND
+  		user_password = HEX(AES_ENCRYPT(#{password}, 'raison'))
+</select>
+<select id="selectUserByUserId"  resultType="org.openpaas.ieda.web.management.user.dao.UserVO" >
+  SELECT 
+  		user_id , 
+  		AES_DECRYPT(UNHEX(user_password), 'raison') as password,
+  		user_name as name,
+  		email ,
+  		role_id  as roleId,
+  		init_pass_yn  as initPassYn
+  	FROM 
+  		ieda_user 
+  	WHERE 
+  		user_id = #{userId}
+</select>
+<select id="getRoleDetailsByRoleId"  resultType="java.util.HashMap" >
+  SELECT 
+  		code_name as auth_code
+  	FROM 
+  		ieda_common_code
+	WHERE
+		code_value IN (	SELECT
+							auth_code
+						FROM
+							ieda_role_detail
+						WHERE
+							role_id = #{roleId}
+					)
+</select>
+<update id="savePassword" >
+  UPDATE 
+  		ieda_user
+  	SET
+  		user_password = HEX(AES_ENCRYPT(#{user.password}, 'raison')),
+  		init_pass_yn = 'Y',
+  		update_user_id = #{user.updateUserId},
+  		update_date = now()  		  		
+  	WHERE 
+  		user_id = #{user.userId}
+</update> 
+<select id="getSecurityPathMapList"  resultType="java.util.HashMap" >
+  SELECT 
+  		code_description,code_name
+  	FROM 
+  		ieda_common_code
+  	WHERE 
+  		parent_code = #{parent_code}
+  	Order by sort_order;
+</select>
+</mapper>

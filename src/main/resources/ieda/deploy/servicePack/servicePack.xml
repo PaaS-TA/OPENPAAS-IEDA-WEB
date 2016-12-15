@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.openpaas.ieda.web.deploy.servicepack.dao.ServicePackDAO">
+	
+	<resultMap id="servicePackMap" type="org.openpaas.ieda.web.deploy.servicepack.dao.ServicePackVO">
+		<id property="id" column="id" />
+		<result property="recid" column ="id"/>
+		<result property="iaas" column ="iaas"/>
+		<result property="deploymentName" column ="deployment_name"/>
+		<result property="deploymentFile" column ="deployment_file"/>
+		<result property="deployStatus" column ="deploy_status"/>
+		<result property="createUserId" column ="create_user_id"/>
+		<result property="createDate" column ="create_date"/>
+		<result property="updateUserId" column ="update_user_id"/>
+		<result property="updateDate" column ="update_date"/>
+	</resultMap>
+	
+	<select id="selectServicePackInfo" resultMap="servicePackMap">
+		SELECT 
+			deployment_name
+			,id
+			,iaas
+			,deployment_file
+			,deploy_status
+			,create_user_id
+			,create_date
+			,update_user_id
+			,update_date
+		FROM
+			ieda_service_pack
+		WHERE iaas = #{iaasAll}
+    </select>
+	
+	
+	<select id="selectServicePackDetailInfo" resultMap="servicePackMap">
+		SELECT 
+			deployment_name
+			,iaas
+			,id
+			,deployment_file
+			,deploy_status
+			,create_user_id
+			,create_date
+			,update_user_id
+			,update_date
+		FROM
+		ieda_service_pack
+		WHERE  
+		id = #{id}
+	</select>
+	
+	<insert id="insertServicePackInfo">
+		INSERT INTO ieda_service_pack(
+			id
+			,deployment_name
+			,iaas
+			,deployment_file
+			,create_user_id
+			,create_date
+			,update_user_id
+			,update_date
+		)
+		VALUES(
+			#{vo.id}
+			,#{vo.deploymentName}
+			,#{vo.iaas}
+			,#{vo.deploymentFile}
+			,#{vo.createUserId}
+			,now()
+			,#{vo.updateUserId}
+			,now()
+		)
+		<selectKey keyProperty="vo.id" resultType="int" order="AFTER">
+			SELECT LAST_INSERT_ID();
+		</selectKey>
+	</insert>
+	
+	<update id="updateServicePackInfo">
+		UPDATE ieda_service_pack SET
+		iaas = #{vo.iaas}
+		,deployment_name = #{vo.deploymentName}
+		,deployment_file = #{vo.deploymentFile}
+		,create_user_id = #{vo.createUserId}
+		,create_date=#{vo.createDate}
+		,update_user_id = #{vo.updateUserId}
+		,update_date= now()
+		,deploy_status = #{vo.deployStatus}
+		WHERE id = #{vo.id}
+	</update>
+	
+	<delete id="deleteServicePackInfoRecord">
+		delete from ieda_service_pack where id = #{id}
+	</delete>
+</mapper>

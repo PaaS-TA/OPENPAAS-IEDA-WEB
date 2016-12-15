@@ -1,0 +1,123 @@
+name: [deploymentName]
+director_uuid: [directorUuid]
+base_releases:
+  diego:
+    name: [diegoReleaseName]
+    version: [diegoReleaseVersion]
+  cf: 
+    name: [cfReleaseName]
+    version: [cfReleaseVersion]
+  garden-linux: 
+    name: [gardenLinuxReleaseName]
+    version: [gardenLinuxReleaseVersion]
+  etcd:
+    name: [etcdReleaseName]
+    version: [etcdReleaseVersion]
+meta:
+  domain: [domain]
+  cf_properties:
+    deployment: [deployment]
+    secret: [secret]
+    etcd:
+      machines: [[etcdMachines]]
+    nats:
+      machines: [[natsMachines]]
+
+networks:
+  oc_network:
+    subnets:
+    - range: [subnetRange]
+      gateway: [subnetGateway]
+      dns: [[subnetDns]]
+      reserved: [[subnetReserved]]
+      static: [[subnetStatic]]
+      cloud_properties:
+        subnet: [subnetId]
+        security_groups: [[cloudSecurityGroups]]
+
+properties:
+  consul:
+    agent:
+      servers:
+        lan: [[consulServersLan]]
+    agent_cert: |
+[consulAgentCert]
+    agent_key: |
+[consulAgentKey]
+    ca_cert: |
+[consulCaCert]
+    encrypt_keys: [[consulEncryptKeys]]
+    server_cert: |
+[consulServerCert]
+    server_key: |
+[consulServerKey]
+
+  diego:
+    auctioneer:
+      bbs:
+        ca_cert: |
+[diegoCaCert]
+        client_cert: |
+[diegoClientCert]
+        client_key: |
+[diegoClientKey]
+
+    bbs:
+      encryption_keys:
+      - passphrase: [diegoEncryptionKeys]
+      server_cert: |
+[diegoServerCert]
+      server_key: |
+[diegoServerKey]
+
+    ssh_proxy:
+      host_key: |
+[diegoHostKey]
+
+  etcd:
+    client_cert: |
+[etcdClientCert]
+    client_key: |
+[etcdClientKey]
+    peer_ca_cert: |
+[etcdPeerCaCert]
+    peer_cert: |
+[etcdPeerCert]
+    peer_key: |
+[etcdPeerKey]
+    server_cert: |
+[etcdServerCert]
+    server_key: |
+[etcdServerKey]
+
+resource_pools:
+- name: access
+  cloud_properties:
+    instance_type: m1.small
+  network: oc_network
+  stemcell:
+    name: [stemcellName]
+    version: [stemcellVersion]
+  env:
+    bosh:
+      password: [boshPassword]
+
+- name: brain
+  cloud_properties:
+    instance_type: m1.small
+
+- name: cc_bridge
+  cloud_properties:
+    instance_type: m1.small
+
+- name: cell
+  cloud_properties:
+    instance_type: m1.medium
+
+- name: database
+  cloud_properties:
+    instance_type: m1.small
+
+- name: route_emitter
+  cloud_properties:
+    instance_type: m1.small

@@ -1,0 +1,188 @@
+meta: ~
+
+name: (( merge || "bosh" ))
+director_uuid: (( merge ))
+
+bosh_releases:
+  name: (( meta.bosh-release.name || "bosh" ))
+  version: (( meta.bosh-release.version || "latest" ))
+
+releases: (( [bosh_releases]  ))
+
+default_resource_pools_env:
+  # Default vcap & root password on deployed VMs (ie c1oudc0w)
+    # Generated using mkpasswd -m sha-512
+    bosh:
+      password: (( meta.vcap-password || "$6$4gDD3aV0rdqlrKC$2axHCxGKIObs6tAmMTqYCspcdvQXh3JJcvWOY2WGb4SrdXtnCyNaWlrf3WEqvYR2MYizEGp3kMmbpwBC6jsHt0" ))
+
+compilation:
+  workers: 3
+  network: internal
+  reuse_compilation_vms: true
+  cloud_properties: (( merge ))
+
+update:
+  canaries: 1
+  canary_watch_time: 3000-120000
+  update_watch_time: 3000-120000
+  max_in_flight: 4
+
+disk_pools: (( merge ))
+
+networks: (( merge ))
+
+resource_pools:
+  - name: small
+    network: internal
+    stemcell: (( meta.stemcell ))
+    cloud_properties: (( merge ))
+    env: (( merge || default_resource_pools_env ))
+
+  - name: director
+    network: internal
+    stemcell: (( meta.stemcell ))
+    cloud_properties: (( merge ))
+    env: (( merge || default_resource_pools_env ))
+
+jobs:
+  - name: nats
+    templates: (( merge || default_templates.nats ))
+    instances: 0
+    resource_pool: small
+    default_networks:
+    - name: internal
+    networks: (( merge || default_networks ))
+
+  - name: postgres
+    templates: (( merge || default_templates.postgres ))
+    instances: 0
+    resource_pool: small
+    persistent_disk_pool: default
+    default_networks:
+    - name: internal
+    networks: (( merge || default_networks ))
+
+  - name: blobstore
+    templates: (( merge || default_templates.blobstore ))
+    instances: 0
+    resource_pool: small
+    persistent_disk_pool: blobstore
+    default_networks:
+    - name: internal
+    networks: (( merge || default_networks ))
+
+  - name: director
+    templates: (( merge || default_templates.director ))
+    instances: 0
+    resource_pool: director
+    persistent_disk_pool: default
+    default_networks:
+    - name: internal
+    networks: (( merge || default_networks ))
+    <<: (( merge ))
+
+  - name: health_monitor
+    templates: (( merge || default_templates.health_monitor ))
+    instances: 0
+    resource_pool: small
+    default_networks:
+    - name: internal
+    networks: (( merge || default_networks ))
+
+  - name: registry
+    templates: (( merge || default_templates.registry ))
+    instances: 0
+    resource_pool: small
+    default_networks:
+    - name: internal
+    networks: (( merge || default_networks ))
+
+properties:
+  nats:
+    address: (( jobs.nats.networks.internal.static_ips.[0] ))
+    port: 4222
+    user: (( meta.nats-user || "nats" ))
+    password: (( meta.nats-password || "nats" ))
+
+  postgres: &bosh_db
+    listen_address: (( jobs.postgres.networks.internal.static_ips.[0] || "0.0.0.0" ))
+    host: (( jobs.postgres.networks.internal.static_ips.[0] ))
+    database: bosh
+    user: (( meta.postgres-user || "postgres" ))
+    password: (( meta.postgres-password || "postgres" ))
+
+  blobstore:
+    address: (( jobs.blobstore.networks.internal.static_ips.[0] ))
+    agent:
+      user: (( meta.agent-user || "agent" ))
+      password: (( meta.agent-password || "agent" ))
+    director:
+      user: (( meta.director-user || "director" ))
+      password: (( meta.director-password || "director" ))
+
+  director:
+    name: (( merge || "bosh" ))
+    address: (( jobs.director.networks.internal.static_ips.[0] ))
+    db: *bosh_db
+    enable_snapshots: (( meta.enable-snapshots || "false" ))
+    snapshot_schedule: (( meta.snapshot-schedule || nil ))
+    user_management:
+      provider: local
+      local:
+        users:
+        - name: (( meta.director-account || "admin" ))
+          password: (( meta.director-account-password || "admin" ))
+        - name: (( meta.hm-user || "hm" ))
+          password: (( meta.hm-password || "hm" ))
+
+  dns:
+    address: (( jobs.director.networks.internal.static_ips.[0] ))
+    db: *bosh_db
+
+  registry:
+    address: (( jobs.registry.networks.internal.static_ips.[0] || nil ))
+    db: *bosh_db
+    http:
+      user: (( meta.registry-user || "admin" ))
+      password: (( meta.registry-password || "admin" ))
+      port: 25777
+
+  hm:
+    http:
+      user: (( meta.hm-user || "hm" ))
+      password: (( meta.hm-password || "hm" ))
+    director_account:
+      user: (( meta.director-account || "admin" ))
+      password: (( meta.director-account-password || "admin" ))
+    resurrector_enabled: (( meta.resurrector-enabled || "true" ))
+
+  ntp: (( meta.ntp || nil ))
+
+  <<: (( merge ))
+
+default_templates:
+  nats:
+  - name: nats
+    release: (( meta.bosh_release.name || "bosh" ))
+
+  postgres:
+  - name: postgres
+    release: (( meta.bosh_release.name || "bosh" ))
+
+  blobstore:
+  - name: blobstore
+    release: (( meta.bosh_release.name || "bosh" ))
+
+  director:
+  - name: director
+    release: (( meta.bosh_release.name || "bosh" ))
+  - name: powerdns
+    release: (( meta.bosh_release.name || "bosh" ))
+
+  health_monitor:
+  - name: health_monitor
+    release: (( meta.bosh_release.name || "bosh" ))
+
+  registry:
+  - name: registry
+    release: (( meta.bosh_release.name || "bosh" ))

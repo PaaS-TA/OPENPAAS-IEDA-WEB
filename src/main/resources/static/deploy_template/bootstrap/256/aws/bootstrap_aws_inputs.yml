@@ -1,0 +1,75 @@
+## 배포명
+name: [deploymentName]
+
+meta:
+  ## BOSH-RELEASE 파일경로 및 파일명
+  bosh-release-url: file:///[boshRelease]
+  
+  ## BOSH-CPI-RELEASE 파일경로 및 파일명
+  bosh-cpi-release-url: file:///[boshCpiRelease]
+  
+  ## STEMCELL 파일경로 및 파일명
+  stemcell-url: file://[stemcell]
+  
+  ## VM 비밀번호
+  vcap-password: [boshPassword]
+
+  ## aws 네트워크 ID
+  private-network-id: [subnetId]
+  
+  ## BootStrap에 할당할 네트워크 대역
+  private-network-range: [subnetRange]
+  
+  ## 게이트웨이
+  private-network-gateway: [subnetGateway]
+  
+  ## DNS
+  private-network-dns: [[subnetDns]]
+
+  ## BootStrap에 할당할 manual 고정 IP
+  private-static-ips: [[privateStaticIp]]
+
+  ## BootStrap에 할당할 VIP
+  public-static-ips: [[publicStaticIp]]
+
+  ## aws access key ID
+  access-key-id: [accessKeyId]
+  
+  ## aws access key 비밀번호
+  secret-access-key: [secretAccessId]
+
+  ## 지역
+  region: [region]
+  
+  ## aws Key
+  default-key-name: [privateKeyName]
+
+  ## aws 기본 시큐리티 그룹
+  default-security-groups: [[defaultSecurityGroups]]
+
+  ## Key 파일경로 및 파일명
+  private-key: [privateKeyPath]
+  
+  ## NTP
+  ntp: [[ntp]]
+
+  ## CPI 명
+  cpi-name: [cpiName]
+  
+  ## CPI 릴리즈명
+  cpi-release: [cpiReleaseName]
+
+  ## 디렉터명
+  director-name: [directorName]
+  
+  ## VM 리소스 타입
+  instance-type: [cloudInstanceType]
+  
+  ## 리소스 AZ
+  availability-zone: [availabilityZone]
+  
+  ## 스냅샷기능 사용여부
+  enable-snapshots: [enableSnapshot]
+  
+  ## 스냅샷 스케줄
+  snapshot-schedule: [snapshotSchedule]

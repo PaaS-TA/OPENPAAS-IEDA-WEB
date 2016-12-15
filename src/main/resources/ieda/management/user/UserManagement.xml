@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.openpaas.ieda.web.management.user.dao.UserManagementDAO">
+	
+	<resultMap type="org.openpaas.ieda.web.management.user.dao.UserManagementVO" id="findUserMap">
+		<result property="userId" column ="user_id"/>
+		<result property="userName" column ="user_name"/>
+		<result property="userPassword" column ="user_password"/>
+		<result property="email" column ="email"/>
+		<result property="roleId" column ="role_id"/>
+		<result property="roleName" column ="role_name"/>
+		<result property="initPassYn" column ="init_pass_yn"/>
+		<result property="updateUserId" column ="update_user_Id"/>
+		<result property="updateDate" column ="update_date"/>
+		<result property="createUserId" column ="create_user_Id"/>
+		<result property="createDate" column ="create_date"/>
+		
+	</resultMap>
+	
+	<select id="selectUserInfoList" resultMap="findUserMap">
+		select 
+			a.user_id as user_id
+			,AES_DECRYPT(UNHEX(a.user_password), 'raison') as user_password
+			,a.user_name as user_name
+			,a.email as email
+			,a.role_id as role_id
+			,a.init_pass_yn as init_pass_yn
+			,a.create_user_id as create_user_id
+			,a.create_date as create_date
+			,a.update_user_id as update_user_id
+			,a.update_date as update_date
+			,b.role_name 
+		from ieda_user a, ieda_role b 
+		where a.role_id= b.role_id 
+		order by a.user_id
+	</select>
+	
+	<select id="selectUserIdInfoById"  resultMap="findUserMap">
+		select * from ieda_user where user_id = #{userId}
+	</select>
+		
+	<insert id="insertUserInfo">
+		insert into ieda_user(
+		user_id,
+		user_password,
+		user_name,
+		email,
+		role_id,
+		init_pass_yn,
+		create_user_id,
+		create_date,
+		update_user_id,
+		update_date
+		)
+		values(
+		#{userVO.userId},
+		HEX(AES_ENCRYPT(#{userVO.userPassword}, 'raison')),
+		#{userVO.userName},
+		#{userVO.email},
+		#{userVO.roleId},
+		#{userVO.initPassYn},
+		#{userVO.createUserId},
+		now(),
+		#{userVO.updateUserId},
+		now()
+		)	
+	</insert>
+	
+	<update id="updateUserInfoByUid">
+		update ieda_user 
+		set 
+			user_password = HEX(AES_ENCRYPT(#{userVO.userPassword}, 'raison')),
+			user_name = #{userVO.userName},
+			email = #{userVO.email},
+			role_id = #{userVO.roleId},
+			update_user_id = #{userVO.updateUserId},
+			update_date = now()
+		where user_id = #{userVO.userId}	
+	</update>
+	
+	<delete id="deleteUserInfoByUid">
+		delete from ieda_user where user_id = #{userId}
+	</delete>
+	
+</mapper>	

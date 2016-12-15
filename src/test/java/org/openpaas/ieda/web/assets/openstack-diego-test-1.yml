@@ -1,0 +1,1397 @@
+compilation:
+  cloud_properties:
+    instance_type: m1.small
+  network: diego1
+  reuse_compilation_vms: true
+  workers: 6
+director_uuid: ff9f7efc-7185-443b-a83a-67b9d819d969
+disk_pools:
+- cloud_properties: {}
+  disk_size: 1024
+  name: database_disks
+jobs:
+- instances: 1
+  name: database_z1
+  networks:
+  - name: diego1
+    static_ips:
+    - 192.168.40.102
+  persistent_disk_pool: database_disks
+  properties:
+    consul:
+      agent:
+        services:
+          etcd: {}
+    metron_agent:
+      zone: z1
+  resource_pool: database_z1
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: etcd
+    release: etcd
+  - name: bbs
+    release: diego
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: true
+- instances: 0
+  name: database_z2
+  networks:
+  - name: diego2
+    static_ips: []
+  persistent_disk_pool: database_disks
+  properties:
+    consul:
+      agent:
+        services:
+          etcd: {}
+    metron_agent:
+      zone: z2
+  resource_pool: database_z2
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: etcd
+    release: etcd
+  - name: bbs
+    release: diego
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: true
+- instances: 0
+  name: database_z3
+  networks:
+  - name: diego3
+    static_ips: []
+  persistent_disk_pool: database_disks
+  properties:
+    consul:
+      agent:
+        services:
+          etcd: {}
+    metron_agent:
+      zone: z3
+  resource_pool: database_z3
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: etcd
+    release: etcd
+  - name: bbs
+    release: diego
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: true
+- instances: 1
+  name: brain_z1
+  networks:
+  - name: diego1
+    static_ips:
+    - 192.168.40.103
+  properties:
+    metron_agent:
+      zone: z1
+  resource_pool: brain_z1
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: auctioneer
+    release: diego
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: true
+- instances: 1
+  name: cell_z1
+  networks:
+  - name: diego1
+  properties:
+    diego:
+      rep:
+        use_azure_fault_domains: null
+        zone: z1
+    metron_agent:
+      zone: z1
+  resource_pool: cell_z1
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: rep
+    release: diego
+  - name: garden
+    release: garden-linux
+  - name: cflinuxfs2-rootfs-setup
+    release: cflinuxfs2-rootfs
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: false
+- instances: 1
+  name: cc_bridge_z1
+  networks:
+  - name: diego1
+    static_ips:
+    - 192.168.40.105
+  properties:
+    metron_agent:
+      zone: z1
+  resource_pool: cc_bridge_z1
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: stager
+    release: cf
+  - name: nsync
+    release: cf
+  - name: tps
+    release: cf
+  - name: cc_uploader
+    release: cf
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: false
+- instances: 1
+  name: route_emitter_z1
+  networks:
+  - name: diego1
+    static_ips:
+    - 192.168.40.106
+  properties:
+    metron_agent:
+      zone: z1
+  resource_pool: route_emitter_z1
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: route_emitter
+    release: diego
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: false
+- instances: 1
+  name: access_z1
+  networks:
+  - name: diego1
+    static_ips:
+    - 192.168.40.107
+  properties:
+    metron_agent:
+      zone: z1
+  resource_pool: access_z1
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: ssh_proxy
+    release: diego
+  - name: metron_agent
+    release: cf
+  - name: file_server
+    release: diego
+  update:
+    max_in_flight: 1
+    serial: false
+- instances: 0
+  name: brain_z2
+  networks:
+  - name: diego2
+    static_ips: []
+  properties:
+    metron_agent:
+      zone: z2
+  resource_pool: brain_z2
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: auctioneer
+    release: diego
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: true
+- instances: 0
+  name: cell_z2
+  networks:
+  - name: diego2
+    static_ips: []
+  properties:
+    diego:
+      rep:
+        use_azure_fault_domains: null
+        zone: z2
+    metron_agent:
+      zone: z2
+  resource_pool: cell_z2
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: rep
+    release: diego
+  - name: garden
+    release: garden-linux
+  - name: cflinuxfs2-rootfs-setup
+    release: cflinuxfs2-rootfs
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: false
+- instances: 0
+  name: cc_bridge_z2
+  networks:
+  - name: diego2
+    static_ips: []
+  properties:
+    metron_agent:
+      zone: z2
+  resource_pool: cc_bridge_z2
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: stager
+    release: cf
+  - name: nsync
+    release: cf
+  - name: tps
+    release: cf
+  - name: cc_uploader
+    release: cf
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: false
+- instances: 0
+  name: route_emitter_z2
+  networks:
+  - name: diego2
+    static_ips: []
+  properties:
+    metron_agent:
+      zone: z2
+  resource_pool: route_emitter_z2
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: route_emitter
+    release: diego
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: false
+- instances: 0
+  name: access_z2
+  networks:
+  - name: diego2
+    static_ips: []
+  properties:
+    metron_agent:
+      zone: z2
+  resource_pool: access_z2
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: ssh_proxy
+    release: diego
+  - name: metron_agent
+    release: cf
+  - name: file_server
+    release: diego
+  update:
+    max_in_flight: 1
+    serial: false
+- instances: 0
+  name: brain_z3
+  networks:
+  - name: diego3
+    static_ips: []
+  properties:
+    metron_agent:
+      zone: z3
+  resource_pool: brain_z3
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: auctioneer
+    release: diego
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: true
+- instances: 0
+  name: cell_z3
+  networks:
+  - name: diego3
+    static_ips: []
+  properties:
+    diego:
+      rep:
+        use_azure_fault_domains: null
+        zone: z3
+    metron_agent:
+      zone: z3
+  resource_pool: cell_z3
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: rep
+    release: diego
+  - name: garden
+    release: garden-linux
+  - name: cflinuxfs2-rootfs-setup
+    release: cflinuxfs2-rootfs
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: false
+- instances: 0
+  name: cc_bridge_z3
+  networks:
+  - name: diego3
+    static_ips: []
+  properties:
+    metron_agent:
+      zone: z3
+  resource_pool: cc_bridge_z3
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: stager
+    release: cf
+  - name: nsync
+    release: cf
+  - name: tps
+    release: cf
+  - name: cc_uploader
+    release: cf
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: false
+- instances: 0
+  name: route_emitter_z3
+  networks:
+  - name: diego3
+    static_ips: []
+  properties:
+    metron_agent:
+      zone: z3
+  resource_pool: route_emitter_z3
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: route_emitter
+    release: diego
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: false
+- instances: 0
+  name: access_z3
+  networks:
+  - name: diego3
+    static_ips: []
+  properties:
+    metron_agent:
+      zone: z3
+  resource_pool: access_z3
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: ssh_proxy
+    release: diego
+  - name: metron_agent
+    release: cf
+  - name: file_server
+    release: diego
+  update:
+    max_in_flight: 1
+    serial: false
+- instances: 0
+  name: colocated_z1
+  networks:
+  - name: diego1
+    static_ips: []
+  persistent_disk_pool: database_disks
+  properties:
+    consul:
+      agent:
+        services:
+          etcd: {}
+    diego:
+      rep:
+        zone: z1
+    metron_agent:
+      zone: z1
+  resource_pool: colocated_z1
+  templates:
+  - name: rep
+    release: diego
+  - name: auctioneer
+    release: diego
+  - name: cc_uploader
+    release: cf
+  - name: file_server
+    release: diego
+  - name: garden
+    release: garden-linux
+  - name: nsync
+    release: cf
+  - name: cflinuxfs2-rootfs-setup
+    release: cflinuxfs2-rootfs
+  - name: route_emitter
+    release: diego
+  - name: ssh_proxy
+    release: diego
+  - name: stager
+    release: cf
+  - name: tps
+    release: cf
+  - name: consul_agent
+    release: cf
+  - name: etcd
+    release: etcd
+  - name: bbs
+    release: diego
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: true
+- instances: 0
+  name: colocated_z2
+  networks:
+  - name: diego2
+    static_ips: []
+  persistent_disk_pool: database_disks
+  properties:
+    consul:
+      agent:
+        services:
+          etcd: {}
+    diego:
+      rep:
+        zone: z2
+    metron_agent:
+      zone: z2
+  resource_pool: colocated_z2
+  templates:
+  - name: rep
+    release: diego
+  - name: auctioneer
+    release: diego
+  - name: cc_uploader
+    release: cf
+  - name: file_server
+    release: diego
+  - name: garden
+    release: garden-linux
+  - name: nsync
+    release: cf
+  - name: cflinuxfs2-rootfs-setup
+    release: cflinuxfs2-rootfs
+  - name: route_emitter
+    release: diego
+  - name: ssh_proxy
+    release: diego
+  - name: stager
+    release: cf
+  - name: tps
+    release: cf
+  - name: consul_agent
+    release: cf
+  - name: etcd
+    release: etcd
+  - name: bbs
+    release: diego
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: true
+- instances: 0
+  name: colocated_z3
+  networks:
+  - name: diego3
+    static_ips: []
+  persistent_disk_pool: database_disks
+  properties:
+    consul:
+      agent:
+        services:
+          etcd: {}
+    diego:
+      rep:
+        zone: z3
+    metron_agent:
+      zone: z3
+  resource_pool: colocated_z3
+  templates:
+  - name: rep
+    release: diego
+  - name: auctioneer
+    release: diego
+  - name: cc_uploader
+    release: cf
+  - name: file_server
+    release: diego
+  - name: garden
+    release: garden-linux
+  - name: nsync
+    release: cf
+  - name: cflinuxfs2-rootfs-setup
+    release: cflinuxfs2-rootfs
+  - name: route_emitter
+    release: diego
+  - name: ssh_proxy
+    release: diego
+  - name: stager
+    release: cf
+  - name: tps
+    release: cf
+  - name: consul_agent
+    release: cf
+  - name: etcd
+    release: etcd
+  - name: bbs
+    release: diego
+  - name: metron_agent
+    release: cf
+  update:
+    max_in_flight: 1
+    serial: true
+name: cf-openstack-diego
+networks:
+- name: diego1
+  subnets:
+  - cloud_properties:
+      net_id: 83d71002-d8f7-4b52-af99-b5b1d16baf65
+      security_groups:
+      - bosh-security
+      - cf-security
+    dns:
+    - 8.8.8.8
+    gateway: 192.168.40.1
+    range: 192.168.40.0/24
+    reserved:
+    - 192.168.40.2 - 192.168.40.100
+    static:
+    - 192.168.40.101 - 192.168.40.127
+  type: manual
+- name: diego2
+  subnets:
+  - cloud_properties:
+      net_id: 83d71002-d8f7-4b52-af99-b5b1d16baf65
+      security_groups:
+      - bosh-security
+      - cf-security
+    dns:
+    - 8.8.8.8
+    gateway: 192.168.40.1
+    range: 192.168.40.0/24
+    reserved:
+    - 192.168.40.2 - 192.168.40.100
+    static:
+    - 192.168.40.101 - 192.168.40.127
+  type: manual
+- name: diego3
+  subnets:
+  - cloud_properties:
+      net_id: 83d71002-d8f7-4b52-af99-b5b1d16baf65
+      security_groups:
+      - bosh-security
+      - cf-security
+    dns:
+    - 8.8.8.8
+    gateway: 192.168.40.1
+    range: 192.168.40.0/24
+    reserved:
+    - 192.168.40.2 - 192.168.40.100
+    static:
+    - 192.168.40.101 - 192.168.40.127
+  type: manual
+properties:
+  capi:
+    cc_uploader:
+      dropsonde_port: null
+      log_level: null
+    nsync:
+      bbs:
+        api_location: null
+        ca_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIFBTCCAu2gAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdkaWVn
+          b0NBMB4XDTE2MDcxMzAzNTgyNFoXDTI2MDcxMzAzNTgyN1owEjEQMA4GA1UEAxMH
+          ZGllZ29DQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOe2lsw3rRaG...TEST
+        client_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIEIjCCAgqgAwIBAgIQSggNzWsVu2zV+hl9UcI4jTANBgkqhkiG9w0BAQsFADAS
+          MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgzMFoXDTE4MDcxMzAzNTgz
+          MFowFTETMBEGA1UEAxMKYmJzIGNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEP...TEST
+        client_key: |+
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEogIBAAKCAQEAwqvB4Ec1otV0W+vYsiQxR/bd0+HOiKB8MDYOJErbBit2xh3y
+          4imQ8KgZcIbsVzR+esWih6CfkWFd3Xf5/RsR0H7kHnaqLWhkafdPeR5GIXWzet/w
+          +v04+HXQ2vXxRyRsjb7xzwgilDchtt40Mer/6g5Dw2nkoKx+ZNUPdt/J1tyhBLjX...TEST
+        client_session_cache_size: null
+        max_idle_conns_per_host: null
+        require_ssl: true
+      cc:
+        base_url: https://api.172.16.100.103.xip.io
+        basic_auth_password: bulk-password
+        basic_auth_username: internal_user
+      diego_privileged_containers: null
+      dropsonde_port: null
+      log_level: debug
+    stager:
+      bbs:
+        api_location: null
+        ca_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIFBTCCAu2gAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdkaWVn
+          b0NBMB4XDTE2MDcxMzAzNTgyNFoXDTI2MDcxMzAzNTgyN1owEjEQMA4GA1UEAxMH
+          ZGllZ29DQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOe2lsw3rRaG...TEST
+        client_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIEIjCCAgqgAwIBAgIQSggNzWsVu2zV+hl9UcI4jTANBgkqhkiG9w0BAQsFADAS
+          MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgzMFoXDTE4MDcxMzAzNTgz
+          MFowFTETMBEGA1UEAxMKYmJzIGNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEP...TEST
+        client_key: |+
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEogIBAAKCAQEAwqvB4Ec1otV0W+vYsiQxR/bd0+HOiKB8MDYOJErbBit2xh3y
+          4imQ8KgZcIbsVzR+esWih6CfkWFd3Xf5/RsR0H7kHnaqLWhkafdPeR5GIXWzet/w
+          +v04+HXQ2vXxRyRsjb7xzwgilDchtt40Mer/6g5Dw2nkoKx+ZNUPdt/J1tyhBLjX...TEST
+        client_session_cache_size: null
+        max_idle_conns_per_host: null
+        require_ssl: true
+      cc:
+        basic_auth_password: bulk-password
+        basic_auth_username: internal_user
+      diego_privileged_containers: null
+      dropsonde_port: null
+      insecure_docker_registry_list: null
+      log_level: debug
+    tps:
+      bbs:
+        api_location: null
+        ca_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIFBTCCAu2gAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdkaWVn
+          b0NBMB4XDTE2MDcxMzAzNTgyNFoXDTI2MDcxMzAzNTgyN1owEjEQMA4GA1UEAxMH
+          ZGllZ29DQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOe2lsw3rRaG...TEST
+        client_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIEIjCCAgqgAwIBAgIQSggNzWsVu2zV+hl9UcI4jTANBgkqhkiG9w0BAQsFADAS
+          MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgzMFoXDTE4MDcxMzAzNTgz
+          MFowFTETMBEGA1UEAxMKYmJzIGNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEP...TEST
+        client_key: |+
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEogIBAAKCAQEAwqvB4Ec1otV0W+vYsiQxR/bd0+HOiKB8MDYOJErbBit2xh3y
+          4imQ8KgZcIbsVzR+esWih6CfkWFd3Xf5/RsR0H7kHnaqLWhkafdPeR5GIXWzet/w
+          +v04+HXQ2vXxRyRsjb7xzwgilDchtt40Mer/6g5Dw2nkoKx+ZNUPdt/J1tyhBLjX...TEST
+        client_session_cache_size: null
+        max_idle_conns_per_host: null
+        require_ssl: true
+      cc:
+        basic_auth_password: bulk-password
+        basic_auth_username: internal_user
+      dropsonde_port: null
+      log_level: null
+      traffic_controller_url: wss://doppler.172.16.100.103.xip.io:443
+  cflinuxfs2-rootfs:
+    trusted_certs: null
+  consul:
+    agent:
+      datacenter: null
+      domain: cf.internal
+      log_level: null
+      servers:
+        lan:
+        - 192.168.60.113
+    agent_cert: |+
+      -----BEGIN CERTIFICATE-----
+      MIIEJjCCAg6gAwIBAgIRAJFxJohnE9e10yrz0P9QET0wDQYJKoZIhvcNAQELBQAw
+      EzERMA8GA1UEAxMIY29uc3VsQ0EwHhcNMTYwNjMwMDEwOTA4WhcNMTgwNjMwMDEw
+      OTA4WjAXMRUwEwYDVQQDEwxjb25zdWwgYWdlbnQwggEiMA0GCSqGSIb3DQEBAQUA
+      A4IBDwAwggEKAoIBAQDAAbpp2a8M1Z9aCYfY8oBypc8aJrIVNxBktAvGMWCMSaPK
+      /yvkDaaDnx8s4bn1W4YwtOMCwS6pHauQGOxIShXCJGQLXTxsagZCLZ4ePZS0iZgB
+      /DXHZgBumhwjIBzvRFv3QIX9HTkG4uUtFn59VA6fQ6gZ3cJtrc/AwnY3PQeiesQE
+      VwSx7ndOptS/Ilwh2YTGyv1fdUkZVovCTdI2RNq1gSkRNJxE8Qi26Do46kwkEA/9
+      wHJhJffD4XCPc/wvjkWrnOW5gPfreCKukudJ4gF0HaPDNDVLyyVyosOQ//E56duL
+      +Eo5jErW2UBryzDMmpyQ91FwSj5UfpgpORj3+w6XAgMBAAGjcTBvMA4GA1UdDwEB
+      /wQEAwIDuDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwHQYDVR0OBBYE
+      FAHjxGFV7Oma20MaXQoGikQe9CMDMB8GA1UdIwQYMBaAFPTCtlFA8q77DPFOHKKW
+      OP9Q4kuBMA0GCSqGSIb3DQEBCwUAA4ICAQCHMCf2P0Lj7F6WlkFTQbGZgx+3SqDJ
+      +SVyInOho/0vg5dHohQML3cVYJbQC405+l4OZkLOIjyfEb8KKKgQsyEITYS5Y5te
+      hZYm0URMJxWFv2CTNbS0eu1MKYUnqz0UYOYW+JBrNs451VBjnELWyLyVj16PveF6
+      2AJ+aYrjPE101g0owLwlc30TFtbBAAfAQOIGXpHPBeQ8c3kxMP2NPnRmvlroWlCZ
+      4+QkeIbyaM0376M8DV8ptR9w0v+o66jYhB4sFbCevH3XnhGQT3kMJJIA3MlWM03e
+      FweLX3dBbguxXq2eJ93saMXwKdntSq/u47R88k+RmbKop3xwhDD4Bw1un71URBP7
+      Rff5Cqu/OjACtgG/CytLd2z8iy3nNlRYi1B1HcDriohDu6r8LlvhQrAK3X/D6/DX
+      W0Wxbk7SHL7qWxDbOyoCsA+IOSrhrqqIJGjakxGG+EcqHDDx8X78/q+TaQgke2Fw
+      ZPnyz9sl2qbNm2toZQEAtUGO0BnmLW6oUJSlTZ2CUccu4K9aVd3aJGlaesv+MLc8
+      GBJ8QDO2RJySsQi5Cjp+SPyPkVif6ozuKXECvzmUyX+vh1c918XG9XaQrkEFtZIG
+      NaXr7Y017TeqNZ7ZfuPAGS3lyEG6RVet86vd2nFByIlgXBeJ/g0/uKZHEaWLczn4
+      bjNMrEgN9o6mTg==
+      -----END CERTIFICATE-----
+    agent_key: |+
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEogIBAAKCAQEAwAG6admvDNWfWgmH2PKAcqXPGiayFTcQZLQLxjFgjEmjyv8r
+      5A2mg58fLOG59VuGMLTjAsEuqR2rkBjsSEoVwiRkC108bGoGQi2eHj2UtImYAfw1
+      x2YAbpocIyAc70Rb90CF/R05BuLlLRZ+fVQOn0OoGd3Cba3PwMJ2Nz0HonrEBFcE
+      se53TqbUvyJcIdmExsr9X3VJGVaLwk3SNkTatYEpETScRPEItug6OOpMJBAP/cBy
+      YSX3w+Fwj3P8L45Fq5zluYD363girpLnSeIBdB2jwzQ1S8slcqLDkP/xOenbi/hK
+      OYxK1tlAa8swzJqckPdRcEo+VH6YKTkY9/sOlwIDAQABAoIBAE93Z6OviJeTQmSN
+      VUAg/bB1l4WHRmUpaQuEyOq6PO9S+wtlGNFGJQiMruZwdfpqatt1wg69zYYI1ZzJ
+      8+DnaKH1VcKuT/e+2eBB6RMzAXzHBbasn8VrHfqopcST4eXVMQrgFZRwp82F0rwa
+      dzd/tp2L7uLluTaTnUx2L18lTyebWC94AHTn1GaQ0mPAZZwgyxi4bkL4DmmyDmbY
+      cM/I06YT4m8CyRHQ5zQ1syox1nMUz9JMEjDWQOxY4Gmeob3/3hhMCayFTJslNlbT
+      nxjlGCar4qSxpzhRiJ/ZSZmW9SdIG708tUM9wJQcYQK5cb38Rl3LVkgW8soHdbbh
+      sU7nhOECgYEA1p2Nx1exy9N8KmdaOVsbzelK/Vt3Xf4Ovh9aXfv6MydBquJIhogv
+      n7AM4FhWdmxgAbkfX+VVF3z9kUWHycLaZyybtzT3bnKVX4vxdW85EQySgwU2D+f3
+      IXvv8D2aZYwpA8FQ8NVyvinIhezRRjnY5dSDSyQ4eG3lcGmE5EGLtZMCgYEA5QgZ
+      15AlGZUqqAjaSC8kVUK4Ent08GnDesyHCC2ECzHo4jzquZ2NpFNVwDAJgOD++ApN
+      chovA6oMj/J1gk2UTp6fAamVCnfswK5VlOvfjqCpqESw57iwVJcNpPnq+ZfOocFJ
+      b10Mo8z+tb9li13iVCUMqEx5HMKZTwby1ekNpW0CgYBClpPc29qwcSe/SF34Gcqg
+      stevkGeS5DbSyouRSZMxt+ZqDNeP1kVgeJEmMoJxL+MB5dxUNqWWKhPKtRYShcCZ
+      7n9J8scqn6a1BIigdSfxoEL9H+rMOJ625utlUNfM1hYLsjlY4AE/+1raIsYz0dL4
+      TF2IPO7AfuiHXlX7NFMSvQKBgFvtiXnVeJ6xGcMCcqLgkSPLuNhqR0CsIvMqHtTw
+      d/yKVuBf9RL1o0Ge1V9jqJzbMlvavsUar144JfytI+9eNjXsQwRGzfS6uAOKtf0l
+      Q8EayZ4pnBwWLGh3jNl4GpF+FkkkrNYPMiCZCm9m2Fo9H7gIevEeaMpbbW+j6Vpk
+      xb5tAoGAKr5dQNYUUiFWjKCdSo5/LTblwZLhU4RGgQbqhXHCzBwpyI6C64M+Uwx4
+      YTqBOk/NCU8g41lpGgNIzn/5VI/bPcK3YVythmKYRDM5eKwkrwktoBliVSrLu/7X
+      cUPCM+p52DPepCVwydIMD7xBqZueKuwbb3+Nj3cUFlkDtOetuqU=
+      -----END RSA PRIVATE KEY-----
+    ca_cert: |+
+      -----BEGIN CERTIFICATE-----
+      MIIFBzCCAu+gAwIBAgIBATANBgkqhkiG9w0BAQsFADATMREwDwYDVQQDEwhjb25z
+      dWxDQTAeFw0xNjA2MzAwMTA4NTlaFw0yNjA2MzAwMTA5MDZaMBMxETAPBgNVBAMT
+      CGNvbnN1bENBMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA21gc29p5
+      xGxQ304yJS1IM699BKaLdTVs6NlbZnoP3MSsOb6pOO1rYVz401/MaKCPOHc7B/YZ
+      VA8OaZFKWDG0DBduniZImrgHVENSMMF3aRcLwNEr3MZtnc3pJccEsBM3YEGedQoQ
+      kuIWHT4ofHvkwelFddAwvHGveCZtGXBvYE6/D5BkKn/rOeGr5akvL1+SujoNM7M8
+      VbFs75Bk24GHYo2alvwxtSdHvNEobSmPmSBlGsXIG2vq2oWvm8uOpgi1mj2T9Ky/
+      gXRppryrtbsvNzaUd1PfVTzOyzf9NHXPLRbHYq9E8oPHlr65rzkeLKq1csIhNF71
+      /AETg3uQL2d8HOP+1xtnaqizLVx/dAwzpvi5QMjVUALIov3Jk21ktdfbQ7HOK6vL
+      Qr7LS+1ytxPdaE5vCGnxvewA2+lRXtG7vRqu1IvMafVC7IZJwUZLjuJFONGmDIgU
+      JP9DmvVTLKZPYHq2lF7op+Ovn3VzxPRTnShacSywaPGA3xhWmUh1tmGIpn1Qh0bN
+      7YYjunTkfkhJufogJvduplj4Li4xt3EUL7PaeZSNZOdya4ZSsOREfVPhNsXWJnpP
+      XbFxte4tRa/IuRe0tTRqREU0Yd59UUgpVW7F69wR7rmYIfKLC4CKrWGsI8RL41tR
+      EZ9eKrtGRupGOebIHmWq95qtGuKaVky28mkCAwEAAaNmMGQwDgYDVR0PAQH/BAQD
+      AgEGMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFPTCtlFA8q77DPFOHKKW
+      OP9Q4kuBMB8GA1UdIwQYMBaAFPTCtlFA8q77DPFOHKKWOP9Q4kuBMA0GCSqGSIb3
+      DQEBCwUAA4ICAQCEPFt7rhNm+uy+Ow0et7k1EbJmzU8XBUJioh5XbvFElX3p+lDN
+      FEuXuguA4LZyhkz+geVovmnEhl6kYpcVfGhpGEIjusV1DpCTDAQIX4RBY9zPLs9M
+      +TDsp9+fRZ15fYnDDgswsqFTX0aEpFT27tvtWfMcfFntH96LaiKA2RrrVtUaJpnk
+      iCCNcxxG0NnA/JbOAuQAOgvRhiPHwJnSuNJUmFwjbDUzzMT6CJcBuSUE/lCYwIWw
+      yKt6c+eG1KG6OCZdtiHW21bJvzteSlIugmfpTG8+9EvMdjUuS9Dkt6C46tP2ecc5
+      JCpb6V7xEsEy7NTlbfwML5D5wvSetURyZ8MrnOB5YbF8d4oNLzPtzIYUFhLhNJ0S
+      EAVEflBOZRrZy7s5UVZQ84t8LYbwSthe0oVLztkcx0K6hxWnW848KRsdY6g47K6R
+      CpMiRDBetOGpxXsQXyWvgSKw7R7DrN+68dvtaAOyXiUou+6P6h1cx1fw6CBhJJLB
+      SG4h+y+f3oh84R4rRXczSo8Lb1dDIXAptb1X591bLsEjvipr5e8wKgponFxdUbem
+      fy7O3I5B9ECCvbo0ePaERx1rQp9HjMT7xrfrU9goDbMfw3tbA5JH2/Xe7z53rZGm
+      O1/ChuudNTeA+kAFMHrxHt9/N5Ahd98PSEuxu677O0Vgk1kjiTO2zLmrMw==
+      -----END CERTIFICATE-----
+    encrypt_keys:
+    - ZpLYHqGFuL0Wk7o1m5ulOw==
+    server_cert: |+
+      -----BEGIN CERTIFICATE-----
+      MIIELzCCAhegAwIBAgIQC/1znIT58wJhzfjeFU9EbzANBgkqhkiG9w0BAQsFADAT
+      MREwDwYDVQQDEwhjb25zdWxDQTAeFw0xNjA2MzAwMTA5MDdaFw0xODA2MzAwMTA5
+      MDdaMCExHzAdBgNVBAMTFnNlcnZlci5kYzEuY2YuaW50ZXJuYWwwggEiMA0GCSqG
+      SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDVXZDQzA/a5wK8IO5eBWtKFQf2D65cOTJR
+      CHWVe7KUZba1tDC/xuKO1W8ZglpY0VI86g8FtTTefDt76M+sds23U9yuYdM4uq9l
+      nAnWcaz3ct5+ky+VR6DuiZgNOLwFTdj7OZkffKKT1AhzFFK1NYm0WuDjkfYOE/YN
+      PW/50iDYCMuBi0JjHMxz5CzCNEf8sO4y1m8o2/vIsR4w4Qz0PoOYP375y1qSRGlH
+      0+d4cu5o6fovyALS3yCslNwU4rfQtKOJB0Vdq0HL1bh+6G1gSAhCES0tPNJf62dg
+      Yoh6l+71Sp21EpnqML+Cu+Jrb8MiRm4EzcmGGamWM2MeVjIRbIIZAgMBAAGjcTBv
+      MA4GA1UdDwEB/wQEAwIDuDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIw
+      HQYDVR0OBBYEFFSTzBYGLZorxqNroZZvGJDCeDyaMB8GA1UdIwQYMBaAFPTCtlFA
+      8q77DPFOHKKWOP9Q4kuBMA0GCSqGSIb3DQEBCwUAA4ICAQBxmG/QfVPzN26BObqJ
+      fMshWIj3Ja9OWdcid0kMNhYftwep9xeKmUJtEVt94jrpUIrrv9Ni82pGZHEx3TJj
+      rgMRx/xvaD952Vuj2GQepviSdmVowG61JVHoqh0WueHptBXNBYBnY9yuaaZPk+Wo
+      UcLbq5T/4rWQpxbahoeKfM2KEcG1IvhDDT0E3e4ZRRyyewutFctF0kV5cICG8TLc
+      n3x3bCv/NW7M/cPoK3agRWrf1rrCAHthncBvCzj9+AOKtx754a1gTqKRVYK85TFh
+      1BUyes6jIK7gTZc/va/Ox5y0iMov4RWHF70Ni537/Y0qc22RKPprVLtQhTx41svq
+      zQlFyvihZ9GraRDbGgE1e5+z0cCg0Lyxsx79qteQwBEM67RsqtdS4DNOlbZE9Vqs
+      ZSsTzXSNAYi+Gu06N1t65Kf3t6oaQCoNpMMpAs0OSHhWKFFLusJMXxtdXVQmG2h9
+      pUsitcEiMHdXHRkxhi3hIegktiKUedHmHd9jnHXCospco70bPMuNBUduIoLcTRfk
+      YLa9rfAMNy7a4ItxzpmqQM+DiDcCY65IKiLN2KjyWyyt1gZxMCl8O+f+PBnfbPdg
+      MPorS3/717lc99F2wyp54M0PCgjVFGXFQ0MwQX1Q06BB9qq5/DpDMWgaKLvyMJ0E
+      w2h08uBH3P57DRpJGnDA6ORptg==
+      -----END CERTIFICATE-----
+    server_key: |+
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEpAIBAAKCAQEA1V2Q0MwP2ucCvCDuXgVrShUH9g+uXDkyUQh1lXuylGW2tbQw
+      v8bijtVvGYJaWNFSPOoPBbU03nw7e+jPrHbNt1PcrmHTOLqvZZwJ1nGs93LefpMv
+      lUeg7omYDTi8BU3Y+zmZH3yik9QIcxRStTWJtFrg45H2DhP2DT1v+dIg2AjLgYtC
+      YxzMc+QswjRH/LDuMtZvKNv7yLEeMOEM9D6DmD9++ctakkRpR9PneHLuaOn6L8gC
+      0t8grJTcFOK30LSjiQdFXatBy9W4fuhtYEgIQhEtLTzSX+tnYGKIepfu9UqdtRKZ
+      6jC/grvia2/DIkZuBM3JhhmpljNjHlYyEWyCGQIDAQABAoIBAQCk0GHM59RXg5rZ
+      N5bpicYWs6gyqmpFUulLLv2lOqf3eZppQYdmnHrlWnk3eznO4eJkq2hvQEpWkiBg
+      1rWUwzClLGKLUYWXjJ1wH9h5jdXOTy0PGSLobSwjFqYdkHWsozW42gUuDViIWIEu
+      Y8R/tZtpdcnCAD3RIhouoAafM3GrbbatdgT4Jj82S686WVwsec5g2lxtYo9MT3sg
+      3vsEW/0zJzBXeRXoiBlfywkrnZpuqs11aXnNdE2oO+cOwbzGarvCPxBHmKEbqigI
+      HrzT4xlCeGTe3pXBefJRq1wNsUJy1dKmhpzFXZYeRBDvboiZdokIVjzDlyvCs02z
+      MsOdQpwBAoGBAOyRuEzIlGFzt825y89dI8Em/DNnNPR/IVKmEY1OGYIpJ5jtB4dX
+      RMjmqWbiJBPkz8/bz4b4aP4wlkCKfQrWs2/2KQcM/Qb+ARSx6IeKt2Ex/xbk7OLo
+      KCVeHz++yPPl4fWo8PeUScHL1KH+mgK6V78PdYraFhewfZdx/mip6NH1AoGBAObj
+      8mvSoLwXGMNUvnIe9HGF+5UKzOlGfkfmRNbadUK7nLxOlAU5jV8gQPM0DHoCS7O2
+      Z0D/H5XhPu9PScjEulAmeX9VVA061zXVDm/F3mv4WwfstFJW/t6XooboZ1V/RA6o
+      +DEAKn44jQpwuKoIyUpPzlkUcvyRaAnw89QA44UVAoGAcVV6auapF2rdwqRhPM3N
+      RErOBj5Kg1uodjTzMbQZyl63Bq9/rNolLO48d/qc+B7lZBpVeL7nZeeXBAKU1y12
+      t4vBqgwR6Fil4ek9kjnlkp3mLGyuBCLeoNBPvjVDhn06XHt8Pc//6eUh0B3uYKIv
+      SWw5jrTeYqj98iD9ldzYmkUCgYEA2/5dQXcTR6QKKDNasonkBzbOG5iK3coZEJDL
+      DpxgFhGEqbeFOeU4Wmb0+8WgDbCaSMWHZFqx0bEosgQuHWm0zCGcqkK3L1PdMqGq
+      e71gzCd7NPXIapwRhC2e4kQWEVSNmBpPQQETe+iOGmCE0x5EDNY1mpLtbNFu++nl
+      qR6fqnECgYARKzYZFI8xf4oBHZwmRwJa0EzcIwfTkfWcAn5Q/Jtw4BNoAzMaf+um
+      iRqRTb+Ffx/uDHt78x/lV08N4VGypy68w+f2btzOSNX8XbzsxPejdjvKcbs/edPK
+      Sx1VY6nBWnwjRT9hROH5pf6x1QyqreAastWKcxINC0Cb5tFJx/+fRw==
+      -----END RSA PRIVATE KEY-----
+  diego:
+    auctioneer:
+      bbs:
+        api_location: null
+        ca_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIFBTCCAu2gAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdkaWVn
+          b0NBMB4XDTE2MDcxMzAzNTgyNFoXDTI2MDcxMzAzNTgyN1owEjEQMA4GA1UEAxMH
+          ZGllZ29DQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOe2lsw3rRaG...TEST
+        client_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIEIjCCAgqgAwIBAgIQSggNzWsVu2zV+hl9UcI4jTANBgkqhkiG9w0BAQsFADAS
+          MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgzMFoXDTE4MDcxMzAzNTgz
+          MFowFTETMBEGA1UEAxMKYmJzIGNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEP...TEST
+        client_key: |+
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEogIBAAKCAQEAwqvB4Ec1otV0W+vYsiQxR/bd0+HOiKB8MDYOJErbBit2xh3y
+          4imQ8KgZcIbsVzR+esWih6CfkWFd3Xf5/RsR0H7kHnaqLWhkafdPeR5GIXWzet/w
+          +v04+HXQ2vXxRyRsjb7xzwgilDchtt40Mer/6g5Dw2nkoKx+ZNUPdt/J1tyhBLjX...TEST
+        client_session_cache_size: null
+        max_idle_conns_per_host: null
+        require_ssl: true
+      cell_state_timeout: null
+      dropsonde_port: null
+      log_level: null
+      starting_container_weight: null
+    bbs:
+      active_key_label: key1
+      auctioneer:
+        api_url: null
+      ca_cert: |+
+        -----BEGIN CERTIFICATE-----
+        MIIFBTCCAu2gAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdkaWVn
+        b0NBMB4XDTE2MDcxMzAzNTgyNFoXDTI2MDcxMzAzNTgyN1owEjEQMA4GA1UEAxMH
+        ZGllZ29DQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOe2lsw3rRaG...TEST
+      convergence:
+        expire_completed_task_duration_in_seconds: null
+        expire_pending_task_duration_in_seconds: null
+        kick_task_duration_in_seconds: null
+        repeat_interval_in_seconds: null
+      dropsonde_port: null
+      encryption_keys:
+      - label: key1
+        passphrase: cloud4u
+      etcd:
+        ca_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIFBTCCAu2gAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdkaWVn
+          b0NBMB4XDTE2MDcxMzAzNTgyNFoXDTI2MDcxMzAzNTgyN1owEjEQMA4GA1UEAxMH
+          ZGllZ29DQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOe2lsw3rRaG...TEST
+        client_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIEKTCCAhGgAwIBAgIQP2jEsUKg8Qoi8gMWji9T3jANBgkqhkiG9w0BAQsFADAS
+          MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgyOFoXDTE4MDcxMzAzNTgy
+          OFowHDEaMBgGA1UEAxMRZGllZ28gZXRjZCBjbGllbnQwggEiMA0GCSqGSIb3DQEB...TEST
+        client_key: |+
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEpQIBAAKCAQEAp4VuVixP56r+4FMQ+wbceKBHHbAYF9yVr8C6zjXVfO3L/UQi
+          KsnB7Bp4FC1UGcph5TPWE8G4rgeGNxykBIlkj0yIA8f5swTaa9zAt3C5fDyZKCEx
+          /SLEQqgeekjAt9vvswOdVGQ8nPsGaiLJ66kiEzvdoQ3rKCGQeEjvIaGFBRSovsYP...TEST
+        client_session_cache_size: null
+        machines:
+        - etcd.service.cf.internal
+        max_idle_conns_per_host: null
+        require_ssl: true
+      log_level: null
+      require_ssl: true
+      server_cert: |+
+        -----BEGIN CERTIFICATE-----
+        MIIEcTCCAlmgAwIBAgIRAJjV9zqnfRSpbi4gCs0ya+EwDQYJKoZIhvcNAQELBQAw
+        EjEQMA4GA1UEAxMHZGllZ29DQTAeFw0xNjA3MTMwMzU4MjlaFw0xODA3MTMwMzU4
+        MjlaMCIxIDAeBgNVBAMTF2Jicy5zZXJ2aWNlLmNmLmludGVybmFsMIIBIjANBgkq...TEST
+      server_key: |+
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpAIBAAKCAQEAwPN+KUBYftQZ6f4ycY/R4dAr/n7shFBdTzEJNrO4F+VVHKwO
+        nqoZuFcJxL5DnCNLaan4tCXTKt4UxabXSoFUIJm4HhcygT/3+CoAG53+7lrwNCGu
+        JWH0cVYKw1tbpO3j6xjLjiYinliFiQMpM89lDtElZ8dsdf8KbSYHAJlBDDq7my6Y...TEST
+      sql:
+        ca_cert: null
+        db_connection_string: null
+        db_driver: null
+        max_open_connections: null
+        require_ssl: null
+    executor:
+      ca_certs_for_downloads: null
+      container_metrics_report_interval: null
+      disk_capacity_mb: null
+      drain_timeout_in_seconds: 0
+      garden:
+        address: 127.0.0.1:7777
+        network: tcp
+      garden_healthcheck:
+        command_retry_pause: null
+        interval: null
+        process:
+          args: null
+          dir: null
+          env: null
+          path: null
+          user: null
+        timeout: null
+      log_level: debug
+      memory_capacity_mb: null
+      post_setup_hook: null
+      post_setup_user: null
+    file_server:
+      dropsonde_port: null
+      log_level: null
+    rep:
+      bbs:
+        api_location: null
+        ca_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIFBTCCAu2gAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdkaWVn
+          b0NBMB4XDTE2MDcxMzAzNTgyNFoXDTI2MDcxMzAzNTgyN1owEjEQMA4GA1UEAxMH
+          ZGllZ29DQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOe2lsw3rRaG...TEST
+        client_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIEIjCCAgqgAwIBAgIQSggNzWsVu2zV+hl9UcI4jTANBgkqhkiG9w0BAQsFADAS
+          MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgzMFoXDTE4MDcxMzAzNTgz
+          MFowFTETMBEGA1UEAxMKYmJzIGNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEP...TEST
+        client_key: |+
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEogIBAAKCAQEAwqvB4Ec1otV0W+vYsiQxR/bd0+HOiKB8MDYOJErbBit2xh3y
+          4imQ8KgZcIbsVzR+esWih6CfkWFd3Xf5/RsR0H7kHnaqLWhkafdPeR5GIXWzet/w
+          +v04+HXQ2vXxRyRsjb7xzwgilDchtt40Mer/6g5Dw2nkoKx+ZNUPdt/J1tyhBLjX...TEST
+        client_session_cache_size: null
+        max_idle_conns_per_host: null
+        require_ssl: true
+      dropsonde_port: null
+      evacuation_timeout_in_seconds: 60
+      log_level: debug
+      preloaded_rootfses:
+      - cflinuxfs2:/var/vcap/packages/cflinuxfs2/rootfs
+      trusted_certs: null
+    route_emitter:
+      bbs:
+        api_location: null
+        ca_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIFBTCCAu2gAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdkaWVn
+          b0NBMB4XDTE2MDcxMzAzNTgyNFoXDTI2MDcxMzAzNTgyN1owEjEQMA4GA1UEAxMH
+          ZGllZ29DQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOe2lsw3rRaG...TEST
+        client_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIEIjCCAgqgAwIBAgIQSggNzWsVu2zV+hl9UcI4jTANBgkqhkiG9w0BAQsFADAS
+          MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgzMFoXDTE4MDcxMzAzNTgz
+          MFowFTETMBEGA1UEAxMKYmJzIGNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEP...TEST
+        client_key: |+
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEogIBAAKCAQEAwqvB4Ec1otV0W+vYsiQxR/bd0+HOiKB8MDYOJErbBit2xh3y
+          4imQ8KgZcIbsVzR+esWih6CfkWFd3Xf5/RsR0H7kHnaqLWhkafdPeR5GIXWzet/w
+          +v04+HXQ2vXxRyRsjb7xzwgilDchtt40Mer/6g5Dw2nkoKx+ZNUPdt/J1tyhBLjX...TEST
+        client_session_cache_size: null
+        max_idle_conns_per_host: null
+        require_ssl: true
+      dropsonde_port: null
+      log_level: debug
+      nats:
+        machines:
+        - 192.168.60.103
+        password: nats
+        port: 4222
+        user: nats
+    ssh_proxy:
+      bbs:
+        api_location: null
+        ca_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIFBTCCAu2gAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdkaWVn
+          b0NBMB4XDTE2MDcxMzAzNTgyNFoXDTI2MDcxMzAzNTgyN1owEjEQMA4GA1UEAxMH
+          ZGllZ29DQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOe2lsw3rRaG...TEST
+        client_cert: |+
+          -----BEGIN CERTIFICATE-----
+          MIIEIjCCAgqgAwIBAgIQSggNzWsVu2zV+hl9UcI4jTANBgkqhkiG9w0BAQsFADAS
+          MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgzMFoXDTE4MDcxMzAzNTgz
+          MFowFTETMBEGA1UEAxMKYmJzIGNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEP...TEST
+        client_key: |+
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEogIBAAKCAQEAwqvB4Ec1otV0W+vYsiQxR/bd0+HOiKB8MDYOJErbBit2xh3y
+          4imQ8KgZcIbsVzR+esWih6CfkWFd3Xf5/RsR0H7kHnaqLWhkafdPeR5GIXWzet/w
+          +v04+HXQ2vXxRyRsjb7xzwgilDchtt40Mer/6g5Dw2nkoKx+ZNUPdt/J1tyhBLjX...TEST
+        client_session_cache_size: null
+        max_idle_conns_per_host: null
+        require_ssl: true
+      diego_credentials: null
+      dropsonde_port: null
+      enable_cf_auth: true
+      enable_diego_auth: false
+      host_key: |+
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpAIBAAKCAQEA0k+NS+z0n7w1caSMswmHpbl1ECGLkV+zZZrNXPpProi5FEDt
+        oQuGPLVGwM9S78pFrzHECCyF0HfRSt/gMptzeeQY82Cz0Z+SUF64IfiFggYjWw6e
+        oGxsrU6LLXuO2gcbEn37T8RQTW7A1QWDG6im1B//uPf/X3BoOSvDYKwpwsvI0NDM...TEST
+      uaa_secret: ssh-proxy-secret
+      uaa_token_url: https://uaa.172.16.100.103.xip.io/oauth/token
+    ssl:
+      skip_cert_verify: true
+  etcd:
+    advertise_urls_dns_suffix: etcd.service.cf.internal
+    ca_cert: |+
+      -----BEGIN CERTIFICATE-----
+      MIIFBTCCAu2gAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdkaWVn
+      b0NBMB4XDTE2MDcxMzAzNTgyNFoXDTI2MDcxMzAzNTgyN1owEjEQMA4GA1UEAxMH
+      ZGllZ29DQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOe2lsw3rRaG...TEST
+    client_cert: |+
+      -----BEGIN CERTIFICATE-----
+      MIIEKTCCAhGgAwIBAgIQP2jEsUKg8Qoi8gMWji9T3jANBgkqhkiG9w0BAQsFADAS
+      MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgyOFoXDTE4MDcxMzAzNTgy
+      OFowHDEaMBgGA1UEAxMRZGllZ28gZXRjZCBjbGllbnQwggEiMA0GCSqGSIb3DQEB...TEST
+    client_key: |+
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEpQIBAAKCAQEAp4VuVixP56r+4FMQ+wbceKBHHbAYF9yVr8C6zjXVfO3L/UQi
+      KsnB7Bp4FC1UGcph5TPWE8G4rgeGNxykBIlkj0yIA8f5swTaa9zAt3C5fDyZKCEx
+      /SLEQqgeekjAt9vvswOdVGQ8nPsGaiLJ66kiEzvdoQ3rKCGQeEjvIaGFBRSovsYP...TEST
+    cluster:
+    - instances: 1
+      name: database_z1
+    - instances: 0
+      name: database_z2
+    - instances: 0
+      name: database_z3
+    - instances: 0
+      name: colocated_z1
+    - instances: 0
+      name: colocated_z2
+    - instances: 0
+      name: colocated_z2
+    election_timeout_in_milliseconds: null
+    heartbeat_interval_in_milliseconds: null
+    machines:
+    - etcd.service.cf.internal
+    peer_ca_cert: |+
+      -----BEGIN CERTIFICATE-----
+      MIIFCzCCAvOgAwIBAgIBATANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwpldGNk
+      UGVlckNBMB4XDTE2MDcxMzAzNTgyN1oXDTI2MDcxMzAzNTgyOFowFTETMBEGA1UE
+      AxMKZXRjZFBlZXJDQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAKNW...TEST
+    peer_cert: |+
+      -----BEGIN CERTIFICATE-----
+      MIIEdjCCAl6gAwIBAgIQM97ap+d6hRI8DqCtMhDHKDANBgkqhkiG9w0BAQsFADAV
+      MRMwEQYDVQQDEwpldGNkUGVlckNBMB4XDTE2MDcxMzAzNTgyOVoXDTE4MDcxMzAz
+      NTgyOVowIzEhMB8GA1UEAxMYZXRjZC5zZXJ2aWNlLmNmLmludGVybmFsMIIBIjAN...TEST
+    peer_key: |+
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEowIBAAKCAQEAqAEf782+SZrIaR74gZAiXnhHvM9Pzg2YK2WvqwHj0bdH4IIR
+      NCXj20hjxNPK0Lyci6a0eClll3IFzeUaMfqI9285CY1p/7HbbiRVnNnTG3/In4Pt
+      xzCOCGTRLpI6Z1bbPhRdHA92b9aLA2g2IRgZNWzdErY0sAdG5ry41YoaujuKuvUP...TEST
+    peer_require_ssl: true
+    require_ssl: true
+    server_cert: |+
+      -----BEGIN CERTIFICATE-----
+      MIIEdDCCAlygAwIBAgIRAOK5xOGEOpaTykT5575SeKEwDQYJKoZIhvcNAQELBQAw
+      EjEQMA4GA1UEAxMHZGllZ29DQTAeFw0xNjA3MTMwMzU4MjhaFw0xODA3MTMwMzU4
+      MjhaMCMxITAfBgNVBAMTGGV0Y2Quc2VydmljZS5jZi5pbnRlcm5hbDCCASIwDQYJ...TEST
+    server_key: |+
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEowIBAAKCAQEA6OfNM/avsWoO5oCZ/5jsa8SQQ+vFBajGf2Iyfvab75KgYcK0
+      ou45C1PmHQpP8t1Nfzs65zfawUYnvbN1j8L4f3vZZpJyP88YODXlbq0+vdYGy7KF
+      I5wXnw1bTSUVBXObFutYHMOHnP3gMQjjiZnebihaJyzgJ/MW3coWUzUqXRA7evqD...TEST
+  garden:
+    allow_host_access: null
+    allow_networks: null
+    default_container_grace_time: 0
+    deny_networks:
+    - 0.0.0.0/0
+    destroy_containers_on_start: true
+    disk_quota_enabled: null
+    graph_cleanup_threshold_in_mb: 0
+    insecure_docker_registry_list: null
+    listen_address: 0.0.0.0:7777
+    listen_network: tcp
+    log_level: debug
+    network_mtu: null
+    persistent_image_list:
+    - /var/vcap/packages/cflinuxfs2/rootfs
+  loggregator:
+    dropsonde_incoming_port: null
+    etcd:
+      ca_cert: null
+      machines:
+      - 192.168.60.109
+      require_ssl: null
+    tls:
+      ca_cert: null
+  metron_agent:
+    buffer_size: null
+    deployment: cf-openstack-diego
+    dropsonde_incoming_port: null
+    enable_buffer: null
+    etcd:
+      client_cert: null
+      client_key: null
+    preferred_protocol: null
+    protocols: null
+    tls:
+      client_cert: null
+      client_key: null
+  metron_endpoint:
+    shared_secret: loggregator-secret
+  syslog_daemon_config: null
+releases:
+- name: diego
+  version: 0.1481.0
+- name: cflinuxfs2-rootfs
+  version: 1.21.0
+- name: etcd
+  version: "63"
+- name: garden-linux
+  version: 0.339.0
+- name: cf
+  version: "236"
+resource_pools:
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: access_z1
+  network: diego1
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: access_z2
+  network: diego2
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: access_z3
+  network: diego3
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: brain_z1
+  network: diego1
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: brain_z2
+  network: diego2
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: brain_z3
+  network: diego3
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: cc_bridge_z1
+  network: diego1
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: cc_bridge_z2
+  network: diego2
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: cc_bridge_z3
+  network: diego3
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.xlarge
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: cell_z1
+  network: diego1
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.xlarge
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: cell_z2
+  network: diego2
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.xlarge
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: cell_z3
+  network: diego3
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: database_z1
+  network: diego1
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: database_z2
+  network: diego2
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: database_z3
+  network: diego3
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: route_emitter_z1
+  network: diego1
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: route_emitter_z2
+  network: diego2
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.small
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: route_emitter_z3
+  network: diego3
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.large
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: colocated_z1
+  network: diego1
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.large
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: colocated_z2
+  network: diego2
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+- cloud_properties:
+    instance_type: m1.large
+  env:
+    bosh:
+      password: $6$FRvRfOuZNC$vo16hHcURELJchFFHohlZYg4275XNshOwranN2Gl6C61LeY2foP39S.NwpZw5yYEGy3HpHfQli73sqxhfGcSx/
+  name: colocated_z3
+  network: diego3
+  stemcell:
+    name: bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: "3262"
+update:
+  canaries: 1
+  canary_watch_time: 5000-120000
+  max_in_flight: 1
+  serial: false
+  update_watch_time: 5000-120000
+
