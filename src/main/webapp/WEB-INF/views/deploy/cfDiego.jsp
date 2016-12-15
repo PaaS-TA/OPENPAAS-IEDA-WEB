@@ -5,7 +5,7 @@
  * 상세설명 : CF & Diego 통합 설치
  * =================================================================
  * 수정일         작성자             내용     
- * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------
  * 2016.12       지향은           CF & Diego 통합 설치 버그 수정 
  * =================================================================
  */ 
@@ -262,7 +262,6 @@ $(function() {
 			yes_text :"확인",
 			yes_callBack :function(event) {
 				var platform = "";
-				console.log("diego deployment: " + record.diegoVo.deploymentName );
 				if( record.diegoVo.deploymentName != "" && record.diegoVo.deploymentName != null ){
 					platform ="diego";
 				}else if( record.cfVo.deploymentName != ""&& record.cfVo.deploymentName != null  ){

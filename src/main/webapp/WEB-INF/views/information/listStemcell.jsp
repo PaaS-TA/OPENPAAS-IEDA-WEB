@@ -5,7 +5,7 @@
  * 상세설명 : 
  * =================================================================
  * 수정일         작성자             내용     
- * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------
  * 2016.12       이동현        목록 화면 개선 및 코드 버그 수정
  * =================================================================
  */ 
@@ -162,7 +162,6 @@ function doSearchLocalStemcells() {
  *********************************************************/
 var lockFile = false;
 function lockFileSet(fileName){
-	console.log(fileName);
 	var FileName = fileName.split(".tgz")[0]+"-upload";
 	var message = "현재 다른 플랫폼 설치 관리자가 동일 한 스템셀을 사용 중 입니다."
 	lockFile = commonLockFile("<c:url value='/common/deploy/lockFile/"+FileName+"'/>",message);
@@ -245,7 +244,6 @@ function doUploadConnect(requestParameter){
         uploadClient.subscribe('/user/info/stemcell/upload/logs', function(data){
 
         	var response = JSON.parse(data.body);
-        	console.log("##### : "+ requestParameter.fileName + " : " + response.tag +" = " +(requestParameter.fileName == response.tag) );
 	        if(requestParameter.fileName == response.tag){
 	        	if ( response.messages != null ) {
 	        		if(  response.state.toLowerCase() != "progress" ) {
@@ -264,7 +262,6 @@ function doUploadConnect(requestParameter){
 	        		}
 	        		else { 
 			       		//progressbar
-			       		console.log("#### :" + data);
 			       		if( response.messages < 100){
 			       			$(".w2ui-box1 .progress-bar").css("width", response.messages+"%").text("Uploading "+response.messages+"% ");
 			       		}

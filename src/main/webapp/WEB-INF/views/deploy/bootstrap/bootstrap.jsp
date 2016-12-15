@@ -5,7 +5,7 @@
  * 상세설명 : Bootstrap 설치
  * =================================================================
  * 수정일         작성자             내용     
- * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------
  * 2016.07       지향은           화면 수정 및 vSphere 클라우드 기능 추가
  * 2016.12       지향은           Bootstrap 목록과 팝업 화면 .jsp 분리 및 설치 버그 수정 
  * =================================================================
@@ -145,7 +145,6 @@ var bootStrapDeploymentName = new Array();
 			return;
 		}
 		var record = w2ui['config_bootstrapGrid'].get(selected);
-		console.log(record);
 		if ( record.deploymentName )
 			message = "BOOTSTRAP (배포명 : " + record.deploymentName + ")를 수정하시겠습니까?";
 		else
@@ -231,7 +230,6 @@ function iaasSelectPopup() {
 			iaas = $(".w2ui-msg-body input:radio[name='iaas']:checked").val();
 			if(iaas){
 				$("#bootstrapPopupDiv").load("/deploy/bootstrap/install/bootstrapPopup",function(event){
-					console.log("iaas: " + iaas.toUpperCase());
 					if( iaas.toUpperCase() == "AWS") {
 						awsPopup();
 					} else if( iaas.toUpperCase() == 'OPENSTACK'){

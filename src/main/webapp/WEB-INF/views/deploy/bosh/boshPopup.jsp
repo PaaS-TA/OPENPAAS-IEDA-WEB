@@ -5,7 +5,7 @@
  * 상세설명 : Bosh 설치
  * =================================================================
  * 수정일         작성자             내용     
- * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------
  * 2016.10       이동현           화면 수정 및 vSphere 클라우드 기능 추가
  * 2016.12       이동현           Bosh 목록과 팝업 화면 .jsp 분리 및 설치 버그 수정 
  * =================================================================
@@ -342,7 +342,6 @@ function saveVsphereInfo(){
 				defaultInfoPopup();
 			},
 			error : function( e, status ) {
-				console.log(e + "status ::: " + status);
 				w2alert("vSphere 설정 등록에 실패 하였습니다.", "BOSH 설치");
 			}
 		});
@@ -374,7 +373,6 @@ function setReleaseData(){
  * Function	: defaultInfoPopup
  *********************************************************/
 function defaultInfoPopup(){
-	 console.log("iaas : " + iaas);
 	if(iaas.toUpperCase() != "OPENSTACK"){
 		$('#directorNameDiv').hide();
 	}else if(iaas.toUpperCase() == "OPENSTACK"){
@@ -389,7 +387,6 @@ function defaultInfoPopup(){
 		onOpen:function(event){
 			event.onComplete = function(){				
 				if(boshInfo != ""){
-					console.log("boshInfo :   " +  boshInfo.enableSnapshots);
 					$(".w2ui-msg-body input[name='deploymentName']").val(boshInfo.deploymentName);
 					$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
 					$(".w2ui-msg-body input[name='ntp']").val(boshInfo.ntp);
@@ -898,7 +895,6 @@ function getDeployInfo(){
 		contentType : "application/json",
 		async : true,
 		success : function(data, status) {
-			alert(data);
 			if(status == "success"){
 				$(".w2ui-msg-body #deployInfo").text(data);
 			}

@@ -5,7 +5,7 @@
  * 상세설명 : 스냅샷 관리
  * =================================================================
  * 수정일         작성자             내용     
- * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------
  * 2016.12       이동현        목록 화면 개선 및 코드 버그 수정
  * =================================================================
  */ 
@@ -159,7 +159,6 @@ function deleteSnapshotInfo(type){
 		 if ( selected == "" || selected == null) return;
 		 var record = w2ui['us_snapshotGrid'].get(selected);
 		 if ( record == "" || record == null) return;
-		 console.log( record.snapshot_cid );
 		 snapshotParam = {
 				deploymentName: record.deploymentName,
 				snapshot_cid	: record.snapshot_cid

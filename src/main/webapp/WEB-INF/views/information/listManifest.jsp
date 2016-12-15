@@ -5,7 +5,7 @@
  * 상세설명 : Manifest 관리
  * =================================================================
  * 수정일         작성자             내용     
- * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------
  * 2016.12       지향은        화면 개선 및 코드 버그 수정
  * =================================================================
  */ 
@@ -166,7 +166,6 @@ function uploadManifestPath(){
   *********************************************************/
 function setIaasInfo(value){
 	$(".w2ui-msg-body #iaasInput").val(value);
-	console.log(	"2"+$(".w2ui-msg-body #iaasInput").val());
 }
 
  /********************************************************
@@ -195,7 +194,6 @@ function setUploadFilePath(fileInput){
   * Function : uploadManifestValidate
   *********************************************************/
 function uploadManifestValidate(){
-	 console.log(  "iaas:" + $(".w2ui-msg-body #iaas").val());
 	if (popupValidation()) {
 		w2popup.lock("Manifest 파일 업로드 중",true);
 		var form = $(".w2ui-msg-body #settingForm");
@@ -245,7 +243,6 @@ function uploadManifest(formData, name){
 		},
 		error : function(e, status) {
 			w2ui['us_manifestGrid'].reset();
-			console.log(JSON.parse(e.responseText).code);
 			if((JSON.parse(e.responseText).code).indexOf("yaml") > -1){
 				var errorResult = JSON.parse(e.responseText).message;
 				errorResult =  "<span style='font-weight:bold'>YAML 형식 오류:</span>" +
@@ -372,7 +369,6 @@ function updateManifestContnet(){
 			},
 			error : function(e, status) {
 				w2popup.unlock();
-				console.log((JSON.parse(e.responseText).code)); 
 				if((JSON.parse(e.responseText).code).indexOf("yaml") > -1){
 					var errorResult = JSON.parse(e.responseText).message;
 					errorResult =  "<span style='font-weight:bold'>YAML 형식 오류:</span>" +

@@ -5,7 +5,7 @@
  * 상세설명 : Diego 설치
  * =================================================================
  * 수정일         작성자             내용     
- * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------
  * 2016.10       이동현           화면 수정 및 vSphere 클라우드 기능 추가
  * 2016.12       이동현           Diego 목록과 팝업 화면 .jsp 분리 및 설치 버그 수정 
  * =================================================================
@@ -157,7 +157,6 @@ function setDiegoData(contents) {
 		 	//internalCnt =
 		 	
 		}
-		console.log("networkinfo : " + networkInfo.length);
 		internalCnt = networkInfo.length;
 		//리소스 정보 설정
 		if(contents.resource != null && contents.resource != ""){
@@ -749,7 +748,6 @@ function networkPopup(){
  *********************************************************/
  function addNetwork( ){
 	var cnt = internalCnt;
-	console.log(cnt);
 	var networkDiv = "#networkInfoDiv_";
 	var panelBody = "#panel-body";
 	if (popupValidation()) {
@@ -1281,7 +1279,6 @@ function diegoDeletePopup(record){
 	};
 	
 	if ( record.deployStatus == null || record.deployStatus == '' ) {
-		console.log("diego deployStatus : " + record.deployStatus );
 		if( menu != "cfDiego" ){
 			// 단순 레코드 삭제
 			var url = "/deploy/diego/delete/data";
@@ -1365,7 +1362,6 @@ function diegoDeletePopup(record){
   *********************************************************/
 function initSetting() {
 	//private var
-	iaas = "";
 	diegoId = "";
 	defaultInfo = "";	
 	cfInfo = "";
@@ -1428,7 +1424,7 @@ function gridReload() {
 	 if( menu == "diego" ){
 		 w2ui['config_diegoGrid'].reset();
 	 }else if( menu =="cfDiego" ){
-		 w2ui[' config_cfDiegoGrid'].reset();
+		 w2ui['config_cfDiegoGrid'].reset();
 	 }else{
 		 w2ui['config_diegoGrid'].reset();
 	 }

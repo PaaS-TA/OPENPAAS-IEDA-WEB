@@ -5,7 +5,7 @@
  * 상세설명 : 
  * =================================================================
  * 수정일         작성자             내용     
- * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------
  * 2016.12       이동현        목록 화면 개선
  * =================================================================
  */ 
@@ -190,7 +190,6 @@ function doGetTaskLog(type, typeName, requestParameter) {
 	var socket = new SockJS('/info/task/list/eventLog/task');
 	webSocketClient = Stomp.over(socket); 
 	webSocketClient.connect({}, function(frame) {
-        console.log('Connected: ' + frame);
         webSocketClient.subscribe('/user/info/task/list/eventLog/socket', function(data){
         	
          	var response = JSON.parse(data.body);

@@ -5,7 +5,7 @@
  * 상세설명 : VM 관리
  * =================================================================
  * 수정일         작성자             내용     
- * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------
  * 2016.12       이동현        코드 버그 수정 및 목록 화면 개선
  * =================================================================
  */ 
@@ -128,7 +128,6 @@ function showSnapshotBtn(){
 		contentType : "application/json",
 		async : true,
 		success : function(data, status) {
-			console.log("result : " + data.contents);
 			if( Number(data.contents) > 0 ){
 				$("#takeSnapshot").show();
 			}else{
@@ -221,7 +220,6 @@ function changeJobState(type){
 	var record = w2ui['us_vmsGrid'].get(selected);
 	if ( record == "" || record == null) return;
 	
-	console.log(record.jobState.indexOf(state));
 	if( record.jobState.indexOf(state) > -1 ){
 		w2alert('이미 '+typeName +  '상태 입니다.',  typeName);
 		return;
