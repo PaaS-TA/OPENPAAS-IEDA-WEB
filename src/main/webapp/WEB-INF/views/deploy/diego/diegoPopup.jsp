@@ -1373,13 +1373,11 @@ function initSetting() {
 	internalCnt=0;
 	resourceInfo = "";
 	internalCnt =1;
-	
 	diegoReleases = "";
 	cfReleases = "";
 	gardenReleaseName = "";
 	etcdReleases = "";
 	cflinuxfs2rootfsrelease = "";
-	
 	stemcells = "";
 	deploymentFile = "";
 	defaultDirector = "";
@@ -1423,10 +1421,10 @@ function popupComplete(){
 function gridReload() {
 	 if( menu == "diego" ){
 		 w2ui['config_diegoGrid'].reset();
+		 doSearch();
 	 }else if( menu =="cfDiego" ){
-		 w2ui['config_cfDiegoGrid'].reset();
-	 }else{
-		 w2ui['config_diegoGrid'].reset();
+		 w2ui['config_cfDiegoGrid'].load("<c:url value='/deploy/cfDiego/list/"+iaas+"'/>",
+					function() { doButtonStyle(); });
 	 }
 }
 </script>
@@ -2147,4 +2145,3 @@ function gridReload() {
 		<button class="btn" style="float:right; padding-right:15%" onclick="popupComplete();">닫기</button>
 	</div>
 </div>
-

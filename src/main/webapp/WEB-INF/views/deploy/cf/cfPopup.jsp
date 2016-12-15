@@ -1394,10 +1394,10 @@ function popupClose() {
 function gridReload() {
 	 if( menu == "cf" ){
 		 w2ui['config_cfGrid'].reset();
+		 doSearch();
 	 }else if( menu =="cfDiego" ){
-		 w2ui['config_cfDiegoGrid'].reset();
-	 }else{
-		 w2ui['config_cfGrid'].reset();
+		 w2ui['config_cfDiegoGrid'].load("<c:url value='/deploy/cfDiego/list/"+iaas+"'/>",
+					function() { doButtonStyle(); });
 	 }
 }
 
@@ -2297,4 +2297,3 @@ function gridReload() {
 	</div>
 </div>
 <!-- End Popup -->
-

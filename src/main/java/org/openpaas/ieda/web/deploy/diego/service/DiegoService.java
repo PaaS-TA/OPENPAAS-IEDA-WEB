@@ -152,13 +152,14 @@ public class DiegoService {
 	 * @return            : DiegoVO
 	***************************************************/
 	public DiegoVO getDiegoDetailInfo(int id) {
-		DiegoVO vo = null;
-		vo = diegoDao.selectDiegoInfo(id);
-		CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
-		
-		vo.setNetworks(networkDao.selectNetworkList(id, codeVo.getCodeName()));
-		vo.setKeys(keyDao.selectKeyInfoLIst(id, codeVo.getCodeName()));
-		vo.setResource(resourceDao.selectResourceInfo(id, codeVo.getCodeName()));
+		DiegoVO vo =  diegoDao.selectDiegoInfo(id);
+		if( vo != null ){
+			CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
+			
+			vo.setNetworks(networkDao.selectNetworkList(id, codeVo.getCodeName()));
+			vo.setKeys(keyDao.selectKeyInfoLIst(id, codeVo.getCodeName()));
+			vo.setResource(resourceDao.selectResourceInfo(id, codeVo.getCodeName()));
+		}
 		return vo;
 	}
 

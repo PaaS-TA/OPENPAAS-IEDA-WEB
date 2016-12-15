@@ -195,14 +195,15 @@ public class CfDiegoService {
 		try{
 			if( dto.getPlatform().equals("diego") ){//delete diego
 				vo = cfDiegoDao.selectCfDiegoInfoByPlaform(dto.getPlatform(), Integer.parseInt(dto.getId()) );
-				if( vo != null && vo.getCfVo().getId() != 0  ){
-					String json =  new Gson().toJson(dto);
-					DiegoParamDTO.Delete diegoDto = mapper.readValue(json, DiegoParamDTO.Delete.class);
-					diegoService.deleteDiegoInfoRecord(diegoDto);
-//					cfDiegoInfo = cfDiegoDao.selectCfDiegoInfoById(vo.getId());
+				if( vo != null  ){
+					if( vo.getDiegoVo().getId() != 0){
+						String json =  new Gson().toJson(dto);
+						DiegoParamDTO.Delete diegoDto = mapper.readValue(json, DiegoParamDTO.Delete.class);
+						diegoService.deleteDiegoInfoRecord(diegoDto);
+					}
 				}
 			}
-			if( dto.getPlatform().equals("diego") || dto.getPlatform().equals("cf") ){//delete cf
+			if( dto.getPlatform().equals("cf") ){//delete cf
 				cfDiegoInfo = cfDiegoDao.selectCfDiegoInfoByPlaform(dto.getPlatform(), Integer.parseInt(dto.getId()) );
 				if(  cfDiegoInfo != null ){
 					if( cfDiegoInfo.getCfVo().getId()  != 0 ){
