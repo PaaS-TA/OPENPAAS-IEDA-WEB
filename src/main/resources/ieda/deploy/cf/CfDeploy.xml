@@ -22,28 +22,17 @@
 		<result property="deaMemoryMB" column="DEA_MEMORY_MB" />
 		<result property="deaDiskMB" column="DEA_DISK_MB" />
 		<result property="proxyStaticIps" column="PROXY_STATIC_IPS" />
-		<result property="sslPemPub" column="SSL_PEM_PUB" />
-		<result property="sslPemRsa" column="SSL_PEM_RSA" />
 		<result property="loginSecret" column="LOGIN_SECRET" />
-		<result property="encryptKeys" column="ENCRYPT_KEYS" />
+		<result property="countryCode" column="COUNTRY_CODE" />
+		<result property="stateName" column="STATE_NAME" />
+		<result property="localityName" column="LOCALITY_NAME" />
+		<result property="organizationName" column="ORGANIZATION_NAME" />
+		<result property="unitName" column="UNIT_NAME" />
+		<result property="email" column="EMAIL" />
+		<result property="keyFile" column="KEY_FILE" />
 		<result property="deploymentFile" column="DEPLOYMENT_FILE" />
 		<result property="deployStatus" column="DEPLOY_STATUS" />
 		<result property="taskId" column="TASK_ID" />
-		<collection property="keys"   ofType="org.openpaas.ieda.web.deploy.common.dao.key.KeyVO"  javaType="ArrayLIst" >
-			<id property="keyType" column="KEY_TYPE" />
-			<result property="id" column="KEY_ID"/>
-			<result property="caCert" column="CA_CERT" />
-			<result property="serverCert" column="SERVER_CERT" />
-			<result property="serverKey" column="SERVER_KEY" />
-			<result property="clientCert" column="CLIENT_CERT" />
-			<result property="clientKey" column="CLIENT_KEY" />
-			<result property="agentCert" column="AGENT_CERT" />
-			<result property="agentKey" column="AGENT_KEY" />
-			<result property="tlsCert" column="TLS_CERT" />
-			<result property="privateKey" column="PRIVATE_KEY" />
-			<result property="publicKey" column="PUBLIC_KEY"/>
-			<result property="hostKey" column="HOST_KEY" />
-		</collection>
 		<collection property="resource" ofType="org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO"  javaType="org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO">
 			<result property="id" column="RESOURCE_ID" />
 			<result property="deployType" column="RESOURCE_DEPLOY_TYPE"/>
@@ -87,13 +76,10 @@
 			,director_uuid
 			,domain
 			,domain_organization
-			,encrypt_keys
-			,login_secret
 			,proxy_static_ips
+			,login_secret
 			,release_name
 			,release_version
-			,ssl_pem_pub
-			,ssl_pem_rsa
 			,task_id
 			,c.create_date as create_date
 			,c.update_date as update_date
@@ -122,59 +108,22 @@
 			,director_uuid
 			,domain
 			,domain_organization
-			,encrypt_keys
-			,login_secret
 			,proxy_static_ips
+			,login_secret
 			,release_name
 			,release_version
-			,ssl_pem_pub
-			,ssl_pem_rsa
+			,country_code
+			,state_name
+			,locality_name
+			,organization_name
+			,unit_name
+			,email
+			,key_file
 			,task_id
 		From ieda_cf
 		where id = #{id}
 	</select>
 	
-	<select id="selectCfKeyInfoById" resultMap="cf">
-		/** cfDeploy.selectCfKeyInfoById  **/
-		Select c.id as id 
-			,k.id as key_id
-			,k.key_type as key_type
-			,iaas_type
-			,dea_memory_mb
-			,dea_disk_mb
-			,diego_yn
-			,agent_cert
-			,agent_key
-			,app_ssh_fingerprint
-			,ca_cert
-			,deploy_status
-			,deployment_file
-			,deployment_name
-			,description
-			,director_uuid
-			,domain
-			,domain_organization
-			,encrypt_keys
-			,login_secret
-			,proxy_static_ips
-			,release_name
-			,release_version
-			,server_cert
-			,server_key
-			,private_key
-			,ssl_pem_pub
-			,ssl_pem_rsa
-			,tls_cert
-			,private_key
-			,ca_cert
-			,public_key
-			,task_id
-		From (select * from ieda_cf where id = #{id} ) c
-		 Left JOIN ieda_key k
-			On c.id = k.id
-		  And k.deploy_type=#{deployType}
-		  And k.key_type=#{keyType}
-	</select>
 	
 	<select id="selectCfResourceInfoById"  resultMap="cf">
 		/** cfDeploy.selectCfResourceInfoById  **/
@@ -193,13 +142,17 @@
 			,director_uuid
 			,domain
 			,domain_organization
-			,encrypt_keys
-			,login_secret
 			,proxy_static_ips
+			,login_secret
 			,release_name
 			,release_version
-			,ssl_pem_pub
-			,ssl_pem_rsa
+			,country_code
+			,state_name
+			,locality_name
+			,organization_name
+			,unit_name
+			,email
+			,key_file
 			,resource.deploy_type as resource_deploy_type
 			,bosh_password
 			,stemcell_name
@@ -242,13 +195,17 @@
 			,domain
 			,description
 			,domain_organization
+			,proxy_static_ips
+			,login_secret
 			,dea_memory_mb
 			,dea_disk_mb
-			,proxy_static_ips
-			,ssl_pem_pub
-			,ssl_pem_rsa
-			,login_secret
-			,encrypt_keys
+			,country_code
+			,state_name
+			,locality_name
+			,organization_name
+			,unit_name
+			,email
+			,key_file
 			,deployment_file
 			,create_date
 			,create_user_id
@@ -267,13 +224,17 @@
 			,#{cf.domain}
 			,#{cf.description}
 			,#{cf.domainOrganization}
+			,#{cf.proxyStaticIps}
+			,#{cf.loginSecret}
 			,#{cf.deaMemoryMB}
 			,#{cf.deaDiskMB}
-			,#{cf.proxyStaticIps}
-			,#{cf.sslPemPub}
-			,#{cf.sslPemRsa}
-			,#{cf.loginSecret}
-			,#{cf.encryptKeys}
+			,#{cf.countryCode}
+			,#{cf.stateName}
+			,#{cf.localityName}
+			,#{cf.organizationName}
+			,#{cf.unitName}
+			,#{cf.email}
+			,#{cf.keyFile}
 			,#{cf.deploymentFile}
 			,now()
 			,#{cf.createUserId}
@@ -300,10 +261,14 @@
 			,description=#{cf.description}
 			,domain_organization=#{cf.domainOrganization}
 			,proxy_static_ips=#{cf.proxyStaticIps}
-			,ssl_pem_pub=#{cf.sslPemPub}
-			,ssl_pem_rsa=#{cf.sslPemRsa}
 			,login_secret=#{cf.loginSecret}
-			,encrypt_keys=#{cf.encryptKeys}
+			,country_code = #{cf.countryCode}
+			,state_name=#{cf.stateName}
+			,locality_name=#{cf.localityName}
+			,organization_name=#{cf.organizationName}
+			,unit_name=#{cf.unitName}
+			,email=#{cf.email}
+			,key_file=#{cf.keyFile}
 			,deployment_file=#{cf.deploymentFile}
 			,deploy_status=#{cf.deployStatus}
 			,task_id=#{cf.taskId}

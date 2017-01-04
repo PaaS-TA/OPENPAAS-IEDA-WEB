@@ -25,6 +25,7 @@
 	var iaasType = "";
 	var installStatus = "";
 	var bdefaultDirector = "";
+	var deleteClient = "";
 	
 	$(function() {
 	 	/************************************************
@@ -45,18 +46,20 @@
 			columns	: [
 						 {field: 'recid', 	caption: 'recid', hidden: true}
 						,{field: 'deployStatus', caption: '배포 상태', size: '130px', style: 'text-align:center',
-							render:function(record) {
-				    			if ( record.deployStatus == 'done' )
+							render: function(record) {
+								if ( record.deployStatus == 'DEPLOY_STATUS_PROCESSING' )
+			    					return '<span class="btn btn-primary" style="width:60px">배포중</span>';
+								else if ( record.deployStatus == 'DEPLOY_STATUS_DONE' )
 				    				return '<span class="btn btn-primary" style="width:60px">성공</span>';
-				    			else	if ( record.deployStatus == 'error' )
-				    				return '<span class="btn btn-primary" style="width:60px">오류</span>';
-				    			else	if ( record.deployStatus == 'cancelled' )
-				    				return '<span class="btn btn-primary" style="width:60px">취소</span>';
-				    			else	if ( record.deployStatus == 'deploying' )
-				    				return '<span class="btn btn-primary" style="width:60px">배포중</span>';
+			    				else	if ( record.deployStatus == 'DEPLOY_STATUS_CANCELLED' )
+				    				return '<span class="btn btn-danger" style="width:60px">취소</span>';
+			    				else	if ( record.deployStatus == 'DEPLOY_STATUS_FAILED' )
+				    				return '<span class="btn btn-danger" style="width:60px">실패</span>';
+				    			else	if ( record.deployStatus == 'DEPLOY_STATUS_DELETING' )
+				    				return '<span class="btn btn-primary" style="width:60px">삭제중</span>';
 								else
 				    				return '&ndash;';
-				    	   }	
+				    	   		}
 						}
 					   , {field: 'iaas', caption: 'IaaS', size: '140px', style: 'text-align:center'
 						   , render: function(record) {
@@ -286,7 +289,7 @@
 				deployPopup(deploymentFile);
 			},
 			error :function(request, status, error) {
-				w2alert(errorResult.message, "서비스팩  배포 파일 생성");
+				w2alert("서비스팩 배포 파일 생성 실패", "서비스팩  배포 파일 생성");
 			}
 		});
 	}
@@ -420,7 +423,7 @@
 			var body = '<textarea id="deleteLogs" style="width:95%;height:90%;overflow-y:visible;resize:none;background-color:#FFF; margin:2%" readonly="readonly"></textarea>';
 			
 			w2popup.open({
-				width :610,
+				width :700,
 				height :500,
 				title :"<b>서비스팩 삭제</b>",
 				body  :body,
@@ -446,7 +449,6 @@
 							    		if ( response.state.toLowerCase() == "error" ) message = message + " 삭제 중 오류가 발생하였습니다.";
 							    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 삭제 중 취소되었습니다.";
 							    		
-							    		installStatus = response.state.toLowerCase();
 							    		deleteClient.disconnect();
 										w2alert(message, "서비스팩 삭제");
 							       	}
@@ -459,8 +461,9 @@
 				}, onClose :function (event){
 					event.onComplete= function(){
 						$("textarea").text("");
-						deleteClient.disconnect();
-						deleteClient = "";
+						if( deleteClient != "" ){
+							deleteClient.disconnect();
+						}
 						initSetting();
 					}
 				}
@@ -620,7 +623,7 @@
 			</sec:authorize>
 			<!-- //Btn -->
 		</div>
-		<div id="w2ui_servicePackGrid" style="width:100%; height:650px"></div>	
+		<div id="w2ui_servicePackGrid" style="width:100%; height:610px"></div>	
 	</div>
 	
 	<!-- 서비스팩 기본 정보 DIV -->

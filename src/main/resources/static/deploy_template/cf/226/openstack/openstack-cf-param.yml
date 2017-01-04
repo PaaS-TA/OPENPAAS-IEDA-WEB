@@ -15,46 +15,23 @@ networks:
       cloud_properties:
         net_id: [cloudNetId]
         security_groups: [[cloudSecurityGroups]]
- 
+
 jobs:
 - name: ha_proxy
   networks:
   - name: op_public
     static_ips: [[proxyStaticIps]]
-  properties:
-    ha_proxy:
-      ssl_pem: |
-[sslPemPub]
-[sslPemRsa]
 
 properties:
   domain: [domain]
-  description: [description]  
+  description: [description]
   system_domain_organization: [domainOrganization]
-  app_ssh: 
+  app_ssh:
     host_key_fingerprint: [appSshFingerprint]
-  
-  consul:
-    agent_cert: |
-[agentCert]
-    agent_key: |
-[agentKey]
-    ca_cert: |
-[caCert]
-    encrypt_keys: [[encryptKeys]]
-    server_cert: |
-[serverCert]
-    server_key: |
-[serverKey]
   uaa:
     clients:
       login:
         secret: [loginSecret]
-    jwt:
-      signing_key: |
-[signingKey]
-      verification_key: |
-[verificationKey]
 
 resource_pools:
 - name: small
@@ -66,7 +43,7 @@ resource_pools:
       password: [boshPassword]
   cloud_properties:
     instance_type: m1.small
-    
+
 - name: medium
   cloud_properties:
     instance_type: m1.medium

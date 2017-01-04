@@ -14,6 +14,8 @@
 	font-size: 10px;
 }
 
+
+
 /* File Upload Button ( Bootstrap/Bosh )  */
 #browse {
 	position: relative;
@@ -52,5 +54,6 @@
 .addBtn { position:relative; left:85%; }
 .delBtn { position:relative; left:85%; }
 .message { width:75%; text-align:center;  }
+
 
 

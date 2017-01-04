@@ -45,7 +45,6 @@ public class DeploymentService {
 			GetMethod get = new GetMethod(DirectorRestHelper.getDeploymentListURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort()));
 			get = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)get);
 			httpClient.executeMethod(get);
-			
 			if ( !StringUtils.isEmpty(get.getResponseBodyAsString()) ) {
 				
 				ObjectMapper mapper = new ObjectMapper();

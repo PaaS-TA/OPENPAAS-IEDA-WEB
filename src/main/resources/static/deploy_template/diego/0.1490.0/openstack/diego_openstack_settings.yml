@@ -1,0 +1,116 @@
+meta: ~
+
+iaas_settings:
+  stemcell:
+    name: (( meta.stemcell-name ))
+    version: (( meta.stemcell-version || "latest" ))
+  compilation_cloud_properties:
+    instance_type: m1.small
+  resource_pool_cloud_properties:
+    - name: access_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: access_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: access_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: brain_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: brain_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: brain_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: cc_bridge_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: cc_bridge_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: cc_bridge_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: cell_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.cell-instance-type || "m1.large" ))
+    - name: cell_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.cell-instance-type || "m1.large" ))
+    - name: cell_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.cell-instance-type || "m1.large" ))
+    - name: colocated_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.large-instance-type || "m1.large" ))
+    - name: colocated_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.large-instance-type || "m1.large" ))
+    - name: colocated_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.large-instance-type || "m1.large" ))
+    - name: database_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: database_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: database_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: route_emitter_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: route_emitter_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: route_emitter_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+    - name: errand
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.small-instance-type || "m1.small" ))
+
+  subnet_configs:
+    - name: diego1
+      type: manual
+      subnets:
+      - range: (( meta.network-0-range ))
+        gateway: (( meta.network-0-gateway ))
+        static: (( meta.network-0-static ))
+        reserved: (( meta.network-0-reserved ))
+        dns: (( meta.network-0-dns ))
+        cloud_properties:
+          net_id: (( meta.network-0-net-id ))
+          security_groups: (( meta.network-0-security-groups ))
+    - name: diego2
+      type: manual
+      subnets: (( merge || iaas_settings.subnet_configs.diego1.subnets ))
+    - name: diego3
+      type: manual
+      subnets: (( merge || iaas_settings.subnet_configs.diego1.subnets ))

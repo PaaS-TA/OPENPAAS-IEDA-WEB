@@ -15,8 +15,8 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <script type="text/javascript">
 
-var uploadClient = "";
-var deleteClient = "";
+var uploadClient = null;
+var deleteClient = null;
 var bDefaultDirector = "";
 $(function() {
 	
@@ -34,6 +34,7 @@ $(function() {
 					selectColumn: true	,
 					footer: true
 					},
+		msgAJAXerror : '업로드 된 릴리즈 조회 실패',
 		multiSelect: false,
 		method	: 'GET',
 		style	: 'text-align:center',
@@ -128,13 +129,11 @@ $(function() {
  *********************************************************/
 function initView(bDefaultDirector) {
 	
-	if ( bDefaultDirector ) {  doSearchUploadedReleases(); }
-	
+	if ( bDefaultDirector ) { w2ui['ru_uploadedReleasesGrid'].clear(); doSearchUploadedReleases(); }
 	// 로컬에 다운로드된 릴리즈 조회
 	w2ui['ru_localReleasesGrid'].clear();
 	doSearchLocalReleases();
-	
-	
+		
 	//버튼 제어 
 	setDisable($('#doDeleteRelease'), true);
 	setDisable($('#doUploadRelease'), true);
@@ -240,16 +239,13 @@ function uploadLogPopup(requestParameter){
 		},  onClose : function(event){
 			event.onComplete= function(){
 				$("textarea").text("");
-				initView();
-				if( uploadClient != ""){
+				initView(bDefaultDirector);
+				if( uploadClient != null){
 					uploadClient.disconnect();
-					uploadClient = "";
+					uploadClient = null;
 				}
 			}
 		},
-		onClose : function(event){
-			initView(bDefaultDirector);
-		}
 	});
 }
 
@@ -271,7 +267,9 @@ function doUploadConnect(requestParameter){
 		        	if ( response.messages != null ) {
 				       	for ( var i=0; i < response.messages.length; i++) {
 				       		$("textarea[name='logAppendArea']").append(response.messages[i] + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
+				       		console.log("started status :" + response.state.toLowerCase());
 				       	}
+				       	console.log("status2 :" + response.state.toLowerCase());
 				       	if ( response.state.toLowerCase() != "started" ) {
 				            if ( response.state.toLowerCase() == "done" )	message = message + " 업로드 되었습니다."; 
 				    		if ( response.state.toLowerCase() == "error" ) message = message + " 업로드 중 오류가 발생하였습니다.";
@@ -348,10 +346,12 @@ function deleteLogPopup(requestParameter){
 		},
 		onClose : function(event){
 			event.onComplete= function(){
+				if(deleteClient != null){
 				$("textarea").text("");
-				initView(bDefaultDirector);
 				deleteClient.disconnect();
-				deleteClient = "";
+				deleteClient = null;
+				}
+				initView(bDefaultDirector);
 			}
 		}
 	});
@@ -396,16 +396,16 @@ function doDeleteConnect(requestParameter){
  * Function	: popupClose
  *********************************************************/
 function popupClose() {
-	if (uploadClient != "") {
+	if (uploadClient != null) {
 		uploadClient.disconnect();
 		$("textarea[name='logAppendArea']").text("");
-		uploadClient = "";
+		uploadClient = null;
 	}
 	
-	if (deleteClient != "") {
+	if (deleteClient != null) {
 		deleteClient.disconnect();
 		$("textarea[name='logAppendArea']").text("");
-		deleteClient ="";
+		deleteClient = null;
 	}
 	
 	w2popup.close();
@@ -449,7 +449,7 @@ $( window ).resize(function() {
 		</sec:authorize>
 	    </div>
 	</div>
-	<div id="ru_uploadedReleasesGrid" style="width:100%; height:298px"></div>	
+	<div id="ru_uploadedReleasesGrid" style="width:100%; height:278px"></div>	
 	<div class="pdt20"> 
 		<div class="title fl">다운로드된 릴리즈 목록</div>
 		<div class="fr">
@@ -458,5 +458,5 @@ $( window ).resize(function() {
 		</sec:authorize>
 		</div>
 	</div>
-	<div id="ru_localReleasesGrid" style="width:100%; height:298px"></div>
+	<div id="ru_localReleasesGrid" style="width:100%; height:278px"></div>
 </div>

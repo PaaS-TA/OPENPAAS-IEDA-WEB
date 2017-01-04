@@ -180,14 +180,12 @@ public class BoshService {
 			
 			vo = boshDao.selectBoshDetailInfo(vo.getId());
 			CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
-			
 			vo.setNetworks(networkDao.selectNetworkList(vo.getId(), codeVo.getCodeName()) );
 			vo.setResource(resourceDao.selectResourceInfo(vo.getId(),codeVo.getCodeName()));
 			
 			String releaseVersion = vo.getReleaseVersion().split("/")[1];
 			String releaseName = vo.getReleaseVersion().split("/")[0];
-			result = commonDao.getManifetTemplate(vo.getIaasType().toLowerCase(), releaseVersion, "BOSH", releaseName);
-			
+			result = commonDao.selectManifetTemplate(vo.getIaasType().toLowerCase(), releaseVersion, "BOSH", releaseName);
 			ManifestTemplateVO manifestTemplate = new ManifestTemplateVO();
 			if(result != null){
 				inputs =  this.getClass().getClassLoader().getResourceAsStream("static/deploy_template/bosh/"+ result.getTemplateVersion() + "/"+  vo.getIaasType().toLowerCase() + "/" +result.getInputTemplate());

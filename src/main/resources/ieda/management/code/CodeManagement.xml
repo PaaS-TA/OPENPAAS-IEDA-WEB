@@ -223,5 +223,29 @@
 		from ieda_common_code 
 		where parent_code  in (select code_value from ieda_common_code where code_name=#{parentCodeName}) ;
 	</select>
+	
+	<select id="selectCountryCodeList" resultMap="managementCode">
+		/** CodeManagement.selectCountryCodeList **/
+		Select
+			code_idx, 
+			code_description,
+			code_name, 
+			code_name_kr,
+			code_value, 
+			create_date, 
+			create_user_id,
+			parent_code, 
+			code_idx as recid, 
+			sort_order,
+			sub_group_code, 
+			update_date, 
+			update_user_id 
+		From 
+			ieda_common_code
+		Where 
+			parent_code = #{parentCode}	
+		Order by 
+			if( code_name='KR', 'A', code_name ) asc
+	</select>
 
 </mapper>

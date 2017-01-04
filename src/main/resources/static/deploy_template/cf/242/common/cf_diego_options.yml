@@ -1,4 +1,5 @@
 meta: ~
+diego-certs: ~
 
 jobs:
   - name: hm9000_z1
@@ -25,7 +26,7 @@ jobs:
 properties:
   <<: (( merge ))
   app_ssh:
-    host_key_fingerprint: (( .meta.host-key-fingerprint ))
+    host_key_fingerprint: (( .diego-certs.ssh-key-fingerprint || .meta.ssh-key-fingerprint ))
     oauth_client_id: ssh-proxy
   cc:
     default_to_diego_backend: true

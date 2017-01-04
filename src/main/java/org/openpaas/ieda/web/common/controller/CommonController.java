@@ -17,6 +17,8 @@ import javax.validation.Valid;
 import org.openpaas.ieda.api.deployment.DeploymentInfoDTO;
 import org.openpaas.ieda.api.release.ReleaseInfoDTO;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
+import org.openpaas.ieda.web.common.dao.ManifestTemplateVO;
+import org.openpaas.ieda.web.common.dto.KeyInfoDTO;
 import org.openpaas.ieda.web.common.service.CommonService;
 import org.openpaas.ieda.web.config.setting.dao.DirectorConfigVO;
 import org.openpaas.ieda.web.config.setting.service.DirectorConfigService;
@@ -38,6 +40,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -75,7 +78,7 @@ public class CommonController {
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : 배포명 조회
+	 * @description   : 기본 설치관리자에 배포명 조회 요청
 	 * @title               : getDeploymentList
 	 * @return            : ResponseEntity<HashMap<String,Object>>
 	***************************************************/
@@ -92,6 +95,22 @@ public class CommonController {
 		
 		if(LOGGER.isInfoEnabled()){ LOGGER.info("================================> 배포명 조회 요청 성공");  }
 		return new ResponseEntity<HashMap<String, Object>>( result, HttpStatus.OK);
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : 플랫폼 별 배포 목록 조회
+	 * @title               : getDeploymentListByPlatform
+	 * @return            : ResponseEntity<HashMap<String,Object>>
+	***************************************************/
+	@RequestMapping(value="/common/deploy/deployments/{platform}", method=RequestMethod.GET)
+	public ResponseEntity<List<String>> getDeploymentListByPlatform(@PathVariable String platform){
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("================================> 플랫폼 별 배포명 조회 요청");  }
+		
+		List<String> contents = commonService.listDeployment(platform);
+		
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("================================> 플랫폼 별 배포명 조회 요청 성공");  }
+		return new ResponseEntity<List<String>>( contents, HttpStatus.OK);
 	}
 	
 	/***************************************************
@@ -299,6 +318,57 @@ public class CommonController {
 		Boolean lock = commonService.lockFileSet(FileName);
 		if(LOGGER.isInfoEnabled()){ LOGGER.debug("====================================> 락 파일 요청 성공"); }
 		return new ResponseEntity<Boolean>(lock, HttpStatus.OK);
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : 국가 코드 조회(KR 우선 정렬 조건)
+	 * @title               : getCountryCodeList
+	 * @return            : ResponseEntity<List<CommonCodeVO>>
+	***************************************************/
+	@RequestMapping(value="/common/deploy/codes/countryCode/{parentCode}", method=RequestMethod.GET)
+	public ResponseEntity<List<CommonCodeVO>> getCountryCodeList(@PathVariable String parentCode) {
+		
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("================================================> 서브 그룹 조회 요청");  }
+		List<CommonCodeVO> content = codeService.getCountryCodeList(parentCode);
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("================================================> 서브 그룹 조회 성공");  }
+		return new ResponseEntity<List<CommonCodeVO>>(content, HttpStatus.OK);
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : Key 생성
+	 * @title               : createKeyInfo
+	 * @return            : ResponseEntity<?>
+	***************************************************/
+	@RequestMapping( value="/common/deploy/key/createKey", method=RequestMethod.POST)
+	public ResponseEntity<HashMap<String, Object>>  createKeyInfo( @RequestBody KeyInfoDTO dto ){
+		
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF Key 생성 요청"); }
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		String keyFile = commonService.createKeyInfo(dto);
+		map.put("keyFile", keyFile);
+		if( dto.getPlatform().toLowerCase().equals("diego") ){
+			String fingerprint = commonService.getFingerprint(keyFile);
+			map.put("fingerprint", fingerprint);
+		}
+		
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF Key 생성 성공!!"); }
+		return new ResponseEntity<HashMap<String, Object>>(map,HttpStatus.OK);
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : 플랫폼 별 릴리즈 설치 지원 버전 목록 조회
+	 * @title               : getReleaseInfoByPlatform
+	 * @return            : ResponseEntity<HashMap<String,Object>>
+	***************************************************/
+	@RequestMapping( value="/common/deploy/list/releaseInfo/{deployType}/{iaas}", method=RequestMethod.GET)
+	public ResponseEntity<List<ManifestTemplateVO>>  getReleaseInfoByPlatform( @PathVariable String deployType, @PathVariable String iaas ){
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> 플랫폼 별 릴리즈 버전의 최적화 정보 조회 요청"); }
+		List<ManifestTemplateVO> vo = commonService.getReleaseInfoByPlatform(deployType, iaas);
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> 플랫폼 별 릴리즈 버전의 최적화 정보 조회 성공!!"); }
+		return new ResponseEntity<List<ManifestTemplateVO>>(vo, HttpStatus.OK);
 	}
 	
 }

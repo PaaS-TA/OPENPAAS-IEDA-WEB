@@ -41,13 +41,19 @@ public class HttpSessionIdHandshakeInterceptor implements HandshakeInterceptor {
 				String menu = uri.split("/")[2];
 				int maxInactiveInterval= 30*60;
 				
-				if( menu.toLowerCase().equals("bootstrap") || menu.toLowerCase().equals("bosh") ){
-					maxInactiveInterval = 60*60;
-				}else if( menu.toLowerCase().equals("cf") || menu.toLowerCase().equals("diego") || menu.toLowerCase().equals("servicepack") ){
-					maxInactiveInterval = 180*60;
-				}else if( !menu.toLowerCase().equals("systemrelease")  ){
-					//stemcell 및 release upload
-					maxInactiveInterval= 30*60;
+				if( uri.indexOf("/install") > -1 ){
+					if( menu.toLowerCase().equals("bootstrap") || menu.toLowerCase().equals("bosh") ){
+						maxInactiveInterval = 60*60;
+					}else if( menu.toLowerCase().equals("cf") || menu.toLowerCase().equals("diego")
+							|| menu.toLowerCase().equals("cfdiego") || menu.toLowerCase().equals("servicepack") ){
+						maxInactiveInterval = 180*60;
+					}
+				}else if( uri.indexOf("/systemRelease") > -1 || uri.indexOf("/release") > -1 || uri.indexOf("/stemcell")  > -1){
+					//stemcell 및 release upload/download
+					maxInactiveInterval= 20*60;
+				}else{
+					//delete
+					maxInactiveInterval = 30*60;
 				}
 				session.setMaxInactiveInterval(maxInactiveInterval);
 				if (LOGGER.isDebugEnabled()) {

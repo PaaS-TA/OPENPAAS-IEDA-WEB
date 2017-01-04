@@ -142,7 +142,7 @@ public class BootstrapService {
 			}
 			String releaseVersion = vo.getBoshRelease().replaceAll("[^0-9]", "");
 			String releaseName = boshRelease.replaceAll("[^A-Za-z]", "");
-			result = commonDao.getManifetTemplate(vo.getIaasType(), releaseVersion, "BOOTSTRAP", releaseName );
+			result = commonDao.selectManifetTemplate(vo.getIaasType(), releaseVersion, "BOOTSTRAP", releaseName );
 
 			ManifestTemplateVO manifestTemplate = new ManifestTemplateVO();
 			if(result != null){

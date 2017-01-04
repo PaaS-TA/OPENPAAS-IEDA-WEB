@@ -1,0 +1,530 @@
+#!/bin/bash
+
+function getCert {
+  while IFS='' read -r line || [[ -n "$line" ]]; do
+    echo "    $line"
+  done < "$1"
+  return
+}
+
+#if [ -z "$1" ]; then  
+#  >&2 echo "ERROR: cf-certs file name is missing"
+#  argument_error=true
+#fi
+
+#############################################
+#  GENERATE MANIFEST START
+#############################################
+echo "cf-certs:" >> $key_file
+
+#############################################
+#  set consul-encrypt-keys
+#############################################
+cert_file="$dir_cf_certs/consul-certs/encrypt_key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate consul-certs"
+  generate_cert_fail=true
+else
+  echo "  consul-encrypt-keys: ["`cat $cert_file`"]" >> $key_file
+fi
+
+#############################################
+#  set consul-ca-cert
+#############################################
+cert_file="$dir_cf_certs/consul-certs/server-ca.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate consul-certs"
+  generate_cert_fail=true
+else
+  echo "  consul-ca-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set consul-server-cert
+#############################################
+cert_file="$dir_cf_certs/consul-certs/server.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate consul-certs"
+  generate_cert_fail=true
+else
+  echo "  consul-server-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set consul-server-key
+#############################################
+cert_file="$dir_cf_certs/consul-certs/server.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate consul-certs"
+  generate_cert_fail=true
+else
+  echo "  consul-server-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set consul-agent-cert
+#############################################
+cert_file="$dir_cf_certs/consul-certs/agent.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate consul-certs"
+  generate_cert_fail=true
+else
+  echo "  consul-agent-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set consul-agent-key
+#############################################
+cert_file="$dir_cf_certs/consul-certs/agent.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate consul-certs"
+  generate_cert_fail=true
+else
+  echo "  consul-agent-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set blobstore-ca-cert
+#############################################
+cert_file="$dir_cf_certs/blobstore-certs/server-ca.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate blobstore-certs"
+  generate_cert_fail=true
+else
+  echo "  blobstore-ca-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set blobstore-server-cert
+#############################################
+cert_file="$dir_cf_certs/blobstore-certs/server.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate blobstore-certs"
+  generate_cert_fail=true
+else
+  echo "  blobstore-server-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set blobstore-server-key
+#############################################
+cert_file="$dir_cf_certs/blobstore-certs/server.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate blobstore-certs"
+  generate_cert_fail=true
+else
+  echo "  blobstore-server-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set dea-ca-cert
+#############################################
+cert_file="$dir_cf_certs/dea-certs/dea_ca.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate dea-certs"
+  generate_cert_fail=true
+else
+  echo "  dea-ca-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set dea-server-cert
+#############################################
+cert_file="$dir_cf_certs/dea-certs/dea_server.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate dea-certs"
+  generate_cert_fail=true
+else
+  echo "  dea-server-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set dea-server-key
+#############################################
+cert_file="$dir_cf_certs/dea-certs/dea_server.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate dea-certs"
+  generate_cert_fail=true
+else
+  echo "  dea-server-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set dea-client-cert
+#############################################
+cert_file="$dir_cf_certs/dea-certs/dea_client.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate dea-certs"
+  generate_cert_fail=true
+else
+  echo "  dea-client-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set dea-client-key
+#############################################
+cert_file="$dir_cf_certs/dea-certs/dea_client.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate dea-certs"
+  generate_cert_fail=true
+else
+  echo "  dea-client-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set hm9000-ca-cert
+#############################################
+cert_file="$dir_cf_certs/hm9000-certs/hm9000_ca.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate hm9000-certs"
+  generate_cert_fail=true
+else
+  echo "  hm9000-ca-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set hm9000-server-cert
+#############################################
+cert_file="$dir_cf_certs/hm9000-certs/hm9000_server.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate hm9000-certs"
+  generate_cert_fail=true
+else
+  echo "  hm9000-server-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set hm9000-server-key
+#############################################
+cert_file="$dir_cf_certs/hm9000-certs/hm9000_server.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate hm9000-certs"
+  generate_cert_fail=true
+else
+  echo "  hm9000-server-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set hm9000-client-cert
+#############################################
+cert_file="$dir_cf_certs/hm9000-certs/hm9000_client.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate hm9000-certs"
+  generate_cert_fail=true
+else
+  echo "  hm9000-client-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set hm9000-client-key
+#############################################
+cert_file="$dir_cf_certs/hm9000-certs/hm9000_client.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate hm9000-certs"
+  generate_cert_fail=true
+else
+  echo "  hm9000-client-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set jwt-verification-key
+#############################################
+cert_file="$dir_cf_certs/jwt-verification.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate jwt-cert"
+  generate_cert_fail=true
+else
+  echo "  jwt-verification-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set jwt-signing-key
+#############################################
+cert_file="$dir_cf_certs/jwt-signing.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate jwt-cert"
+  generate_cert_fail=true
+else
+  echo "  jwt-signing-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set uaa-ssl-cert
+#############################################
+cert_file="$dir_cf_certs/uaa-certs/server.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate uaa-ssl-certs"
+  generate_cert_fail=true
+else
+  echo "  uaa-ssl-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set uaa-ssl-key
+#############################################
+cert_file="$dir_cf_certs/uaa-certs/server.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate uaa-ssl-certs"
+  generate_cert_fail=true
+else
+  echo "  uaa-ssl-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set ha_proxy_cert
+#############################################
+cert_file="$dir_cf_certs/ha_proxy_ssl/ha_proxy_ssl"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate ha_proxy_cert"
+  generate_cert_fail=true
+else
+  echo "  ha-proxy-ssl: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set loggregator-ca-cert
+#############################################
+cert_file="$dir_cf_certs/loggregator-certs/loggregator-ca.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate loggregator-certs"
+  generate_cert_fail=true
+else
+  echo "  loggregator-ca-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set doppler-cert
+#############################################
+cert_file="$dir_cf_certs/loggregator-certs/doppler.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate loggregator-certs"
+  generate_cert_fail=true
+else
+  echo "  doppler-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set doppler-key
+#############################################
+cert_file="$dir_cf_certs/loggregator-certs/doppler.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate loggregator-certs"
+  generate_cert_fail=true
+else
+  echo "  doppler-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set trafficcontroller-cert
+#############################################
+cert_file="$dir_cf_certs/loggregator-certs/trafficcontroller.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate loggregator-certs"
+  generate_cert_fail=true
+else
+  echo "  trafficcontroller-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set trafficcontroller-key
+#############################################
+cert_file="$dir_cf_certs/loggregator-certs/trafficcontroller.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate loggregator-certs"
+  generate_cert_fail=true
+else
+  echo "  trafficcontroller-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set metron-cert
+#############################################
+cert_file="$dir_cf_certs/loggregator-certs/metron.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate loggregator-certs"
+  generate_cert_fail=true
+else
+  echo "  metron-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set metron-key
+#############################################
+cert_file="$dir_cf_certs/loggregator-certs/metron.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate loggregator-certs"
+  generate_cert_fail=true
+else
+  echo "  metron-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set etcd-ca-cert
+#############################################
+cert_file="$dir_cf_certs/etcd-certs/etcd-ca.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  etcd-ca-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set etcd-server-cert
+#############################################
+cert_file="$dir_cf_certs/etcd-certs/server.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  etcd-server-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set etcd-server-key
+#############################################
+cert_file="$dir_cf_certs/etcd-certs/server.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  etcd-server-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set etcd-client-cert
+#############################################
+cert_file="$dir_cf_certs/etcd-certs/client.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  etcd-client-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set etcd-client-key
+#############################################
+cert_file="$dir_cf_certs/etcd-certs/client.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  etcd-client-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set peer-ca-cert
+#############################################
+cert_file="$dir_cf_certs/etcd-certs/peer-ca.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  peer-ca-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set peer-cert
+#############################################
+cert_file="$dir_cf_certs/etcd-certs/peer.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  peer-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set peer-key
+#############################################
+cert_file="$dir_cf_certs/etcd-certs/peer.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  peer-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  GENERATE MANIFEST END
+#############################################
+if [ ! -z $generate_cert_fail ]; then  
+  exit 1
+fi

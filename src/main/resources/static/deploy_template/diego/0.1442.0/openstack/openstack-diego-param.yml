@@ -1,27 +1,13 @@
-name: [deploymentName]
-director_uuid: [directorUuid]
 base_releases:
   diego:
     name: [diegoReleaseName]
     version: [diegoReleaseVersion]
-  cf: 
-    name: [cfReleaseName]
-    version: [cfReleaseVersion]
   garden-linux: 
     name: [gardenLinuxReleaseName]
     version: [gardenLinuxReleaseVersion]
   etcd:
     name: [etcdReleaseName]
     version: [etcdReleaseVersion]
-meta:
-  domain: [domain]
-  cf_properties:
-    deployment: [deployment]
-    secret: [secret]
-    etcd:
-      machines: [[etcdMachines]]
-    nats:
-      machines: [[natsMachines]]
 
 networks:
   oc_network:
@@ -34,61 +20,6 @@ networks:
       cloud_properties:
         net_id: [cloudNetId]
         security_groups: [[cloudSecurityGroups]]
-
-properties:
-  consul:
-    agent:
-      servers:
-        lan: [[consulServersLan]]
-    agent_cert: |
-[consulAgentCert]
-    agent_key: |
-[consulAgentKey]
-    ca_cert: |
-[consulCaCert]
-    encrypt_keys: [[consulEncryptKeys]]
-    server_cert: |
-[consulServerCert]
-    server_key: |
-[consulServerKey]
-
-  diego:
-    auctioneer:
-      bbs:
-        ca_cert: |
-[diegoCaCert]
-        client_cert: |
-[diegoClientCert]
-        client_key: |
-[diegoClientKey]
-
-    bbs:
-      encryption_keys:
-      - passphrase: [diegoEncryptionKeys]
-      server_cert: |
-[diegoServerCert]
-      server_key: |
-[diegoServerKey]
-
-    ssh_proxy:
-      host_key: |
-[diegoHostKey]
-
-  etcd:
-    client_cert: |
-[etcdClientCert]
-    client_key: |
-[etcdClientKey]
-    peer_ca_cert: |
-[etcdPeerCaCert]
-    peer_cert: |
-[etcdPeerCert]
-    peer_key: |
-[etcdPeerKey]
-    server_cert: |
-[etcdServerCert]
-    server_key: |
-[etcdServerKey]
 
 resource_pools:
 - name: access

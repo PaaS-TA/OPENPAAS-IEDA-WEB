@@ -15,7 +15,6 @@ import org.openpaas.ieda.web.config.setting.service.DirectorConfigService;
 import org.openpaas.ieda.web.deploy.cf.dao.CfDAO;
 import org.openpaas.ieda.web.deploy.cf.dao.CfVO;
 import org.openpaas.ieda.web.deploy.cf.dto.CfParamDTO;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyDAO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkDAO;
 import org.openpaas.ieda.web.deploy.common.dao.resource.ResourceDAO;
 import org.openpaas.ieda.web.management.code.dao.CommonCodeDAO;
@@ -35,7 +34,6 @@ public class CfDeleteDeployAsyncService {
 	@Autowired private DirectorConfigService directorConfigService;
 	@Autowired private CfDAO cfDao;
 	@Autowired private NetworkDAO networkDao;
-	@Autowired private KeyDAO keyDao;
 	@Autowired private ResourceDAO resourceDao;
 	@Autowired private CommonCodeDAO commonCodeDao;
 	
@@ -90,11 +88,10 @@ public class CfDeleteDeployAsyncService {
 				String taskId = DirectorRestHelper.getTaskId(location.getValue());
 				
 				DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, messageEndpoint, httpClient, taskId, "event", principal.getName());
-				deleteCfInfo(vo);
-				
 			} else {
-				deleteCfInfo(vo);
+				DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, messageEndpoint, "done", Arrays.asList("CF 삭제가 완료되었습니다."));
 			}
+			deleteCfInfo(vo);
 		} catch(RuntimeException e){
 			DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, messageEndpoint, "error", Arrays.asList("배포삭제 중 Exception이 발생하였습니다."));
 		} catch ( Exception e) {
@@ -115,7 +112,6 @@ public class CfDeleteDeployAsyncService {
 			CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
 			networkDao.deleteNetworkInfoRecord( vo.getId(), codeVo.getCodeName() );
 			resourceDao.deleteResourceInfo( vo.getId(), codeVo.getCodeName() );	
-			keyDao.deleteKeyInfo(vo.getId(), codeVo.getCodeName());
 		}
 	}
 	

@@ -20,45 +20,22 @@ jobs:
   networks:
   - name: op_public
     static_ips: [[proxyStaticIps]]
-  properties:
-    ha_proxy:
-      ssl_pem: |
-[sslPemPub]
-[sslPemRsa]
 
 properties:
   domain: [domain]
   description: [description]
   system_domain_organization: [domainOrganization]
-  app_ssh: 
+  app_ssh:
     host_key_fingerprint: [appSshFingerprint]
-    
-  consul:
-    agent_cert: |
-[agentCert]
-    agent_key: |
-[agentKey]
-    ca_cert: |
-[caCert]
-    encrypt_keys: [[encryptKeys]]
-    server_cert: |
-[serverCert]
-    server_key: |
-[serverKey]
 
   uaa:
     clients:
       login:
         secret: [loginSecret]
-    jwt:
-      signing_key: |
-[signingKey]
-      verification_key: |
-[verificationKey]
 
 resource_pools:
 - name: small
-  cloud_properties:  
+  cloud_properties:
     instance_type: m1.small
   env:
     bosh:
@@ -68,17 +45,17 @@ resource_pools:
     version: [stemcellVersion]
 
 - name: medium
-  cloud_properties:  
+  cloud_properties:
     instance_type: m1.small
 
 - name: large
-  cloud_properties:  
+  cloud_properties:
     instance_type: m1.small
-    
+
 - name: runner
-  cloud_properties:  
+  cloud_properties:
     instance_type: m1.small
-    
+
 - name: router
-  cloud_properties:  
+  cloud_properties:
     instance_type: m1.medium

@@ -47,7 +47,6 @@ public class TaskService {
 	public List<TaskListDTO> listTask() {
 		//기본설치자 조회
 		DirectorConfigVO defaultDirector = directorConfigService.getDefaultDirector();
-
 		TaskListDTO[] tasks = null;
 		
 		try {

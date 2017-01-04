@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.openpaas.ieda.api.deployment.DeploymentDTO;
 import org.openpaas.ieda.api.deployment.DeploymentInfoDTO;
@@ -239,9 +241,19 @@ public class VmsServiceTest {
 					vmInfoList.add(dto);
 				}
 			}	
-		}catch(Exception e){
-			throw new CommonException("notfound.vm.exception", "VM 정보를 가져올  수 없습니다. ", HttpStatus.NOT_FOUND);
-		}finally{
+		}catch(InterruptedException e){
+			throw new CommonException("InterruptedException.vm.exception", "VM 정보를 가져올  수 없습니다. ", HttpStatus.BAD_REQUEST);
+		}catch (UnsupportedEncodingException e) {
+			throw new CommonException("UnsupportedEncodingException.vm.exception", "VM 정보를 가져올  수 없습니다. ", HttpStatus.BAD_REQUEST);
+		}catch (NumberFormatException e) {
+			throw new CommonException("NumberFormatException.vm.exception", "VM 정보를 가져올  수 없습니다. ", HttpStatus.BAD_REQUEST);
+		}catch (JSONException e) {
+			throw new CommonException("JSONException.vm.exception", "VM 정보를 가져올  수 없습니다. ", HttpStatus.BAD_REQUEST);
+		}catch (IOException e) {
+			throw new CommonException("IOException.vm.exception", "VM 정보를 가져올  수 없습니다. ", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		finally{
 			if( getTaskStaus  != null){
 				getTaskStaus.releaseConnection();
 			}
@@ -338,7 +350,7 @@ public class VmsServiceTest {
 					status = 200;
 				}else{
 					status =404;
-					throw new CommonException("illigalArgument.logDownload.exception",
+					throw new CommonException("not found.logDownload.exception",
 							"리소스를 다운로드 할 수 없습니다. ", HttpStatus.NOT_FOUND);
 				}
 			}

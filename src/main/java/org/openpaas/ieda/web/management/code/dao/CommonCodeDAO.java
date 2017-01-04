@@ -102,4 +102,12 @@ public interface CommonCodeDAO {
 	 * @return            : List<String>
 	***************************************************/
 	List<String> selectReleaseTypeList(@Param("parentCodeName") String parentCodeName);
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : KR을 default로 국가 코드 조회
+	 * @title               : selectCountryCodeList
+	 * @return            : List<CommonCodeVO>
+	***************************************************/
+	List<CommonCodeVO> selectCountryCodeList(@Param("parentCode")String parentcode);
 }

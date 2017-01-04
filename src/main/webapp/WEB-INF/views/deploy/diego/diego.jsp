@@ -18,7 +18,6 @@
 <script type="text/javascript">
 //private var
 var iaas = "";//iaas
-var deigoDeploymentName = new Array();
 var bDefaultDirector = "";
 var menu = "";
 var cfId = "";
@@ -61,12 +60,7 @@ $(function() {
 	    	   		}
 				}
 			, {field: 'taskId', caption: 'TASK ID', size: '100px', hidden: true}
-			, {field:'deploymentName', caption:'배포명', size:'100px',
-				render : function(record){
-						deigoDeploymentName.push(record.deploymentName);
-					return record.deploymentName;
-				}
-			}
+			, {field:'deploymentName', caption:'배포명', size:'100px'}
 			, {field:'iaas', caption:'IaaS', size:'100px'
 				, render: function(record) {
 					return record.iaas.toLowerCase();
@@ -374,7 +368,7 @@ $(window).resize(function() {
 			<!-- //Btn -->
 		</div>
 	</div>
-	<div id="config_diegoGrid" style="width:100%; height:650px"></div>
+	<div id="config_diegoGrid" style="width:100%; height:610px"></div>
 </div>
 
 <!-- IaaS 설정 DIV -->

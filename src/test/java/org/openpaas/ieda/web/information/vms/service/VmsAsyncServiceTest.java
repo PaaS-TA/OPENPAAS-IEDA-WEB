@@ -2,6 +2,8 @@ package org.openpaas.ieda.web.information.vms.service;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.UnsupportedEncodingException;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -94,12 +96,17 @@ public class VmsAsyncServiceTest {
 					LOGGER.error(" Exception이 발생했습니다.");
 				}
 			}
-		}catch(Exception e){
+		}catch(InterruptedException e){
 			status = "error";
 			if(LOGGER.isErrorEnabled()){
 				LOGGER.error(" Exception이 발생했습니다.");
 			}
 			
+		}catch (UnsupportedEncodingException e) {
+			status = "error";
+			if(LOGGER.isErrorEnabled()){
+				LOGGER.error(" Exception이 발생했습니다.");
+			}
 		}finally{
 			if ( getMethod != null ){
 				getMethod.releaseConnection();

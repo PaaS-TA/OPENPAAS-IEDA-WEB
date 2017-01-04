@@ -8,12 +8,11 @@ import java.util.Map;
 import javax.transaction.Transactional;
 
 import org.openpaas.ieda.common.CommonException;
+import org.openpaas.ieda.web.common.dto.KeyInfoDTO;
 import org.openpaas.ieda.web.common.dto.SessionInfoDTO;
 import org.openpaas.ieda.web.deploy.cf.dao.CfDAO;
 import org.openpaas.ieda.web.deploy.cf.dao.CfVO;
 import org.openpaas.ieda.web.deploy.cf.dto.CfParamDTO;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyDAO;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyVO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkDAO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkVO;
 import org.openpaas.ieda.web.deploy.common.dao.resource.ResourceDAO;
@@ -32,7 +31,6 @@ public class CfSaveService {
 	
 	@Autowired private CfDAO cfDao;
 	@Autowired private NetworkDAO networkDao;
-	@Autowired private KeyDAO keyDao;
 	@Autowired private ResourceDAO resourceDao;
 	@Autowired private CommonCodeDAO commonCodeDao;
 	
@@ -75,6 +73,8 @@ public class CfSaveService {
 		vo.setDomain(dto.getDomain());
 		vo.setDescription(dto.getDescription());
 		vo.setDomainOrganization(dto.getDomainOrganization());
+		vo.setProxyStaticIps(dto.getProxyStaticIps());
+		vo.setLoginSecret(dto.getLoginSecret());
 		vo.setUpdateUserId(sessionInfo.getUserId());
 		
 		if( StringUtils.isEmpty(dto.getId()) ||  "Y".equals(test) )
@@ -85,6 +85,30 @@ public class CfSaveService {
 		return vo;
 	}
 	
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : Key 생성 정보 저장
+	 * @title               : saveKeyInfo
+	 * @return            : void
+	***************************************************/
+	public void saveKeyInfo(KeyInfoDTO dto){
+		SessionInfoDTO sessionInfo = new SessionInfoDTO();
+		CfVO vo = cfDao.selectCfInfoById(Integer.parseInt(dto.getId()));
+		
+		if( vo != null ){
+			vo.setCountryCode(dto.getCountryCode());
+			vo.setStateName(dto.getStateName());
+			vo.setLocalityName(dto.getLocalityName());
+			vo.setOrganizationName(dto.getOrganizationName());
+			vo.setUnitName(dto.getUnitName());
+			vo.setEmail(dto.getEmail());
+			vo.setUpdateUserId(sessionInfo.getUserId());
+			cfDao.updateCfInfo(vo);
+		}else{
+			throw new CommonException("cfsave.notfound.exception", "CF 정보가 조회되지 않습니다.", HttpStatus.NOT_FOUND);
+		}
+	}
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
@@ -127,171 +151,6 @@ public class CfSaveService {
 		}
 	}
 	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Uaa 정보 저장
-	 * @title               : saveUaaCfInfo
-	 * @return            : CfVO
-	***************************************************/
-	@Transactional
-	public CfVO saveUaaCfInfo(CfParamDTO.Uaa dto) {
-		int keyType=1310; //uaa key type 
-		CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
-		CfVO vo = cfDao.selectCfKeyInfoById(Integer.parseInt(dto.getId()), CODE_NAME, keyType);
-		SessionInfoDTO sessionInfo = new SessionInfoDTO();
-		KeyVO keyVo = new KeyVO();
-		
-		// 1.1 UAA 정보
-		vo.setLoginSecret(dto.getLoginSecret());
-		if(vo.getKeys().size()>0){
-			keyVo = vo.getKeys().get(0);
-		}else{
-			keyVo.setId(Integer.parseInt(dto.getId()));
-			keyVo.setCreateUserId(sessionInfo.getUserId());
-		}
-		keyVo.setDeployType(codeVo.getCodeName());
-		keyVo.setKeyType(keyType);
-		keyVo.setPrivateKey(dto.getSigningKey());
-		keyVo.setPublicKey(dto.getVerificationKey());
-		keyVo.setUpdateUserId(sessionInfo.getUserId());
-		
-		// 1.2프록시 정보
-		vo.setProxyStaticIps(dto.getProxyStaticIps());
-		vo.setSslPemPub(dto.getSslPemPub());
-		vo.setSslPemRsa(dto.getSslPemRsa());
-		
-		//1.3 Security 세션 정보
-		vo.setUpdateUserId(sessionInfo.getUserId());
-		
-		//cf 정보 저장
-		cfDao.updateCfInfo(vo);
-		//key 정보 저장
-		if(vo.getKeys().size() > 0){
-			keyDao.updateKeyInfo(keyVo);
-		}else{
-			keyDao.insertKeyInfo(keyVo);
-		}
-		return vo;
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Consul 정보 저장 
-	 * @title               : saveConsulCfInfo
-	 * @return            : CfVO
-	***************************************************/
-	@Transactional
-	public CfVO saveConsulCfInfo(CfParamDTO.Consul dto) {
-		
-		int keyType = 1320;
-		CfVO vo = cfDao.selectCfKeyInfoById(Integer.parseInt(dto.getId()), CODE_NAME, keyType);
-		CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
-		SessionInfoDTO sessionInfo = new SessionInfoDTO();
-		KeyVO keyVo = new KeyVO();
-		
-		if(vo.getKeys().size()>0){
-			keyVo = vo.getKeys().get(0);
-		}else{
-			keyVo.setId(Integer.parseInt(dto.getId()));
-			keyVo.setCreateUserId(sessionInfo.getUserId());
-		}
-		keyVo.setDeployType(codeVo.getCodeName());
-		keyVo.setKeyType(keyType);
-		keyVo.setAgentCert(dto.getAgentCert());
-		keyVo.setAgentKey(dto.getAgentKey());
-		keyVo.setCaCert(dto.getCaCert());
-		keyVo.setServerCert(dto.getServerCert());
-		keyVo.setServerKey(dto.getServerKey());
-		keyVo.setUpdateUserId(sessionInfo.getUserId());
-		
-		vo.setEncryptKeys(dto.getEncryptKeys());
-		vo.setUpdateUserId(sessionInfo.getUserId());
-		
-		cfDao.updateCfInfo(vo);
-		//key 정보 저장
-		if(vo.getKeys().size() > 0){
-			keyDao.updateKeyInfo(keyVo);
-		}else{
-			keyDao.insertKeyInfo(keyVo);
-		}
-		return vo;
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : BlobStore 정보 저장
-	 * @title               : saveBlobstoreInfo
-	 * @return            : CfVO
-	***************************************************/
-	@Transactional
-	public CfVO saveBlobstoreInfo(CfParamDTO.Blobstore dto){
-		
-		int keyType = 1330;
-		CfVO vo = cfDao.selectCfKeyInfoById(Integer.parseInt(dto.getId()), CODE_NAME, keyType);
-		CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
-		SessionInfoDTO sessionInfo = new SessionInfoDTO();
-		KeyVO keyVo = new KeyVO();
-		
-		if(vo.getKeys().size()>0){
-			keyVo = vo.getKeys().get(0);
-		}else{
-			keyVo.setId(Integer.parseInt(dto.getId()));
-			keyVo.setCreateUserId(sessionInfo.getUserId());
-		}
-		keyVo.setDeployType(codeVo.getCodeName());
-		keyVo.setKeyType(keyType);
-		keyVo.setCaCert(dto.getBlobstoreCaCert());
-		keyVo.setPrivateKey(dto.getBlobstorePrivateKey());
-		keyVo.setTlsCert(dto.getBlobstoreTlsCert());
-		keyVo.setUpdateUserId(sessionInfo.getUserId());
-		vo.setUpdateUserId(sessionInfo.getUserId());
-		cfDao.updateCfInfo(vo);//key 정보 저장
-		if(vo.getKeys().size() > 0){
-			keyDao.updateKeyInfo(keyVo);
-		}else{
-			keyDao.insertKeyInfo(keyVo);
-		}
-		return vo;
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : HM9000 정보 저장
-	 * @title               : saveHm9000Info
-	 * @return            : void
-	***************************************************/
-	@Transactional
-	public void saveHm9000Info(CfParamDTO.Hm9000 dto){
-		
-		int keyType= 1340;
-		CfVO vo = cfDao.selectCfKeyInfoById(Integer.parseInt(dto.getId()), CODE_NAME, keyType);
-		CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
-		SessionInfoDTO sessionInfo = new SessionInfoDTO();
-		KeyVO keyVo = new KeyVO();
-		
-		if(vo.getKeys().size()>0){
-			keyVo = vo.getKeys().get(0);
-		}else{
-			keyVo.setId(Integer.parseInt(dto.getId()));
-			keyVo.setDeployType(codeVo.getCodeName());
-			keyVo.setCreateUserId(sessionInfo.getUserId());
-		}
-		keyVo.setKeyType(keyType);
-		keyVo.setServerCert(dto.getHm9000ServerCert());
-		keyVo.setServerKey(dto.getHm9000ServerKey());
-		keyVo.setClientCert(dto.getHm9000ClientCert());
-		keyVo.setClientKey(dto.getHm9000ClientKey());
-		keyVo.setCaCert(dto.getHm9000CaCert());
-		keyVo.setUpdateUserId(sessionInfo.getUserId());
-		vo.setUpdateUserId(sessionInfo.getUserId());
-		
-		cfDao.updateCfInfo(vo);
-		if(vo.getKeys().size() > 0){
-			keyDao.updateKeyInfo(keyVo);
-		}else{
-			keyDao.insertKeyInfo(keyVo);
-		}
-	}
 
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화

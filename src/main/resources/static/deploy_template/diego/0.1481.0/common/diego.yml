@@ -525,7 +525,7 @@ properties:
     # -- Job-specific properties --
     auctioneer:
       bbs:
-        api_location: (( property_overrides.bbs.api_location || nil ))
+        api_location: (( property_overrides.bbs.api_location || "bbs.service.cf.internal:8889" ))
         ca_cert: (( property_overrides.bbs.ca_cert ))
         client_cert: (( property_overrides.bbs.client_cert ))
         client_key: (( property_overrides.bbs.client_key ))
@@ -545,7 +545,7 @@ properties:
       server_key: (( property_overrides.bbs.server_key ))
       dropsonde_port: (( config_from_cf.metron_agent.dropsonde_incoming_port ))
       auctioneer:
-        api_url: (( property_overrides.bbs.auctioneer.api_url || nil ))
+        api_url: (( property_overrides.bbs.auctioneer.api_url || "http://auctioneer.service.cf.internal:9016" ))
       etcd: (( bbs_overrides.bbs_properties.etcd ))
       sql:
         db_connection_string: (( sql_overrides.bbs.db_connection_string || nil ))
@@ -588,7 +588,7 @@ properties:
       preloaded_rootfses: (( property_overrides.diego.rep.preloaded_rootfses || ["cflinuxfs2:/var/vcap/packages/cflinuxfs2/rootfs"] ))
       dropsonde_port: (( config_from_cf.metron_agent.dropsonde_incoming_port ))
       bbs:
-        api_location: (( property_overrides.bbs.api_location || nil ))
+        api_location: (( property_overrides.bbs.api_location || "bbs.service.cf.internal:8889" ))
         ca_cert: (( property_overrides.bbs.ca_cert ))
         client_cert: (( property_overrides.bbs.client_cert ))
         client_key: (( property_overrides.bbs.client_key ))
@@ -601,7 +601,7 @@ properties:
     route_emitter:
       dropsonde_port: (( config_from_cf.metron_agent.dropsonde_incoming_port ))
       bbs:
-        api_location: (( property_overrides.bbs.api_location || nil ))
+        api_location: (( property_overrides.bbs.api_location || "bbs.service.cf.internal:8889" ))
         ca_cert: (( property_overrides.bbs.ca_cert ))
         client_cert: (( property_overrides.bbs.client_cert ))
         client_key: (( property_overrides.bbs.client_key ))
@@ -617,7 +617,7 @@ properties:
     ssh_proxy:
       dropsonde_port: (( config_from_cf.metron_agent.dropsonde_incoming_port ))
       bbs:
-        api_location: (( property_overrides.bbs.api_location || nil ))
+        api_location: (( property_overrides.bbs.api_location || "bbs.service.cf.internal:8889" ))
         ca_cert: (( property_overrides.bbs.ca_cert ))
         client_cert: (( property_overrides.bbs.client_cert ))
         client_key: (( property_overrides.bbs.client_key ))
@@ -640,7 +640,7 @@ properties:
       diego_privileged_containers: (( property_overrides.nsync.diego_privileged_containers || nil ))
       dropsonde_port: (( config_from_cf.metron_agent.dropsonde_incoming_port ))
       bbs:
-        api_location: (( property_overrides.bbs.api_location || nil ))
+        api_location: (( property_overrides.bbs.api_location || "bbs.service.cf.internal:8889" ))
         ca_cert: (( property_overrides.bbs.ca_cert ))
         client_cert: (( property_overrides.bbs.client_cert ))
         client_key: (( property_overrides.bbs.client_key ))
@@ -659,7 +659,7 @@ properties:
         basic_auth_username: (( config_from_cf.cc.internal_api_user ))
         basic_auth_password: (( config_from_cf.cc.internal_api_password ))
       bbs:
-        api_location: (( property_overrides.bbs.api_location || nil ))
+        api_location: (( property_overrides.bbs.api_location || "bbs.service.cf.internal:8889" ))
         ca_cert: (( property_overrides.bbs.ca_cert ))
         client_cert: (( property_overrides.bbs.client_cert ))
         client_key: (( property_overrides.bbs.client_key ))
@@ -674,7 +674,7 @@ properties:
         basic_auth_username: (( config_from_cf.cc.internal_api_user ))
         basic_auth_password: (( config_from_cf.cc.internal_api_password ))
       bbs:
-        api_location: (( property_overrides.bbs.api_location || nil ))
+        api_location: (( property_overrides.bbs.api_location || "bbs.service.cf.internal:8889" ))
         ca_cert: (( property_overrides.bbs.ca_cert ))
         client_cert: (( property_overrides.bbs.client_cert ))
         client_key: (( property_overrides.bbs.client_key ))
@@ -708,7 +708,7 @@ instance_count_overrides: (( merge || nil ))
 property_overrides: (( merge ))
 sql_overrides: (( merge  || nil ))
 bridge_overrides:
-  job_release: cf
+  job_release: (( config_from_cf.cf_release.name || "cf" ))
   releases: (( merge || [] ))
 
 bbs_overrides:
@@ -765,7 +765,7 @@ base_etcd_properties:
     election_timeout_in_milliseconds: (( property_overrides.etcd.election_timeout_in_milliseconds || nil ))
 
 garden_overrides:
-  job_release: garden-linux
+  job_release: (( release_versions.garden-linux.name || "garden-linux" ))
   release:
     name: (( release_versions.garden-linux.name || "garden-linux" ))
     version: (( release_versions.garden-linux.version || "latest" ))
@@ -787,23 +787,23 @@ release_versions: (( merge || nil ))
 base_job_templates:
   access:
     - name: consul_agent
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
     - name: ssh_proxy
-      release: diego
+      release: (( release_versions.diego.name || "diego" ))
     - name: metron_agent
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
     - name: file_server
-      release: diego
+      release: (( release_versions.diego.name || "diego" ))
   brain:
     - name: consul_agent
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
     - name: auctioneer
-      release: diego
+      release: (( release_versions.diego.name || "diego" ))
     - name: metron_agent
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
   cc_bridge:
     - name: consul_agent
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
     - name: stager
       release: (( bridge_overrides.job_release || "cf" ))
     - name: nsync
@@ -813,56 +813,56 @@ base_job_templates:
     - name: cc_uploader
       release: (( bridge_overrides.job_release || "cf" ))
     - name: metron_agent
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
   cell:
     - name: consul_agent
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
     - name: rep
-      release: diego
+      release: (( release_versions.diego.name || "diego" ))
     - name: garden
       release: (( garden_overrides.job_release || "garden-linux" ))
     - name: cflinuxfs2-rootfs-setup
-      release: cflinuxfs2-rootfs
+      release: (( release_versions.cflinuxfs2-rootfs.name || "cflinuxfs2-rootfs" ))
     - name: metron_agent
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
   database:
     - name: consul_agent
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
     - name: etcd
-      release: etcd
+      release: (( release_versions.etcd.name || "etcd" ))
     - name: bbs
-      release: diego
+      release: (( release_versions.diego.name || "diego" ))
     - name: metron_agent
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
   route_emitter:
     - name: consul_agent
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
     - name: route_emitter
-      release: diego
+      release: (( release_versions.diego.name || "diego" ))
     - name: metron_agent
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
   colocated:
     - name: rep
-      release: diego
+      release: (( release_versions.diego.name || "diego" ))
     - name: auctioneer
-      release: diego
+      release: (( release_versions.diego.name || "diego" ))
     - name: cc_uploader
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
     - name: file_server
-      release: diego
+      release: (( release_versions.diego.name || "diego" ))
     - name: garden
       release: (( garden_overrides.job_release || "garden-linux" ))
     - name: nsync
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
     - name: cflinuxfs2-rootfs-setup
-      release: cflinuxfs2-rootfs
+      release: (( release_versions.cflinuxfs2-rootfs.name || "cflinuxfs2-rootfs" ))
     - name: route_emitter
-      release: diego
+      release: (( release_versions.diego.name || "diego" ))
     - name: ssh_proxy
-      release: diego
+      release: (( release_versions.diego.name || "diego" ))
     - name: stager
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
     - name: tps
-      release: cf
+      release: (( config_from_cf.cf_release.name || "cf" ))
 
 resource_pool_overrides: (( merge || nil ))

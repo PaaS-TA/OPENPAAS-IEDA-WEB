@@ -69,16 +69,14 @@ public class ServicePackDeleteDeployAsyncService {
 				
 				DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, MESSAGE_ENDPOINT, httpClient, taskId, "event", principal.getName());
 				
-				if ( vo != null ) {
-					dao.deleteServicePackInfoRecord(vo.getId());
-					manifestVo.setDeployStatus(null);
-					manifestDao.updateManifestInfo(manifestVo);
-				}
-				
-			} else {
-				DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("배포삭제 중 오류가 발생하였습니다.[" + statusCode + "]"));
+			}else{
+				DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("배포삭제 중 Exception이 발생하였습니다."));
 			}
-
+			if ( vo != null ) {
+				dao.deleteServicePackInfoRecord(vo.getId());
+				manifestVo.setDeployStatus(null);
+				manifestDao.updateManifestInfo(manifestVo);
+			}
 		} catch(RuntimeException e){
 			DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("배포삭제 중 Exception이 발생하였습니다."));
 		} catch ( Exception e) {
@@ -86,6 +84,7 @@ public class ServicePackDeleteDeployAsyncService {
 		}
 	}
 	
+
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
 	 * @description   : 비동기로  deleteDeploy 메소드 호출

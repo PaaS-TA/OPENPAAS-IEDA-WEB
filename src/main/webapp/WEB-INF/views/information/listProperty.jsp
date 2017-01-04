@@ -28,6 +28,7 @@
 	 	$('#us_PropertyGrid').w2grid({
 			name: 'us_PropertyGrid',
 			method: 'GET',
+			msgAJAXerror : '프로퍼티 조회 실패',
 			header: '<b>Property 목록</b>',
 			multiSelect: false,
 			show: {	
@@ -168,6 +169,7 @@
 				},
 				onClose :function(event) {
 					event.onComplete = function() {
+						buttonStyle();
 						doSearch($("#deployments").val());
 					}
 				}
@@ -327,13 +329,15 @@
 				async : true,		
 				data : JSON.stringify(propertyParam),
 				success : function(status) {
-					doSearch($("#deployments").val());			
+					buttonStyle();
+					doSearch($("#deployments").val());
 				},
 				error : function(request, status, error) {
 					w2popup.unlock();
 					w2popup.close();
 					var errorResult = JSON.parse(request.responseText);
 					w2alert(errorResult.message);
+					buttonStyle();
 					doSearch($("#deployments").val());	
 				}
 			});
@@ -442,7 +446,7 @@
 			</sec:authorize>
 			<!-- //Btn -->
 		</div>
-		<div id="us_PropertyGrid" style="width:100%; height:573px"></div>	
+		<div id="us_PropertyGrid" style="width:100%; height:533px"></div>	
 	</div>
 </div>
 

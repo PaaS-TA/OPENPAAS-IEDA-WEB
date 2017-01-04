@@ -1,0 +1,52 @@
+#!/bin/bash
+
+set -e -x
+
+#############################################################################
+#  SYNOPSIS:
+#    Generate cert files for a cf deploy
+#
+#  USAGE:
+#    keygen-diego-certs
+#
+#  MANDATORY ARGUMENTS:
+#   N/A
+#
+#  EXAMPLE:
+#    keygen-diego-certs 
+#############################################################################
+export GOPATH=$BASEDIR/certstrap
+export PATH=$PATH:$GOPATH/bin
+
+#############################################
+#  GENERATE DIEGO CA CERTS
+#############################################
+. $BASEDIR/scripts/diego/generate-diego-ca-certs
+wait
+
+#############################################
+#  GENERATE ETCD CERTS
+#############################################
+. $BASEDIR/scripts/diego/generate-etcd-certs etcd-peer-ca $dir_diego_certs diego-ca $dir_diego_certs &
+
+#############################################
+#  GENERATE BBS CERTS
+#############################################
+. $BASEDIR/scripts/diego/generate-bbs-certs diego-ca $dir_diego_certs &
+
+#############################################
+#  GENERATE REP CERTS
+#############################################
+. $BASEDIR/scripts/diego/generate-rep-certs diego-ca $dir_diego_certs &
+
+#############################################
+#  GENERATE SSH PROXY CERTS
+#############################################
+SSH_PROXY_KEY=ssh_proxy
+ssh-keygen -f $dir_diego_certs/$SSH_PROXY_KEY -q -N ""
+ssh-keygen -lf $dir_diego_certs/${SSH_PROXY_KEY}.pub | cut -d ' ' -f2 > $dir_diego_certs/${SSH_PROXY_KEY}.fin
+fingerprint=$(cat $dir_diego_certs/${SSH_PROXY_KEY}.fin)
+
+if [ "${fingerprint:0:3}" == "SHA" ]; then
+  ssh-keygen -E md5 -lf $dir_diego_certs/${SSH_PROXY_KEY}.pub | sed 's/MD5://' | cut -d ' ' -f2 > $dir_diego_certs/${SSH_PROXY_KEY}.fin
+fi

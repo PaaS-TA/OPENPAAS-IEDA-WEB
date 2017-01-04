@@ -23,6 +23,8 @@ import org.openpaas.ieda.web.deploy.servicepack.dao.ServicePackVO;
 import org.openpaas.ieda.web.deploy.servicepack.dto.ServicePackParamDTO;
 import org.openpaas.ieda.web.information.manifest.dao.ManifestDAO;
 import org.openpaas.ieda.web.information.manifest.dao.ManifestVO;
+import org.openpaas.ieda.web.management.code.dao.CommonCodeDAO;
+import org.openpaas.ieda.web.management.code.dao.CommonCodeVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +40,10 @@ public class ServicePackDeployAsyncService {
 	@Autowired private SimpMessagingTemplate messagingTemplate;
 	@Autowired private DirectorConfigService directorConfigService;
 	@Autowired ManifestDAO manifestDao;
+	@Autowired private CommonCodeDAO commonCodeDao;
 	
+	final private static String PARENT_CODE="1000"; //배포 코드
+	final private static String SUB_GROUP_CODE="1200"; //배포 유형 코드
 	final private static String MESSAGE_ENDPOINT = "/deploy/servicePack/install/logs"; 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ServicePackDeployAsyncService.class);
 	
@@ -52,6 +57,7 @@ public class ServicePackDeployAsyncService {
 		ServicePackVO vo = null;
 		ManifestVO manifestVo = null;
 		String deploymentFileName = null;
+		CommonCodeVO commonCode = null;
 		SessionInfoDTO sessionInfo = new SessionInfoDTO(principal);
 		vo = dao.selectServicePackDetailInfo(dto.getId());
 
@@ -68,11 +74,16 @@ public class ServicePackDeployAsyncService {
 			throw new CommonException("notfound.diegodelete.exception",
 					"배포파일 정보가 존재하지 않습니다..", HttpStatus.NOT_FOUND);
 		}
+		
 		if ( vo != null ) {
-			vo.setDeployStatus("processing");
-			vo.setUpdateUserId(sessionInfo.getUserId());
-			dao.updateServicePackInfo(vo);
+			commonCode = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, "DEPLOY_STATUS_PROCESSING");
+			if( commonCode != null ){
+				vo.setDeployStatus(commonCode.getCodeName());
+				vo.setUpdateUserId(sessionInfo.getUserId());
+				dao.updateServicePackInfo(vo);
+			}
 		}
+		
 		String status = "";
 		StringBuffer content = new StringBuffer(); 
 		String temp = "";
@@ -131,12 +142,27 @@ public class ServicePackDeployAsyncService {
 					LOGGER.error( e.getMessage() );
 				}
 			}
+			
+			String deployStatus = "";
+			if( status.toLowerCase().equals("done") ){
+				deployStatus = "DEPLOY_STATUS_DONE";
+			} else if( status.toLowerCase().equals("error") ){
+				deployStatus = "DEPLOY_STATUS_FAILED";
+			} else if( status.toLowerCase().equals("cancelled") ){
+				deployStatus = "DEPLOY_STATUS_CANCELLED";
+			}else if( status.toLowerCase().equals("cancelled") ){
+				deployStatus = "DEPLOY_STATUS_FAILED";
+			}
+			
 			if ( vo != null ) {
-				vo.setDeployStatus(status);
-				vo.setUpdateUserId(sessionInfo.getUserId());
-				dao.updateServicePackInfo(vo);
-				manifestVo.setDeployStatus(status);
-				manifestDao.updateManifestInfo(manifestVo);
+				commonCode = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, deployStatus);
+				if( commonCode != null ){
+					vo.setDeployStatus(commonCode.getCodeName());
+					vo.setUpdateUserId(sessionInfo.getUserId());
+					dao.updateServicePackInfo(vo);
+					manifestVo.setDeployStatus(commonCode.getCodeName());
+					manifestDao.updateManifestInfo(manifestVo);
+				}
 			}
 		}
 	}

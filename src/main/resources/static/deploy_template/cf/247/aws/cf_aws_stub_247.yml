@@ -1,0 +1,259 @@
+---
+director_uuid: (( meta.director-uuid ))
+
+meta: ~
+cf-certs: ~
+
+resource_pool_overrides:
+  small_instance_type: (( meta.small-instance-type || "t2.small" ))
+  medium_instance_type: (( meta.medium-instance-type || "t2.medium" ))
+  large_instance_type: (( meta.large-instance-type || "m4.large" ))
+  runner_instance_type: (( meta.runner-instance-type || "m4.large" ))
+
+base_security_group:
+  rules:
+  - destination: 10.244.0.0-10.254.0.0
+    protocol: all
+
+networks:
+- name: bosh
+  subnets:
+    - range: (( meta.network-external-range ))
+      static: (( meta.network-external-static ))
+      gateway: (( meta.network-external-gateway ))
+      dns: (( meta.network-external-dns ))
+      cloud_properties:
+        security_groups: (( meta.network-external-security-groups ))
+        subnet: (( meta.network-external-subnet-id ))
+- name: cf1
+  subnets:
+    - range: (( meta.network-0-range ))
+      reserved: (( meta.network-0-reserved ))
+      static: (( meta.network-0-static ))
+      gateway: (( meta.network-0-gateway ))
+      dns: (( meta.network-0-dns ))
+      cloud_properties:
+        security_groups: (( meta.network-0-security-groups ))
+        subnet: (( properties.template_only.aws.subnet_ids.cf1 ))
+- name: cf2
+  subnets: (( merge || networks.cf1.subnets ))
+  
+- name: elastic
+  type: vip
+  cloud_properties: {}
+
+properties:
+  template_only:
+    aws:
+      access_key_id: (( meta.access-key-id || nil ))
+      secret_access_key: (( meta.secret-access-key || nil  ))
+      availability_zone: (( meta.network-0-availability-zone || nil  ))
+      availability_zone2: (( meta.network-1-availability-zone || nil  ))
+      subnet_ids:
+        cf1: (( meta.network-0-subnet-id ))
+        cf2: (( meta.network-1-subnet-id ))
+
+  domain: (( meta.system-domain ))
+  system_domain: (( meta.system-domain ))
+  system_domain_organization: (( meta.system-domain-organization ))
+  app_domains:
+  - (( meta.system-domain ))
+
+  ssl:
+    skip_cert_verify: (( meta.ssl-skip-cert-verify || true ))
+
+  cc:
+    staging_upload_user: (( meta.staging-upload-user || "upload-user" ))
+    staging_upload_password: (( meta.staging-upload-password || "upload-password" ))
+    bulk_api_password: (( meta.bulk-api-password || "bulk-password" ))
+    db_encryption_key: (( meta.bulk-api-password || "db-encryption-key" ))
+    uaa_skip_ssl_validation: true
+
+  blobstore:
+    admin_users:
+      - username: (( meta.blobstore-username || "blobstore-username" ))
+        password: (( meta.blobstore-password || "blobstore-password" ))
+    secure_link:
+      secret: (( meta.blobstore-secret || "blobstore-secret" ))
+    tls:
+      cert: (( cf-certs.blobstore-server-cert ))
+      private_key: (( cf-certs.blobstore-server-key ))
+      ca_cert: (( cf-certs.blobstore-ca-cert ))
+  ccdb:
+    db_scheme: (( meta.ccdb-scheme || "postgres" ))
+    roles:
+      - tag: admin
+        name: (( meta.ccadmin || "ccadmin" ))
+        password: (( meta.ccadmin-password || "admin" ))
+    databases:
+      - tag: cc
+        name: ccdb
+    address: (( meta.ccdb-address || jobs.postgres_z1.networks.cf1.static_ips.[0] ))
+    port: (( meta.ccdb-port || 5524 ))  
+  databases:
+    db_scheme: postgres
+    address: (( merge || jobs.postgres_z1.networks.cf1.static_ips.[0] ))
+    port: 5524
+    roles:
+      - tag: admin
+        name: (( meta.ccadmin || "ccadmin" ))
+        password: (( meta.ccadmin-password || "admin" ))
+      - tag: admin
+        name: (( meta.uaaadmin || "uaaadmin" ))
+        password: (( meta.uaaadmin-password || "admin" ))
+      - tag: admin
+        name: (( meta.diegoadmin || "diego" ))
+        password: (( meta.diego-password || "admin" ))
+    databases:
+      - tag: cc
+        name: ccdb
+        citext: true
+      - tag: uaa
+        name: uaadb
+        citext: true
+      - tag: diego
+        name: diego
+        citext: false
+    collect_statement_statistics: null
+    additional_config: (( merge || nil ))
+  consul:
+    encrypt_keys: (( cf-certs.consul-encrypt-keys ))
+    ca_cert: (( cf-certs.consul-ca-cert ))
+    server_cert: (( cf-certs.consul-server-cert ))
+    server_key: (( cf-certs.consul-server-key ))
+    agent_cert: (( cf-certs.consul-agent-cert ))
+    agent_key: (( cf-certs.consul-agent-key ))
+  dea_next:
+    disk_mb: (( meta.dea-next-disk-mb || 2048 ))
+    memory_mb: (( meta.dea-next-memory-mb || 1024 ))
+    ca_cert: (( cf-certs.dea-ca-cert ))
+    client_cert: (( cf-certs.dea-client-cert ))
+    client_key: (( cf-certs.dea-client-key ))
+    enable_ssl: (( meta.dea-enable-ssl || false ))
+    server_cert: (( cf-certs.dea-server-key ))
+    server_key: (( cf-certs.dea-server-key ))
+  etcd:    
+    require_ssl: (( meta.etcd-require-ssl || false ))
+    ca_cert: (( cf-certs.etcd-ca-cert ))
+    server_cert: (( cf-certs.etcd-server-cert ))
+    server_key: (( cf-certs.etcd-server-key ))
+    client_cert: (( cf-certs.etcd-client-cert ))
+    client_key: (( cf-certs.etcd-client-key ))
+    peer_require_ssl: (( meta.peer-require-ssl || false ))
+    peer_ca_cert: (( cf-certs.peer-ca-cert ))
+    peer_cert: (( cf-certs.peer-cert ))
+    peer_key: (( cf-certs.peer-key ))
+  loggregator:
+    tls:
+      ca_cert: (( cf-certs.loggregator-ca-cert ))
+      doppler:
+        cert: (( cf-certs.doppler-cert ))
+        key: (( cf-certs.doppler-key ))
+      trafficcontroller:
+        cert: (( cf-certs.trafficcontroller-cert ))
+        key: (( cf-certs.trafficcontroller-key ))
+  loggregator_endpoint:
+    shared_secret: (( meta.loggregator-secret || "loggregator-secret" ))
+  login:
+    protocol: (( meta.login-protocol || "https" ))
+  nats:
+    user: (( meta.nats-user || "nats" ))
+    password: (( meta.nats-password || "nats" ))
+  router:
+    status:
+      user: (( meta.router-user || "router" ))
+      password: (( meta.router-password || "router" ))
+  uaa:
+    admin:
+      client_secret: (( meta.admin-secret || "admin-secret" ))
+    cc:
+      client_secret: (( meta.cc-secret || "cc-secret" ))
+    clients:
+      <<: (( merge || nil ))
+      cc_routing:
+        secret: (( meta.cc-routing-secret || "cc-routing-secret" ))
+      cloud_controller_username_lookup:
+        secret: (( meta.cloud-controller-username-lookup-secret || "cloud-controller-username-lookup-secret" ))
+      doppler:
+        secret: (( meta.doppler-secret || "doppler-secret" ))
+      gorouter:
+        secret: (( meta.gorouter-secret || "gorouter-secret" ))
+      tcp_emitter:
+        secret: (( meta.tcp-emitter-secret || "tcp-emitter-secret" ))
+      tcp_router:
+        secret: (( meta.tcp-router-secret || "tcp-router-secret" ))
+      login:
+        secret: (( meta.login-secret || "login-secret" ))
+      notifications:
+        secret: (( meta.notification-secret || "notification-secret" ))
+      cc-service-dashboards:
+        secret: (( meta.cc-service-dashboards || "cc-service-dashboards-secret" ))
+    jwt:
+      verification_key: (( cf-certs.jwt-verification-key ))
+      signing_key: (( cf-certs.jwt-signing-key ))
+    scim:
+      users:
+      - name: (( meta.admin-name || "admin" ))
+        password: (( meta.admin-password ))
+        email: (( meta.admin-email || nil ))
+        groups:
+        - scim.write
+        - scim.read
+        - openid
+        - cloud_controller.admin
+        - doppler.firehose
+        - clients.read
+        - clients.write
+        - routing.router_groups.read
+        - routing.router_groups.write
+
+    sslCertificate: (( cf-certs.uaa-ssl-cert ))
+    sslPrivateKey: (( cf-certs.uaa-ssl-key ))
+
+  uaadb:
+    db_scheme: (( meta.uaadb-scheme || "postgresql" ))
+    roles:
+      - tag: admin
+        name: (( meta.uaaadmin || "uaaadmin" ))
+        password: (( meta.uaaadmin-password || "admin" ))
+    databases:
+      - tag: uaa
+        name: uaadb
+    address: (( meta.ccdb-address || jobs.postgres_z1.networks.cf1.static_ips.[0] ))
+    port: (( meta.uaadb-port || 5524 ))  
+  hm9000:
+    server_key: (( cf-certs.hm9000-server-key || nil ))
+    server_cert: (( cf-certs.hm9000-server-cert || nil ))
+    client_key: (( cf-certs.hm9000-client-key || nil ))
+    client_cert: (( cf-certs.hm9000-client-cert || nil ))
+    ca_cert: (( cf-certs.hm9000-ca-cert || nil ))
+
+jobs:
+  - name: postgres_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(4) ))
+
+  - name: ha_proxy_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: elastic
+        static_ips: (( meta.elastic_static_ips ))
+      - name: bosh
+        default:
+        - dns
+        - gateway
+        static_ips: (( static_ips(0) ))
+
+    properties:
+      ha_proxy:
+        ssl_pem: (( cf-certs.ha-proxy-ssl ))
+
+security_group_overrides:
+  service_networks:
+    rules: (( merge || base_security_group.rules ))
+  load_balancer:
+    rules:
+    - destination: (( .jobs.ha_proxy_z1.networks.elastic.static_ips.[0] ))
+      protocol: all

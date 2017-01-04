@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openpaas.ieda.OpenpaasIedaWebApplication;
+import org.openpaas.ieda.TestBeansConfiguration;
 import org.openpaas.ieda.api.release.ReleaseInfoDTO;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.common.BaseTestController;
@@ -40,7 +41,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {OpenpaasIedaWebApplication.class})
+@SpringApplicationConfiguration(classes = {OpenpaasIedaWebApplication.class, TestBeansConfiguration.class})
 @WebAppConfiguration
 @Transactional
 @TransactionConfiguration(defaultRollback=true)

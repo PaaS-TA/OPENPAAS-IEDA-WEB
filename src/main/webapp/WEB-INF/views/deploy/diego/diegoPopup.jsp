@@ -13,7 +13,6 @@
 %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
 <script type="text/javascript">
 var diegoId = "";
 var networkId = "";
@@ -38,11 +37,64 @@ var installStatus = "";
 var installClient ="";
 var modifyNetWork = "";
 var cfInfoYn = false;
-//Main View Event
+var diegoKeyFile = "";
 
 $(function() {
-	
+	//릴리즈 정보 popup over
+ 	$('[data-toggle="popover"]').popover();
+ 	//Diego Release Info
+ 	getReleaseVersionList();
+ 	
+ 	$(".gardenRelease-info").attr('data-content', "https://github.com/cloudfoundry/diego-cf-compatibility");
+ 	$(".cflinux-info").attr('data-content', "https://github.com/cloudfoundry/diego-cf-compatibility");
+ 	$(".etcd-info").attr('data-content', "https://github.com/cloudfoundry/diego-cf-compatibility");
+ 	
+ 	//Diego 릴리즈 popover가 나타난 후
+ 	$('.diego-info').on('show.bs.popover', function () {
+ 		$(".gardenRelease-info").popover('hide')
+ 		$(".cflinux-info").popover('hide')
+ 	 	$(".etcd-info").popover('hide')
+ 	 })
+ 	 
+ 	 //다른 곳 클릭 시 popover hide 이벤트
+ 	$('.w2ui-popup').on('click', function (e) {
+ 	    $('[data-toggle="popover"]').each(function () {
+ 	        //the 'is' for buttons that trigger popups
+ 	        //the 'has' for icons within a button that triggers a popup
+ 	        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+ 	            $(this).popover('hide');
+ 	        }
+ 	    });
+ 	});
+ 	 
 });
+
+/********************************************************
+ * 설명 :  Diego 릴리즈 설치 지원 버전 목록 조회
+ * Function : getReleaseVersionList
+ *********************************************************/
+function getReleaseVersionList(){
+	 var contents = "";
+	$.ajax({
+		type :"GET",
+		url :"/common/deploy/list/releaseInfo/diego/"+iaas, 
+		contentType :"application/json",
+		success :function(data, status) {
+			if (data != null && data != "") {
+				contents = "<table id='popoverTable'><tr><th>IaaS 유형</th><th>릴리즈 버전</th></tr>";
+				data.map(function(obj) {
+					contents += "<tr><td>" + obj.iaasType+ "</td><td>" +  obj.minReleaseVersion +"</td></tr>";
+				});
+				contents += "</table>";
+				$('.diego-info').attr('data-content', contents);
+			}
+		},
+		error :function(request, status, error) {
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message, "DIEGO 릴리즈 정보 목록 조회");
+		}
+	});
+}
 
 /********************************************************
  * 설명 :  Diego 수정 - 데이터 조회
@@ -82,6 +134,7 @@ function setDiegoData(contents) {
 		if( menu == "cfDiego" ) internalCnt = contents.networks.length;
 	}
 	 //기본 정보 설정
+	 diegoKeyFile = contents.keyFile
 	 defaultInfo = {
 			 iaas										: contents.iaas,
 			 cfId										: cfId,
@@ -93,46 +146,9 @@ function setDiegoData(contents) {
 			gardenReleaseVersion 			: contents.gardenReleaseVersion,
 			etcdReleaseName 					: contents.etcdReleaseName,
 			etcdReleaseVersion 				: contents.etcdReleaseVersion,
-			cfDeploymentFile 					: contents.cfName,
+			cfDeploymentName 					: contents.cfName,
 			cflinuxfs2rootfsreleaseName 	: contents.cflinuxfs2rootfsreleaseName,
-			cflinuxfs2rootfsreleaseVersion	: contents.cflinuxfs2rootfsreleaseVersion
-		}
-	
-		//키 정보 설정
-		for(var i=0; i<contents.keys.length; i++){
-			if(contents.keys[i].keyType == 1410){
-				diegoInfo = {
-					id 					:contents.id,
-					iaas				:contents.iaas,
-					diegoCaCert			:contents.keys[i].caCert,
-					diegoClientCert		:contents.keys[i].clientCert,
-					diegoClientKey		:contents.keys[i].clientKey,
-					diegoEncryptionKeys	:contents.diegoEncryptionKeys,
-					diegoServerCert		:contents.keys[i].serverCert,
-					diegoServerKey		:contents.keys[i].serverKey,
-					diegoHostKey 		:contents.keys[i].hostKey
-				}
-			}
-		}
-	
-		for(var i=0; i<contents.keys.length; i++){
-			if(contents.keys[i].keyType == 1420){
-				etcdInfo = {
-					id 					:contents.id,
-					iaas				:contents.iaas,
-					etcdClientCert		:contents.keys[i].clientCert,
-					etcdClientKey		:contents.keys[i].clientKey,
-					etcdServerCert		:contents.keys[i].serverCert,
-					etcdServerKey		:contents.keys[i].serverKey
-				}
-			}
-			else if(contents.keys[i].keyType == 1430){
-				peerInfo = {
-					etcdPeerCaCert		:contents.keys[i].caCert,
-					etcdPeerCert		:contents.keys[i].serverCert,
-					etcdPeerKey			:contents.keys[i].serverKey,
-				}
-			}
+			cflinuxfs2rootfsreleaseVersion	: contents.cflinuxfs2rootfsreleaseVersion,
 		}
 	
 		//네트워크 정보 설정
@@ -154,7 +170,6 @@ function setDiegoData(contents) {
 				cloudSecurityGroups 	: contents.networks[i].cloudSecurityGroups
 			}
 		 	networkInfo.push(arr);
-		 	//internalCnt =
 		 	
 		}
 		internalCnt = networkInfo.length;
@@ -191,13 +206,16 @@ function setDiegoData(contents) {
  *********************************************************/
 function defaultPopup() {
 	$("#defaultInfoDiv").w2popup({
-		width : 950,
-		height :470,
+		width : 750,
+		height :500,
 		modal :true,
 		showMax :false,
 		onOpen :function(event) {
 			event.onComplete = function() {
-				if( menu == "cfDiego") $('.w2ui-msg-buttons #defaultPopupBtn').show();
+				if( menu == "cfDiego") {
+					$('.w2ui-msg-buttons #defaultPopupBtn').show();
+					$('.w2ui-msg-body #keyBtn').css("display","none");
+				}
 				if (defaultInfo != "") {
 					$(".w2ui-msg-body input[name='deploymentName']").val(defaultInfo.deploymentName);
 					$(".w2ui-msg-body input[name='directorUuid']").val(defaultInfo.directorUuid);
@@ -412,7 +430,9 @@ function setReleaseList(){
 	$(".w2ui-msg-body input[name='diegoReleases']").w2field('list', {items :diegoReleases,maxDropHeight :200,width :250});
 	$(".w2ui-msg-body input[name='gardenReleaseName']").w2field('list', {items :gardenReleaseName,maxDropHeight :200,width :250});
 	$(".w2ui-msg-body input[name='etcdReleases']").w2field('list', {items :etcdReleases,maxDropHeight :200,width :250});
-	if(  menu != "cfDiego") $(".w2ui-msg-body input[name='cfInfo']").w2field('list', {items :cfInfo,maxDropHeight :200,width :250});
+	if(  menu != "cfDiego"){
+		$(".w2ui-msg-body input[name='cfInfo']").w2field('list', {items :cfInfo,maxDropHeight :200,width :250});
+	}
 	$(".w2ui-msg-body input[name='cflinuxfs2rootfsrelease']").w2field('list', {items :cflinuxfs2rootfsrelease,maxDropHeight :200,width :250});
 	setReleaseData();
 }
@@ -423,11 +443,9 @@ function setReleaseList(){
  *********************************************************/
 function setcflinuxDisplay(val){
 	var diegoReleaseVersion = val.split("/")[1];
-	diegoReleaseVersion = diegoReleaseVersion.split(".")[1];
-	if(diegoReleaseVersion>1463){
+	if( compare( diegoReleaseVersion, "0.1463.0" ) > 0 ){
 		$('.w2ui-msg-body #cflinux').css('display','block');
-	}
-	else{
+	} else{
 		$('.w2ui-msg-body #cflinux').css('display','none');
 		$(".w2ui-msg-body input[name='cflinuxfs2rootfsrelease']").val("");
 	}
@@ -438,23 +456,94 @@ function setcflinuxDisplay(val){
  * Function	: setReleaseData
  *********************************************************/
 function setReleaseData(){
-	if( !checkEmpty(defaultInfo.diegoReleaseName) && !checkEmpty(defaultInfo.diegoReleaseVersion) ){
+	if( !checkEmpty(defaultInfo.diegoReleaseName) && !checkEmpty(defaultInfo.diegoReleaseVersion) ){//diego 릴리즈
 		$(".w2ui-msg-body input[name='diegoReleases']").data('selected',{text :defaultInfo.diegoReleaseName + "/"+ defaultInfo.diegoReleaseVersion});
 	}
-	if( !checkEmpty(defaultInfo.gardenReleaseName) &&  !checkEmpty(defaultInfo.gardenReleaseVersion) ){
+	if( !checkEmpty(defaultInfo.gardenReleaseName) &&  !checkEmpty(defaultInfo.gardenReleaseVersion) ){//Garden-Linux 릴리즈
 		$(".w2ui-msg-body input[name='gardenReleaseName']").data('selected',{text :defaultInfo.gardenReleaseName + "/"+ defaultInfo.gardenReleaseVersion});
 	}
-	if( !checkEmpty(defaultInfo.etcdReleaseName) &&  !checkEmpty(defaultInfo.etcdReleaseVersion) ){
+	if( !checkEmpty(defaultInfo.etcdReleaseName) &&  !checkEmpty(defaultInfo.etcdReleaseVersion) ){//ETCD 릴리즈
 		$(".w2ui-msg-body input[name='etcdReleases']").data('selected',{text :defaultInfo.etcdReleaseName + "/"+ defaultInfo.etcdReleaseVersion});
 	}
-	if( !checkEmpty(defaultInfo.cfDeploymentFile)){
-		$(".w2ui-msg-body input[name='cfInfo']").data('selected',{text :defaultInfo.cfDeploymentFile });
+	if( !checkEmpty(defaultInfo.cfDeploymentName)){//DIEGO와 연동할 CF 배포명
+		$(".w2ui-msg-body input[name='cfInfo']").data('selected',{text :defaultInfo.cfDeploymentName });
 	}
-	if( !checkEmpty(defaultInfo.cflinuxfs2rootfsreleaseVersion) &&  !checkEmpty(defaultInfo.cflinuxfs2rootfsreleaseName)){
+	if( !checkEmpty(defaultInfo.cflinuxfs2rootfsreleaseVersion) &&  !checkEmpty(defaultInfo.cflinuxfs2rootfsreleaseName)){ //cflinuxfs2rootfsrelease
 		$('.w2ui-msg-body #cflinux').css('display','block');
 		$(".w2ui-msg-body input[name='cflinuxfs2rootfsrelease']").data('selected',{text :defaultInfo.cflinuxfs2rootfsreleaseName + "/"+ defaultInfo.cflinuxfs2rootfsreleaseVersion});
 	}
 	w2popup.unlock();
+}
+
+
+/********************************************************
+ * 설명		: Key 생성 확인
+ * Function	: createKeyConfirm
+ *********************************************************/
+function createKeyConfirm(){
+	 
+	 var message = "";
+	 if( !checkEmpty(diegoKeyFile) ){//이미 key가 생성됐으면,
+		 message = "Key를 재 생성하시겠습니다.?";
+	 }else{
+		message ="Key를 생성하시겠습니까?"; 
+	 }
+	 
+	 w2confirm({
+		width 			: 350,
+		height 			: 180,
+		title 				: '<b>Key 생성 여부</b>',
+		msg 				: message,
+		modal			: true,
+		yes_text 		: "확인",
+		no_text 		: "취소",
+		yes_callBack 	: function(){
+			createKey();
+		},
+		no_callBack : function(event){
+		}
+	});
+}
+
+/********************************************************
+ * 설명		:  diego 키 생성
+ * Function	: createKey
+ *********************************************************/
+function createKey(){
+	w2popup.lock("Key 생성 중입니다.", true);
+	keyInfo = {
+			id                      		: diegoId,
+			iaas 							: iaas.toLowerCase(),
+			platform					: "diego", //cf -> 1, diego -> 2, cf&diego -> 3
+	}
+	$.ajax({
+		type : "POST",
+		url : "/common/deploy/key/createKey",
+		contentType : "application/json",
+		data : JSON.stringify(keyInfo),
+		async : true,
+		success : function(data, status) {
+			w2popup.unlock();
+			w2popup.message({
+			    width  : 500,
+			    height : 120,
+			    html   : '<div>' + 
+						    	'<div style="padding: 10px; font-size:11px; text-align:center">'+ 
+						    		"Key 생성에 성공하였습니다. <br/> 아래 SSH 핑거프린트를 복사하여 CF SSH 핑거프린트 항목에 입력 후 CF를 재 설치해주세요. <br/><br/>" +
+									"ssh-key-fingerprint: <b>" +data.fingerprint + '</b>'+ 
+								'</div>'+
+								'<div rel="buttons" style="text-align:center;"><button class="btn" onclick="w2popup.message()">닫기</button><div>'+
+							'</div>'
+			});
+			diegoKeyFile = data.keyFile;
+			
+		},
+		error :function(request, status, error) {
+			w2popup.unlock();
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message, "Diego Key 생성");
+		}
+	});
 }
 
 
@@ -467,18 +556,25 @@ function saveDefaultInfo(type) {
 		w2alert("Diego와 연동 할 CF를 설치해 주세요.", "DIEGO 설치");
 		return;
 	}
-  	for(var i=0;i<deigoDeploymentName.length;i++){
-		if($(".w2ui-msg-body input[name='deploymentName']").val()==deigoDeploymentName[i]
-		&& defaultInfo.deploymentName != $(".w2ui-msg-body input[name='deploymentName']").val() ){
-			w2alert("중복 된 DIEGO 배포 파일 명 입니다.CF파일 변경 요청", "DIEGO 설치");
-			return;
-		}
+	// 배포명 중복 검사
+	if( !checkDeploymentNameDuplicate("diego", $(".w2ui-msg-body input[name='deploymentName']").val() ) 
+			&& defaultInfo.deploymentName !=  $(".w2ui-msg-body input[name='deploymentName']").val() ){
+		w2alert(  "입력한 배포명 (" + $(".w2ui-msg-body input[name='deploymentName']").val()  + ") 은 이미 존재합니다.","Diego 설치");
+		return;
 	}
+	
+   //key 생성하지 하지 않았을 경우
+  	if( checkEmpty(diegoKeyFile) && menu =='diego' ){
+  		w2alert("Diego Key를 먼저 생성해주세요.", "DIEGO 설치");
+		return;
+  	}
+  	
 	var diegoRelease = $(".w2ui-msg-body input[name='diegoReleases']").val();
 	var gardenRelease = $(".w2ui-msg-body input[name='gardenReleaseName']").val();
 	var etcdRelease = $(".w2ui-msg-body input[name='etcdReleases']").val();
 	var cflinuxfs2rootfsrelease = $(".w2ui-msg-body input[name='cflinuxfs2rootfsrelease']").val();
 	var cfName = $(".w2ui-msg-body input[name='cfInfo']").val();
+	
 	defaultInfo = {
 				id 											: (diegoId) ? diegoId :"",
 				iaas 										: iaas.toUpperCase(),
@@ -495,7 +591,8 @@ function saveDefaultInfo(type) {
 				etcdReleaseName 					: etcdRelease.split("/")[0],
 				etcdReleaseVersion				: etcdRelease.split("/")[1],
 				cflinuxfs2rootfsreleaseName 	: cflinuxfs2rootfsrelease.split("/")[0],
-				cflinuxfs2rootfsreleaseVersion	: cflinuxfs2rootfsrelease.split("/")[1]
+				cflinuxfs2rootfsreleaseVersion	: cflinuxfs2rootfsrelease.split("/")[1],
+				keyFile										: diegoKeyFile
 	}
 	if( type == 'after'){
 		if (popupValidation()) {
@@ -516,8 +613,9 @@ function saveDefaultInfo(type) {
 						networkPopup();
 					}
 				},
-				error :function(e, status) {
-					w2alert(JSON.parse(e.responseText).message, "기본정보 저장");
+				error :function(request, status, error) {
+					var errorResult = JSON.parse(request.responseText);
+					w2alert(errorResult.message, "diego  기본정보 등록");
 					return;
 				}
 			});
@@ -529,121 +627,12 @@ function saveDefaultInfo(type) {
 }
 
 /********************************************************
- * 설명		:  Diego 정보 팝업
- * Function	: diegoPopup
- *********************************************************/
-function diegoPopup(){
-	$("#diegoInfoDiv").w2popup({
-		width  : 950,
-		height 	:780,
-		modal 	:true,
-		showMax :false,
-		onOpen :function(event) {
-			event.onComplete = function() {
-				if (diegoInfo != "") {
-					//2.1 Diego 정보	
-					$(".w2ui-msg-body textarea[name='diegoCaCert']").val(diegoInfo.diegoCaCert);
-					$(".w2ui-msg-body textarea[name='diegoClientCert']").val(diegoInfo.diegoClientCert);
-					$(".w2ui-msg-body textarea[name='diegoClientKey']").val(diegoInfo.diegoClientKey);
-					$(".w2ui-msg-body input[name='diegoEncryptionKeys']").val(diegoInfo.diegoEncryptionKeys);
-					$(".w2ui-msg-body textarea[name='diegoServerCert']").val(diegoInfo.diegoServerCert);
-					$(".w2ui-msg-body textarea[name='diegoServerKey']").val(diegoInfo.diegoServerKey);
-					$(".w2ui-msg-body textarea[name='diegoHostKey']").val(diegoInfo.diegoHostKey);
-				}
-			}	
-		},
-		onClose :function(event) {
-			event.onComplete = function() {
-				initSetting();
-			}
-		}
-	});
-}
-
-/********************************************************
- * 설명		:  Diego 정보 저장
- * Function	: saveDiegoInfo
- *********************************************************/
-function saveDiegoInfo(type){
-	diegoInfo = {
-			id 								: diegoId,
-			iaas							: iaas.toUpperCase(),
-			diegoCaCert				: $(".w2ui-msg-body textarea[name='diegoCaCert']").val(),
-			diegoClientCert			: $(".w2ui-msg-body textarea[name='diegoClientCert']").val(),
-			diegoClientKey			: $(".w2ui-msg-body textarea[name='diegoClientKey']").val(),
-			diegoEncryptionKeys 	: $(".w2ui-msg-body input[name='diegoEncryptionKeys']").val(),
-			diegoServerCert			: $(".w2ui-msg-body textarea[name='diegoServerCert']").val(),
-			diegoCaCert				: $(".w2ui-msg-body textarea[name='diegoCaCert']").val(),
-			diegoServerKey 			: $(".w2ui-msg-body textarea[name='diegoServerKey']").val(),
-			diegoHostKey				: $(".w2ui-msg-body textarea[name='diegoHostKey']").val()
-	}
-	
-	if( type == 'after'){
-		if (popupValidation()) {
-			//ajax AwsInfo Save
-			$.ajax({
-				type :"PUT",
-				url : "/deploy/"+menu+"/install/saveDiegoInfo",
-				contentType :"application/json",
-				data :JSON.stringify(diegoInfo),
-				success :function(data, status) {
-					w2popup.clear();
-					etcdPopup();
-				},
-				error :function(e, status) {
-					w2alert("Diego ("+iaas.toUpperCase()+") 등록에 실패 하였습니다.", "DIEGO 설치");
-				}
-			});
-		}
-	} else{
-		w2popup.clear();
-		if(iaas.toUpperCase() =="VSPHERE" ){
-			vSphereNetworkPopup();
-		}else{
-			networkPopup();
-		}
-	}
-}
-
-/********************************************************
- * 설명		:  ETCD 정보 팝업
- * Function	: etcdPopup
- *********************************************************/
-function etcdPopup(){
-	$("#etcdInfoDiv").w2popup({
-		width  : 950,
-		height 	:770,
-		modal 	:false,
-		showMax :false,
-		onOpen 	:function(event) {
-			event.onComplete = function() {
-				if (etcdInfo != "") {
-					$(".w2ui-msg-body textarea[name='etcdClientCert']").val(etcdInfo.etcdClientCert);
-					$(".w2ui-msg-body textarea[name='etcdClientKey']").val(etcdInfo.etcdClientKey);
-					$(".w2ui-msg-body textarea[name='etcdPeerCaCert']").val(peerInfo.etcdPeerCaCert);
-					$(".w2ui-msg-body textarea[name='etcdPeerCert']").val(peerInfo.etcdPeerCert);
-					$(".w2ui-msg-body textarea[name='etcdPeerKey']").val(peerInfo.etcdPeerKey);
-					$(".w2ui-msg-body textarea[name='etcdServerCert']").val(etcdInfo.etcdServerCert);
-					$(".w2ui-msg-body textarea[name='etcdServerKey']").val(etcdInfo.etcdServerKey);
-				}					
-			}
-		},
-		onClose :function(event) {
-			event.onComplete = function() {
-				initSetting();
-			}
-		}
-	});
-}
-
-
-/********************************************************
  * 설명		: 네트워크 정보 팝업(openstack/aws)
  * Function	: networkPopup
  *********************************************************/
 function networkPopup(){
 	$("#networkInfoDiv").w2popup({
-		width  : 950,
+		width  : 750,
 		height 	:700,
 		modal 	:true,
 		showMax :false,
@@ -683,7 +672,7 @@ function networkPopup(){
   *********************************************************/
  function vSphereNetworkPopup(){
  		$("#VsphereNetworkInfoDiv").w2popup({
- 			width : 950,
+ 			width : 750,
  			height : 500,
  			modal : true,
  			showMax : false,
@@ -804,9 +793,6 @@ function delNetwork(value){
 		$("#networkInfoDiv .addInternal").hide();
 		$("#networkInfoDiv .delInternal").hide();
 	}
-
-	
-	
 }
 
 /********************************************************
@@ -855,7 +841,11 @@ function saveNetworkInfo(type) {
 				data : JSON.stringify(networkInfo),
 				success :function(data, status) {
 					w2popup.clear();
-					diegoPopup();
+					if( iaas.toLowerCase() == 'vsphere'){
+						vSphereResourceInfoPopup();	
+					}else{
+						resourcePopup();
+					}
 				},
 				error :function(e, status) {
 					w2alert("Diego (OPENSTACK) Network 등록에 실패 하였습니다.", "Diego 설치");
@@ -868,50 +858,6 @@ function saveNetworkInfo(type) {
 	}
 }
 
-/********************************************************
- * 설명		:  ETCD 정보 저장
- * Function	: saveEtcdInfo
- *********************************************************/
-function saveEtcdInfo(type){
-	etcdInfo = {
-			id 					: diegoId,
-			iaas				: iaas.toUpperCase(),
-			etcdClientCert		: $(".w2ui-msg-body textarea[name='etcdClientCert']").val(),
-			etcdClientKey		: $(".w2ui-msg-body textarea[name='etcdClientKey']").val(),
-			etcdPeerCaCert		: $(".w2ui-msg-body textarea[name='etcdPeerCaCert']").val(),
-			etcdPeerCert		: $(".w2ui-msg-body textarea[name='etcdPeerCert']").val(),
-			etcdPeerKey			: $(".w2ui-msg-body textarea[name='etcdPeerKey']").val(),
-			etcdServerCert		: $(".w2ui-msg-body textarea[name='etcdServerCert']").val(),
-			etcdServerKey		: $(".w2ui-msg-body textarea[name='etcdServerKey']").val(),
-	}
-	
-	if( type == 'after'){
-		if (popupValidation()) {
-			$.ajax({
-				type	:"PUT",
-				url 	: "/deploy/diego/install/saveEtcdInfo",
-				contentType :"application/json",
-				data :JSON.stringify(etcdInfo),
-				success :function(data, status) {
-					w2popup.clear();
-					if(iaas=="VSPHERE"){
-						vSphereResourceInfoPopup();
-					}else{
-						resourcePopup();
-					}
-				},
-				error :function(e, status) {
-					w2alert("ETCD 정보 등록에 실패 하였습니다.", "DIEGO 설치");
-				}
-			});
-		}
-	}
-	else{
-		w2popup.clear();
-		diegoPopup();
-	}
-}
-
 
 /********************************************************
  * 설명		:  Resource 정보 팝업
@@ -919,7 +865,7 @@ function saveEtcdInfo(type){
  *********************************************************/
 function resourcePopup() {
 	$("#resourceInfoDiv").w2popup({
-		width  : 950,
+		width  : 750,
 		height	:800,
 		modal 	:true,
 		showMax :false,
@@ -950,7 +896,7 @@ function resourcePopup() {
  *********************************************************/
 function vSphereResourceInfoPopup() {
 	$("#vSphereResourceInfoDiv").w2popup({
-		width : 950,
+		width : 750,
 		height : 800,
 		modal : true,
 		showMax : false,
@@ -1064,7 +1010,12 @@ function saveResourceInfo(type) {
 		}
 	} else if (type == 'before') {
 			w2popup.clear();
-			etcdPopup();
+			if( iaas.toLowerCase() == 'vsphere'){
+				vSphereNetworkPopup();	
+			}else{
+				networkPopup();	
+			}
+			
 	}
 }
 
@@ -1105,7 +1056,7 @@ function createSettingFile(id, deploymentFile){
  *********************************************************/
 function deployPopup() {
 	$("#deployDiv").w2popup({
-		width : 950,
+		width : 750,
 		height :520,
 		modal :true,
 		showMax :true,
@@ -1180,12 +1131,16 @@ function diegoDeploy(type) {
 			}else{
 				var selected = w2ui['config_cfDiegoGrid'].getSelection();
 				var record = w2ui['config_cfDiegoGrid'].get(selected);
-				//나중에 cfInstallPopup();  수정
-				 if( record.deployStatus == 'CF 성공' ||  record.deployStatus == 'DIEGO 취소' ||  record.deployStatus == 'DIEGO 오류' ){
-					 diegoInstallPopup();
-				 }else { 
-					 cfInstallPopup(); 
-				 }
+				//cf & diego 수정일 경우
+				if( !checkEmpty(record) ) {
+					 if( record.cfVo.deployStatus == 'CF 성공' ||  record.diegoVo.deployStatus == 'DIEGO 취소' ||  record.diegoVo.deployStatus == 'DIEGO 오류' ){
+						 diegoInstallPopup(defaultInfo.deploymentName);
+					 }else { 
+						 cfInstallPopup(defaultInfo.cfDeploymentName, defaultInfo.deploymentName); 
+					 }
+				}else{
+					cfInstallPopup(defaultInfo.cfDeploymentName);
+				}
 			}
 		}
 	});
@@ -1206,7 +1161,7 @@ function installPopup(){
 	};
 	
 	$("#installDiv").w2popup({
-		width 	: 950,
+		width 	: 750,
 		height 	: 520,
 		modal	:true,
 		showMax :true,
@@ -1288,7 +1243,6 @@ function diegoDeletePopup(record){
 				data :JSON.stringify(requestParameter),
 				contentType :"application/json",
 				success :function(data, status) {
-					deigoDeploymentName = [];
 					doSearch();
 				},
 				error :function(request, status, error) {
@@ -1304,7 +1258,7 @@ function diegoDeletePopup(record){
 		var body = '<textarea id="deleteLogs" style="width:95%;height:90%;overflow-y:visible;resize:none;background-color:#FFF; margin:2%" readonly="readonly"></textarea>';
 		
 		w2popup.open({
-			width :610,
+			width :700,
 			height :500,
 			title :"<b>DIEGO 삭제</b>",
 			body  :body,
@@ -1348,7 +1302,6 @@ function diegoDeletePopup(record){
 					if( deleteClient != ""){
 						deleteClient.disconnect();
 					}
-					deigoDeploymentName = [];
 					initSetting();
 				}
 			}
@@ -1384,8 +1337,8 @@ function initSetting() {
 	installClient = "";
 	installStatus = "";
 	modifyNetWork = "";
-	deigoDeploymentName = new Array();
 	cfInfoYn= false;
+	diegoKeyFile ="";
 	//grid Reload
 	gridReload();
 }
@@ -1434,11 +1387,9 @@ function gridReload() {
 	<div rel="title"><b>DIEGO 설치</b></div>
 	<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 		<div style="margin-left:2%;display:inline-block;width:97%;">
-			<ul class="progressStep_7">
+			<ul class="progressStep_5">
 				<li class="active">기본 정보</li>
 				<li class="before">네트워크 정보</li>
-				<li class="before">DIEGO 정보</li>
-				<li class="before">ETCD 정보</li>
 				<li class="before">리소스 정보</li>
 				<li class="before">배포파일 정보</li>
 				<li class="before">설치</li>
@@ -1464,24 +1415,28 @@ function gridReload() {
 					</div>
 					<div class="w2ui-field" >
 						<label style="text-align:left; width:40%; font-size:11px;">DIEGO 릴리즈</label>
+						<img alt="diego-help-info"  src="../images/help-Info-icon.png" class="diego-info" style="width:18px; position:absolute; left:20%; margin-top:3px"  data-toggle="popover"  data-trigger="hover" data-html="true" title="Diego 릴리즈 설치 지원 버전 목록"/>
 						<div>
 							<input name="diegoReleases" onchange='setcflinuxDisplay(this.value);' type="list" style="float:left; width:60%;" required placeholder="DIEGO 릴리즈를 선택하세요." />
 						</div>
 					</div>
 					<div class="w2ui-field" id="cflinux" style="display:none">
 						<label style="text-align:left; width:40%; font-size:11px;">Cflinuxfs2-Rootfs 릴리즈</label>
+						<img alt="cflinux-help-info" class="cflinux-info"  style="width:18px; position:absolute; left:27%; margin-top:3px"  data-toggle="popover"  data-html="true" title="cflinuxfs2Root 릴리즈 호환성 정보 참조 사이트"  src="../images/help-Info-icon.png"/>
 						<div>
 							<input name="cflinuxfs2rootfsrelease" type="list" style="float:left; width:60%;" required placeholder="cflinuxfs2Root 릴리즈를 선택하세요." />
 						</div>
 					</div>
 					<div class="w2ui-field" >
 						<label style="text-align:left; width:40%; font-size:11px;">Garden-Linux 릴리즈</label>
+						<img alt="gardenRelease-help-info" class="gardenRelease-info" style="width:18px; position:absolute; left:25%; margin-top:3px"   data-toggle="popover"  title="Garden-Linux 릴리즈 호환성 정보 참조 사이트 "  data-html="true" src="../images/help-Info-icon.png"/>
 						<div>
 							<input name="gardenReleaseName" type="list" style="float:left; width:60%;" required placeholder="Garden-Linux 릴리즈를 선택하세요." />
 						</div>
 					</div>
 					<div class="w2ui-field" >
 						<label style="text-align:left; width:40%; font-size:11px;">ETCD 릴리즈</label>
+						<img alt="etcdReleases-help-info" class="etcd-info" style="width:18px; position:absolute; left:18%; margin-top:3px"  data-toggle="popover" title="ETCD 릴리즈 호환성 정보 참조 사이트 "  data-html="true" src="../images/help-Info-icon.png">
 						<div>
 							<input name="etcdReleases" type="list" style="float:left; width:60%;" required placeholder="ETCD 릴리즈를 선택하세요." />
 						</div>
@@ -1493,6 +1448,7 @@ function gridReload() {
 						<input name="cfDeploymentFile" type="hidden"/>
 					</div>
 				</div>
+				<button class="btn" style="float: right; margin-top:10px;" id="keyBtn" onclick="createKeyConfirm();" >Key 생성</button>
 			</div>
 		</div>
 		<br />
@@ -1503,185 +1459,14 @@ function gridReload() {
 	</div>
 </div>
 
-<!-- Diego 정보 설정 DIV -->
-<div id="diegoInfoDiv" style="width:100%; height:100%;" hidden="true">
-	<div rel="title"><b>DIEGO 설치</b></div>
-	<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-		<div style="margin-left:2%;display:inline-block;width:97%;">
-			<ul class="progressStep_7">
-				<li class="pass">기본 정보</li>
-				<li class="pass">네트워크 정보</li>
-				<li class="active">DIEGO 정보</li>
-				<li class="before">ETCD 정보</li>
-				<li class="before">리소스 정보</li>
-				<li class="before">배포파일 정보</li>
-				<li class="before">설치</li>
-			</ul>
-		</div>
-		<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
-			<div class="panel panel-info">	
-				<div class="panel-heading"><b>DIEGO 인증정보</b></div>
-				<div class="panel-body" style="padding:5px 5% 10px 5%;">
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">CA 인증서</label>
-						<div>
-							<textarea name="diegoCaCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="diego-ca.crt를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">SSH Proxy 개인키</label>
-						<div>
-							<textarea name="diegoHostKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="ssh_proxy를 입력하세요." ></textarea>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="panel panel-info">	
-				<div class="panel-heading"><b>BBS 인증정보</b></div>
-				<div class="panel-body" style="padding:5px 5% 10px 5%;">
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">암호화키</label>
-						<div>
-							<input name="diegoEncryptionKeys" type="text" style="float:left; width:60%;" required placeholder="encrypt_key를 입력하세요." />
-							<div class="isMessage"></div>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">클라이언트 인증서</label>
-						<div>
-							<textarea name="diegoClientCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="client.crt를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">클라이언트 개인키</label>
-						<div>
-							<textarea name="diegoClientKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="client.key를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">서버 인증서</label>
-						<div>
-							<textarea name="diegoServerCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="server.crt를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">서버 개인키</label>
-						<div>
-							<textarea name="diegoServerKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="server.key를 입력하세요." ></textarea>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<br />
-		<div class="w2ui-buttons" rel="buttons" hidden="true"> 
-			<button class="btn" style="float:left;" onclick="saveDiegoInfo('before');">이전</button>
-			<button class="btn" style="float:right; padding-right:15%" onclick="saveDiegoInfo('after');">다음>></button>
-		</div>
-	</div>
-</div>
-
-<!-- ETCD 설정 DIV -->
-<div id="etcdInfoDiv" style="width:100%; height:100%;" hidden="true">
-	<div rel="title"><b>DIEGO 설치</b></div>
-	<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
-		<div style="margin-left:2%;display:inline-block;width:97%;">
-			<ul class="progressStep_7">
-				<li class="pass">기본 정보</li>
-				<li class="pass">네트워크 정보</li>
-				<li class="pass">DIEGO 정보</li>
-				<li class="active">ETCD 정보</li>
-				<li class="before">리소스 정보</li>
-				<li class="before">배포파일 정보</li>
-				<li class="before">설치</li>
-			</ul>
-		</div>
-		<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
-			<div class="panel panel-info">	
-				<div class="panel-heading"><b>ETCD 인증정보</b></div>
-				<div class="panel-body" style="padding:5px 5% 10px 5%;">
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">클라이언트 인증서</label>
-						<div>
-							<textarea name="etcdClientCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="client.cert를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">클라이언트 개인키</label>
-						<div>
-							<textarea name="etcdClientKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="client.key를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">서버 인증서</label>
-						<div>
-							<textarea name="etcdServerCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="server.crt를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">서버 개인키</label>
-						<div>
-							<textarea name="etcdServerKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="server.key를 입력하세요." ></textarea>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="panel panel-info">	
-				<div class="panel-heading"><b>PEER 인증정보</b></div>
-				<div class="panel-body" style="padding:5px 5% 10px 5%;">
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">CA 인증서</label>
-						<div>
-							<textarea name="etcdPeerCaCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="etcd-peer-ca.crt를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">인증서</label>
-						<div>
-							<textarea name="etcdPeerCert" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="peer.crt를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align:left; width:40%; font-size:11px;">개인키</label>
-						<div>
-							<textarea name="etcdPeerKey" style="float:left; width:60%; height:50px;margin-bottom:10px; overflow-y:visible; resize:none; background-color:#FFF;"
-								required placeholder="peer.key를 입력하세요." ></textarea>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		<br />
-		<div class="w2ui-buttons" rel="buttons" hidden="true"> 
-			<button class="btn" style="float:left;" onclick="saveEtcdInfo('before');">이전</button>
-			<button class="btn" style="float:right; padding-right:15%" onclick="saveEtcdInfo('after');">다음>></button>
-		</div>
-	</div>
-</div>
-
 <!-- network 정보 -->
 <div id="networkInfoDiv" style="width:100%; height:100%;" hidden="true">
 	<div rel="title">DIEGO 설치</div>
 	<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 		<div style="margin-left:2%;display:inline-block;width:97%;">
-			<ul class="progressStep_7">
+			<ul class="progressStep_5">
 				<li class="pass">기본 정보</li>
 				<li class="active">네트워크 정보</li>
-				<li class="before">DIEGO 정보</li>
-				<li class="before">ETCD 정보</li>
 				<li class="before">리소스 정보</li>
 				<li class="before">배포파일 정보</li>
 				<li class="before">설치</li>
@@ -1775,11 +1560,9 @@ function gridReload() {
 	<div rel="title">DIEGO 설치</div>
 	<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 		<div style="margin-left:2%;display:inline-block;width:97%;">
-			<ul class="progressStep_7">
+			<ul class="progressStep_5">
 				<li class="pass">기본 정보</li>
 				<li class="active">네트워크 정보</li>
-				<li class="before">DIEGO 정보</li>
-				<li class="before">ETCD 정보</li>
 				<li class="before">리소스 정보</li>
 				<li class="before">배포파일 정보</li>
 				<li class="before">설치</li>
@@ -1861,11 +1644,9 @@ function gridReload() {
 	<div rel="title"><b>DIEGO 설치</b></div>
 	<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 		<div style="margin-left:2%;display:inline-block;width:97%;">
-			<ul class="progressStep_7">
+			<ul class="progressStep_5">
 				<li class="pass">기본 정보</li>
 				<li class="pass">네트워크 정보</li>
-				<li class="pass">DIEGO 정보</li>
-				<li class="pass">ETCD 정보</li>
 				<li class="active">리소스 정보</li>
 				<li class="before">배포파일 정보</li>
 				<li class="before">설치</li>
@@ -1953,11 +1734,9 @@ function gridReload() {
 	<div rel="title"><b>DIEGO 설치</b></div>
 	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 		<div style="margin-left: 2%;display:inline-block;width: 98%;">
-			<ul class="progressStep_7">
+			<ul class="progressStep_5">
 				<li class="pass">기본 정보</li>
 				<li class="pass">네트워크 정보</li>
-				<li class="pass">DIEGO 정보</li>
-				<li class="pass">ETCD 정보</li>
 				<li class="active">리소스 정보</li>
 				<li class="before">배포파일 정보</li>
 				<li class="before">설치</li>
@@ -2101,11 +1880,9 @@ function gridReload() {
 	<div rel="title"><b>DIEGO 설치</b></div>
 	<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
 		<div style="margin-left:2%;display:inline-block;width:97%;">
-			<ul class="progressStep_7">
+			<ul class="progressStep_5">
 				<li class="pass">기본 정보</li>
 				<li class="pass">네트워크 정보</li>
-				<li class="pass">DIEGO 정보</li>
-				<li class="pass">ETCD 정보</li>
 				<li class="pass">리소스 정보</li>
 				<li class="active">배포파일 정보</li>
 				<li class="before">설치</li>
@@ -2126,11 +1903,9 @@ function gridReload() {
 	<div rel="title">DIEGO 설치</div>
 	<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 		<div style="margin-left:2%;display:inline-block;width:97%;">
-			<ul class="progressStep_7">
+			<ul class="progressStep_5">
 				<li class="pass">기본 정보</li>
 				<li class="pass">네트워크 정보</li>
-				<li class="pass">DIEGO 정보</li>
-				<li class="pass">ETCD 정보</li>
 				<li class="pass">리소스 정보</li>
 				<li class="pass">배포파일 정보</li>
 				<li class="active">설치</li>

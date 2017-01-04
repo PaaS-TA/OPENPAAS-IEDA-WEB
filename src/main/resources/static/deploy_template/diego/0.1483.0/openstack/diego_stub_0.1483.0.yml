@@ -2,40 +2,27 @@ property_overrides:
   etcd:
     require_ssl: true
     peer_require_ssl: true
-    ca_cert: (( meta.etcd-ca-cert ))
-
-    server_cert: (( meta.etcd-server-cert ))
-
-    server_key: (( meta.etcd-server-key ))
-
-    client_cert: (( meta.etcd-client-cert ))
-    
-    client_key: (( meta.etcd-client-key ))
-
-    peer_ca_cert: (( meta.etcd-peer-ca-cert ))
-
-    peer_cert: (( meta.etcd-peer-cert ))
-
-    peer_key: (( meta.etcd-peer-key ))
-
+    ca_cert: (( diego-certs.etcd-ca-cert ))
+    server_cert: (( diego-certs.etcd-server-cert ))
+    server_key: (( diego-certs.etcd-server-key ))
+    client_cert: (( diego-certs.etcd-client-cert ))
+    client_key: (( diego-certs.etcd-client-key ))
+    peer_ca_cert: (( diego-certs.peer-ca-cert ))
+    peer_cert: (( diego-certs.peer-cert ))
+    peer_key: (( diego-certs.peer-key ))
   bbs:
     active_key_label: key1
     encryption_keys:
       - label: key1
-        passphrase: (( meta.bbs-encryption-keys ))
+        passphrase: (( diego-certs.bbs-encrypt-keys ))
     etcd:
       machines: ["etcd.service.cf.internal"]
     require_ssl: true
-    ca_cert: (( meta.bbs-ca-cert ))
-
-    server_cert: (( meta.bbs-server-cert ))
-
-    server_key: (( meta.bbs-server-key ))
-
-    client_cert: (( meta.bbs-client-cert ))
-    
-    client_key: (( meta.bbs-client-key ))
-
+    ca_cert: (( diego-certs.bbs-ca-cert ))
+    server_cert: (( diego-certs.bbs-server-cert ))
+    server_key: (( diego-certs.bbs-server-key ))
+    client_cert: (( diego-certs.bbs-client-cert ))
+    client_key: (( diego-certs.bbs-client-key ))
   executor:
     drain_timeout_in_seconds: 0
     garden:
@@ -57,11 +44,10 @@ property_overrides:
     log_level: debug
   skip_cert_verify: true
   ssh_proxy:
-    host_key: (( meta.ssh-proxy-host-key ))
-
+    host_key: (( diego-certs.ssh-proxy-key ))
     enable_cf_auth: (( meta.enable-cf-auth || true ))
     enable_diego_auth: (( meta.enable-diego-auth || false ))
-    diego_credentials: null
+    diego_credentials: (( meta.diego-credentials || "ssh-secret" ))
 
 instance_count_overrides:
   - name: cell_z1
@@ -72,15 +58,23 @@ instance_count_overrides:
     instances: 0
   - name: brain_z2
     instances: 0
+  - name: brain_z3
+    instances: 0
   - name: cc_bridge_z2
     instances: 0
+  - name: cc_bridge_z3
+    instances: 0
   - name: cell_z2
+    instances: 0
+  - name: cell_z3
     instances: 0
   - name: database_z2
     instances: 0
   - name: database_z3
     instances: 0
   - name: route_emitter_z2
+    instances: 0
+  - name: route_emitter_z3
     instances: 0
 
 #sql_overrides:
@@ -113,3 +107,5 @@ release_versions:
 config_from_cf: ~
 
 meta: ~
+
+diego-certs: ~

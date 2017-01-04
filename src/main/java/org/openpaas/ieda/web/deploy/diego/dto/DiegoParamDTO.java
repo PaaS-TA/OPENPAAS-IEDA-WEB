@@ -31,11 +31,14 @@ public class DiegoParamDTO {
 		@NotNull
 		private String etcdReleaseVersion; //ETCD 릴리즈 버전
 		private int cfId; //cf 아아디
-		private String cfDeployment; //cf 파일명
+		private String cfDeploymentFile; //cf 파일명
 		private String cfDeploymentName;
 		
 		private String cflinuxfs2rootfsreleaseName; //cflinuxfs2rootf 릴리즈 명
 		private String cflinuxfs2rootfsreleaseVersion; //cflinuxfs2rootf 릴리즈 버전
+		
+		@NotNull
+		private String keyFile;
 		
 		public String getId() {
 			return id;
@@ -103,11 +106,11 @@ public class DiegoParamDTO {
 		public void setCfId(int cfId) {
 			this.cfId = cfId;
 		}
-		public String getCfDeployment() {
-			return cfDeployment;
+		public String getCfDeploymentFile() {
+			return cfDeploymentFile;
 		}
-		public void setCfDeployment(String cfDeployment) {
-			this.cfDeployment = cfDeployment;
+		public void setCfDeploymentFile(String cfDeploymentFile) {
+			this.cfDeploymentFile = cfDeploymentFile;
 		}
 		public String getCfDeploymentName() {
 			return cfDeploymentName;
@@ -127,164 +130,14 @@ public class DiegoParamDTO {
 		public void setCflinuxfs2rootfsreleaseVersion(String cflinuxfs2rootfsreleaseVersion) {
 			this.cflinuxfs2rootfsreleaseVersion = cflinuxfs2rootfsreleaseVersion;
 		}
-	}
-	
-	public static class Diego {
-		@NotNull
-		private String id; //id
-		private String iaas; //IaaS
-		//2.1 Diego 정보	
-		@NotNull
-		private String diegoCaCert; //CA 인증서
-		//2.2 프록시 정보
-		@NotNull
-		private String diegoHostKey; //SSH Proxy 개인키
-		//2.3 BBS 인증정보
-		@NotNull
-		private String diegoClientCert; //클라이언트 인증서
-		@NotNull
-		private String diegoClientKey; //클라이언트 개인키
-		@NotNull
-		private String diegoEncryptionKeys; //암호화키
-		@NotNull
-		private String diegoServerCert; //서버 인증서
-		@NotNull
-		private String diegoServerKey; //서버 개인키
-		public String getId() {
-			return id;
+		public String getKeyFile() {
+			return keyFile;
 		}
-		public void setId(String id) {
-			this.id = id;
-		}
-		public String getIaas() {
-			return iaas;
-		}
-		public void setIaas(String iaas) {
-			this.iaas = iaas;
-		}
-		public String getDiegoCaCert() {
-			return diegoCaCert;
-		}
-		public void setDiegoCaCert(String diegoCaCert) {
-			this.diegoCaCert = diegoCaCert;
-		}
-		public String getDiegoHostKey() {
-			return diegoHostKey;
-		}
-		public void setDiegoHostKey(String diegoHostKey) {
-			this.diegoHostKey = diegoHostKey;
-		}
-		public String getDiegoClientCert() {
-			return diegoClientCert;
-		}
-		public void setDiegoClientCert(String diegoClientCert) {
-			this.diegoClientCert = diegoClientCert;
-		}
-		public String getDiegoClientKey() {
-			return diegoClientKey;
-		}
-		public void setDiegoClientKey(String diegoClientKey) {
-			this.diegoClientKey = diegoClientKey;
-		}
-		public String getDiegoEncryptionKeys() {
-			return diegoEncryptionKeys;
-		}
-		public void setDiegoEncryptionKeys(String diegoEncryptionKeys) {
-			this.diegoEncryptionKeys = diegoEncryptionKeys;
-		}
-		public String getDiegoServerCert() {
-			return diegoServerCert;
-		}
-		public void setDiegoServerCert(String diegoServerCert) {
-			this.diegoServerCert = diegoServerCert;
-		}
-		public String getDiegoServerKey() {
-			return diegoServerKey;
-		}
-		public void setDiegoServerKey(String diegoServerKey) {
-			this.diegoServerKey = diegoServerKey;
+		public void setKeyFile(String keyFile) {
+			this.keyFile = keyFile;
 		}
 		
 	}
-	public static class Etcd {
-		@NotNull
-		private String id; //id
-		private String iaas; //IaaS
-		@NotNull
-		//ETCD 인증정보
-		private String etcdClientCert; //클라이언트 인증서
-		@NotNull
-		private String etcdClientKey; //클라이언트 개인키
-		@NotNull
-		private String etcdServerCert; //서버 인증서
-		@NotNull
-		private String etcdServerKey; //서버 개인키
-		//PEER 인증 정보
-		@NotNull
-		private String etcdPeerCaCert; //CA 인증서
-		@NotNull
-		private String etcdPeerCert; //인증서
-		@NotNull
-		private String etcdPeerKey; //개인키
-		
-		public String getId() {
-			return id;
-		}
-		public void setId(String id) {
-			this.id = id;
-		}
-		public String getIaas() {
-			return iaas;
-		}
-		public void setIaas(String iaas) {
-			this.iaas = iaas;
-		}
-		public String getEtcdClientCert() {
-			return etcdClientCert;
-		}
-		public void setEtcdClientCert(String etcdClientCert) {
-			this.etcdClientCert = etcdClientCert;
-		}
-		public String getEtcdClientKey() {
-			return etcdClientKey;
-		}
-		public void setEtcdClientKey(String etcdClientKey) {
-			this.etcdClientKey = etcdClientKey;
-		}
-		public String getEtcdServerCert() {
-			return etcdServerCert;
-		}
-		public void setEtcdServerCert(String etcdServerCert) {
-			this.etcdServerCert = etcdServerCert;
-		}
-		public String getEtcdServerKey() {
-			return etcdServerKey;
-		}
-		public void setEtcdServerKey(String etcdServerKey) {
-			this.etcdServerKey = etcdServerKey;
-		}
-		public String getEtcdPeerCaCert() {
-			return etcdPeerCaCert;
-		}
-		public void setEtcdPeerCaCert(String etcdPeerCaCert) {
-			this.etcdPeerCaCert = etcdPeerCaCert;
-		}
-		public String getEtcdPeerCert() {
-			return etcdPeerCert;
-		}
-		public void setEtcdPeerCert(String etcdPeerCert) {
-			this.etcdPeerCert = etcdPeerCert;
-		}
-		public String getEtcdPeerKey() {
-			return etcdPeerKey;
-		}
-		public void setEtcdPeerKey(String etcdPeerKey) {
-			this.etcdPeerKey = etcdPeerKey;
-		}
-		
-		
-	}
-	
 	
 	public static class Network {
 		@NotNull

@@ -1,0 +1,289 @@
+#!/bin/bash
+
+function getCert {
+  while IFS='' read -r line || [[ -n "$line" ]]; do
+    echo "    $line"
+  done < "$1"
+  return
+}
+
+#############################################
+#  GENERATE MANIFEST START
+#############################################
+echo "diego-certs:" >> $key_file
+
+#############################################
+#  set bbs-ca-cert
+#############################################
+cert_file="$dir_diego_certs/diego-ca.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate diego-ca"
+  generate_cert_fail=true
+else
+  echo "  bbs-ca-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set bbs-encrypt-keys
+#############################################
+cert_file="$dir_diego_certs/bbs-certs/encrypt_key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate bbs-certs"
+  generate_cert_fail=true
+else
+  echo "  bbs-encrypt-keys: ["`cat $cert_file`"]" >> $key_file
+fi
+
+#############################################
+#  set bbs-server-cert
+#############################################
+cert_file="$dir_diego_certs/bbs-certs/server.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate bbs-certs"
+  generate_cert_fail=true
+else
+  echo "  bbs-server-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set bbs-server-key
+#############################################
+cert_file="$dir_diego_certs/bbs-certs/server.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate bbs-certs"
+  generate_cert_fail=true
+else
+  echo "  bbs-server-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set bbs-client-cert
+#############################################
+cert_file="$dir_diego_certs/bbs-certs/client.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate bbs-certs"
+  generate_cert_fail=true
+else
+  echo "  bbs-client-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set bbs-client-key
+#############################################
+cert_file="$dir_diego_certs/bbs-certs/client.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate bbs-certs"
+  generate_cert_fail=true
+else
+  echo "  bbs-client-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set peer-ca-cert
+#############################################
+cert_file="$dir_diego_certs/etcd-peer-ca.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-peer-certs"
+  generate_cert_fail=true
+else
+  echo "  peer-ca-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set peer-cert
+#############################################
+cert_file="$dir_diego_certs/etcd-certs/peer.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-peer-certs"
+  generate_cert_fail=true
+else
+  echo "  peer-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set peer-key
+#############################################
+cert_file="$dir_diego_certs/etcd-certs/peer.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-peer-certs"
+  generate_cert_fail=true
+else
+  echo "  peer-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set etcd-ca-cert
+#############################################
+cert_file="$dir_diego_certs/diego-ca.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  etcd-ca-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set etcd-server-cert
+#############################################
+cert_file="$dir_diego_certs/etcd-certs/server.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  etcd-server-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set etcd-server-key
+#############################################
+cert_file="$dir_diego_certs/etcd-certs/server.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  etcd-server-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set etcd-client-cert
+#############################################
+cert_file="$dir_diego_certs/etcd-certs/client.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  etcd-client-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set etcd-client-key
+#############################################
+cert_file="$dir_diego_certs/etcd-certs/client.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate etcd-certs"
+  generate_cert_fail=true
+else
+  echo "  etcd-client-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set rep-ca-cert
+#############################################
+cert_file="$dir_diego_certs/diego-ca.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate rep-certs"
+  generate_cert_fail=true
+else
+  echo "  rep-ca-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set rep-server-cert
+#############################################
+cert_file="$dir_diego_certs/rep-certs/server.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate rep-certs"
+  generate_cert_fail=true
+else
+  echo "  rep-server-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set rep-server-key
+#############################################
+cert_file="$dir_diego_certs/rep-certs/server.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate rep-certs"
+  generate_cert_fail=true
+else
+  echo "  rep-server-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set rep-client-cert
+#############################################
+cert_file="$dir_diego_certs/rep-certs/client.crt"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate rep-certs"
+  generate_cert_fail=true
+else
+  echo "  rep-client-cert: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set rep-client-key
+#############################################
+cert_file="$dir_diego_certs/rep-certs/client.key"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate rep-certs"
+  generate_cert_fail=true
+else
+  echo "  rep-client-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set ssh-proxy-key
+#############################################
+cert_file="$dir_diego_certs/ssh_proxy"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate ssh_proxy"
+  generate_cert_fail=true
+else
+  echo "  ssh-proxy-key: |" >> $key_file
+  cert_info=`getCert $cert_file`
+  echo "$cert_info" >> $key_file
+fi
+
+#############################################
+#  set ssh-key-fingerprint
+#############################################
+cert_file="$dir_diego_certs/ssh_proxy.fin"
+if [ ! -f "$cert_file" ]; then
+  >&2 echo "ERROR: generate ssh_proxy"
+  generate_cert_fail=true
+else  
+  echo "  ssh-key-fingerprint: "`cat $cert_file` >> $key_file
+fi
+
+#############################################
+#  GENERATE MANIFEST END
+#############################################
+if [ ! -z $generate_cert_fail ]; then  
+  exit 1
+fi

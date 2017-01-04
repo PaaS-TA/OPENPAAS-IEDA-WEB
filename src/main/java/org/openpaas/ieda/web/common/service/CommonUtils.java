@@ -30,7 +30,6 @@ import org.yaml.snakeyaml.parser.ParserException;
 final public class CommonUtils {
 
 	final private static Logger LOGGER = LoggerFactory.getLogger(CommonUtils.class);
-	final private static String UTF_8 = "UTF-8";
 	public static final double SPACE_KB = 1024;
 	public static final double SPACE_MB = 1024 * SPACE_KB;
 	public static final double SPACE_GB = 1024 * SPACE_MB;
@@ -81,13 +80,13 @@ final public class CommonUtils {
 	 * @title               : setSpiffMerge
 	 * @return            : void
 	***************************************************/
-	public static void setSpiffMerge(String iaas, Integer id, String prefix, String settingFileName,
+	public static void setSpiffMerge(String iaas, Integer id, String keyFile, String settingFileName,
 			ManifestTemplateVO manifestTemplate) {
 
 		// temp
 		String inputFile = TEMP_FILE + settingFileName;
-		// 최종 Manifest File
 		String deploymentPath = DEPLOYMENT_FILE + settingFileName;
+		String keyPath = LocalDirectoryConfiguration.getKeyDir() + SEPARATOR + keyFile;
 
 		File settingFile = null;
 		InputStream inputStream = null;
@@ -101,11 +100,9 @@ final public class CommonUtils {
 				cmd.add("merge");
 				if (!StringUtils.isEmpty(manifestTemplate.getCommonBaseTemplate())) {
 					cmd.add(manifestTemplate.getCommonBaseTemplate());
-					LOGGER.debug(manifestTemplate.getCommonBaseTemplate()  );
 				}
 				if (!StringUtils.isEmpty(manifestTemplate.getCommonJobTemplate())) {
 					cmd.add(manifestTemplate.getCommonJobTemplate());
-					LOGGER.debug(manifestTemplate.getCommonJobTemplate()  );
 				}
 				if (!StringUtils.isEmpty(manifestTemplate.getIaasPropertyTemplate())) {
 					cmd.add(manifestTemplate.getIaasPropertyTemplate());
@@ -125,10 +122,16 @@ final public class CommonUtils {
 				if (!StringUtils.isEmpty(manifestTemplate.getOptionEtc())) {
 					cmd.add(manifestTemplate.getOptionEtc());
 				}
+				if (!StringUtils.isEmpty(manifestTemplate.getOptionEtc())) {
+					cmd.add(manifestTemplate.getOptionEtc());
+				}
+				if( !keyFile.equals("microbosh") && !StringUtils.isEmpty(keyPath) ){
+					cmd.add(keyPath);//생성한 key.yml파일 추가
+				}
+				
 				cmd.add(inputFile);
 				builder.command(cmd);
 				builder.redirectErrorStream(true);
-				
 				
 				Process process = builder.start();
 				inputStream = process.getInputStream();
@@ -137,7 +140,6 @@ final public class CommonUtils {
 				StringBuffer deployBuffer = new StringBuffer();
 				while ((info = bufferedReader.readLine()) != null) {
 					deployBuffer.append(info + "\n");
-					
 				}
 				String deloymentContent = deployBuffer.toString();
 				if( !deloymentContent.equals("") ){
@@ -151,6 +153,7 @@ final public class CommonUtils {
 				throw new CommonException("notfound.manifest.exception", "Merge할 File이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 			}
 		} catch (FileNotFoundException e){
+			e.printStackTrace();
 				throw new CommonException("fileNotFound.manifest.exception", "Merge할 File이 존재하지 않습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -168,7 +171,7 @@ final public class CommonUtils {
 
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Manifest 템플릿 파일과 병합하여 읽어와서 deployment 경로에 최종 Manifest 파일 생성
+	 * @description   : Diego Manifest 템플릿 파일과 병합하여 읽어와서 deployment 경로에 최종 Manifest 파일 생성
 	 * @title               : setSpiffScript
 	 * @return            : void
 	***************************************************/
@@ -228,6 +231,9 @@ final public class CommonUtils {
 				cmd.add(inputFile);
 				//1.9 Path to DIEGO manifest file.
 				cmd.add(inputFile);
+				if (!StringUtils.isEmpty( vo.getKeyFile() )) {
+					cmd.add( vo.getKeyFile() );
+				}
 				
 				//2. OPTIONAL TEMPLATES
 				//2.1 Path to DIEGO Network 1 stub file.
@@ -248,6 +254,8 @@ final public class CommonUtils {
 				} else {
 					cmd.add("");
 				}
+				
+				
 				builder.command(cmd);
 				builder.redirectErrorStream(true);
 				Process process = builder.start();
@@ -263,7 +271,7 @@ final public class CommonUtils {
 				
 				String deloymentContent = deployBuffer.toString();
 				if (!deloymentContent.equals("")) {
-					IOUtils.write(deloymentContent, new FileOutputStream( DEPLOYMENT_FILE + vo.getDeploymentFile()), UTF_8);
+					IOUtils.write(deloymentContent, new FileOutputStream( DEPLOYMENT_FILE + vo.getDeploymentFile()), "UTF-8");
 				}
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("deloymentContent :" + "\n" + deloymentContent);
@@ -278,6 +286,7 @@ final public class CommonUtils {
 			throw new CommonException("notfound.diegoManifest.exception", 
 					"DIEGO Manifest 파일을 생성할 수 없습니다. ", HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (IOException e) {
+			e.printStackTrace();
 			throw new CommonException("ioFileRead.diegoManifest.exception", 
 					"DIEGO Manifest 파일 정보를 읽어올 수 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 			 
@@ -354,12 +363,10 @@ final public class CommonUtils {
 			
 		} catch(ParserException e ){
 			String errorMessage = getPrintStackTrace(e);
-			throw new CommonException("illigalArgument.yaml.exception",
-					errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new CommonException("parser.yaml.exception", errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch(Exception e){
 			String errorMessage = getPrintStackTrace(e);
-			throw new CommonException("illigalArgument.yaml.exception",
-					errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new CommonException("server.yaml.exception", errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return object;
 	}

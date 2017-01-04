@@ -1,0 +1,78 @@
+meta: ~
+
+networks:
+  - name: cf2
+    type: manual
+    subnets:
+    - range: (( meta.network-1-range ))
+      reserved: (( meta.network-1-reserved ))
+      static: (( meta.network-1-static ))
+      gateway: (( meta.network-1-gateway ))
+      dns: (( meta.network-1-dns ))
+      cloud_properties:
+        security_groups: (( meta.network-1-security-groups ))
+        subnet: (( meta.network-1-subnet-id ))
+jobs:
+  - name: nats_z2
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf2
+        static_ips: (( static_ips(2) ))
+
+  - name: router_z2
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf2
+        static_ips: (( static_ips(5) ))
+
+  - name: consul_z1
+    instances: (( merge || 2 ))
+    networks:
+      - name: cf1
+        
+  - name: consul_z2
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf2
+        static_ips: (( static_ips(27, 28, 29) ))
+
+  - name: etcd_z1
+    instances: (( merge || 2 ))
+    networks:
+      - name: cf1
+
+  - name: etcd_z2
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf2
+        static_ips: (( static_ips(9) ))
+        
+  - name: loggregator_z2
+    instances: (( merge || 0 ))
+    networks:
+     - name: cf2
+
+  - name: doppler_z2
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+
+  - name: loggregator_trafficcontroller_z2
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf2
+
+  - name: uaa_z2
+    instances: (( merge || 1 ))
+
+  - name: api_z2
+    instances: (( merge || 1 ))
+
+  - name: api_worker_z2
+    instances: (( merge || 1 ))
+
+  - name: hm9000_z2
+    instances: (( merge || 1 ))
+
+  - name: runner_z2
+    instances: (( meta.runner_z2_instances || 1 ))

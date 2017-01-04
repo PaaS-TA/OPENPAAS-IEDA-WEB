@@ -14,17 +14,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <script type="text/javascript">
 
 //setting variable
 var cfId = "";
 var networkId = "";
 var defaultInfo = "";
-var uaaInfo = "";
-var consulInfo = "";
-var blobstoreInfo="";
-var hm9000Info = "";
 var networkInfo = [];
+var keyInfo="";
 var publicStaticIp = "";
 var internalCnt=1;
 var resourceInfo = "";
@@ -32,10 +30,40 @@ var releases = "";
 var stemcells = "";
 var deploymentFile = "";
 var installStatus ="";
+var countryCodes = null;
+var keyFile ="";
 
 $(function() {
-
 });
+
+
+/********************************************************
+ * 설명 : CF 릴리즈 설치 지원 버전 목록 조회
+ * Function : getReleaseVersionList
+ *********************************************************/
+function getReleaseVersionList(){
+	 var contents = "";
+	$.ajax({
+		type :"GET",
+		url :"/common/deploy/list/releaseInfo/cf/"+iaas, 
+		contentType :"application/json",
+		success :function(data, status) {
+			if (data != null && data != "") {
+				contents = "<table id='popoverTable'><tr><th>IaaS 유형</th><th>릴리즈 버전</th></tr>";
+				data.map(function(obj) {
+					contents += "<tr><td>" + obj.iaasType+ "</td><td>" +  obj.minReleaseVersion +"</td></tr>";
+				});
+				contents += "</table>";
+				$('.cf-info').attr('data-content', contents);
+			}
+		},
+		error :function(request, status, error) {
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message, "CF 릴리즈 설치 지원 버전");
+		}
+	});
+}
+
 /********************************************************
  * 설명 :  CF 조회 시 데이터 조회
  * Function : getCfData
@@ -79,18 +107,19 @@ function setCfData(contents) {
 	}
 	//기본정보
 	defaultInfo = {
-		iaas 							: iaas,
-		deploymentName 		: contents.deploymentName,
-		directorUuid 				: contents.directorUuid,
-		releaseName 			: contents.releaseName,
-		releaseVersion 			: contents.releaseVersion,
-		appSshFingerprint		: contents.appSshFingerprint,
-		deaMemoryMB			: contents.deaMemoryMB,
-		deaDiskMB				: contents.deaDiskMB,
-		
-		domain 						: contents.domain,
-		description 				: contents.description,
-		domainOrganization 	: contents.domainOrganization,			
+		iaas                   : iaas,
+		deploymentName         : contents.deploymentName,
+		directorUuid           : contents.directorUuid,
+		releaseName            : contents.releaseName,
+		releaseVersion         : contents.releaseVersion,
+		appSshFingerprint      : contents.appSshFingerprint,
+		deaMemoryMB            : contents.deaMemoryMB,
+		deaDiskMB              : contents.deaDiskMB,
+		domain                 : contents.domain,
+		description            : contents.description,
+		domainOrganization     : contents.domainOrganization,		
+		proxyStaticIps		   : contents.proxyStaticIps,
+		loginSecret            : contents.loginSecret
 	}
 	//네트워크 정보 
 	for(var i=0; i<contents.networks.length; i++){
@@ -113,57 +142,14 @@ function setCfData(contents) {
 	 	networkInfo.push(arr);
 	}
 	
-	
-	//UAA
-	for(var i=0; i<contents.keys.length; i++){
-		if(Number(contents.keys[i].keyType) == 1310){
-			uaaInfo = {
-					id 							: contents.id,
-					loginSecret				: contents.loginSecret,
-					signingKey				: contents.keys[i].privateKey,
-					verificationKey		: contents.keys[i].publicKey,
-					
-					proxyStaticIps 		: contents.proxyStaticIps,
-					sslPemPub 			: contents.sslPemPub,
-					sslPemRsa 			: contents.sslPemRsa
-			}
-		}
-	
-	
-		//CONSUL
-		else if(Number(contents.keys[i].keyType) == 1320){
-			consulInfo = {
-					id 							: contents.id,
-					agentCert				: contents.keys[i].agentCert,
-					agentKey				: contents.keys[i].agentKey,
-					caCert					: contents.keys[i].caCert,
-					encryptKeys			: contents.encryptKeys,
-					serverCert				: contents.keys[i].serverCert,
-					serverKey				: contents.keys[i].serverKey
-			}
-		}
-		
-		//Blobstore
-		else if(Number(contents.keys[i].keyType) == 1330){
-			blobstoreInfo = {
-					id							: contents.id,
-					blobstoreTlsCert		: contents.keys[i].tlsCert,
-					blobstorePrivateKey	: contents.keys[i].privateKey,
-					blobstoreCaCert		: contents.keys[i].caCert
-			}
-		}
-		
-		//hm9000
-		else if(Number(contents.keys[i].keyType) == 1340){
-			hm9000Info = {
-					id							: contents.id,
-					hm9000ServerKey				: contents.keys[i].serverKey,
-					hm9000ServerCert				: contents.keys[i].serverCert,
-					hm9000ClientKey				: contents.keys[i].clientKey,
-					hm9000ClientCert				: contents.keys[i].clientCert,
-					hm9000CaCert					: contents.keys[i].caCert
-			}
-		}
+	keyFile = contents.keyFile;
+	keyInfo = {
+			countryCode					: contents.countryCode,
+			stateName					: contents.stateName,
+			localityName					: contents.localityName,
+			organizationName			: contents.organizationName,
+			unitName						: contents.unitName,
+			email							: contents.email
 	}
 	
 	//resource
@@ -199,14 +185,20 @@ function setCfData(contents) {
  *********************************************************/
 function defaultInfoPopup() {
 	 settingDiegoUse(diegoUse, $("#defaultInfoDiv ul"));
+	
+	 	
 	$("#defaultInfoDiv").w2popup({
-		width : 950,
-		height : 620,
+		width : 750,
+		height : 670,
 		modal : true,
 		showMax : false,
 		onOpen : function(event) {
 			event.onComplete = function() {
-				if ( defaultInfo != "" && defaultInfo != null) {
+				//릴리즈 정보 popup over
+			 	$('[data-toggle="popover"]').popover();
+			 	getReleaseVersionList();
+
+			 	if ( defaultInfo != "" && defaultInfo != null) {
 					//설치관리자 UUID
 					$(".w2ui-msg-body input[name='deploymentName']").val(defaultInfo.deploymentName);
 					$(".w2ui-msg-body input[name='directorUuid']").val(defaultInfo.directorUuid);
@@ -218,6 +210,8 @@ function defaultInfoPopup() {
 					//CF 정보
 					$(".w2ui-msg-body input[name='domain']").val(defaultInfo.domain);
 					$(".w2ui-msg-body input[name='description']").val(defaultInfo.description);
+					$(".w2ui-msg-body input[name='proxyStaticIps']").val(defaultInfo.proxyStaticIps);
+					$(".w2ui-msg-body input[name='loginSecret']").val(defaultInfo.loginSecret);
 				} else{
 					if( !checkEmpty($("#directorUuid").text()) ){
 						$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
@@ -279,29 +273,29 @@ function setReleaseData(){
  *********************************************************/
 function saveDefaultInfo() {
 	var release = $(".w2ui-msg-body input[name='releases']").val();
-	for(var i=0; i < deploymentName.length; i++){
-		if ( $(".w2ui-msg-body input[name='deploymentName']").val() == deploymentName[i]  
-		&& defaultInfo.deploymentName != $(".w2ui-msg-body input[name='deploymentName']").val() 	){
-			w2alert("이미 존재하는 배포명 입니다.","CF 설치");
-			return;
-		}
+	// 배포명 중복 검사
+	if( !checkDeploymentNameDuplicate("cf", $(".w2ui-msg-body input[name='deploymentName']").val() ) 
+			&& defaultInfo.deploymentName !=  $(".w2ui-msg-body input[name='deploymentName']").val() ){
+		w2alert(  "입력한 배포명 (" + $(".w2ui-msg-body input[name='deploymentName']").val()  + ") 은 이미 존재합니다.","CF 설치");
+		return;
 	}
 	defaultInfo = {
-				id 								: (cfId) ? cfId : "",
-				iaas 							: iaas.toUpperCase(),
-				diegoYn						: diegoUse,
-				platform						: "cf",
-				deploymentName 		: $(".w2ui-msg-body input[name='deploymentName']").val(),
-				directorUuid 				: $(".w2ui-msg-body input[name='directorUuid']").val(),
+				id 						: (cfId) ? cfId : "",
+				iaas 					: iaas.toUpperCase(),
+				diegoYn					: diegoUse,
+				platform				: "cf",
+				deploymentName          : $(".w2ui-msg-body input[name='deploymentName']").val(),
+				directorUuid            : $(".w2ui-msg-body input[name='directorUuid']").val(),
 				releaseName 			: release.split("/")[0],
 				releaseVersion 			: release.split("/")[1],
 				appSshFingerprint   	: $(".w2ui-msg-body input[name='appSshFingerprint']").val(),
-				deaMemoryMB			: $(".w2ui-msg-body input[name='deaMemoryMB']").val(),
+				deaMemoryMB			    : $(".w2ui-msg-body input[name='deaMemoryMB']").val(),
 				deaDiskMB				: $(".w2ui-msg-body input[name='deaDiskMB']").val(),
-	
-				domain 						: $(".w2ui-msg-body input[name='domain']").val(),
-				description 				: $(".w2ui-msg-body input[name='description']").val(),
-				domainOrganization 	: $(".w2ui-msg-body input[name='domainOrganization']").val(),
+				domain 					: $(".w2ui-msg-body input[name='domain']").val(),
+				description 			: $(".w2ui-msg-body input[name='description']").val(),
+				domainOrganization 	    : $(".w2ui-msg-body input[name='domainOrganization']").val(),
+				proxyStaticIps			: $(".w2ui-msg-body input[name='proxyStaticIps']").val(),
+				loginSecret			    : $(".w2ui-msg-body input[name='loginSecret']").val()
 	}
 	//유효성
 	if (popupValidation()) {
@@ -338,10 +332,9 @@ function saveDefaultInfo() {
  * 설명		: 네트워크 정보 팝업(openstack/aws)
  * Function	: networkPopup
  *********************************************************/
-function networkPopup(proxyStaticIps){
-	 settingDiegoUse(diegoUse, $("#networkInfoDiv ul"));
+function networkPopup(){
 	$("#networkInfoDiv").w2popup({
-		width : 950,
+		width : 750,
 		height : 700,
 		modal : true,
 		showMax : false,
@@ -384,9 +377,8 @@ function networkPopup(proxyStaticIps){
  * Function	: vSphereNetworkInfoDiv
  *********************************************************/
 function vSphereNetworkPopup(){
-	 settingDiegoUse(diegoUse, $("#VsphereNetworkInfoDiv ul"));
 		$("#VsphereNetworkInfoDiv").w2popup({
-			width : 950,
+			width : 750,
 			height : 700,
 			modal : true,
 			showMax : false,
@@ -560,7 +552,8 @@ function saveNetworkInfo(type) {
 				data : JSON.stringify(networkInfo),
 				success : function(data, status) {
 					w2popup.clear();
-					uaaInfoPopup();
+					getCountryCodes();
+					keyInfoPopup();
 				},
 				error : function(e, status) {
 					networkInfo = [];
@@ -574,37 +567,57 @@ function saveNetworkInfo(type) {
 	}
 }
 
+
 /********************************************************
- * 설명		: UAA 정보 팝업
+ * 설명		: 국가 코드 목록 조회
+ * Function	: getCountryCodes
+ *********************************************************/
+function getCountryCodes() {
+	var parentCode = 20000; //common_code -> country_code
+	$.ajax({
+		type : "GET",
+		url : "/common/deploy/codes/countryCode/"+parentCode,
+		contentType : "application/json",
+		async : true,
+		success : function(data, status) {
+			countryCodes = new Array();
+			if( data != null){
+				data.map(function(obj) {
+					countryCodes.push(obj.codeName);
+				});
+			}
+			$(".w2ui-msg-body input[name='countryCode']").w2field('list', {items : countryCodes, maxDropHeight : 300,width : 150});
+			if( !checkEmpty(keyInfo.countryCode) && !checkEmpty(keyInfo.countryCode) ){
+				$(".w2ui-msg-body input[name='countryCode']").data('selected',{text : keyInfo.countryCode});
+			}
+		},
+		error : function(e, status) {
+			w2popup.unlock();
+			w2alert("국가 코드를 가져오는데 실패하였습니다.", "CF 설치");
+		}
+	});
+}
+
+/********************************************************
+ * 설명		: Key 생성  팝업
  * Function	: uaaInfoPopup
  *********************************************************/
-function uaaInfoPopup(){
-	settingDiegoUse(diegoUse, $("#uaaInfoDiv ul"));
-	$("#uaaInfoDiv").w2popup({
-		width : 950,
-		height : 750,
+function keyInfoPopup(){
+	$("#KeyInfoDiv").w2popup({
+		width : 650,
+		height : 520,
 		modal : true,
 		showMax : false,
 		onOpen : function(event) {
 			event.onComplete = function() {
-				if( $(".w2ui-msg-body input[name='proxyStaticIps']").val() == "" ){
-					$(".w2ui-msg-body input[name='proxyStaticIps']").val(publicStaticIp);
-				}
-				
-				if (uaaInfo != "") {
-					$(".w2ui-msg-body input[name='loginSecret']").val(uaaInfo.loginSecret);
-					$(".w2ui-msg-body textarea[name='signingKey']").val(uaaInfo.signingKey);
-					$(".w2ui-msg-body textarea[name='verificationKey']").val(uaaInfo.verificationKey);
-					
-					//HAProxy 정보
-					if( uaaInfo.proxyStaticIps != "" ){
-						$(".w2ui-msg-body input[name='proxyStaticIps']").val(uaaInfo.proxyStaticIps);
-					}else{
-						$(".w2ui-msg-body input[name='proxyStaticIps']").val(publicStaticIp);
-					}
-					
-					$(".w2ui-msg-body textarea[name='sslPemPub']").val(uaaInfo.sslPemPub);
-					$(".w2ui-msg-body textarea[name='sslPemRsa']").val(uaaInfo.sslPemRsa);
+				$(".w2ui-msg-body input[name='cfDomain']").val(defaultInfo.domain);//도메인
+				if (keyInfo != "") {
+					$(".w2ui-msg-body input[name='countryCode']").val(keyInfo.countryCode);//국가코드
+					$(".w2ui-msg-body input[name='stateName']").val(keyInfo.stateName);//시/도
+					$(".w2ui-msg-body input[name='localityName']").val(keyInfo.localityName);//시/구/군
+					$(".w2ui-msg-body input[name='organizationName']").val(keyInfo.organizationName);//회사명
+					$(".w2ui-msg-body input[name='unitName']").val(keyInfo.unitName);//부서명
+					$(".w2ui-msg-body input[name='email']").val(keyInfo.email);//이메일
 				}					
 			}
 		},
@@ -617,35 +630,115 @@ function uaaInfoPopup(){
 }
 
 /********************************************************
- * 설명		: UAA 정보 등록
+ * 설명		: Key 생성 확인
+ * Function	: createKeyConfirm
+ *********************************************************/
+function createKeyConfirm(){
+	 
+	 var message = "";
+	 if( !checkEmpty(keyFile) ){//이미 key가 생성됐으면,
+		 message = "Key를 재 생성하시겠습니다.? \nDiego와 연동한 경우 Diego를 다시 설치해야 합니다.";
+	 }else{
+		message ="Key를 생성하시겠습니까?"; 
+	 }
+	 
+	 w2confirm({
+		width 			: 350,
+		height 			: 180,
+		title 				: '<b>Key 생성 여부</b>',
+		msg 				: message,
+		modal			: true,
+		yes_text 		: "확인",
+		no_text 		: "취소",
+		yes_callBack 	: function(){
+			createKeyInfo();
+		},
+		no_callBack : function(event){
+		}
+	});
+}
+
+/********************************************************
+ * 설명		: Key 정보 생성
+ * Function	: createKeyInfo
+ *********************************************************/
+function createKeyInfo(){
+	 w2popup.lock("Key 생성 중입니다.", true);
+	 keyInfo = {
+				id                      		: cfId,
+				iaas 							: iaas.toLowerCase(),
+				platform					: menu, //cf -> 1, diego -> 2, cf&diego -> 3
+				domain	 	        		: $(".w2ui-msg-body input[name='cfDomain']").val(), //도메인
+				countryCode				: $(".w2ui-msg-body input[name='countryCode']").val(), //국가코드
+				stateName      		 	: $(".w2ui-msg-body input[name='stateName']").val(), //시/도
+				localityName 			: $(".w2ui-msg-body input[name='localityName']").val(), //시/구/군
+				organizationName 	: $(".w2ui-msg-body input[name='organizationName']").val(), //회사명
+				unitName 					: $(".w2ui-msg-body input[name='unitName']").val(), //부서명
+				email 						: $(".w2ui-msg-body input[name='email']").val() //email
+	}
+	 
+	 if (popupValidation()) {
+		 $.ajax({
+			type : "POST",
+			url : "/common/deploy/key/createKey",
+			contentType : "application/json",
+			data : JSON.stringify(keyInfo),
+			async : true,
+			success : function(data, status) {
+				w2popup.unlock();
+				w2alert("Key 생성에 성공하였습니다.", "CF Key 생성");
+				keyFile = data.keyFile;
+			},
+			error :function(request, status, error) {
+				w2popup.unlock();
+				var errorResult = JSON.parse(request.responseText);
+				w2alert(errorResult.message, "CF Key 생성");
+			}
+		});
+	 }
+}
+
+/********************************************************
+ * 설명		: Key 정보 등록
  * Function	: saveUaaInfo
  *********************************************************/
-function saveUaaInfo(type){
-	uaaInfo = {
-			id 						: cfId,
-			iaas 					: iaas.toUpperCase(),
-			loginSecret	 		: $(".w2ui-msg-body input[name='loginSecret']").val(), //로그인 비밀번호
-			signingKey			: $(".w2ui-msg-body textarea[name='signingKey']").val(), //개인키
-			verificationKey 	: $(".w2ui-msg-body textarea[name='verificationKey']").val(), //공개키
-			proxyStaticIps 	: $(".w2ui-msg-body input[name='proxyStaticIps']").val(), //ha-proxy-staticips
-			sslPemPub 		: $(".w2ui-msg-body textarea[name='sslPemPub']").val(), //ha-proxy-공개키
-			sslPemRsa 		: $(".w2ui-msg-body textarea[name='sslPemRsa']").val() //ha-proxy 개인키
-	}
-	
-	if( type == 'after'){
+function saveKeyInfo(type){
+	 
+	 if( type == "after"){
+		 if( checkEmpty(keyFile) ){
+			 w2alert("Key를 생성하지 않았습니다. 확인해주세요.", "CF 설치");
+			 return;
+		 }
+		 
+		keyInfo = {
+				id                      		: cfId,
+				iaas 							: iaas.toUpperCase(),
+				platform					: "cf", //cf -> 1, diego -> 2, cf&diego -> 3
+				domain	 	        		: $(".w2ui-msg-body input[name='cfDomain']").val(), //도메인
+				countryCode				: $(".w2ui-msg-body input[name='countryCode']").val(), //국가코드
+				stateName      		 	: $(".w2ui-msg-body input[name='stateName']").val(), //시/도
+				localityName 			: $(".w2ui-msg-body input[name='localityName']").val(), //시/구/군
+				organizationName 	: $(".w2ui-msg-body input[name='organizationName']").val(), //회사명
+				unitName 					: $(".w2ui-msg-body input[name='unitName']").val(), //부서명
+				email 						: $(".w2ui-msg-body input[name='email']").val(), //email
+		}
+		
 		if (popupValidation()) {
-			//ajax AwsInfo Save
 			$.ajax({
 				type : "PUT",
-				url : "/deploy/"+menu+"/install/saveUaaInfo",
+				url : "/deploy/"+menu+"/install/saveKeyInfo",
 				contentType : "application/json",
-				data : JSON.stringify(uaaInfo),
+				data : JSON.stringify(keyInfo),
 				success : function(data, status) {
 					w2popup.clear();
-					consulInfoPopup();
+					if(iaas.toLowerCase() == "vsphere"){
+						vSphereResourceInfoPopup();	
+					}else{
+						resourceInfoPopup();
+					}
 				},
 				error : function(e, status) {
-					w2alert("UAA 정보 등록에 실패 하였습니다.", "CF 설치");
+					w2alert("Key 생성 정보 등록에 실패 하였습니다.", "CF 설치");
 				}
 			});
 		}
@@ -660,227 +753,12 @@ function saveUaaInfo(type){
 }
 
 /********************************************************
- * 설명		: Consul 정보 팝업
- * Function	: consulInfoPopup
- *********************************************************/
-function consulInfoPopup(){
-	settingDiegoUse(diegoUse, $("#consulInfoDiv ul"));
-	$("#consulInfoDiv").w2popup({
-		width : 950,
-		height : 750,
-		modal : false,
-		showMax : false,
-		onOpen : function(event) {
-			event.onComplete = function() {
-				if (consulInfo != "") {
-					$(".w2ui-msg-body textarea[name='agentCert']").val(consulInfo.agentCert);
-					$(".w2ui-msg-body textarea[name='agentKey']").val(consulInfo.agentKey);
-					$(".w2ui-msg-body textarea[name='caCert']").val(consulInfo.caCert);
-					$(".w2ui-msg-body input[name='encryptKeys']").val(consulInfo.encryptKeys);
-					$(".w2ui-msg-body textarea[name='serverCert']").val(consulInfo.serverCert);
-					$(".w2ui-msg-body textarea[name='serverKey']").val(consulInfo.serverKey);
-				}					
-			}
-		},
-		onClose : function(event) {
-			event.onComplete = function() {
-				initSetting();
-			}
-		}
-	});
-}
-
-/********************************************************
- * 설명		: Consul 정보 등록
- * Function	: saveConsulInfo
- *********************************************************/
-function saveConsulInfo(type){
-	consulInfo = {
-			id 						: cfId,
-			iaas					: iaas.toUpperCase(),
-			agentCert			: $(".w2ui-msg-body textarea[name='agentCert']").val(),
-			agentKey			: $(".w2ui-msg-body textarea[name='agentKey']").val(),
-			caCert				: $(".w2ui-msg-body textarea[name='caCert']").val(),
-			encryptKeys		: $(".w2ui-msg-body input[name='encryptKeys']").val(),
-			serverCert			: $(".w2ui-msg-body textarea[name='serverCert']").val(),
-			serverKey			: $(".w2ui-msg-body textarea[name='serverKey']").val()
-	}
-	
-	if( type == 'after'){
-		if (popupValidation()) {
-			//ajax AwsInfo Save
-			$.ajax({
-				type : "PUT",
-				url : "/deploy/"+menu+"/install/saveConsulInfo",
-				contentType : "application/json",
-				data : JSON.stringify(consulInfo),
-				success : function(data, status) {
-					w2popup.clear();
-					blobstoreInfoPopup();
-				},
-				error : function(e, status) {
-					w2alert("CONSUL 등록에 실패 하였습니다.", "CF 설치");
-				}
-			});
-		}
-	} else{
-		w2popup.clear();
-		uaaInfoPopup();
-	}
-}
-
-/********************************************************
- * 설명		: BLOBSTORE 정보 팝업
- * Function	: blobstorePopup
- *********************************************************/
-function blobstoreInfoPopup(){
-	settingDiegoUse(diegoUse, $("#blobstoreInfoDiv ul"));
-	$("#blobstoreInfoDiv").w2popup({
-		width : 950,
-		height : 550,
-		modal : true,
-		showMax : false,
-		onOpen : function(event) {
-			event.onComplete = function() {
-				if (blobstoreInfo != "") {
-					$(".w2ui-msg-body textarea[name='blobstoreTlsCert']").val(blobstoreInfo.blobstoreTlsCert);
-					$(".w2ui-msg-body textarea[name='blobstorePrivateKey']").val(blobstoreInfo.blobstorePrivateKey);
-					$(".w2ui-msg-body textarea[name='blobstoreCaCert']").val(blobstoreInfo.blobstoreCaCert);
-				}					
-			}
-		},
-		onClose : function(event) {
-			event.onComplete = function() {
-				initSetting();
-			}
-		}
-	});
-}
-
-/********************************************************
- * 설명		: BLOBSTORE 정보 등록
- * Function	: saveBlobstoreInfo
- *********************************************************/
-function saveBlobstoreInfo(type){
-	 blobstoreInfo = {
-				id 								: cfId,
-				blobstoreTlsCert			: $(".w2ui-msg-body textarea[name='blobstoreTlsCert']").val(),
-				blobstorePrivateKey		: $(".w2ui-msg-body textarea[name='blobstorePrivateKey']").val(),
-				blobstoreCaCert			: $(".w2ui-msg-body textarea[name='blobstoreCaCert']").val(),
-		}
-	 
-	if (type == 'after') {
- 		if (popupValidation()) {
-			//Server send Cf Info
-			$.ajax({
-				type : "PUT",
-				url : "/deploy/"+menu+"/install/saveBlobstoreInfo",
-				contentType : "application/json",
-				async : true,
-				data : JSON.stringify(blobstoreInfo),
-				success : function(data, status) {
-					w2popup.clear();
-					if(diegoUse=="true") {
-						if(iaas.toLowerCase() == "vsphere"){
-							vSphereResourceInfoPopup();	
-						}else{
-							resourceInfoPopup();
-						}
-					}else {
-						hm9000InfoPopup();
-					}
-				},
-				error : function(e, status) {
-					w2alert("Cf BlobStore 등록에 실패 하였습니다.", "Cf 설치");
-				}
-			});
-		} 
-	} else {
-		w2popup.clear();
-		consulInfoPopup();
-	}
-	
-}
-
-/********************************************************
- * 설명		: hm9000 정보 팝업
- * Function	: hm9000Popup
- *********************************************************/
-function hm9000InfoPopup(){
-	$("#hm9000InfoDiv").w2popup({
-		width : 950,
-		height : 750,
-		modal : true,
-		showMax : false,
-		onOpen : function(event) {
-			event.onComplete = function() {
-				if(hm9000Info != ""){
-					$(".w2ui-msg-body textarea[name='hm9000ServerKey']").val(hm9000Info.hm9000ServerKey);
-					$(".w2ui-msg-body textarea[name='hm9000ServerCert']").val(hm9000Info.hm9000ServerCert);
-					$(".w2ui-msg-body textarea[name='hm9000ClientKey']").val(hm9000Info.hm9000ClientKey);
-					$(".w2ui-msg-body textarea[name='hm9000ClientCert']").val(hm9000Info.hm9000ClientCert);
-					$(".w2ui-msg-body textarea[name='hm9000CaCert']").val(hm9000Info.hm9000CaCert);
-				}
-			}
-		},
-		onClose : function(event) {
-			event.onComplete = function() {
-				initSetting();
-			}
-		}
-	});
-}
-
-/*******************************************************
- * 설명		: hm9000 정보 등록
- * Function	: saveHm9000Info
- *********************************************************/
-function saveHm9000Info(type){
-	 hm9000Info = {
-			id					: cfId,
-			hm9000ServerKey		: $(".w2ui-msg-body textarea[name='hm9000ServerKey']").val(),
-			hm9000ServerCert		: $(".w2ui-msg-body textarea[name='hm9000ServerCert']").val(),
-			hm9000ClientKey		: $(".w2ui-msg-body textarea[name='hm9000ClientKey']").val(),
-			hm9000ClientCert		: $(".w2ui-msg-body textarea[name='hm9000ClientCert']").val(),
-			hm9000CaCert			: $(".w2ui-msg-body textarea[name='hm9000CaCert']").val()
-	 }	
-	 
-	if (type == 'after') {
- 		if (popupValidation()) {
-			$.ajax({
-				type : "PUT",
-				url : "/deploy/cf/install/saveHm9000Info",
-				contentType : "application/json",
-				async : true,
-				data : JSON.stringify(hm9000Info),
-				success : function(data, status) {
-					w2popup.clear();
-					if(iaas.toLowerCase() == "vsphere"){
-						vSphereResourceInfoPopup();	
-					}else{
-						resourceInfoPopup();
-					}
-				},
-				error : function(e, status) {
-					w2alert("Cf HM9000 등록에 실패 하였습니다.", "Cf 설치");
-				}
-			});
-		} 
-	} else {
-		w2popup.clear();
-		blobstoreInfoPopup();
-	}
-}
-
-
-/********************************************************
  * 설명		: 리소스 정보 팝업(openstack/aws)
  * Function	: resourceInfoPopup
  *********************************************************/
 function resourceInfoPopup() {
-	 settingDiegoUse(diegoUse, $("#resourceInfoDiv ul"));
 	$("#resourceInfoDiv").w2popup({
-		width : 950,
+		width : 750,
 		height : 800,
 		modal : true,
 		showMax : false,
@@ -910,9 +788,8 @@ function resourceInfoPopup() {
  * Function	: vSphereResourceInfoPopup
  *********************************************************/
 function vSphereResourceInfoPopup() {
-	settingDiegoUse(diegoUse, $("#vSphereResourceInfoDiv ul"));
 	$("#vSphereResourceInfoDiv").w2popup({
-		width : 950,
+		width : 750,
 		height : 800,
 		modal : true,
 		showMax : false,
@@ -1035,11 +912,7 @@ function saveResourceInfo(type) {
 		}
 	} else if (type == 'before') {
 		w2popup.clear();
-		if(diegoUse=="true") {
-			blobstoreInfoPopup();
-		} else {
-			hm9000InfoPopup();
-		}
+		keyInfoPopup();
 	}
 }
 
@@ -1080,9 +953,8 @@ function createSettingFile(id){
  * Function	: deployPopup
  *********************************************************/
 function deployPopup() {
-	 settingDiegoUse(diegoUse, $("#deployDiv ul"));
 	$("#deployDiv").w2popup({
-		width : 950,
+		width : 750,
 		height : 550,
 		modal : true,
 		showMax : true,
@@ -1152,7 +1024,6 @@ function cfDeploy(type) {
  *********************************************************/
 var installClient = "";
 function installPopup(){
-	settingDiegoUse(diegoUse, $("#installDiv ul"));
 	var deploymentName =  defaultInfo.deploymentName;
 	var message = "CF(배포명:" + deploymentName +  ") ";
 	
@@ -1215,17 +1086,9 @@ function installPopup(){
 function settingDiegoUse(flag, thisDiv){
 	if(flag=="false"){
 		//ham_9000 display
-		$(".progressStep .hm9000").show();
 		$("#fingerprint").css("display","none");
 	}else{
-		$(".progressStep .hm9000").hide();
 		$("#fingerprint").css("display","block");
-		//progress style
-		thisDiv.removeClass("progressStep");
-		thisDiv.addClass("progressStep_"+installStep);
-		if( installStep == 7 ) { 
-			$(".progressStep_"+installStep +" .install").hide();
-		}
 	}
 	return;
 }
@@ -1249,7 +1112,6 @@ function deletePopup(record){
 			data : JSON.stringify(requestParameter),
 			contentType : "application/json",
 			success : function(data, status) {
-				deploymentName = [];
 				doSearch();
 			},
 			error : function(request, status, error) {
@@ -1309,7 +1171,7 @@ function deletePopup(record){
 					if( deleteClient != "" ){
 						deleteClient.disconnect();
 					}
-					initSetting();
+					doSearch();
 				}
 			}
 		});
@@ -1322,7 +1184,6 @@ function deletePopup(record){
  *********************************************************/
 function initSetting() {
 	cfId = "";
-	deploymentName = [];
 	installClient ="";
 	installStep = 0;
 	internalCnt = 1;
@@ -1338,10 +1199,6 @@ function popupInit(){
 	diegoUse = "";
 	networkId="";
 	defaultInfo = "";
-	uaaInfo = "";
-	consulInfo = "";
-	blobstoreInfo ="";
-	hm9000Info ="";
 	networkInfo = [];
 	publicStaticIp = "";
 	resourceInfo = "";
@@ -1349,7 +1206,9 @@ function popupInit(){
 	stemcells = "";
 	installStatus ="";
 	deploymentFile = "";
-	blobstoreInfo="";
+	countryCodes = null;
+	keyFile ="";
+
 }
 
 /********************************************************
@@ -1398,6 +1257,9 @@ function gridReload() {
 	 }else if( menu =="cfDiego" ){
 		 w2ui['config_cfDiegoGrid'].load("<c:url value='/deploy/cfDiego/list/"+iaas+"'/>",
 					function() { doButtonStyle(); });
+	 }else{
+		 w2ui['config_cfGrid'].reset();
+		 doSearch();
 	 }
 }
 
@@ -1408,13 +1270,10 @@ function gridReload() {
 	<div rel="title"><b>CF 설치</b></div>
 	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 		<div style="margin-left: 2%;display:inline-block;width: 98%;">
-			<ul class="progressStep">
+			<ul class="progressStep_6">
 				<li class="active">기본 정보</li>
 				<li class="before">네트워크 정보</li>
-				<li class="before">UAA 정보</li>
-				<li class="before">CONSUL 정보</li>
-				<li class="before">BLOBSTORE 정보</li>
-				<li class="before hm9000">HM9000 정보</li>
+				<li class="before">Key 생성</li>
 				<li class="before">리소스 정보</li>
 				<li class="before">배포파일 정보</li>
 				<li class="before install">설치</li>
@@ -1440,6 +1299,7 @@ function gridReload() {
 					</div>
 					<div class="w2ui-field">
 						<label style="text-align: left; width: 40%; font-size: 11px;">CF 릴리즈</label>
+						<img alt="diego-help-info"  src="../images/help-Info-icon.png" class="cf-info" style="width:18px; position:absolute; left:17%; margin-top:3px"  data-toggle="popover"  data-trigger="hover" data-html="true" title="CF 릴리즈 설치 지원 버전 목록"/>
 						<div>
 							<input name="releases" type="list" style="float: left; width: 60%;" required placeholder="CF 릴리즈를 선택하세요." />
 						</div>
@@ -1447,7 +1307,7 @@ function gridReload() {
 					<div class="w2ui-field" id="fingerprint">
 						<label style="text-align: left; width: 40%; font-size: 11px;">SSH 핑거프린트</label>
 						<div>
-							<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="Diego SSH 핑거프린트를 입력하세요." />
+							<input name="appSshFingerprint" type="text" style="float: left; width: 60%;" required placeholder="Diego 키 생성 후 SSH 핑거프린트를 입력하세요." />
 							<div class="isMessage"></div>
 						</div>
 					</div>
@@ -1491,6 +1351,20 @@ function gridReload() {
 							<div class="isMessage"></div>
 						</div>
 					</div>
+					<div class="w2ui-field">
+						<label style="text-align: left; width: 40%; font-size: 11px;">HAProxy 공인 IP</label>
+						<div>
+							<input name="proxyStaticIps" type="text" style="float: left; width: 60%;" required placeholder="HAProxy 공인 IP를 입력하세요." />
+							<div class="isMessage"></div>
+						</div>
+					</div>
+					<div class="w2ui-field">
+						<label style="text-align: left; width: 40%; font-size: 11px;">로그인 비밀번호</label>
+						<div>
+							<input name="loginSecret" type="text" style="float: left; width: 60%;" required placeholder="로그인 비밀번호룰 입력하세요." />
+							<div class="isMessage"></div>
+						</div>
+					</div>
 				</div>
 			</div>	
 		</div>
@@ -1506,13 +1380,10 @@ function gridReload() {
 	<div rel="title"><b>CF 설치</b></div>
 	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 		<div style="margin-left: 2%;display:inline-block;width: 98%;">
-			<ul class="progressStep">
+			<ul class="progressStep_6">
 				<li class="pass">기본 정보</li>
 				<li class="active">네트워크 정보</li>
-				<li class="before">UAA 정보</li>
-				<li class="before">CONSUL 정보</li>
-				<li class="before">BLOBSTORE 정보</li>
-				<li class="before hm9000">HM9000 정보</li>
+				<li class="before">Key 생성</li>
 				<li class="before">리소스 정보</li>
 				<li class="before">배포파일 정보</li>
 				<li class="before install">설치</li>
@@ -1610,18 +1481,16 @@ function gridReload() {
 	    </div>
 	</div>
 </div>
+
 <!-- vSphere Network -->
 <div id="VsphereNetworkInfoDiv" style="width:100%;height:100%;" hidden="true">
 	<div rel="title"><b>CF 설치</b></div>
 	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 		<div style="margin-left: 2%;display:inline-block;width: 98%;">
-            <ul class="progressStep" >
+            <ul class="progressStep_6" >
 	            <li class="pass">기본 정보</li>
 				<li class="active">네트워크 정보</li>
-				<li class="before">UAA 정보</li>
-				<li class="before">CONSUL 정보</li>
-				<li class="before">BLOBSTORE 정보</li>
-				<li class="before hm9000">HM9000 정보</li>
+				<li class="before">Key 생성</li>
 				<li class="before">리소스 정보</li>
 				<li class="before">배포파일 정보</li>
 				<li class="before install">설치</li>
@@ -1745,18 +1614,15 @@ function gridReload() {
 	</div>
 </div>
 
-<!--  UAA 설정 DIV -->
-<div id="uaaInfoDiv" style="width: 100%; height: 100%;" hidden="true">
+<!--  Key 생성 Div -->
+<div id="KeyInfoDiv" style="width: 100%; height: 100%;" hidden="true">
 	<div rel="title"><b>CF 설치</b></div>
 	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 		<div style="margin-left: 2%;display:inline-block;width: 98%;">
-			<ul class="progressStep">
+			<ul class="progressStep_6">
 				<li class="pass">기본 정보</li>
 				<li class="pass">네트워크 정보</li>
-				<li class="active">UAA 정보</li>
-				<li class="before">CONSUL 정보</li>
-				<li class="before">BLOBSTORE 정보</li>
-				<li class="before hm9000">HM9000 정보</li>
+				<li class="active">Key 생성</li>
 				<li class="before">리소스 정보</li>
 				<li class="before">배포파일 정보</li>
 				<li class="before install">설치</li>
@@ -1764,254 +1630,64 @@ function gridReload() {
 		</div>
 		<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
 			<div class="panel panel-info">	
-				<div class="panel-heading"><b>UAA 정보</b></div>
+				<div class="panel-heading"><b>Key 생성 정보</b></div>
 				<div class="panel-body" style="padding:5px 5% 10px 5%;">
 					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">로그인 비밀번호</label>
+						<label style="text-align: left; width: 40%; font-size: 11px;">도메인</label>
 						<div>
-							<input name="loginSecret" type="text" style="float: left; width: 60%;" required placeholder="로그인 비밀번호를 입력하세요." />
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">개인키</label>
-						<div>
-							<textarea name="signingKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="jwt-signing.key를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">공개키</label>
-						<div>
-							<textarea name="verificationKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="jwt-verification.key를 입력하세요." ></textarea>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="panel panel-info">	
-				<div class="panel-heading"><b>HAProxy 정보</b></div>
-				<div class="panel-body" style="padding:5px 5% 10px 5%;">
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">HAProxy 공인 IP</label>
-						<div>
-							<input name="proxyStaticIps" type="text" style="float: left; width: 60%;" required placeholder="프록시 서버 공인 IP를 입력하세요." />
+							<input name="cfDomain" type="text" style="float: left; width: 55%;" required readonly placeholder="도메인을 입력하세요." />
 							<div class="isMessage"></div>
 						</div>
-					</div>	
+					</div>
 					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">HAProxy 인증서</label>
+						<label style="text-align: left; width: 40%; font-size: 11px;">국가 코드</label>
 						<div>
-							<textarea name="sslPemPub" style="float: left; width: 60%; height: 60px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="ha_proxy_ssl을 인증서를 입력하세요." ></textarea>
+							<input name="countryCode" type="list" style="float: left; width: 40%;" required placeholder="국가 코드를 선택하세요." />
 						</div>
 					</div>
 					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">HAProxy 개인키</label>
+						<label style="text-align: left; width: 40%; font-size: 11px;">시/도</label>
 						<div>
-							<textarea name="sslPemRsa" style="float: left; width: 60%; height: 60px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="ha_proxy_ssl을 개인키 입력하세요." ></textarea>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<br/>
-		<div class="w2ui-buttons" rel="buttons" hidden="true"> 
-			<button class="btn" style="float: left;" onclick="saveUaaInfo('before');">이전</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="saveUaaInfo('after');">다음>></button>
-		</div>
-	</div>
-</div>
-
-<!-- CONSUL 설정 DIV -->
-<div id="consulInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-	<div rel="title"><b>CF 설치</b></div>
-	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
-		<div style="margin-left: 2%;display:inline-block;width: 98%;">
-			<ul class="progressStep">
-				<li class="pass">기본 정보</li>
-				<li class="pass">네트워크 정보</li>
-				<li class="pass">UAA 정보</li>
-				<li class="active">CONSUL 정보</li>
-				<li class="before">BLOBSTORE 정보</li>
-				<li class="before hm9000">HM9000 정보</li>
-				<li class="before">리소스 정보</li>
-				<li class="before">배포파일 정보</li>
-				<li class="before install">설치</li>
-			</ul>
-		</div>
-		<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
-			<div class="panel panel-info">	
-				<div class="panel-heading"><b>CONSUL 정보</b></div>
-				<div class="panel-body" style="padding:5px 5% 10px 5%;">
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">암호화 키</label>
-						<div>
-							<input name="encryptKeys" type="text" style="float: left; width: 60%;" required placeholder="encrypt_key를 입력하세요." />
+							<input name="stateName" type="text" style="float: left; width: 55%;" required placeholder="시/도를 선택하세요." />
+							<div class="isMessage"></div>
 						</div>
 					</div>
 					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">에이전트 인증서</label>
+						<label style="text-align: left; width: 40%; font-size: 11px;">시/구/군</label>
 						<div>
-							<textarea name="agentCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="agent.crt를 입력하세요." ></textarea>
+							<input name="localityName" type="text" style="float: left; width: 55%;" required placeholder="시/구/군을 입력하세요." />
+							<div class="isMessage"></div>
 						</div>
 					</div>
 					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">에이전트 개인키</label>
+						<label style="text-align: left; width: 40%; font-size: 11px;">회사명</label>
 						<div>
-							<textarea name="agentKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="agent.key를 입력하세요." ></textarea>
+							<input name="organizationName" type="text" style="float: left; width: 55%;" required placeholder="회사명을 입력하세요." />
+							<div class="isMessage"></div>
 						</div>
 					</div>
 					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">서버 CA 인증서</label>
+						<label style="text-align: left; width: 40%; font-size: 11px;">부서명</label>
 						<div>
-							<textarea name="caCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="server-ca.crt를 입력하세요." ></textarea>
+							<input name="unitName" type="text" style="float: left; width: 55%;" required placeholder="부서명을 입력하세요." />
+							<div class="isMessage"></div>
 						</div>
 					</div>
 					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">서버 인증서</label>
+						<label style="text-align: left; width: 40%; font-size: 11px;">Email</label>
 						<div>
-							<textarea name="serverCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="server.crt를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">서버 개인키</label>
-						<div>
-							<textarea name="serverKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="server.key를 입력하세요." ></textarea>
+							<input name="email" type="text" style="float: left; width: 55%;"  required placeholder="Email을 입력하세요." />
+							<div class="isMessage"></div>
 						</div>
 					</div>
 				</div>
+					<button class="btn" style="float: right; margin-top:10px;" onclick="createKeyConfirm();" >Key 생성</button>
 			</div>
 		</div>
 		<br/>
-		<div class="w2ui-buttons" rel="buttons" hidden="true"> 
-			<button class="btn" style="float: left;" onclick="saveConsulInfo('before');">이전</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="saveConsulInfo('after');">다음>></button>
-		</div>
-	</div>
-</div>
-
-<!-- BLOBSTORE 설정 DIV -->
-<div id="blobstoreInfoDiv" style="width: 100%; height: 100%;" hidden="true">
-	<div rel="title"><b>CF 설치</b></div>
-	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
-		<div style="margin-left: 2%;display:inline-block;width: 98%;">
-			<ul class="progressStep">
-				<li class="pass">기본 정보</li>
-				<li class="pass">네트워크 정보</li>
-				<li class="pass">UAA 정보</li>
-				<li class="pass">CONSUL 정보</li>
-				<li class="active">BLOBSTORE 정보</li>
-				<li class="before hm9000">HM9000 정보</li>
-				<li class="before">리소스 정보</li>
-				<li class="before">배포파일 정보</li>
-				<li class="before install">설치</li>
-			</ul>
-		</div>
-		<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
-			<div class="panel panel-info">	
-				<div class="panel-heading"><b>BLOBSTORE 정보</b></div>
-				<div class="panel-body" style="padding:5px 5% 10px 5%;">
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">BlobStroe CA 인증서</label>
-						<div>
-							<textarea name="blobstoreCaCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="server-ca.crt를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">BlobStroe 서버키</label>
-						<div>
-							<textarea name="blobstorePrivateKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="server.key를 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">BlobStroe 서버 인증서</label>
-						<div>
-							<textarea name="blobstoreTlsCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="server.crt를 입력하세요." ></textarea>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<br/>
-		<div class="w2ui-buttons" rel="buttons" hidden="true"> 
-			<button class="btn" style="float: left;" onclick="saveBlobstoreInfo('before');">이전</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="saveBlobstoreInfo('after');">다음>></button>
-		</div>
-	</div>
-</div>
-
-<!-- hm9000 설정 DIV -->
-<div id="hm9000InfoDiv" style="width: 100%; height: 100%;" hidden="true">
-	<div rel="title"><b>CF 설치</b></div>
-	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
-		<div style="margin-left: 2%;display:inline-block;width: 98%;">
-			<ul class="progressStep">
-				<li class="pass">기본 정보</li>
-				<li class="pass">네트워크 정보</li>
-				<li class="pass">UAA 정보</li>
-				<li class="pass">CONSUL 정보</li>
-				<li class="pass">BLOBSTORE 정보</li>
-				<li class="active hm9000">HM9000 정보</li>
-				<li class="before">리소스 정보</li>
-				<li class="before">배포파일 정보</li>
-				<li class="before install">설치</li>
-			</ul>
-		</div>
-		<div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
-			<div class="panel panel-info">	
-				<div class="panel-heading"><b>HM9000 정보</b></div>
-				<div class="panel-body" style="padding:5px 5% 10px 5%;">
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">HM9000 서버키</label>
-						<div>
-							<textarea name="hm9000ServerKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="hm9000_server.key 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">HM9000 서버 인증서</label>
-						<div>
-							<textarea name="hm9000ServerCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="hm9000_server.crt 입력하세요. " ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">HM9000 클라이언트키</label>
-						<div>
-							<textarea name="hm9000ClientKey" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="hm9000_client.key 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">HM9000 클라이언트 인증서</label>
-						<div>
-							<textarea name="hm9000ClientCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="hm9000_client.crt 입력하세요." ></textarea>
-						</div>
-					</div>
-					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">HM9000 CA 인증서</label>
-						<div>
-							<textarea name="hm9000CaCert" style="float: left; width: 60%; height: 80px;margin-bottom:10px; overflow-y: visible; resize: none; background-color: #FFF;"
-								required placeholder="hm9000_ca.crt 입력하세요." ></textarea>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<br/>
-		<div class="w2ui-buttons" rel="buttons" hidden="true"> 
-			<button class="btn" style="float: left;" onclick="saveHm9000Info('before');">이전</button>
-			<button class="btn" style="float: right; padding-right: 15%" onclick="saveHm9000Info('after');">다음>></button>
+		<div class="w2ui-buttons" rel="buttons" hidden="true">
+			<button class="btn" style="float: left;" onclick="saveKeyInfo('before');" >이전</button>
+			<button class="btn" style="float: right; padding-right: 15%" onclick="saveKeyInfo('after');">다음>></button>
 		</div>
 	</div>
 </div>
@@ -2021,13 +1697,10 @@ function gridReload() {
 	<div rel="title"><b>CF 설치</b></div>
 	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 		<div style="margin-left: 2%;display:inline-block;width: 98%;">
-			<ul class="progressStep">
+			<ul class="progressStep_6">
 				<li class="pass">기본 정보</li>
 				<li class="pass">네트워크 정보</li>
-				<li class="pass">UAA 정보</li>
-				<li class="pass">CONSUL 정보</li>
-				<li class="pass">BLOBSTORE 정보</li>
-				<li class="pass hm9000">HM9000 정보</li>
+				<li class="pass">Key 생성</li>
 				<li class="active">리소스 정보</li>
 				<li class="before">배포파일 정보</li>
 				<li class="before install">설치</li>
@@ -2109,18 +1782,16 @@ function gridReload() {
 		<button class="btn" style="float: right; padding-right: 15%" onclick="saveResourceInfo('after');">다음>></button>
 	</div>
 </div>
+
 <!--  vSphere Resource -->
 <div id="vSphereResourceInfoDiv" style="width: 100%; height: 100%;" hidden="true">
 	<div rel="title"><b>CF 설치</b></div>
 	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 		<div style="margin-left: 2%;display:inline-block;width: 98%;">
-			<ul class="progressStep">
+			<ul class="progressStep_6">
 				<li class="pass">기본 정보</li>
 				<li class="pass">네트워크 정보</li>
-				<li class="pass">UAA 정보</li>
-				<li class="pass">CONSUL 정보</li>
-				<li class="pass">BLOBSTORE 정보</li>
-				<li class="pass hm9000">HM9000 정보</li>
+				<li class="pass">Key 생성</li>
 				<li class="active">리소스 정보</li>
 				<li class="before">배포파일 정보</li>
 				<li class="before install">설치</li>
@@ -2248,13 +1919,10 @@ function gridReload() {
 	<div rel="title"><b>CF 설치</b></div>
 	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
 		<div style="margin-left: 2%;display:inline-block;width: 98%;">
-			<ul class="progressStep">
+			<ul class="progressStep_6">
 				<li class="pass">기본 정보</li>
 				<li class="pass">네트워크 정보</li>
-				<li class="pass">UAA 정보</li>
-				<li class="pass">CONSUL 정보</li>
-				<li class="pass">BLOBSTORE 정보</li>
-				<li class="pass hm9000">HM9000 정보</li>
+				<li class="pass">Key 생성</li>
 				<li class="pass">리소스 정보</li>
 				<li class="active">배포파일 정보</li>
 				<li class="before install">설치</li>
@@ -2275,13 +1943,10 @@ function gridReload() {
 	<div rel="title"><b>CF 설치</b></div>
 	<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 		<div style="margin-left: 2%;display:inline-block;width: 98%;">
-			<ul class="progressStep">
+			<ul class="progressStep_6">
 				<li class="pass">기본 정보</li>
 				<li class="pass">네트워크 정보</li>
-				<li class="pass">UAA 정보</li>
-				<li class="pass">CONSUL 정보</li>
-				<li class="pass">BLOBSTORE 정보</li>
-				<li class="pass hm9000">HM9000 정보</li>
+				<li class="pass">Key 생성</li>
 				<li class="pass">리소스 정보</li>
 				<li class="pass">배포파일 정보</li>
 				<li class="active install">설치</li>

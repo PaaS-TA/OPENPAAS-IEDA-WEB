@@ -74,6 +74,7 @@ $(function(){
 					selectColumn: true,
 					footer: true
 					},
+		msgAJAXerror : '해당 코드가 존재 하지 않습니다.',
 		multiSelect: false,
 		method 	: "GET",
 		style	: 'text-align:center',
@@ -211,6 +212,9 @@ $(function(){
 					getSubList(record.codeValue);
 				}					
 			},onClose:function(event){
+				w2ui['us_codeGrid'].clear();
+				$('#modifyCodeBtn').attr('disabled', true);
+				$('#deleteCodeBtn').attr('disabled', true);
 				doSearchByIdx(record.codeValue);
 			}
 		});
@@ -253,6 +257,9 @@ $(function(){
 					deleteCode(record.codeIdx);// 코드 삭제
 				},
 				no_callBack	: function(){
+					w2ui['us_codeGrid'].clear();
+					$('#modifyCodeBtn').attr('disabled', true);
+					$('#deleteCodeBtn').attr('disabled', true);
 					doSearchByIdx(record.parentCode)
 				}
 			});
@@ -547,6 +554,9 @@ function updateCodePopup(record) {
 				getSubList(record.parentCode, record.subGroupCode);
 			}
 		},onClose:function(event){
+			w2ui['us_codeGrid'].clear();
+			$('#modifyCodeBtn').attr('disabled', true);
+			$('#deleteCodeBtn').attr('disabled', true);
 			doSearchByIdx(record.parentCode);
 		}
 	});
@@ -609,7 +619,7 @@ function lock (msg) {
 			<span id="deleteBtn" class="btn btn-danger" style="width:120px">삭제</span>
 	    </div>
 	</div>
-	<div id="us_codeGroupGrid" style="width:100%; height:250px"></div>
+	<div id="us_codeGroupGrid" style="width:100%; height:230px"></div>
 	
 	<!-- 코드 목록-->
 	<div class="pdt20">
@@ -620,7 +630,7 @@ function lock (msg) {
 			<span id="deleteCodeBtn" class="btn btn-danger" style="width:120px">삭제</span>
 	    </div>
 	</div>	
-	<div id="us_codeGrid" style="width:100%; height:450px"></div>
+	<div id="us_codeGrid" style="width:100%; height:430px"></div>
 	
 	<!-- 코드 그룹 추가/수정 팝업 -->
 	<div id="regPopupDiv" hidden="true">

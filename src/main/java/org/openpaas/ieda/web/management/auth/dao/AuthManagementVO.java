@@ -23,6 +23,9 @@ public class AuthManagementVO {
 	
 	private Date updateDate; // 수정일자
 	
+	private String authCode;//권한코드
+	
+	private String seq;//seq
 	
 	public Integer getRecid() {
 		return recid;
@@ -111,4 +114,21 @@ public class AuthManagementVO {
 			this.createDate = new Date(createDate.getTime());
 		}
 	}
+
+	public String getAuthCode() {
+		return authCode;
+	}
+
+	public void setAuthCode(String authCode) {
+		this.authCode = authCode;
+	}
+
+	public String getSeq() {
+		return seq;
+	}
+
+	public void setSeq(String seq) {
+		this.seq = seq;
+	}
+	
 }

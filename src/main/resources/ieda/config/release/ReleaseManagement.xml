@@ -9,7 +9,6 @@
 		<result property="releaseType" column ="RELEASE_TYPE"/>
 		<result property="releaseFileName" column ="RELEASE_FILENAME"/>
 		<result property="releaseSize" column ="SIZE"/>
-		<result property="releaseVersion" column ="RELEASE_VERSION"/>
 		<result property="createUserId" column="CREATE_USER_ID"/>
 		<result property="updateUserId" column="UPDATE_USER_ID"/>
 		<result property="downloadStatus" column ="DOWNLOAD_STATUS"/>

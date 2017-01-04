@@ -28,7 +28,7 @@ public interface DiegoDAO {
 	 * @title               : insertDiegoDefaultInfo
 	 * @return            : void
 	***************************************************/
-	void insertDiegoDefaultInfo(@Param("diego")DiegoVO config);
+	void insertDiegoDefaultInfo(@Param("diego")DiegoVO vo);
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
@@ -36,7 +36,7 @@ public interface DiegoDAO {
 	 * @title               : updateDiegoDefaultInfo
 	 * @return            : void
 	***************************************************/
-	void updateDiegoDefaultInfo(@Param("diego")DiegoVO config);
+	void updateDiegoDefaultInfo(@Param("diego")DiegoVO vo);
 
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화

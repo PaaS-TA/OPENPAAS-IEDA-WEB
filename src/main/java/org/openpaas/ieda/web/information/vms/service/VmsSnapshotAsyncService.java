@@ -52,9 +52,8 @@ public class VmsSnapshotAsyncService {
 			getMethod  = new GetMethod(DirectorRestHelper.getManifestURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), dto.getDeploymentName()));
 			getMethod = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)getMethod);
 			int statusCode = client.executeMethod(getMethod);
-			
 			if (HttpStatus.valueOf(statusCode) != HttpStatus.OK) {
-				throw new CommonException("notfound.vm.exception",  "스냅 정보가 존재 하지 않습니다.", HttpStatus.NOT_FOUND);
+				throw new CommonException("notfound.vm.exception",  "스냅샷 정보가 존재 하지 않습니다.", HttpStatus.NOT_FOUND);
 			}
 			JSONObject obj = new JSONObject(getMethod.getResponseBodyAsString());
 			content = obj.get("manifest").toString();
@@ -68,7 +67,6 @@ public class VmsSnapshotAsyncService {
 			
 			postMethod.setRequestEntity(new StringRequestEntity(content, "text/yaml", "UTF-8"));
 			statusCode = client.executeMethod(postMethod);
-			
 			if ( statusCode == HttpStatus.MOVED_PERMANENTLY.value()
 					  || statusCode == HttpStatus.MOVED_TEMPORARILY.value() ) {
 				
@@ -79,7 +77,7 @@ public class VmsSnapshotAsyncService {
 				
 				status = DirectorRestHelper.trackToTaskLineOne(defaultDirector, messagingTemplate, MESSAGE_ENDPOINT, client, taskId, "event", principal.getName());
 			}else {
-				DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("스냅샷 생성 중 오류가 발생하였습니다.[" + statusCode + "]"));
+				DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("스냅샷 생성 중 오류가 발생하였습니다."));
 			}
 		}catch(RuntimeException e){
 			DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("스냅샷 생성 중 Exception이 발생하였습니다."));

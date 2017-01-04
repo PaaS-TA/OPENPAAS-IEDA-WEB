@@ -39,8 +39,8 @@ public class CfDiegoService {
 	@Autowired DiegoService diegoService;
 	@Autowired private NetworkDAO networkDao;
 	@Autowired private ResourceDAO resourceDao;
-	@Autowired  CfDeleteDeployAsyncService cfDeleteDeployAsyncService;
-	@Autowired  DiegoDeleteDeployAsyncService diegoDeleteDeployAsyncService;
+	@Autowired CfDeleteDeployAsyncService cfDeleteDeployAsyncService;
+	@Autowired DiegoDeleteDeployAsyncService diegoDeleteDeployAsyncService;
 	@Autowired private CommonCodeDAO commonCodeDao;
 	
 	final private static String PARENT_CODE="1000"; //배포 코드
@@ -93,7 +93,10 @@ public class CfDiegoService {
 								cloudSecurityGroups += networkVO.getCloudSecurityGroups() + br;
 							}
 						}
-						if( cfCodeVo.getCodeName().toUpperCase().equals("DEPLOY_TYPE_CF") ){
+						
+						//Resource
+						ResourceVO resource = null;
+						if( i == 0 ){
 							cfDiegoVo.getCfVo().getNetwork().setSubnetRange(subnetRange);
 							cfDiegoVo.getCfVo().getNetwork().setSubnetGateway(subnetGateway);
 							cfDiegoVo.getCfVo().getNetwork().setSubnetDns(subnetDns);
@@ -101,6 +104,13 @@ public class CfDiegoService {
 							cfDiegoVo.getCfVo().getNetwork().setSubnetStaticFrom(subnetStaticIp);
 							cfDiegoVo.getCfVo().getNetwork().setSubnetId(subnetId);
 							cfDiegoVo.getCfVo().getNetwork().setCloudSecurityGroups(cloudSecurityGroups);
+							//cf resource
+							resource = resourceDao.selectResourceInfo( cfDiegoVo.getCfVo().getId(), cfCodeVo.getCodeName());
+							if( resource != null ){
+								cfDiegoVo.getCfVo().getResource().setStemcellName(resource.getStemcellName());
+								cfDiegoVo.getCfVo().getResource().setStemcellVersion(resource.getStemcellVersion());
+								cfDiegoVo.getCfVo().getResource().setBoshPassword(resource.getBoshPassword());
+							}
 						} else {
 							cfDiegoVo.getDiegoVo().getNetwork().setSubnetRange(subnetRange);
 							cfDiegoVo.getDiegoVo().getNetwork().setSubnetGateway(subnetGateway);
@@ -109,32 +119,21 @@ public class CfDiegoService {
 							cfDiegoVo.getDiegoVo().getNetwork().setSubnetStaticFrom(subnetStaticIp);
 							cfDiegoVo.getDiegoVo().getNetwork().setSubnetId(subnetId);
 							cfDiegoVo.getDiegoVo().getNetwork().setCloudSecurityGroups(cloudSecurityGroups);
+							//diego Resource
+							resource = resourceDao.selectResourceInfo( cfDiegoVo.getDiegoVo().getId(), diegoCodeVo.getCodeName());
+							if( resource != null ){
+								cfDiegoVo.getDiegoVo().getResource().setStemcellName(resource.getStemcellName());
+								cfDiegoVo.getDiegoVo().getResource().setStemcellVersion(resource.getStemcellVersion());
+								cfDiegoVo.getDiegoVo().getResource().setBoshPassword(resource.getBoshPassword());
+							}
 						}
 					}
-				
-					//Resource
-					ResourceVO resource = null;
-					if( i == 0 ){
-						resource = resourceDao.selectResourceInfo( cfDiegoVo.getCfVo().getId(), cfCodeVo.getCodeName());
-						if( resource != null ){
-							cfDiegoVo.getCfVo().getResource().setStemcellName(resource.getStemcellName());
-							cfDiegoVo.getCfVo().getResource().setStemcellVersion(resource.getStemcellVersion());
-							cfDiegoVo.getCfVo().getResource().setBoshPassword(resource.getBoshPassword());
-						}
-					} else {
-						resource = resourceDao.selectResourceInfo( cfDiegoVo.getDiegoVo().getId(), diegoCodeVo.getCodeName());
-						if( resource != null ){
-							cfDiegoVo.getDiegoVo().getResource().setStemcellName(resource.getStemcellName());
-							cfDiegoVo.getDiegoVo().getResource().setStemcellVersion(resource.getStemcellVersion());
-							cfDiegoVo.getDiegoVo().getResource().setBoshPassword(resource.getBoshPassword());
-						}
-					}
-					
 				}
 			}
 		}
 		return list;
 	}
+	
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
@@ -174,7 +173,7 @@ public class CfDiegoService {
 		
 		if( "cf".equals(dto.getPlatform()) ){
 			CfVO vo = cfService.getCfInfo( Integer.parseInt(dto.getId()) );
-			cfService.createSettingFile(vo, test);
+			cfService.createSettingFile(vo);
 		}else{
 			DiegoVO vo = diegoService.getDiegoDetailInfo( Integer.parseInt(dto.getId()) );
 			diegoService.createSettingFile(vo, test);

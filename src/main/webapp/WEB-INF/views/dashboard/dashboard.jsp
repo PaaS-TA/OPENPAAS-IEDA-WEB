@@ -21,6 +21,7 @@ $(function() {
 	$('#main_deploymentsGrid').w2grid({
 		name: 'main_deploymentsGrid',
 		style	: 'text-align:center',
+		msgAJAXerror : '배포 정보 조회 실패',
 		method	: 'GET',
 		multiSelect: false,
 		show: {	
@@ -45,6 +46,7 @@ $(function() {
 	$('#main_releasesGrid').w2grid({
 		name: 'main_releasesGrid',
 		method 	: "GET",
+		msgAJAXerror : '업로드 된 릴리즈 조회 실패',
 		style: 'text-align:center',
 		columns:[
          	 {field: 'recid', caption: 'recid', hidden: true}
@@ -63,6 +65,7 @@ $(function() {
 	$('#main_stemcellsGrid').w2grid({
 		name: 'main_stemcellsGrid',
 		method 	: "GET",
+		msgAJAXerror : '업로드 된 스템셀 조회 실패',
 		style: 'text-align:center',
 		columns:[
            	   {field: 'recid', caption: 'recid', hidden: true}

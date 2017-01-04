@@ -46,7 +46,7 @@ public class ReleaseManagementDownloadService {
 	public void systemReleaseDownload(ReleaseManagementDTO.Regist dto, Principal principal) {
 		
 		if(StringUtils.isEmpty(dto.getReleaseFileName())){
-			throw new CommonException("illigalArgument.systemRelease.exception",
+			throw new CommonException("notfound.systemRelease.exception",
 					"릴리즈 파일 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 		
@@ -86,7 +86,7 @@ public class ReleaseManagementDownloadService {
 			
 		} catch(IOException e){
 			status = "error";
-			throw new CommonException("illigalArgument.releaseDownload.exception",
+			throw new CommonException("ioFileRead.releaseDownload.exception",
 					"릴리즈 파일 다운로드 처리 중 오류가 발생하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
 			//lock 파일 삭제
@@ -174,7 +174,7 @@ public class ReleaseManagementDownloadService {
 				dto.setUpdateUserId(sessionInfo.getUserId());
 				dao.updateSystemReleaseById(dto);
 			}else{
-				throw new CommonException("illigalArgument.systemRelease.exception",
+				throw new CommonException("sql.systemRelease.exception",
 						"시스템 릴리즈 정보 저장에 실패하였습니다. 확인해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 	}

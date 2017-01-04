@@ -52,7 +52,6 @@ public class ReleaseUploadAsyncService {
 			DirectorRestHelper.sendTaskOutputWithTag(userId, messagingTemplate, MESSAGE_ENDPOINT, "Started", releaseFileName, Arrays.asList("Uploading Release ...", ""));
 			
 			int statusCode = httpClient.executeMethod(postMethod);
-			
 			if ( statusCode == HttpStatus.MOVED_PERMANENTLY.value()
 			  || statusCode == HttpStatus.MOVED_TEMPORARILY.value()	) {
 				Header location = postMethod.getResponseHeader("Location");
@@ -63,7 +62,7 @@ public class ReleaseUploadAsyncService {
 				if(LOGGER.isDebugEnabled()){  
 					LOGGER.debug("################ 업로드 요청 오류 상태코드 : " +  statusCode);
 				}
-				DirectorRestHelper.sendTaskOutputWithTag(userId, messagingTemplate, MESSAGE_ENDPOINT, "error", releaseFileName, Arrays.asList("릴리즈 업로드 중 오류가 발생하였습니다.[" + statusCode + "]"));
+				DirectorRestHelper.sendTaskOutputWithTag(userId, messagingTemplate, MESSAGE_ENDPOINT, "error", releaseFileName, Arrays.asList("릴리즈 업로드 중 오류가 발생하였습니다."));
 			}
 			
 		} catch(RuntimeException e){
@@ -79,10 +78,6 @@ public class ReleaseUploadAsyncService {
 					LOGGER.debug("check delete lock File  : "  + check);
 				}
 			}
-			if(postMethod != null){
-				postMethod.releaseConnection();
-			}
-			
 		}
 	}
 

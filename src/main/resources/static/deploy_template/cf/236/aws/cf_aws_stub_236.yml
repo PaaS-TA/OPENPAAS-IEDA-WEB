@@ -2,6 +2,7 @@
 director_uuid: (( meta.director-uuid ))
 
 meta: ~
+cf-certs: ~
 
 resource_pool_overrides:
   small_instance_type: (( meta.small-instance-type || "t2.small" ))
@@ -76,9 +77,9 @@ properties:
       secret: (( meta.blobstore-secret || "blobstore-secret" ))
     tls:
       port: 443
-      cert: (( meta.blobstore-tls-cert ))
-      private_key: (( meta.blobstore-private-key ))
-      ca_cert: (( meta.blobstore-ca-cert ))
+      cert: (( cf-certs.blobstore-server-cert ))
+      private_key: (( cf-certs.blobstore-server-key ))
+      ca_cert: (( cf-certs.blobstore-ca-cert ))
   ccdb:
     db_scheme: (( meta.ccdb-scheme || "postgres" ))
     roles:
@@ -111,12 +112,12 @@ properties:
     collect_statement_statistics: null
     additional_config: (( merge || nil ))
   consul:
-    encrypt_keys: (( meta.consul-encrypt-keys ))
-    ca_cert: (( meta.consul-ca-cert ))
-    server_cert: (( meta.consul-server-cert ))
-    server_key: (( meta.consul-server-key ))
-    agent_cert: (( meta.consul-agent-cert ))
-    agent_key: (( meta.consul-agent-key ))
+    encrypt_keys: (( cf-certs.consul-encrypt-keys ))
+    ca_cert: (( cf-certs.consul-ca-cert ))
+    server_cert: (( cf-certs.consul-server-cert ))
+    server_key: (( cf-certs.consul-server-key ))
+    agent_cert: (( cf-certs.consul-agent-cert ))
+    agent_key: (( cf-certs.consul-agent-key ))
   dea_next:
     disk_mb: (( meta.dea-next-disk-mb || 2048 ))
     memory_mb: (( meta.dea-next-memory-mb || 1024 ))
@@ -155,8 +156,8 @@ properties:
       notifications:
         secret: (( meta.notification-secret || "notification-secret" ))
     jwt:
-      verification_key: (( meta.jwt-verification-key ))
-      signing_key: (( meta.jwt-signing-key ))
+      verification_key: (( cf-certs.jwt-verification-key ))
+      signing_key: (( cf-certs.jwt-signing-key ))
     scim:
       users:
         - (( "admin|" meta.admin-password "|scim.write,scim.read,openid,cloud_controller.admin,clients.read,clients.write,doppler.firehose,routing.router_groups.read,routing.router_groups.write" ))
@@ -172,11 +173,11 @@ properties:
     address: (( meta.ccdb-address || jobs.postgres_z1.networks.cf1.static_ips.[0] ))
     port: (( meta.uaadb-port || 5524 ))  
   hm9000:
-    server_key: (( meta.hm9000-server-key || nil ))
-    server_cert: (( meta.hm9000-server-cert || nil ))
-    client_key: (( meta.hm9000-client-key || nil ))
-    client_cert: (( meta.hm9000-client-cert || nil ))
-    ca_cert: (( meta.hm9000-ca-cert || nil ))
+    server_key: (( cf-certs.hm9000-server-key || nil ))
+    server_cert: (( cf-certs.hm9000-server-cert || nil ))
+    client_key: (( cf-certs.hm9000-client-key || nil ))
+    client_cert: (( cf-certs.hm9000-client-cert || nil ))
+    ca_cert: (( cf-certs.hm9000-ca-cert || nil ))
 
 jobs:
   - name: postgres_z1

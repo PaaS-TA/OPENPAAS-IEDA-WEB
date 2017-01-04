@@ -125,9 +125,6 @@ public class ManifestService {
 				//1.2 yaml parser
 				Map<String, Object> object = CommonUtils.yamlParser(contents.toString());
 				if(object != null){
-					if( LOGGER.isDebugEnabled() ){
-				    	LOGGER.debug( object.get("name").toString() );
-				    }
 				    //1.3 배포명 중복 체크
 					String deploymentName = object.get("name").toString();
 					ManifestVO vo = manifestDao.selectManifestInfoByDeployName(deploymentName);
@@ -218,6 +215,7 @@ public class ManifestService {
 			File manifest = new File( MANIFEST_DIRECTORY + manifestInfo.getFileName() );
 			if(  manifest.exists()){
 				try {
+					fileName = null;
 					//download web browser
 					byte[] content = FileUtils.readFileToByteArray(manifest);
 					fileName = manifestInfo.getFileName();
@@ -229,6 +227,9 @@ public class ManifestService {
 					throw new CommonException("ioFileRead.manifest.exception",
 							"해당 Manifest 파일을 다운로드 할 수 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 				}
+			}else{
+				throw new CommonException("notfound.manifest.exception",
+						"해당 Manifest 파일을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 			}
 		}
 	}

@@ -12,7 +12,6 @@ import org.openpaas.ieda.common.CommonException;
 import org.openpaas.ieda.web.common.dto.SessionInfoDTO;
 import org.openpaas.ieda.web.config.setting.dao.DirectorConfigVO;
 import org.openpaas.ieda.web.config.setting.service.DirectorConfigService;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyDAO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkDAO;
 import org.openpaas.ieda.web.deploy.common.dao.resource.ResourceDAO;
 import org.openpaas.ieda.web.deploy.diego.dao.DiegoDAO;
@@ -35,7 +34,6 @@ public class DiegoDeleteDeployAsyncService {
 	@Autowired private SimpMessagingTemplate messagingTemplate;
 	@Autowired private DirectorConfigService directorConfigService;
 	@Autowired private NetworkDAO networkDao;
-	@Autowired private KeyDAO keyDao;
 	@Autowired private ResourceDAO resourceDao;
 	@Autowired private CommonCodeDAO commonCodeDao;
 	
@@ -80,7 +78,6 @@ public class DiegoDeleteDeployAsyncService {
 			
 			DeleteMethod deleteMethod = new DeleteMethod(DirectorRestHelper.getDeleteDeploymentURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), deploymentName));
 			deleteMethod = (DeleteMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)deleteMethod);
-		
 			int statusCode = httpClient.executeMethod(deleteMethod);
 			if ( statusCode == HttpStatus.MOVED_PERMANENTLY.value()
 			  || statusCode == HttpStatus.MOVED_TEMPORARILY.value()	) {
@@ -93,10 +90,23 @@ public class DiegoDeleteDeployAsyncService {
 				
 			} else {
 				deleteDiegoInfo(vo);
+				DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, messageEndpoint, "done", Arrays.asList("Diego 삭제가 완료되었습니다."));
 			}
 		}catch(RuntimeException e){
+			commonCode = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, STATUS_SUB_GROUP_CODE, "DEPLOY_STATUS_FAILED");
+			if( commonCode != null ){
+				vo.setDeployStatus(commonCode.getCodeValue());
+				vo.setUpdateUserId(sessionInfo.getUserId());
+				saveDeployStatus(vo);
+			}
 			DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, messageEndpoint, "error", Arrays.asList("배포삭제 중 Exception이 발생하였습니다."));
 		}catch ( Exception e) {
+			commonCode = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, STATUS_SUB_GROUP_CODE, "DEPLOY_STATUS_FAILED");
+			if( commonCode != null ){
+				vo.setDeployStatus(commonCode.getCodeValue());
+				vo.setUpdateUserId(sessionInfo.getUserId());
+				saveDeployStatus(vo);
+			}
 			DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, messageEndpoint, "error", Arrays.asList("배포삭제 중 Exception이 발생하였습니다."));
 		}
 
@@ -115,7 +125,6 @@ public class DiegoDeleteDeployAsyncService {
 			CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
 			networkDao.deleteNetworkInfoRecord( vo.getId(), codeVo.getCodeName() );
 			resourceDao.deleteResourceInfo( vo.getId(), codeVo.getCodeName() );	
-			keyDao.deleteKeyInfo(vo.getId(), codeVo.getCodeName());
 		}
 	}
 	

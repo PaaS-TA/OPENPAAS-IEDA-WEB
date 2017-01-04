@@ -117,20 +117,20 @@ public class ReleaseManagementService {
 		String status = "";
 		ReleaseManagementVO vo = null;
 		if( fileName.indexOf(".tgz") < 0 && fileName.indexOf(".zip") < 0 ){
-			status = "preconditionFailed";
+			status = "error";
 			deleteLockFile(status, fileName);
-			throw new CommonException("preconditionFailed.extension.fileupload",
+			throw new CommonException("preconditionFailed.systemRelease.exception",
 					"잘못된 확장자를 갖은 릴리즈 파일 입니다.", HttpStatus.PRECONDITION_FAILED);
 		}
 		if(StringUtils.isEmpty(dto.getReleaseFileName())){
-			status = "notFound";
+			status = "error";
 			deleteLockFile(status, fileName);
 			throw new CommonException("notfound.systemRelease.exception",
 					"해당하는 릴리즈 파일이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 		
 		if(Long.parseLong(dto.getReleaseSize()) < 1 ){
-			status = "notFound";
+			status = "error";
 			deleteLockFile(status, fileName);
 			throw new CommonException("notfound.systemRelease.exception",
 					"해당하는 릴리즈 파일이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
@@ -186,6 +186,11 @@ public class ReleaseManagementService {
 	***************************************************/
 	public ReleaseManagementVO registSystemReleaseDownloadInfo(ReleaseManagementDTO.Regist dto,  String testFlag){
 		
+		if(StringUtils.isEmpty(dto.getReleaseFileName())&& dto.getReleaseFileName() == null){
+			throw new CommonException("notfound.systemRelease.exception",
+					"릴리즈 파일 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+		}
+		
 		ReleaseManagementVO vo = null;
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
@@ -213,7 +218,7 @@ public class ReleaseManagementService {
 					releaseFileName = search[search.length-1];
 					String fileType = releaseFileName.substring(releaseFileName.lastIndexOf(".") + 1, releaseFileName.length());
 					if(!fileType.toLowerCase().equals("tgz") || fileType.toLowerCase().equals("zip")){
-						throw new CommonException("badFileType.extension.fileupload", "잘 못된 확장자를 갖은 릴리즈 파일 입니다.", HttpStatus.PRECONDITION_FAILED);
+						throw new CommonException("preconditionFailed.systemRelease.exception", "잘 못된 확장자를 갖은 릴리즈 파일 입니다.", HttpStatus.PRECONDITION_FAILED);
 					}
 					flag = true;
 				}

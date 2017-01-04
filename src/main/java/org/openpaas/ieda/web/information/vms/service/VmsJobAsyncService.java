@@ -49,11 +49,10 @@ public class VmsJobAsyncService {
 			httpClient = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
 			getMethod  = new GetMethod(DirectorRestHelper.getManifestURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), dto.getDeploymentName()));
 			getMethod = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)getMethod);
-			int statusCode = httpClient.executeMethod(getMethod);
 			
+			int statusCode = httpClient.executeMethod(getMethod);
 			if (HttpStatus.valueOf(statusCode) != HttpStatus.OK) {
-				throw new CommonException("notfound.vm.exception", 
-						"Job 정보가 존재 하지 않습니다.", HttpStatus.NOT_FOUND);
+				throw new CommonException("notfound.vm.exception", "Job 정보가 존재 하지 않습니다.", HttpStatus.NOT_FOUND);
 			}
 			JSONObject obj = new JSONObject(getMethod.getResponseBodyAsString());
 			content = obj.get("manifest").toString();
@@ -76,7 +75,7 @@ public class VmsJobAsyncService {
 				taskId = DirectorRestHelper.getTaskId(location.getValue());
 				DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, MESSAGE_ENDPOINT, httpClient, taskId, "event", principal.getName());
 			}else {
-				DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("Job " + dto.getState() + " 중 오류가 발생하였습니다.[" + statusCode + "]"));
+				DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("Job " + dto.getState() + " 중 오류가 발생하였습니다."));
 			}
 		}catch(RuntimeException e){
 			DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("Job " + dto.getState() + " 중 Exception이 발생하였습니다."));

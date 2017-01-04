@@ -27,6 +27,8 @@ public class CfDiegoParamDTO {
 		private String domain; //도메인
 		private String description; //도메인 설명
 		private String domainOrganization; //도메인 그룹
+		private String proxyStaticIps; //HAProxy 공인 IP
+        private String loginSecret; //로그인 비밀번호
 		
 		//1.3 Diego 기본 정보
 		private String diegoReleaseName; //DIEGO 릴리즈명
@@ -37,10 +39,12 @@ public class CfDiegoParamDTO {
 		private String etcdReleaseVersion; //ETCD 릴리즈 버전
 		private int cfId; //cf 아아디
 		private String cfDeployment; //cf 파일명
-		private String cfDeploymentName;
+		private String cfDeploymentName;//cf 배포명
 		
 		private String cflinuxfs2rootfsreleaseName; //cflinuxfs2rootf 릴리즈 명
 		private String cflinuxfs2rootfsreleaseVersion; //cflinuxfs2rootf 릴리즈 버전
+
+		private String keyFile;
 		
 		public String getId() {
 			return id;
@@ -193,6 +197,25 @@ public class CfDiegoParamDTO {
 		public void setCflinuxfs2rootfsreleaseVersion(String cflinuxfs2rootfsreleaseVersion) {
 			this.cflinuxfs2rootfsreleaseVersion = cflinuxfs2rootfsreleaseVersion;
 		}
+		public String getKeyFile() {
+			return keyFile;
+		}
+		public void setKeyFile(String keyFile) {
+			this.keyFile = keyFile;
+		}
+		public String getProxyStaticIps() {
+			return proxyStaticIps;
+		}
+		public void setProxyStaticIps(String proxyStaticIps) {
+			this.proxyStaticIps = proxyStaticIps;
+		}
+		public String getLoginSecret() {
+			return loginSecret;
+		}
+		public void setLoginSecret(String loginSecret) {
+			this.loginSecret = loginSecret;
+		}
+		
 		
 	}
 	

@@ -47,7 +47,7 @@ public class ReleaseManagementDownloadServiceTest {
 	public void testReleaseDownloadAsync(ReleaseManagementDTO.Regist dto, Principal principal){
 		
 		if(StringUtils.isEmpty(dto.getReleaseFileName())){
-			throw new CommonException("illigalArgument.systemRelease.exception",
+			throw new CommonException("notfound.systemRelease.exception",
 					"릴리즈 파일 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 		
@@ -62,7 +62,6 @@ public class ReleaseManagementDownloadServiceTest {
 			ProcessBuilder builder = new ProcessBuilder("wget", "-d", "-P", TMPDIRECTORY, "--content-disposition", dto.getReleaseFileName());
 			builder.redirectErrorStream(true);
 			Process process = builder.start();
-			
 			inputStream = process.getInputStream();
 			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 			
@@ -111,7 +110,6 @@ public class ReleaseManagementDownloadServiceTest {
 		}else{
 			try {
 				FileUtils.moveFile(tmpFile,releseFile);
-				
 				//다운로드 여부
 				dto.setDownloadStatus("Y");
 				saveSystemReleseSave(dto, principal);

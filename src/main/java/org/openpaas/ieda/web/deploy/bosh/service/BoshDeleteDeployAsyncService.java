@@ -38,7 +38,7 @@ public class BoshDeleteDeployAsyncService {
 	@Autowired private CommonCodeDAO commonCodeDao;
 	
 	final private static String PARENT_CODE="1000"; //배포 코드
-	final private static String SUB_GROUP_CODE="1100"; //배포 유형 코드
+	final private static String SUB_GROUP_CODE="1200";
 	final private static String STATUS_SUB_GROUP_CODE="1200"; //배포 상태 코드
 	final private static String CODE_NAME="DEPLOY_TYPE_BOSH"; //배포 할 플랫폼명
 	final private static String MESSAGE_ENDPOINT = "/deploy/bosh/delete/logs"; 
@@ -58,7 +58,6 @@ public class BoshDeleteDeployAsyncService {
 		
 		vo = boshDao.selectBoshDetailInfo(Integer.parseInt(dto.getId()));
 		if ( vo != null ) deploymentName = vo.getDeploymentName();
-			
 		if ( StringUtils.isEmpty(deploymentName) ) {
 			throw new CommonException("notfound.boshdelete.exception",
 					"배포정보가 존재하지 않습니다..", HttpStatus.NOT_FOUND);
@@ -79,7 +78,6 @@ public class BoshDeleteDeployAsyncService {
 			
 			DeleteMethod deleteMethod = new DeleteMethod(DirectorRestHelper.getDeleteDeploymentURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), deploymentName));
 			deleteMethod = (DeleteMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)deleteMethod);
-		
 			int statusCode = httpClient.executeMethod(deleteMethod);
 			if ( statusCode == HttpStatus.MOVED_PERMANENTLY.value()
 			  || statusCode == HttpStatus.MOVED_TEMPORARILY.value()	) {
@@ -91,12 +89,19 @@ public class BoshDeleteDeployAsyncService {
 				//정보 삭제
 				deleteBoshInfo(vo);
 			} else {
+				DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "done", Arrays.asList("Bosh 삭제가 완료되었습니다."));
 				deleteBoshInfo(vo);
 			}
 		}catch(RuntimeException e){
 			DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("배포삭제 중 Exception이 발생하였습니다."));
+			commonCode = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, "DEPLOY_STATUS_FAILED");
+			vo.setDeployStatus(commonCode.getCodeName());
+			saveDeployStatus(vo);
 		}catch ( Exception e) {
 			DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("배포삭제 중 Exception이 발생하였습니다."));
+			commonCode = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, "DEPLOY_STATUS_FAILED");
+			vo.setDeployStatus(commonCode.getCodeName());
+			saveDeployStatus(vo);
 		}
 	}
 	

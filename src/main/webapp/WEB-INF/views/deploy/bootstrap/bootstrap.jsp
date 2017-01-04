@@ -257,6 +257,53 @@ function doButtonStyle(){
 	$('#modifyBtn').attr('disabled', true);
 	$('#deleteBtn').attr('disabled', true);
 }
+ 
+/******************************************************************
+ * Function : getDeployLogMsg
+ * 설명		  : 설치 로그 조회
+ ***************************************************************** */
+function getDeployLogMsg(id){
+	$.ajax({
+		type : "GET",
+		url : "/deploy/bootstrap/list/"+id,
+		contentType : "application/json",
+		success : function(data, status) {
+			if(!checkEmpty(data)){
+				deployLogMsgPopup(data);
+			}
+			else{
+				w2alert("배포 로그가 존재 하지 않습니다.",  "BOOTSTRAP 배포로그");
+			}
+		},
+		error : function(request, status, error) {
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message, "BOOTSTRAP 배포로그");
+		}
+	});	
+}
+
+/******************************************************************
+ * Function : deployLogMsgPopup
+ * 설명		  : 배포 로그 팝업창
+ ***************************************************************** */
+function deployLogMsgPopup(msg){
+	var body = '<textarea id="deployLogMsg" style="margin-left:2%;width:95%;height:93%;overflow-y:visible;resize:none;background-color: #FFF; margin:2%" readonly="readonly"></textarea>';
+	
+	w2popup.open({
+		width : 800,
+		height : 700,
+		title : "<b>BOOTSTRAP 배포로그"+"</b>",
+		body  : body,
+		buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="w2popup.close();">닫기</button>',
+		showMax : true,
+		onOpen : function(event){
+			event.onComplete = function(){
+				$("#deployLogMsg").text(msg);
+			}
+		}
+	});	
+}
+
 
  /******************************************************************
   * Function : clearMainPage
@@ -295,7 +342,7 @@ $( window ).resize(function() {
 			<!-- //Btn -->
 	    </div>
 	</div>
-	<div id="config_bootstrapGrid" style="width:100%; height:758px"></div>	
+	<div id="config_bootstrapGrid" style="width:100%; height:718px"></div>	
 </div>
 
 <!-- Infrastructure  설정 DIV -->
@@ -306,7 +353,7 @@ $( window ).resize(function() {
 	</div>
 	<div>
 		<div class="btn-group" data-toggle="buttons" >
-			<label style="width: 100px; ">
+			<label style="width: 100px;">
 				<input type="radio" name="iaas" id="type1" value="AWS" checked="checked"  />
 				&nbsp;AWS
 			</label>

@@ -412,6 +412,9 @@
 				error : function(request, status, error) {
 					// ajax가 실패할때 처리...
 					w2popup.unlock();
+					w2ui['auth_GroupGrid'].clear();
+					doSearch();
+					w2ui['auth_sub_Grid'].clear();
 					w2popup.close();
 					var errorResult = JSON.parse(request.responseText);
 					w2alert(errorResult.message);
@@ -442,6 +445,9 @@
 			},
 			error : function(request, status, error) {
 				var errorResult = JSON.parse(request.responseText);
+				w2ui['auth_GroupGrid'].clear();
+				doSearch();
+				w2ui['auth_sub_Grid'].clear();
 				w2alert(errorResult.message, "삭제 실패");
 			}
 		});
@@ -481,6 +487,9 @@
 				error : function(request, status, error) {
 					// ajax가 실패할때 처리...
 					w2popup.unlock();
+					w2ui['auth_GroupGrid'].clear();
+					doSearch();
+					w2ui['auth_sub_Grid'].clear();
 					w2popup.close();			
 					var errorResult = JSON.parse(request.responseText);
 					w2alert(errorResult.message);
@@ -622,7 +631,7 @@
 			<span id="deleteBtn" class="btn btn-danger" style="width:120px">삭제</span>
 	    </div>
 	</div>
-	<div id="auth_GroupGrid" style="width:100%; height:250px"></div>
+	<div id="auth_GroupGrid" style="width:100%; height:230px"></div>
 	
 	<!-- 권한 목록-->
 	<div class="pdt20">
@@ -632,7 +641,7 @@
 	    </div>
 		
 	</div>	
-	<div id="auth_sub_Grid" style="width:100%; height:450px"></div>
+	<div id="auth_sub_Grid" style="width:100%; height:430px"></div>
 	
 	<!-- 코드 그룹 추가/수정 팝업 -->
 	<div id="regPopupDiv" hidden="true">
@@ -687,7 +696,7 @@
  					<div class="w2ui-field">
 						<label style="width:88%;text-align: left;padding-left: 20px;">권한 설정</label>
 						<div  style="width:90%; height:34px; float:left; position:relative; margin:0px 10px 5px 20px; top:10px; ">
-							<table class="table table-striped"; style="height: 20px;" >
+							<table class="table table-striped" style="height: 20px;" >
 								<tr class="info" style="line-height: 25px;">
 									<th width="67%" style="background-color: #d9d9da; background: linear-gradient(to bottom,#f1f1f1 0,#c8c8c8 100%); font-size:13px; border-right:1px solid #9e9e9e; box-shadow: 3px 2px 10px #c1c1c1;" >권한 명</th>
 									<th style="background-color: #d9d9da; background: linear-gradient(to bottom,#f1f1f1 0,#c8c8c8 100%);font-size:13px;border-right:1px solid #9e9e9e; text-align: center; box-shadow: 3px 2px 10px #c1c1c1;">허용</th>

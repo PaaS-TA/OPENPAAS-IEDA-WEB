@@ -24,11 +24,13 @@
 			<result property="domainOrganization" column="DOMAIN_ORGANIZATION" />
 			<result property="deaMemoryMB" column="DEA_MEMORY_MB" />
 			<result property="deaDiskMB" column="DEA_DISK_MB" />
-			<result property="proxyStaticIps" column="PROXY_STATIC_IPS" />
-			<result property="sslPemPub" column="SSL_PEM_PUB" />
-			<result property="sslPemRsa" column="SSL_PEM_RSA" />
-			<result property="loginSecret" column="LOGIN_SECRET" />
-			<result property="encryptKeys" column="ENCRYPT_KEYS" />
+			<result property="countryCode" column="COUNTRY_CODE" />
+			<result property="stateName" column="STATE_NAME" />
+			<result property="localityName" column="LOCALITY_NAME" />
+			<result property="organizationName" column="ORGANIZATION_NAME" />
+			<result property="unitName" column="UNIT_NAME" />
+			<result property="email" column="EMAIL" />
+			<result property="keyFile" column="KEY_FILE" />
 			<result property="deploymentFile" column="CF_DEPLOYMENT_FILE" />
 			<result property="deployStatus" column="CF_DEPLOY_STATUS" />
 			<result property="taskId" column="CF_TASK_ID" />
@@ -69,11 +71,6 @@
 			,c.domain as domain 
 			,c.description as description 
 			,c.domain_organization as domain_organization 
-			,c.proxy_static_ips as proxy_static_ips 
-			,c.ssl_pem_pub as ssl_pem_pub 
-			,c.ssl_pem_rsa as ssl_pem_rsa 
-			,c.login_secret as login_secret 
-			,c.encrypt_keys as encrypt_keys 
 			,c.deployment_file as cf_deployment_file 
 			,c.deploy_status as cf_deploy_status
 			,c.task_id as cf_task_id 
@@ -87,7 +84,6 @@
 			,d.garden_release_version as garden_release_version 
 			,d.etcd_release_name as etcd_release_name 
 			,d.etcd_release_version as etcd_release_version 
-			,d.diego_encryption_keys as diego_encryption_keys 
 			,d.deployment_file as diego_deployment_file 
 			,d.deploy_status as diego_deploy_status
 			,d.task_id as diego_task_id 
@@ -97,11 +93,11 @@
 			,a.update_user_id as update_user_id 
 			,Case 
 				When (c.deploy_status = 'DEPLOY_STATUS_DONE' 	 	 And  d.deploy_status = 'DEPLOY_STATUS_DONE') Then '성공' 
-				When d.deploy_status = 'DEPLOY_STATUS_DELETING' Then 'DIEGO 삭제중' 
-				When d.deploy_status = 'DEPLOY_STATUS_FAILED' 		Then 'DIEGO 오류' 
-				When d.deploy_status = 'DEPLOY_STATUS_CANCELLED' Then 'DIEGO 취소' 
-				When d.deploy_status = 'DEPLOY_STATUS_DONE' 		Then 'DIEGO 성공'
-				When d.deploy_status = 'DEPLOY_STATUS_PROCESSING' Then 'DIEGO 배포중' 
+				When (c.deploy_status = 'DEPLOY_STATUS_DONE' 		 And  d.deploy_status = 'DEPLOY_STATUS_DELETING') Then 'DIEGO 삭제중' 
+				When (c.deploy_status = 'DEPLOY_STATUS_DONE'		 And  d.deploy_status = 'DEPLOY_STATUS_FAILED') Then 'DIEGO 오류' 
+				When (c.deploy_status = 'DEPLOY_STATUS_DONE'		 And  d.deploy_status = 'DEPLOY_STATUS_CANCELLED') Then 'DIEGO 취소' 
+				When (c.deploy_status = 'DEPLOY_STATUS_DONE'		 And  d.deploy_status = 'DEPLOY_STATUS_DONE') Then 'DIEGO 성공'
+				When (c.deploy_status = 'DEPLOY_STATUS_DONE'		 And  d.deploy_status = 'DEPLOY_STATUS_PROCESSING') Then 'DIEGO 배포중' 
 				When c.deploy_status = 'DEPLOY_STATUS_DELETING' Then 'CF 삭제중' 
 				When c.deploy_status = 'DEPLOY_STATUS_FAILED' 		Then 'CF 오류' 
 				When c.deploy_status = 'DEPLOY_STATUS_CANCELLED' Then 'CF 취소' 
@@ -147,14 +143,10 @@
 					,c.domain as domain
 					,c.description as description
 					,c.domain_organization as domain_organization
-					,c.proxy_static_ips as proxy_static_ips
-					,c.ssl_pem_pub as ssl_pem_pub
-					,c.ssl_pem_rsa as ssl_pem_rsa
-					,c.login_secret as login_secret
-					,c.encrypt_keys as encrypt_keys
 					,c.deployment_file as cf_deployment_file
 					,c.deploy_status as cf_deploy_status
 					,c.task_id as cf_task_id
+					,c.key_file
 				</when>
 				<when test="platform == 'diego' and platform != null">
 					,d.id as diego_id
@@ -167,7 +159,6 @@
 					,d.garden_release_version as garden_release_version
 					,d.etcd_release_name as etcd_release_name
 					,d.etcd_release_version as garden_release_version
-					,d.diego_encryption_keys as diego_encryption_keys
 					,d.deployment_file as diego_deployment_file
 					,d.deploy_status as diego_deploy_status
 					,d.task_id as diego_task_id

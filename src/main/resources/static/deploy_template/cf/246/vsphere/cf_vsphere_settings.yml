@@ -1,0 +1,275 @@
+meta:
+  stemcell: (( merge || .meta.default_stemcell ))
+
+  default_stemcell:
+    name: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+    version: latest
+
+  resource_pools:
+    small:
+      cloud_properties: (( resource_pool_overrides.small_instance_type ))
+    medium:
+      cloud_properties: (( resource_pool_overrides.medium_instance_type ))
+    large:
+      cloud_properties: (( resource_pool_overrides.large_instance_type ))
+    runner:
+      cloud_properties: (( resource_pool_overrides.runner_instance_type ))
+
+  runner_z1_instances: (( merge || 1 ))
+
+resource_pool_overrides: (( merge ))
+
+compilation:
+  cloud_properties:
+    ram: 1024
+    disk: 8192
+    cpu: 2
+networks: (( merge ))
+
+resource_pools:
+  - name: small_z1
+    cloud_properties: (( merge || meta.resource_pools.small.cloud_properties ))
+
+  - name: small_z2
+    cloud_properties: (( merge || meta.resource_pools.small.cloud_properties ))
+
+  - name: medium_z1
+    cloud_properties: (( merge || meta.resource_pools.medium.cloud_properties ))
+
+  - name: medium_z2
+    cloud_properties: (( merge || meta.resource_pools.medium.cloud_properties ))
+
+  - name: large_z1
+    cloud_properties: (( merge || meta.resource_pools.large.cloud_properties ))
+
+  - name: large_z2
+    cloud_properties: (( merge || meta.resource_pools.large.cloud_properties ))
+
+  - name: runner_z1
+    cloud_properties: (( merge || meta.resource_pools.runner.cloud_properties ))
+
+  - name: runner_z2
+    cloud_properties: (( merge || meta.resource_pools.runner.cloud_properties ))
+
+  - name: router_z1
+    cloud_properties: (( merge || meta.resource_pools.small.cloud_properties ))
+
+  - name: router_z2
+    cloud_properties: (( merge || meta.resource_pools.small.cloud_properties ))
+
+  - name: small_errand
+    cloud_properties: (( merge || meta.resource_pools.small.cloud_properties ))
+
+jobs:
+  - name: nats_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(1) ))
+
+  - name: nats_z2
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf2
+        static_ips: (( static_ips(1) ))
+
+  - name: stats_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+
+  - name: nfs_z1
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(2) ))
+
+  - name: blobstore_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+
+  - name: postgres_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(12) ))
+
+  - name: uaa_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+
+  - name: uaa_z2
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf2
+
+  - name: api_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+
+  - name: api_z2
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf2
+
+  - name: clock_global
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+
+  - name: api_worker_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+
+  - name: api_worker_z2
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf2
+
+  - name: router_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(5, 6) ))
+
+  - name: router_z2
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf2
+        static_ips: (( static_ips(5, 6) ))
+
+  - name: loggregator_z1
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf1
+
+  - name: loggregator_z2
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf2
+
+  - name: doppler_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+
+  - name: doppler_z2
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf2
+
+  - name: loggregator_trafficcontroller_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+
+  - name: loggregator_trafficcontroller_z2
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf2
+
+  - name: etcd_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(14, 15) ))
+
+  - name: etcd_z2
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf2
+        static_ips: (( static_ips(13) ))
+
+  - name: consul_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(17, 18, 19) ))
+
+  - name: consul_z2
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf2
+        static_ips: (( static_ips(17, 18, 19) ))
+
+  - name: hm9000_z1
+    instances: (( merge || 1 ))
+    networks:
+      - name: cf1
+
+  - name: hm9000_z2
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf2
+
+  - name: runner_z1
+    instances: (( meta.runner_z1_instances ))
+    networks:
+      - name: cf1
+
+  - name: runner_z2
+    instances: (( merge || 0 ))
+    networks:
+      - name: cf2
+
+  - name: smoke_tests
+    instances: 1
+
+properties:
+  <<: (( merge ))
+  logger_endpoint:
+    port: 4443
+  system_domain_organization: pivotal
+
+  ccdb:
+    db_scheme: postgres
+    address: (( properties.databases.address ))
+    port: 5524
+    roles:
+      - tag: admin
+        name: ccadmin
+        password: admin
+    databases:
+      - tag: cc
+        name: ccdb
+        citext: true
+
+  uaadb:
+    db_scheme: postgresql
+    address: (( properties.databases.address ))
+    port: 5524
+    roles:
+      - tag: admin
+        name: uaaadmin
+        password: admin
+    databases:
+      - tag: uaa
+        name: uaadb
+        citext: true
+
+  databases:
+    db_scheme: postgres
+    address: (( jobs.postgres_z1.networks.cf1.static_ips.[0] ))
+    port: 5524
+    roles:
+      - tag: admin
+        name: ccadmin
+        password: admin
+      - tag: admin
+        name: uaaadmin
+        password: admin
+      - << : (( merge ))
+    databases:
+      - tag: cc
+        name: ccdb
+        citext: true
+      - tag: uaa
+        name: uaadb
+        citext: true
+      - << : (( merge ))
+    collect_statement_statistics: null
+    additional_config: (( merge || nil ))

@@ -84,10 +84,17 @@ public class AuthManagementService {
 	 * @return            : boolean
 	***************************************************/
 	public boolean deleteRole(Integer roleId) {
+		
+		if(roleId == null || roleId.toString().isEmpty()){
+			throw new CommonException("sqlException.auth.exception",
+					"권한 그룹 삭제 중 에러가 발생 했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 		AuthManagementVO authVO = dao.selectRoleInfoByRoleId(roleId);
-		if ( authVO == null )
+		if ( authVO == null ){
 			throw new CommonException("notfound_rold_id.auth_delete.exception",
 					"해당 권한 코드가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+		}
 		try{
 			dao.deleteRoleDetailInfoByRoleId(roleId);
 			dao.deleteRoleGroupInfoByRoleId(roleId);					
@@ -146,7 +153,6 @@ public class AuthManagementService {
 		auth.setCreateUserId(sessionInfo.getUserId());
 		auth.setUpdateUserId(sessionInfo.getUserId());
 		if(authVO==null){
-			//여기서 롤 아이디로 검사를 한번 더 해준다..
 			if(auth.getActiveYn().size()!=0){
 			dao.insertRoleDetailInfoByRoleId(auth, auth.getActiveYn());
 			}

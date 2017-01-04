@@ -314,7 +314,7 @@ $( window ).resize(function() {
 			<!-- //Btn -->
 	    </div>
 	</div>
-	<div id="config_boshGrid" style="width:100%; height:650px"></div>
+	<div id="config_boshGrid" style="width:100%; height:610px"></div>
 </div>
 
 <!-- IaaS 설정 DIV -->

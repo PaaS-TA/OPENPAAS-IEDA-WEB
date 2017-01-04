@@ -7,8 +7,10 @@
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
+		<config>src/test/java/org/openpaas/ieda/BeansConfiguration.java</config>
 	</configs>
 	<autoconfigs>
+		<config>java:org.openpaas.ieda.OpenpaasIedaWebApplication</config>
 	</autoconfigs>
 	<configSets>
 	</configSets>

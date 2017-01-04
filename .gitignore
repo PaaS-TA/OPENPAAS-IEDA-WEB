@@ -1,4 +1,12 @@
-deployer.sh
+bin
+/.apt_generated/
+/app.pid
+/.classpath
+/.factorypath
+/.settings/
+cookies.txt
+src/main/resources/application.properties
+src/test/resources/application_test.properties
 
 ### Maven ###
 target/
@@ -10,4 +18,3 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-/.apt_generated/

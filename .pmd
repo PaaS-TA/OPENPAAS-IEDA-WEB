@@ -2,10 +2,7 @@
 <pmd>
     <useProjectRuleSet>false</useProjectRuleSet>
     <ruleSetFile>.ruleset</ruleSetFile>
-    <excludePatterns>
-        <excludePattern>.*/Sha512Crypt.java</excludePattern>
-        <excludePattern>.*/ExSSLSocketFactory.java</excludePattern>
-    </excludePatterns>
+    <excludePatterns/>
     <includePatterns/>
     <rules>
         <rule>

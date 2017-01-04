@@ -17,8 +17,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
 		config.enableSimpleBroker( "/socket"
-								, "/config/stemcell/download/logs"
-								, "/config/stemcell/download/socket/downloadStemcell"
+								, "/config/stemcell/regist/socket/logs"
+								, "/config/stemcell/regist/download/logs"
 								, "/config/systemRelease/regist/socket/logs"
 								, "/config/systemRelease/regist/download/logs"
 								, "/deploy/bootstrap/install/logs"
@@ -29,7 +29,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 								, "/deploy/cf/delete/logs"
 								, "/deploy/diego/install/logs"
 								, "/deploy/diego/delete/logs"
-								, "/deploy/cfDiego/install/logs"
+								, "/deploy/cfDiego/install/cfLogs"
+								, "/deploy/cfDiego/install/diegoLogs"
 								, "/deploy/cfDiego/delete/logs"
 								, "/info/stemcell/upload/logs"
 								, "/info/stemcell/delete/logs"
@@ -49,7 +50,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 	
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint( "/config/stemcell/download/stemcellDownloading"
+		registry.addEndpoint( "/config/stemcell/regist/stemcellDownloading"
 							, "/config/systemRelease/regist/download/releaseDownloading"
 							, "/deploy/bootstrap/install/bootstrapInstall"
 							, "/deploy/bootstrap/delete/instance"
@@ -59,7 +60,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 							, "/deploy/cf/delete/instance"
 							, "/deploy/diego/install/diegoInstall"
 							, "/deploy/diego/delete/instance"
-							, "/deploy/cfDiego/install/cfDiegoinstall"
+							, "/deploy/cfDiego/install/cfInstall"
+							, "/deploy/cfDiego/install/diegoInstall"
 							, "/deploy/cfDiego/delete/instance"
 							, "/info/stemcell/upload/stemcellUploading"
 							, "/info/stemcell/delete/stemcellDelete"

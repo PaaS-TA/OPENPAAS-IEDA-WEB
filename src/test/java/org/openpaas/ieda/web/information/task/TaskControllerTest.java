@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openpaas.ieda.OpenpaasIedaWebApplication;
+import org.openpaas.ieda.TestBeansConfiguration;
 import org.openpaas.ieda.api.task.TaskListDTO;
 import org.openpaas.ieda.web.common.BaseTestController;
 import org.openpaas.ieda.web.information.task.dto.TaskDTO;
@@ -35,7 +36,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {OpenpaasIedaWebApplication.class})
+@SpringApplicationConfiguration(classes = {OpenpaasIedaWebApplication.class, TestBeansConfiguration.class})
 @WebAppConfiguration
 @Transactional
 @TransactionConfiguration(defaultRollback=true)

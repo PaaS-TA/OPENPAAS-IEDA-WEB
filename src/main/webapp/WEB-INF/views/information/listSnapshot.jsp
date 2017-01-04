@@ -29,6 +29,7 @@ $(function() {
 		header: '<b>스냅샷 조회</b>',
 		style	: 'text-align:center',
 		method	: 'GET',
+		msgAJAXerror : '스냅샷 조회 실패',
 		multiSelect: false,
 		show: {	
 			selectColumn: true,
@@ -188,6 +189,8 @@ function deleteSnapshot(type, snapshotParam){
 			if(type == "all"){
 				$('#deleteAllSnapshot').attr('disabled', true);
 				$('#deleteSnapshot').attr('disabled', true);
+			}else{
+				$('#deleteSnapshot').attr('disabled', true);
 			}
 		},
 		error : function(request, status, error) {
@@ -242,6 +245,6 @@ $( window ).resize(function() {
 			</sec:authorize>
 			<!-- //Btn -->
 		</div>
-		<div id="us_snapshotGrid" style="width:100%; height:573px"></div>	
+		<div id="us_snapshotGrid" style="width:100%; height:533px"></div>	
 	</div>
 </div>

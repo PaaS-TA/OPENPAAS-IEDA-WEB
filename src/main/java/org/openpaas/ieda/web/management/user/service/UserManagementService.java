@@ -1,9 +1,8 @@
 package org.openpaas.ieda.web.management.user.service;
 
+import java.sql.SQLException;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.openpaas.ieda.common.CommonException;
@@ -72,7 +71,7 @@ public class UserManagementService {
 	 * @title               : updateUserInfo
 	 * @return            : void
 	***************************************************/
-	public void updateUserInfo(UserManagementDTO.Regist dto, String userId) {
+	public void updateUserInfo(UserManagementDTO.Regist dto, String userId) throws SQLException {
 		UserManagementVO findUserId = dao.selectUserIdInfoById(userId);
 		if(findUserId==null ){
 			throw new CommonException("NOT_FOUND.user.exception",
@@ -87,12 +86,7 @@ public class UserManagementService {
 		userVO.setRoleId(dto.getRoleId());
 		userVO.setInitPassYn(dto.getInitPassYn());
 		userVO.setEmail(dto.getEmail());
-		try{
-			dao.updateUserInfoByUid(userVO);
-		}catch(Exception e){
-			throw new CommonException("sql.user.exception",
-					"사용자 정보 수정 중 에러가 발생 했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		dao.updateUserInfoByUid(userVO);
 		
 	}
 	
@@ -103,7 +97,7 @@ public class UserManagementService {
 	 * @return            : void
 	***************************************************/
 	@Transactional
-	public void deleteUserInfo(HttpServletRequest request, HttpServletResponse response, String userId) {
+	public void deleteUserInfo(String userId) {
 		UserManagementVO findUserInfo = dao.selectUserIdInfoById(userId);
 		if(findUserInfo==null){
 			throw new CommonException("notfound.user.exception",
@@ -111,7 +105,7 @@ public class UserManagementService {
 		}
 		try{
 			dao.deleteUserInfoByUid(userId);
-			expireUserSessions(request, response, userId);
+			expireUserSessions(userId);
 		}catch(Exception e){
 			e.printStackTrace();
 			throw new CommonException("sql.user.exception",
@@ -125,9 +119,9 @@ public class UserManagementService {
 	 * @title               : expireUserSessions
 	 * @return            : void
 	***************************************************/
-	public void expireUserSessions(HttpServletRequest request, HttpServletResponse response, String username) {
+	public void expireUserSessions(String username) {
 		List<SessionInformation> usersessions = sessionRegistry.getAllSessions(username, false);
-		if(usersessions !=null){
+		if(usersessions !=null && usersessions.size() > 0){
 			for (int i = 0; i < usersessions.size(); i++){
 				usersessions.get(i).expireNow();
 			}

@@ -141,7 +141,6 @@ public class BoshSaveService {
 		vo.setvCenterDiskPath(dto.getvCenterDiskPath());
 		vo.setvCenterCluster(dto.getvCenterCluster());
 		vo.setUpdateUserId(sessionInfo.getUserId());
-		
 		if( StringUtils.isEmpty(dto.getId())  ||  "Y".equals(test) ){ 
 			boshDao.saveBoshInfo(vo); 
 		}else{ 

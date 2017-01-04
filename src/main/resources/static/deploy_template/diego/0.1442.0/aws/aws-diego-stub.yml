@@ -6,7 +6,6 @@ releases:
 - (( config_from_cf.cf_release ))
 - (( base_releases.garden-linux ))
 - (( base_releases.etcd ))
-meta: (( merge ))
 
 networks:
 - name: oc_network
@@ -209,9 +208,9 @@ properties:
     auctioneer:
       bbs:
         api_location: bbs.service.cf.internal:8889
-        ca_cert: (( merge ))
-        client_cert: (( merge ))
-        client_key: (( merge ))
+        ca_cert: (( diego-certs.bbs-ca-cert ))
+        client_cert: (( diego-certs.bbs-client-cert ))
+        client_key: (( diego-certs.bbs-client-key ))
         client_session_cache_size: null
         max_idle_conns_per_host: null
         require_ssl: true
@@ -224,7 +223,7 @@ properties:
       ca_cert: (( .properties.diego.auctioneer.bbs.ca_cert ))
       encryption_keys:
       - label: key1
-        passphrase: (( merge ))
+        passphrase: (( diego-certs.bbs-encrypt-keys ))
       etcd:
         ca_cert: (( diego.auctioneer.bbs.ca_cert ))
         client_cert: (( .properties.etcd.client_cert ))
@@ -236,8 +235,8 @@ properties:
         require_ssl: true
       log_level: null
       require_ssl: true
-      server_cert: (( merge ))
-      server_key: (( merge ))
+      server_cert: (( diego-certs.bbs-server-cert ))
+      server_key: (( diego-certs.bbs-server-key ))
     cc_uploader:
       cc:
         base_url: (( config_from_cf.cc.srv_api_uri ))
@@ -317,10 +316,10 @@ properties:
         client_session_cache_size: null
         max_idle_conns_per_host: null
         require_ssl: true
-      diego_credentials: null
+      diego_credentials: (( meta.diego-credentials || "ssh-secret" ))
       enable_cf_auth: true
       enable_diego_auth: false
-      host_key: (( merge ))
+      host_key: (( diego-certs.ssh-proxy-key ))
       servers: (( jobs.access.networks.oc_network.static_ips ))
       uaa_secret: (( config_from_cf.uaa.ssh_proxy_client_secret ))
       uaa_token_url: (( config_from_cf.uaa.token_url ))
@@ -359,9 +358,9 @@ properties:
       log_level: null
       traffic_controller_url: (( config_from_cf.loggregator.traffic_controller_url ))
   etcd:
-    ca_cert: (( .properties.diego.auctioneer.bbs.ca_cert ))
-    client_cert: (( merge ))
-    client_key: (( merge ))
+    ca_cert: (( diego-certs.etcd-ca-cert ))
+    client_cert: (( diego-certs.etcd-client-cert ))
+    client_key: (( diego-certs.etcd-client-key ))
     cluster:
     - instances: 1
       name: database
@@ -371,13 +370,13 @@ properties:
     heartbeat_interval_in_milliseconds: null
     machines:
     - etcd.service.cf.internal
-    peer_ca_cert: (( merge ))
-    peer_cert: (( merge ))
-    peer_key: (( merge ))
+    peer_ca_cert: (( diego-certs.peer-ca-cert ))
+    peer_cert: (( diego-certs.peer-cert ))
+    peer_key: (( diego-certs.peer-key ))
     peer_require_ssl: true
     require_ssl: true
-    server_cert: (( merge ))
-    server_key: (( merge ))
+    server_cert: (( diego-certs.etcd-server-cert ))
+    server_key: (( diego-certs.etcd-server-key ))
   garden:
     allow_host_access: null
     allow_networks: null
@@ -486,5 +485,6 @@ update:
   update_watch_time: 5000-120000
 
 config_from_cf: ~
+diego-certs: ~
 
 base_releases: ~

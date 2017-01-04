@@ -30,6 +30,7 @@ $(function() {
 		name: 'sq_taskHistoryGrid',
 		header: '<b>Task 실행 이력</b>',
 		method: 'GET',
+		msgAJAXerror : 'Task 실행 이력 조회 실패',
 		multiSelect: false,
 		show: {	
 				selectColumn: true,
@@ -280,5 +281,5 @@ $( window ).resize(function() {
 		</div>
 	</div>	
 	<div id="hMargin"></div>
-	<div id="sq_taskHistoryGrid" style="width:100%; height:650px"></div>
+	<div id="sq_taskHistoryGrid" style="width:100%; height:610px"></div>
 </div>

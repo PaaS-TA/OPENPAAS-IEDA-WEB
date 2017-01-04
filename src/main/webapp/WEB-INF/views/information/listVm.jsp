@@ -34,6 +34,7 @@ $(function() {
 		header: '<b>VM 목록</b>',
 		style	: 'text-align:center',
 		method	: 'GET',
+		msgAJAXerror : 'VM 조회 실패',
 		multiSelect: false,
 		show: {	
 			selectColumn: true,
@@ -113,6 +114,8 @@ $(function() {
 				logType = $(".w2ui-msg-body input:radio[name='logSelect']:checked").val();
 				downloadLog(logType);
 				return;
+			},no_callBack : function(){
+				doSearch($("#deployments").val());
 			}
 		});
  	});
@@ -277,6 +280,8 @@ function showJobLog(type, typeName, jobParam ){
 			        webSocketClient.send('/send/info/vms/vmLogs/job', {}, JSON.stringify(jobParam));
 			    });
 			}
+		},onClose : function(evnet){
+			doSearch(jobParam.deploymentName);
 		}
 	});
 }
@@ -339,9 +344,7 @@ function showSnapshotLog(snapshotParam){
 			    });
 			}
 		}, onClose : function(event){
-			event.onComplete= function(){
-				popupComplete();
-			}
+			doSearch(snapshotParam.deploymentName);
 		}
 	});
 }
@@ -445,7 +448,7 @@ $( window ).resize(function() {
 			</sec:authorize>
 			<!-- //Btn -->
 		</div>
-		<div id="us_vmsGrid" style="width:100%; height:573px"></div>	
+		<div id="us_vmsGrid" style="width:100%; height:533px"></div>	
 	</div>
 </div>
 

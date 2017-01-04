@@ -12,6 +12,7 @@ public class CommonDTO {
 		private String iaas; //IaaS
 		@NotNull
 		private Integer id; //id
+		
 		public String getService() {
 			return service;
 		}

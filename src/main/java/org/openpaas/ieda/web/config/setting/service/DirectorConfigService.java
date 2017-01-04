@@ -309,7 +309,11 @@ public class DirectorConfigService  {
 		}catch(IOException e){
 			throw new CommonException("unsupportedencoding.director.exception",
 					"설치관리자 설정 파일에 오류가 발생하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
-		}finally {
+		}catch(NullPointerException e){
+			throw new CommonException("nullpoint.director.exception",
+					"설치관리자 설정 파일에 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
+		}
+		finally {
 			try {
 				if(fileWriter != null){
 					fileWriter.close();
@@ -425,6 +429,9 @@ public class DirectorConfigService  {
 			} catch (IOException e) {
 				throw new CommonException("taretDirector.director.exception",
 						"설치관리자 타겟 설정 중 오류 발생하였습니다.", HttpStatus.NOT_FOUND);
+			} catch (NullPointerException e){
+				throw new CommonException("notfound.directorFile.exception",
+						"설치관리자 관리 파일을 읽어오는 중 오류가 발생했습니다.", HttpStatus.NOT_FOUND);
 			}finally {
 				try {
 					if(fileWriter != null) fileWriter.close();

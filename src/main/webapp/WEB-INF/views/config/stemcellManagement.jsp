@@ -10,19 +10,23 @@
  * =================================================================
  */ 
 %>
-<%@page import="org.springframework.security.core.context.SecurityContextHolder"%>
-<%@page import="org.springframework.security.core.Authentication"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <script type="text/javascript">
-var downloadClient = "";
-var completeButton = '<div class="btn btn-success btn-xs" style="width:100px;">Downloaded</div>';
-var downloadingButton = '<div class="btn btn-info btn-xs" style="width:100px;">Downloading</div>';
 
+//private common variable
+var downloadClient = "";
+var downloadStatus = "";
 var OS_TYPE_CODE = '200';
 var IAAS_TYPE_CODE = '100';
-
+var osVersionArray = [];
+var stemcellArray = [];
+var completeButton = '<div><div class="btn btn-success btn-xs" style="width:100px; padding:3px;">Downloaded</div></div>';
+var downloadingButton = '<div class="btn btn-info btn-xs" style="width:100px;">Downloading</div>';
+var progressBarDiv = '<div class="progress">';
+	progressBarDiv += '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" >';
+	progressBarDiv += '</div></div>';
 $(function() {
 	/********************************************************
 	 * 설명 :  스템셀 목록 조회 Grid 생성
@@ -31,54 +35,41 @@ $(function() {
 		name: 'config_opStemcellsGrid',
 		show: {selectColumn: true, footer: true},
 		multiSelect: false,
+		msgAJAXerror : '스템셀 조회 실패',
 		method: 'GET',
 		style: 'text-align:center',
 		columns:[
 			 {field: 'recid', caption: 'recid', hidden: true}
-			,{field: 'id', caption: '운영체계', hidden: true} 
-			,{field: 'os', caption: '운영체계', size: '10%'}			
-			,{field: 'osVersion', caption: '버전', size: '10%'}
+			,{field: 'id', caption: '아이디', hidden: true} 
+			,{field: 'stemcellName', caption: '스템셀 명', size: '15%'}
+			,{field: 'os', caption: 'Os 유형', size: '10%'}			
+			,{field: 'osVersion', caption: 'Os 버전', size: '10%'}
 			,{field: 'iaas', caption: 'IaaS', size: '10%', sortable: true}
-			,{field: 'stemcellVersion', caption: '스템셀버전', size: '10%'}
-			,{field: 'stemcellFileName', caption: '파일명', size: '40%', style: 'text-align:left'}
+			,{field: 'stemcellFileName', caption: '스템셀 파일명', size: '45%', style: 'text-align:left'}
+			,{field: 'stemcellVersion', caption: '스템셀 버전', size: '10%'}
+			,{field: 'size', caption: '파일 크기', size: '10%'}
 			,{field: 'isExisted', caption: '다운로드 여부', size: '20%',
 				render: function(record) {
-					if ( record.downloadStatus == 'Y' ){
+					if ( record.downloadStatus == 'DOWNLOADED'  ){
 						return '<div class="btn btn-success btn-xs" id= "downloaded_'+record.id+'" style="width:100px;">Downloaded</div>';
-					}
-// 					else if ( record.isExisted == 'Y' && record.isDose == 'N' ){
-// 						//현재는 다운중 표시만...추후 다운로드 중인 소켓 정보를 가져와서 ProgressBar로 변경
-// 						return downloadingButton;
-// 					}
-					else{
+					}else if(record.downloadStatus == 'DOWNLOADING'){ //다른 사용자가다운로드 중일 경우
+						return '<div class="btn btn-info btn-xs" id= "downloading_'+record.id+'" style="width:100px;">Downloading</div>';
+					} else{
 						return '<div class="btn" id="isExisted_'+record.id+'" style="position: relative;width:100px;"></div>';
 					}
 				}
 			}
 		],
 		onSelect: function(event) {
-			var grid = this;
 			event.onComplete = function() {
-				var sel = grid.getSelection();
-				
-				var record = grid.get(sel);
-				if ( record.downloadStatus == 'Y' ) {
-					// 다운로드 버튼 Disable
-					$('#doDownload').attr('disabled', true);
-					// 삭제 버튼 Enable
+					$('#doregist').attr('disabled', false);
 					$('#doDelete').attr('disabled', false);
-				} else {
-					// 다운로드 버튼 Enable
-					$('#doDownload').attr('disabled', false);
-					// 삭제 버튼 Disable
-					$('#doDelete').attr('disabled', true);
-				}
 			}
 		},
 		onUnselect: function(event) {
 			var grid = this;
 			event.onComplete = function() {
-				$('#doDownload').attr('disabled', true);
+				$('#doRegist').attr('disabled', false);
 				$('#doDelete').attr('disabled', true);
 			}
 		}, onLoad:function(event){
@@ -90,51 +81,74 @@ $(function() {
 		}, onError:function(evnet){
 	
 		}
-		
 	});
-
- 	//  화면 초기화에 필요한 데이터 요청
- 		initView();
- 	
- 
- 	/********************************************************
-	 * 설명 :   목록조회
-	 *********************************************************/
- 	$("#doSearch").click(function(){
- 		doSearch();
-    });
- 	
- 	 /********************************************************
-	 * 설명 :   목록 동기화
-	 *********************************************************/
- 	$("#doSync").click(function(){
- 		doSync();
-    });
- 	
- 	 /********************************************************
-	 * 설명 :   스템셀 다운로드
-	 *********************************************************/
- 	$("#doDownload").click(function(){
- 		if($("#doDownload").attr('disabled') == "disabled") return;
-    	doDownload();
-    });
- 	
- 	 /********************************************************
-	 * 설명 :   스템셀 삭제
-	 *********************************************************/
- 	$("#doDelete").click(function(){
- 		if($("#doDelete").attr('disabled') == "disabled") return;
- 		doDelete();
-    });
- 	
- 	 /********************************************************
-	 * 설명 :   OS구분 코드 변경 시  OS버전 구분코드 조회
-	 *********************************************************/
- 	$("#os").change(function() {
- 		// OS버전 코드  (OS구분과 연관된 하위코드로 선택된 OS구분 코드의 값)
- 		setCommonCode('<c:url value="/common/deploy/codes/parent/"/>' + IAAS_TYPE_CODE + '<c:url value="/subcode/"/>' + $("#os option:selected").val(), 'osVersion');
+	
+ 	/**************************************************************
+ 	 * 설명 스템셀 등록 버튼 클릭
+ 	 **************************************************************/
+ 	$("#doRegist").click(function(){
+ 		w2popup.open({
+ 			title 	: "<b>스템셀 등록</b>",
+ 			width 	: 675,
+ 			height	: 590,
+ 			modal	: true,
+ 			body	: $("#regPopupDiv").html(),
+ 			buttons : $("#regPopupBtnDiv").html(),
+ 			onClose : function(event){
+ 				w2ui['config_opStemcellsGrid'].clear();
+ 				initView();
+ 			}
+ 		});
+ 		setCommonCode('<c:url value="/common/deploy/codes/parent/"/>'+ OS_TYPE_CODE, 'os');
+ 		setCommonCode('<c:url value="/common/deploy/codes/parent/"/>' + IAAS_TYPE_CODE, 'iaas');
+ 		$('.w2ui-msg-body input:radio[name=fileType]:input[value=version]').attr("checked", true);	
+ 		$('.w2ui-msg-body input:text[name=stemcellPathVersion]').attr("readonly", false);
+ 		$('[data-toggle="popover"]').popover();
+ 	 	//스템셀 버전 정보
+ 	 	$(".stemcell-info").attr('data-content', "http://bosh.cloudfoundry.org/stemcells/");
+ 	 	
+ 	 	 //다른 곳 클릭 시 popover hide 이벤트
+ 	 	$('.w2ui-popup').on('click', function (e) {
+ 	 	    $('[data-toggle="popover"]').each(function () {
+ 	 	        //the 'is' for buttons that trigger popups
+ 	 	        //the 'has' for icons within a button that triggers a popup
+ 	 	        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+ 	 	            $(this).popover('hide');
+ 	 	        }
+ 	 	    });
+ 	 	});
  	});
-
+ 	
+ 	/**************************************************************z
+ 	 * 설명 스템셀 삭제 버튼 클릭
+ 	 **************************************************************/
+ 	$('#doDelete').click(function(){
+		if($("#doDelete").attr('disabled') == "disabled") return;
+		var selected = w2ui['config_opStemcellsGrid'].getSelection();
+		var record = w2ui['config_opStemcellsGrid'].get(selected);
+		var message = "";
+		
+		if ( record.stemcellFileName )
+			message = "스템셀 (파일명 : " + record.stemcellFileName + ")를 삭제하시겠습니까?";
+		else
+			message = "선택된 스템셀을 삭제하시겠습니까?";
+		w2confirm({
+			title 	: "스템셀 삭제",
+			msg		: message,
+			yes_text: "확인",
+			yes_callBack : function(event){
+				deletePop(record);						
+			},
+			no_text : "취소",
+			no_callBack	: function(){
+				w2ui['config_opStemcellsGrid'].clear();
+				initView();
+			}
+		});
+ 	})
+ 	
+ 	//  화면 초기화에 필요한 데이터 요청
+ 	initView();
 });
 
 /**************************************************************
@@ -149,315 +163,505 @@ function setCommonCode(url, id) {
 		error : function(xhr, status) {
 			if(xhr.status==403){
 				location.href = "/abuse";
+			}else{
+				var errorResult = JSON.parse(request.responseText);
+				w2alert(errorResult, "스템셀 조회");
 			}
 		},
 		success : function(data) {
-			var $object = jQuery("#" + id);
-
-			var optionString = "";
-			for (i = 0; i < data.length; i++) {
-				if (i == 0) {
-					optionString += "<option selected='selected' ";
-					optionString += "value='" + data[i].codeIdx + "' >";
-					optionString += data[i].codeName;
-					optionString += "</option>\n";
-				} else {
-					optionString += "<option ";
-					optionString += "value='" + data[i].codeIdx + "'>";
-					optionString += data[i].codeName;
-					optionString += "</option>\n";
-				}
+			stemcellArray = new Array();
+			if(data[0].parentCode == 200 && data[0].subGroupCode == null){
+				data.map(function(obj) {
+					stemcellArray.push(obj.codeName);
+					osVersionArray.push(obj);
+				});
+				$(".w2ui-msg-body input[name='osList']").w2field('list', {items : stemcellArray,maxDropHeight : 200,width : 250});
+			}else if(data[0].parentCode == 100){
+				data.map(function(obj) {
+					stemcellArray.push(obj.codeName);
+				});
+				$(".w2ui-msg-body input[name='iaasList']").w2field('list', {items : stemcellArray,maxDropHeight : 200,width : 250});
+			}else if(data[0].parentCode == 200 && data[0].subGroupCode != null){
+				
+				data.map(function(obj) {
+				stemcellArray.push(obj.codeName);
+				});
+				$('.w2ui-msg-body #osVersionList').removeAttr('disabled');
+				$('.w2ui-msg-body #osVersionList').attr("placeholder","선택하세요.");
+				$(".w2ui-msg-body input[name='osVersionList']").w2field('list', {items : stemcellArray,maxDropHeight : 200,width : 250});
 			}
-			$object.html(optionString);
 		}
 	});
 }
+
+/**************************************************************
+ * 설명 IaaS 유형 change Event
+ * Function : setAwsType
+ **************************************************************/
+function setAwsType(value){
+	if(value == "AWS"){
+		if($('.w2ui-msg-body input:radio[name=fileType]:input[value=version]').is(':checked')==true){
+			$('.w2ui-msg-body input:checkbox[name=awsLight]').attr("disabled", false);
+		}
+	}else {
+		$('.w2ui-msg-body input:checkbox[name=awsLight]').attr("disabled", true);
+		$('.w2ui-msg-body input:checkbox[name=awsLight]').attr('checked',false)
+	}
+}
+
+/**************************************************************
+ * 설명 Os 유형 change Event
+ * Function : setOsVersion
+ **************************************************************/
+function setOsVersion(value){
+	var subCodeValue = 0;
+ 	for(var i=0;i<osVersionArray.length;i++){
+		if(value == osVersionArray[i].codeName){
+			subCodeValue = osVersionArray[i].codeValue;
+		}
+	}
+	setCommonCode('<c:url value="/common/deploy/codes/parent/"/>' + OS_TYPE_CODE + '<c:url value="/subcode/"/>' + subCodeValue, 'osVersion');
+}
+
+/**************************************************************
+ * 설명 스템셀 다운 유형 change Event
+ * Function : setRegistType
+ **************************************************************/
+function setRegistType(value){
+	if(value == "file"){
+		$('.w2ui-msg-body #browser').attr("disabled", false);
+		$('.w2ui-msg-body input:text[name=stemcellPathUrl]').attr("readonly", true);
+		$('.w2ui-msg-body input:text[name=stemcellPathVersion]').attr("readonly", true);
+		$('.w2ui-msg-body input:checkbox[name=awsLight]').attr("disabled", true);
+		$('.w2ui-msg-body input:text[name=stemcellPathUrl]').val("");
+		$('.w2ui-msg-body input:text[name=stemcellPathVersion]').val("");
+		$('.w2ui-msg-body input:checkbox[name=awsLight]').attr('checked',false)
+	}else if(value == "url"){
+		$('.w2ui-msg-body input:text[name=stemcellPathUrl]').attr("readonly", false);
+		$('.w2ui-msg-body #browser').attr("disabled", true);
+		$('.w2ui-msg-body input:text[name=stemcellPathVersion]').attr("readonly", true);
+		$('.w2ui-msg-body input:checkbox[name=awsLight]').attr("disabled", true);
+		$('.w2ui-msg-body input:text[name=stemcellPathVersion]').val("");
+		$('.w2ui-msg-body input:checkbox[name=awsLight]').attr('checked',false)
+		$('.w2ui-msg-body input:text[name=stemcellPathFileName]').val("");
+	}else if(value == "version"){
+			$('.w2ui-msg-body input:text[name=stemcellPathVersion]').attr("readonly", false);
+			$('.w2ui-msg-body #browser').attr("disabled", true);
+			$('.w2ui-msg-body input:text[name=stemcellPathUrl]').attr("readonly", true);
+			$('.w2ui-msg-body input:checkbox[name=awsLight]').attr("disabled", true);
+			$('.w2ui-msg-body input:text[name=stemcellPathUrl]').val("");
+			$('.w2ui-msg-body input:text[name=stemcellPathFileName]').val("");
+			if($(".w2ui-msg-body input[name='iaasList']").val()=="AWS"){
+				$('.w2ui-msg-body input:checkbox[name=awsLight]').attr("disabled", false);
+			}
+	}else{
+		w2alert(errorResult, "잘못 된 요청 입니다.");
+	}
+}
+
+/**************************************************************
+ * 설명 초기 스템셀 조회
+ * Function : doSearch
+ **************************************************************/
+function doSearch(){
+	w2ui['config_opStemcellsGrid'].load('/config/stemcell/publicStemcells');
+}
+
+/********************************************************
+ * 설명		: 스템셀 파일 정보
+ * Function	: setstemcellFilePath
+ *********************************************************/
+function setstemcellFilePath(fileInput){
+	var file = fileInput.files;
+	var files = $('.w2ui-msg-body #stemcellPathFile')[0].files;
+	$(".w2ui-msg-body input[name='stemcellSize']").val(files[0].size);
+	$(".w2ui-msg-body input[name=stemcellPath]").val(files[0].name);
+	$(".w2ui-msg-body #stemcellPathFileName").val(files[0].name);
+	
+}
+
+/********************************************************
+ * 설명		: 스템셀 브라우저 선택
+ * Function	: openBrowse
+ *********************************************************/
+function openBrowse(){
+	if($('.w2ui-msg-body #browser').attr('disabled') == "disabled") return;	
+	$(".w2ui-msg-body input[name='stemcellPathFile[]']").click();
+}
+
+/**************************************************************
+ * 설명 스템셀 정보 저장 Array 설정
+ * Function : stemcellRegist
+ **************************************************************/
+function stemcellRegist(){
+	var stemcellInfo = {
+			id			   : $(".w2ui-msg-body input[name='id']").val(),
+			stemcellName   : $(".w2ui-msg-body input[name='stemcellName']").val(),
+			stemcellFileName : $(".w2ui-msg-body input[name=stemcellPathFileName]").val(),
+			stemcellUrl   : $(".w2ui-msg-body input[name='stemcellPathUrl']").val(),
+			stemcellVersion   : $(".w2ui-msg-body input[name='stemcellPathVersion']").val(),
+			osName         : $(".w2ui-msg-body input[name='osList']").val(),
+			osVersion      : $(".w2ui-msg-body input[name='osVersionList']").val(),
+			iaasType       : $(".w2ui-msg-body input[name='iaasList']").val(),
+			fileType       : $(".w2ui-msg-body :radio[name='fileType']:checked").val(), 
+			overlayCheck   : $(".w2ui-msg-body :checkbox[name='overlay']").is(':checked'),
+			stemcellSize    : $(".w2ui-msg-body input[name='stemcellSize']").val(),
+			awsLight       : $(".w2ui-msg-body :checkbox[name='awsLight']").is(':checked'),
+			downloadStatus : ""
+	}
+	
+	if(stemcellInfo.fileType == "file"){
+		if($(".w2ui-msg-body input[name='stemcellSize']").val() == 0){
+	 		w2alert("스템셀 파일을 찾을 수 없습니다. 확인해주세요.", "스템셀 파일 업로드");
+	 		return false;
+	 	}
+	}
+	stemcellInfoSave(stemcellInfo);
+}
+
+/**************************************************************
+ * 설명 스템셀 정보 저장
+ * Function : stemcellInfoSave
+ **************************************************************/
+function stemcellInfoSave(stemcellInfo){
+	lock( '등록 중입니다.', true);
+	if(popupValidation()){
+		$.ajax({
+			type : "POST",
+			url : "/config/stemcell/regist/savestemcell/N",
+			contentType : "application/json",
+			async : true,
+			data : JSON.stringify(stemcellInfo),
+			success : function(data, status) {
+				w2popup.close();
+				stemcellInfo.id = data.id;
+				stemcellInfo.downloadStatus = data.downloadStatus;
+				stemcellInfo.stemcellFileName = data.stemcellFileName;
+				initView();//재조회
+				if(stemcellInfo.fileType == "file"){
+					stemcellFileUpload(stemcellInfo);		
+				}else if(stemcellInfo.fileType == "url"){
+					stemcellFileDownload(stemcellInfo);
+				}else if (stemcellInfo.fileType == "version"){
+					stemcellFileDownload(stemcellInfo);
+				}else{
+					w2alert("잘못된 스템셀 등록 방식 입니다.");
+				}
+			}, error : function(request, status, error) {
+				w2popup.unlock();
+				var errorResult = JSON.parse(request.responseText);
+				w2alert(errorResult.message);
+			}
+		});
+	}
+}
+
+/**************************************************************
+ * 설명 로컬에 있는 스템셀 업로드
+ * Function : stemcellFileUpload
+ **************************************************************/
+function stemcellFileUpload(stemcellInfo){
+	var form = $(".w2ui-msg-body #settingForm");
+	var formData = new FormData(form);
+	var files = $('.w2ui-msg-body #stemcellPathFile')[0].files;
+	formData.append("file", files[0]);
+	formData.append("overlay", stemcellInfo.overlayCheck);
+	formData.append("id", stemcellInfo.id);
+	formData.append("fileSize", files[0].size);
+	
+	if(stemcellInfo.id == 'undefined' || stemcellInfo.id==null || stemcellInfo.id=="" ){
+		alert(stemcellInfo.id);
+		return;
+	}
+	
+	if(files[0].size == 0){
+ 		w2alert("스템셀 파일을 찾을 수 없습니다. 확인해주세요.", "스템셀 파일 업로드");
+ 		return false;
+ 	}
+	
+	$.ajax({
+        type:'POST',
+        url: '/config/stemcell/regist/upload',
+        enctype : 'multipart/form-data',
+ 		dataType: "text",
+ 		async : true,
+        data:formData,
+        xhr: function() {
+				var myXhr = $.ajaxSettings.xhr();
+				myXhr.onreadystatechange = function () {}
+				myXhr.upload.onprogress = function(e) {
+					
+					if (e.lengthComputable) {
+						var max = e.total;
+						var current = e.loaded;
+		
+						var Percentage = parseInt((current * 100) / max);
+						if (Percentage == 1) {
+				        	if(stemcellInfo.downloadStatus == "DOWNLOADED"  ){
+				        		$("#downloaded_"+ stemcellInfo.id).wrap('<div class="btn" id="isExisted_'+stemcellInfo.id+'" style="position: relative;width:100px;"></div>');
+				        		$("div").remove(stemcellInfo.id);
+							} else if(  stemcellInfo.downloadStatus == 'DOWNLOADING'  ){
+								$("#downloading_"+ stemcellInfo.id).wrap('<div class="btn" id="isExisted_'+stemcellInfo.id+'" style="position: relative;width:100px;"></div>');
+				    			$("div").remove(stemcellInfo.id);
+							}
+				        	$("#isExisted_" + stemcellInfo.id).html(progressBarDiv);
+				        	
+						} else if (Percentage == 100){ 
+								Percentage = 99;
+							};
+						$("#isExisted_"+ stemcellInfo.id + " .progress .progress-bar")
+								.css({ "width" : Percentage + "%", "padding-top" : "5px", "text-align" : "center"}).text(Percentage + "%");
+					}
+				}
+				return myXhr;
+			},
+			cache : false,
+			contentType : false,
+			processData : false,
+			success : function(data) {
+				$("#isExisted_" + stemcellInfo.id + " .progress .progress-bar")
+						.css({ "width" : "100%", "padding-top" : "5px", "text-align" : "center" }).text("100%");
+				doSearch();
+			},
+			error : function(data) {
+			}
+		});
+}
+
+/**************************************************************
+ * 설명 원격지에 있는 스템셀 다운로드
+ * Function : stemcellFileDownload
+ **************************************************************/
+var fail_count = 0;
+function stemcellFileDownload(stemcellInfo){
+	lock( '다운로드 중입니다.', true);
+	var socket = new SockJS("<c:url value='/config/stemcell/regist/stemcellDownloading'/>");
+	downloadClient = Stomp.over(socket); 
+	var status = 0;
+	
+	var downloadPercentage = 0;
+	downloadClient.heartbeat.outgoing = 50000;
+	downloadClient.heartbeat.incoming = 0;
+	downloadClient.connect({}, function(frame) {
+		downloadClient.subscribe('/user/config/stemcell/regist/download/logs', function(data){
+			w2popup.unlock();
+			status = data.body.split('/')[1]; //recid/percent 중 percent
+        	id = data.body.split('/')[0]; //recid/percent 중 recid
+        	if(  stemcellInfo.downloadStatus == 'DOWNLOADING' &&  downloadStatus == ""){
+        		downloadStatus ="PROCESSING";
+				$("#downloading_"+id).wrap('<div class="btn" id="isExisted_'+ id+'" style="position: relative;width:100px;"></div>');
+				$("#downloading_"+id).remove();
+				$("#isExisted_" + id).html(progressBarDiv);
+			}
+        	
+        	console.log("### Download Status ::: " + status.split("%")[0]);
+        	
+        	if ( Number(status.split("%")[0]) < 100 ) {
+       		 $("#isExisted_" + id+ " .progress .progress-bar")
+       		 	.css({"width": status
+       		 		, "padding-top": "5px"
+       		 		, "text-align": "center"	
+       		 	}).text( status );
+		    }else if( status == "done") {
+		    	downloadStatus = '';
+		    	$("#isExisted_" + id).parent().html(completeButton);
+		    	downloadClient.disconnect();
+		    	doSearch();
+		    }
+		});
+		downloadClient.send("<c:url value='/send/config/stemcell/regist/stemcellDownloading'/>", {}, JSON.stringify(stemcellInfo));
+	}, function(frame){
+		fail_count ++;
+		console.log("request reConnecting.... fail_count: " + fail_count);
+		downloadClient.disconnect();
+		if( fail_count < 10 ){
+			socketDwonload(stemcellInfo);	
+		}else{
+			w2alert("스템셀 다운로드에 실패하였습니다. ", "스템셀 다운로드")
+			fail_count = 0;
+			var requestParameter = {
+					id : stemcellInfo.id,
+					stemcellFileName : stemcellInfo.stemcelleFileName
+				};
+		}
+	});
+}
+
+/**************************************************************
+ * 설명 스템셀 삭제 버튼 클릭 후 확인 팝업 화면
+ * Function : deletePop
+ **************************************************************/
+function deletePop(record){
+	var requestParameter = {
+			id : record.id,
+			stemcellFileName : record.stemcellFileName
+		};
+	$.ajax({
+		type : "DELETE",
+		url : "/config/stemcell/deletePublicStemcell",
+		contentType : "application/json",
+		async : true,
+		data : JSON.stringify(requestParameter),
+		success : function(data, status) {
+			w2ui['config_opStemcellsGrid'].clear();
+			initView();
+		}, error : function(request, status, error) {
+			w2popup.unlock();
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message);
+			w2ui['config_opStemcellsGrid'].clear();
+			doSearch();
+		}
+	});
+}
+
+
+/********************************************************
+ * 설명		: 그리드 재조회
+ * Function	: gridReload
+ *********************************************************/
+function gridReload() {
+	w2ui['config_opStemcellsGrid'].reset();
+	doSearch();
+}
+
+/********************************************************
+ * 설명		: 다른 페이지 이동 시 호출
+ * Function	: clearMainPage
+ *********************************************************/
+function clearMainPage() {
+	$().w2destroy('config_opStemcellsGrid');
+}
+
+ /********************************************************
+ * 설명		: Lock 실행
+ * Function	: clearMainPage
+ *********************************************************/
+function lock(msg) {
+	w2popup.lock(msg, true);
+}
+
+/********************************************************
+ * 설명 :  화면 변환 시
+ *********************************************************/
+$(window).resize(function() {
+	setLayoutContainerHeight();
+});
+
 
 /**************************************************************
  * 설명 : 정보 조회
  * Function : initView
  **************************************************************/
 function initView() {
-	//  기본 설치관리자 정보 조회
-	getDefaultDirector();
-
-	// OS구분 코드 (코드값 : '200')
-	setCommonCode('<c:url value="/common/deploy/codes/parent/"/>'+ OS_TYPE_CODE, 'os');
-	
-	// OS버전 코드  (OS구분과 연관된 하위코드로 선택된 OS구분 코드의 값)
-	setCommonCode('<c:url value="/common/deploy/codes/parent/"/>' + OS_TYPE_CODE + '<c:url value="/subcode/"/>' + $("#os option:selected").val(), 'osVersion');
-	
-	// IaaS 코드 (코드값 : '1')
-	//setCommonCode('<c:url value="/codes/child/"/>' + '1', 'iaas');
-	setCommonCode('<c:url value="/common/deploy/codes/parent/"/>' + '100', 'iaas');
-	
-	// 스템셀 목록 조회
-	doSearch();
-	
-	// 다운로드 & 삭제버튼 Disable
-	$('#doDownload').attr('disabled', true);
 	$('#doDelete').attr('disabled', true);
+	doSearch();
 }
-
-/**************************************************************
- * 설명 : OS버전 Option 목록 조회
- * Function : changeOS
- **************************************************************/
-function changeOS() {
-	// OS버전 코드  (OS구분과 연관된 하위코드로 선택된 OS구분 코드의 값)
-	setCommonCode('<c:url value="/common/deploy/codes/parent/"/>' + IAAS_TYPE_CODE + '<c:url value="/subcode/"/>' + $("#os option:selected").val(), 'osVersion');
-}
-
-/**************************************************************
- * 설명 : 스템셀 목록 조회
- * Function : doSearch
- **************************************************************/
-function doSearch() {
-	var requestParam = "?os=" + $("#os option:selected").text();
-	requestParam += "&osVersion=" + $("#osVersion option:selected").text();
-	requestParam += "&iaas=" + $("#iaas option:selected").text();
-
-	w2ui['config_opStemcellsGrid'].load("<c:url value='/config/stemcell/publicStemcells'/>" + requestParam);
-}
-
-/**************************************************************
- * 설명 : 스템셀 목록 동기화
- * Function : doSync
- **************************************************************/
-function doSync() {
-	w2confirm({
-		msg : '스템셀 목록을 동기화 하시겠습니까?',
-		title : '스템셀 목록 동기화',
-		yes_text : '확인',
-		no_text : '취소',
-		yes_callBack : function(event){
-			w2ui['config_opStemcellsGrid'].lock('목록 동기화 중입니다.', true);
-			$.ajax({
-				method : 'PUT',
-				type : "json",
-				url : "/config/stemcell/syncPublicStemcell",
-				contentType : "application/json",
-				success : function(data, status) {
-					
-					w2ui['config_opStemcellsGrid'].reset();
-					doSearch();
-					w2ui['config_opStemcellsGrid'].unlock();
-					w2alert("스템셀 목록 동기화 처리가 완료되었습니다.", "스템셀 목록 동기화");
-				},
-				error : function(request, status, error) {
-					w2ui['config_opStemcellsGrid'].unlock();
-					var errorResult = JSON.parse(request.responseText);
-					w2alert(errorResult.message, "스템셀 목록 동기화");
-					doSearch();
-				}
-			});
-		},
-		no_callBack : function(event){
-			doSearch();
-		}
-	});	
-}
-
-
-/**************************************************************
- * 설명 : 스템셀 다운로드
- * Function : doDownload
- **************************************************************/
-function doDownload() {
-	var selected = w2ui['config_opStemcellsGrid'].getSelection();
-	var record = w2ui['config_opStemcellsGrid'].get(selected);
-	var message = record.stemcellVersion + '버전의 스템셀 ' + record.stemcellFileName + '을 다운로드 하시겠습니까?';
-	w2confirm({
-		title 			: '스템셀 다운로드',
-		msg 			: message,
-		yes_text 		: '확인',
-		no_text 		: '취소',
-		yes_callBack	: function(event){
-			if(lockFileSet(record.stemcellFileName)==false) {
-				return;
-			}
-			var requestParameter = {
-					recid		: record.recid,
-					id 			: record.id,
-					sublink 	: record.sublink,
-					fileName	: record.stemcellFileName,
-					fileSize	: record.size
-					};
-			progressGrow(requestParameter, record );	
-			
-		},
-		no_callBack : function(event){
-			doSearch();
-		}
-		
-	});
-}
-
-/**************************************************************
- * 설명 : PROGRESSBAR 생성
-* Function : progressGrow
-**************************************************************/
-function progressGrow(requestParameter, record) {
-    //var progressbar = $("td #isExisted_" + requestParameter.recid);
-    var downloadPercentage = 0;
-    //downloading bar 생성
-    var progressBarDiv = '<div class="progress">';
-    progressBarDiv += '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" >';
-    progressBarDiv += '</div></div>';
-    $("#isExisted_" + requestParameter.id).html(progressBarDiv);
-     
-    //소켓 연결
-    var socket = new SockJS('/config/stemcell/download/stemcellDownloading');
-     
-    downloadClient = Stomp.over(socket); //Stomp client 구성
-    var status = 0;
-    downloadClient.connect({}, function(frame) {
-        downloadClient.subscribe('/config/stemcell/download/logs', function(data){
-            //데이터에서 타겟을 받아서 지정
-            //progressbar status change
-            status = data.body.split('/')[1]; //recid/percent 중 percent
-            var id = data.body.split('/')[0]; //recid/percent 중 recid
-            console.log("### Download Status ::: " + status);
-             if ( status < 100 ) {
-                 $("#isExisted_" + id+ " .progress .progress-bar")
-                    .css({"width": status + "%"
-                        , "padding-top": "5px"
-                        , "text-align": "center"    
-                    }).text( status + "%");
-            }
-            else if(status == 100) {
-                $("#isExisted_" + id).parent().html(completeButton);
-                if(downloadClient!=null){
-               	  downloadClient.disconnect();
-                }
-                doSearch();
-            }           
-        });
-        //send to message
-        downloadClient.send("/send/config/stemcell/download/stemcellDownloading", {}, JSON.stringify(requestParameter));
-    });
-}
-
-
-/**************************************************************
- * 설명 : 스템셀 삭제
- * Function : doDelete
- **************************************************************/
-function doDelete() {
-	var selected = w2ui['config_opStemcellsGrid'].getSelection();
-	var record = w2ui['config_opStemcellsGrid'].get(selected);
-
-	var requestParameter = {
-		stemcellFileName	: record.stemcellFileName,
-		id					: record.id
-	};
-	
-
-	w2confirm({
-		title 		 : '스템셀 삭제',
-		msg 		 : '선택된 스템셀 ' + record.stemcellFileName + '을 삭제하시겠습니까?',
-		yes_text 	 : '확인',
-		no_text 	 : '취소',
-		yes_callBack : function(event){
-			$.ajax({
-				method 	: 'delete',
-				type 	: "json",
-				url 	: "/config/stemcell/deletePublicStemcell",
-				contentType : "application/json",
-				data 	: JSON.stringify(requestParameter),
-				success : function(data, status) {
-					record.isExisted = 'N';
-					doSearch();
-					$('#doDelete').attr('disabled', true);
-					w2ui['config_opStemcellsGrid'].selectNone();
-				},
-				error : function(e) {
-					w2alert("오류가 발생하였습니다.");
-				}
-			});
-		},
-		no_callBack : function(event){
-			doSearch();
-		}
-	});		
-}
-
-/********************************************************
- * 설명 :  lock 검사
- * Function : lockFileSet
- *********************************************************/
-var lockFile = false;
-function lockFileSet(fileName){
-	var FileName = fileName.split(".tgz")[0]+"-download";
-	var message = "현재 다른 플랫폼 설치 관리자가 동일 한 릴리즈를 사용 중 입니다."
-	lockFile = commonLockFile("<c:url value='/common/deploy/lockFile/"+FileName+"'/>",message);
-	return lockFile;
-}
-
-/**************************************************************
- * 설명 : Lock 실행
- * Function : lock
- **************************************************************/
-function lock (msg) {
-    w2popup.lock(msg, true);
-}
-
-/********************************************************
- * 설명 :  다른페이지 이동시 호출
- * Function : clearMainPage
- *********************************************************/
-function clearMainPage() {
-	$().w2destroy('config_opStemcellsGrid');
-}
-
-/********************************************************
- * 설명 :  화면 리사이즈시 호출
- *********************************************************/
-$(window).resize(function() {
-	setLayoutContainerHeight();
-});
 </script>
-
+<style type="text/css">
+#stemcellPathFile { display:none; } 
+</style>
 <div id="main">
 	<div class="page_site">환경설정 및 관리 > <strong>스템셀 관리</strong></div>
 	
 	<!-- OpenPaaS 스템셀 목록-->
 	
-	<div class="title">스템셀 목록</div>
-	
- 	<div class="search_box" align="center">
-		<span class="search_li">OS</span>&nbsp;&nbsp;&nbsp;
-		<!-- OS구분 -->
-		<select name="select" id="os" class="select" style="width:120px">
-		</select>
-		<span class="search_li">OS버전</span>&nbsp;&nbsp;&nbsp;
-		<!-- OS버전구분 -->
-		<select name="select" id="osVersion" class="select" style="width:120px">
-		</select>
-		<span class="search_li">IaaS</span>&nbsp;&nbsp;&nbsp;
-		<!-- IaaS구분 -->
-		<select name="select" id="iaas" class="select" style="width:120px">
-		</select>
-		&nbsp;&nbsp;&nbsp;
-		
-		<!-- Btn -->
-		<sec:authorize access="hasAuthority('CONFIG_STEMCELL_LIST')">
-		<span id="doSearch" class="btn btn-info" style="width:100px" >조회</span>
-		</sec:authorize>
-		<sec:authorize access="hasAuthority('CONFIG_STEMCELL_SYNC')">
-		<span id="doSync" class="btn btn-primary" style="width:100px" >목록 동기화</span>
-		</sec:authorize>
-		<sec:authorize access="hasAuthority('CONFIG_STEMCELL_DOWNLOAD')">
-		<span id="doDownload" class="btn btn-primary" style="width:100px" >다운로드</span>
-		</sec:authorize>
-		<sec:authorize access="hasAuthority('CONFIG_STEMCELL_DELETE')">
-		<span id="doDelete" class="btn btn-danger" style="width:100px" >삭제</span>
-		</sec:authorize>
-		<!-- //Btn -->
-
+	<div class="pdt20">
+		<div class="title fl">스템셀 목록</div>
+		<div class="fr"> 
+			<!-- Btn -->
+			<sec:authorize access="hasAuthority('CONFIG_STEMCELL_REGIST')">
+			<span id="doRegist" class="btn btn-primary" style="width:120px" >등록</span>
+			</sec:authorize>
+			<sec:authorize access="hasAuthority('CONFIG_STEMCELL_DELETE')">
+			<span id="doDelete" class="btn btn-danger" style="width:120px" >삭제</span>
+			</sec:authorize>
+			<!-- //Btn -->
+		</div>
 	</div>
 	
 	<!-- 그리드 영역 -->
-	<div id="config_opStemcellsGrid" style="width:100%; height:700px"></div>	
+	<div id="config_opStemcellsGrid" style="width:100%; height:718px"></div>
+	
+	<!-- 스템셀 등록 팝업 -->
+	<form id="settingForm" action="POST" style="padding:5px 0 5px 0;margin:0;">
+		<div id="regPopupDiv" hidden="true">
+			<input name="stemcellSize" type="hidden" />
+			<input name="id" type="hidden" />
+			<div class="panel panel-info" style ="margin-top:20px;">	
+				<div class="panel-heading"><b>스템셀 기본 정보</b></div>
+				<div class="panel-body" style="padding:5px 5% 10px 5%;height:145px;">
+					<div class="w2ui-field">
+						<label style="width:30%;text-align: left;padding-left: 20px;">스템셀 명</label>
+						<div style="width: 70%;">
+							<input name="stemcellName" type="text" maxlength="100" style="width: 250px" required placeholder="스템셀 명을 입력 하세요."  />
+						</div>
+					</div>
+					<div class="w2ui-field" >
+							<label style="width:30%;text-align: left;padding-left: 20px;">IaaS 유형</label>
+							<div style="width: 70%">
+								<input name="iaasList" onchange='setAwsType(this.value);' type="list" style="float: left; width: 60%;" required placeholder="선택하세요." />
+							</div>
+					</div>
+					<div class="w2ui-field">
+							<label style="width:30%;text-align: left;padding-left: 20px;">OS 유형</label>
+							<div style="width: 70%">
+								<input name="osList" onchange='setOsVersion(this.value);' type="list" style="float: left; width: 60%;" required placeholder="선택하세요." />
+							</div>
+					</div>
+					<div class="w2ui-field">
+							<label style="width:30%;text-align:left;padding-left: 20px;">OS 버전</label>
+							<div style="width: 70%">
+								<input name="osVersionList" id="osVersionList"  disabled="disabled" type="list" style="float: left; width: 60%;" required placeholder="OS 유형을 선택하세요." />
+							</div>
+					</div>
+				</div>
+			</div>
+			<input name="id" type="hidden" />
+			<div class="panel panel-info" >	
+				<div class="panel-heading"><b>스템셀 다운 유형</b></div>
+				<div class="panel-body" style="padding:5px 5% 10px 5%;height:210px;">
+					<div class="w2ui-field" style="margin: 8px 0px 0px 0px;" >
+			        <label style="width:30%;text-align: left;padding-left: 15px;"><input type="radio" name="fileType" value="file" onchange='setRegistType(this.value);'/>&nbsp;&nbsp;로컬에서 선택</label>
+			        	<div>
+				        	<span>
+				        	<input type="file" name="stemcellPathFile[]" id="stemcellPathFile" onchange="setstemcellFilePath(this);" hidden="true"/>
+				        	<input type="text" id="stemcellPathFileName" name="stemcellPathFileName" style="width:53%;" readonly  onClick="openBrowse();" placeholder="업로드할 stemcell 파일을 선택하세요."/>
+				        	<span class="btn btn-primary" id = "browser" onClick="openBrowse();" disabled style="height: 25px; padding: 1px 7px 7px 6px;">Browse </span>&nbsp;&nbsp;&nbsp;
+				        	</span>
+			        	</div>
+			        </div>
+			         <div class="w2ui-field" style="margin: 8px 0px 0px 0px;">
+			          <img alt="stemcellVersion-help-info" class="stemcell-info" style="width:18px; position:absolute; left:25%; margin-top:10px" data-toggle="popover" title="공개 스템셀 참조 사이트"  data-html="true" src="../images/help-Info-icon.png">	
+			         <label style="width:30%;text-align: left;padding-left: 15px;"><input type="radio" name="fileType" value="url" onchange='setRegistType(this.value);'/>&nbsp;&nbsp;스템셀 Url</label>
+			        	<div>
+			        		<input type="text" id="stemcellPathUrl" name="stemcellPathUrl" style="width:53%;" readonly   placeholder="스템셀 다운로드 Url을 입력 하세요."/>
+						</div>			        
+			        </div>
+			         <div class="w2ui-field" style="margin: 8px 0px 0px 0px;">
+			         <label style="width:30%;text-align: left;padding-left: 15px;"><input type="radio" name="fileType" value="version" onchange='setRegistType(this.value);' />&nbsp;&nbsp;스템셀 Version</label>
+			        	<div>
+			        		<input type="text" id="stemcellPathVersion" name="stemcellPathVersion" style="width:53%;" readonly   placeholder="스템셀 다운로드 버전을 입력 하세요."/>
+			        	</div>
+			        	<div>
+			        		<input name="awsLight" type="checkbox" value="awsLight" disabled/>&nbsp;Lite 유형
+			        	</div>
+			        </div>
+			         <div class="w2ui-field" style="margin: 8px 0px 0px 0px;">
+			          <label style="width:30%;text-align: left;padding-left: 15px;">파일 덮어 쓰기</label>
+			         	 <div>
+			        		<input name="overlay" type="checkbox" value="overlay" checked/>&nbsp;
+			        	</div>
+			         </div>
+				</div>
+			</div>
+		</div>
+		<div id="regPopupBtnDiv" hidden="true">
+			<button class="btn" id="registBtn" onclick="stemcellRegist()">등록</button>
+			<button class="btn" id="popClose"  onclick="w2popup.close();">취소</button>
+		</div>
+	<!-- //스템셀 등록 팝업 -->
+	</form>	
+	
 	
 </div>

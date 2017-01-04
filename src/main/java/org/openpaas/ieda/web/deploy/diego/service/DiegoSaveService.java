@@ -11,8 +11,6 @@ import org.openpaas.ieda.common.CommonException;
 import org.openpaas.ieda.web.common.dto.SessionInfoDTO;
 import org.openpaas.ieda.web.deploy.cf.dao.CfDAO;
 import org.openpaas.ieda.web.deploy.cf.dao.CfVO;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyDAO;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyVO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkDAO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkVO;
 import org.openpaas.ieda.web.deploy.common.dao.resource.ResourceDAO;
@@ -33,7 +31,6 @@ import org.springframework.util.StringUtils;
 public class DiegoSaveService {
 	@Autowired private DiegoDAO diegoDao;
 	@Autowired private NetworkDAO networkDao;
-	@Autowired private KeyDAO keyDao;
 	@Autowired private CfDAO cfDao;
 	@Autowired private ResourceDAO resourceDao;
 	@Autowired private CommonCodeDAO commonCodeDao;
@@ -41,9 +38,6 @@ public class DiegoSaveService {
 	final private static String PARENT_CODE="1000"; //배포 코드
 	final private static String SUB_GROUP_CODE="1100"; //배포 유형 코드
 	final private static String CODE_NAME="DEPLOY_TYPE_DIEGO"; //배포 할 플랫폼명
-	final static private int DIEGO_KEY=1410; 
-	final static private int ETCD_KEY=1420; 
-	final static private int ETCD_PEER_KEY=1430; 
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
@@ -72,12 +66,13 @@ public class DiegoSaveService {
 		vo.setCflinuxfs2rootfsreleaseName(dto.getCflinuxfs2rootfsreleaseName());
 		vo.setCflinuxfs2rootfsreleaseVersion(dto.getCflinuxfs2rootfsreleaseVersion());
 		vo.setCfId(dto.getCfId());
-		if(dto.getCfDeployment()!=null&&!dto.getCfDeployment().equals("")){
-			vo.setCfDeployment(dto.getCfDeployment());
+		
+		if(dto.getCfDeploymentFile()!=null&&!dto.getCfDeploymentFile().equals("")){
+			vo.setCfDeployment(dto.getCfDeploymentFile());
 		}else if(!"Y".equals(test)){
 			CfVO cfvo = cfDao.selectDeploymentFilebyDeploymentName(dto.getCfDeploymentName());
 			//cf 야물 파일에 대한 경고 문 필요
-			if(cfvo.getDeploymentFile()==null){
+			if(cfvo==null){
 				throw new CommonException("notfound.deigo.exception",
 						"CF 배포 파일이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 			}
@@ -87,8 +82,8 @@ public class DiegoSaveService {
 		vo.setGardenReleaseVersion(dto.getGardenReleaseVersion());
 		vo.setEtcdReleaseName(dto.getEtcdReleaseName());
 		vo.setEtcdReleaseVersion(dto.getEtcdReleaseVersion());
+		vo.setKeyFile(dto.getKeyFile());
 		vo.setUpdateUserId(sessionInfo.getUserId());
-		
 		if( StringUtils.isEmpty(dto.getId()) || "Y".equals(test) ) { 
 			diegoDao.insertDiegoDefaultInfo(vo);//저장
 		}else{  
@@ -96,98 +91,7 @@ public class DiegoSaveService {
 		}
 		return vo;
 	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Diego 정보 저장  
-	 * @title               : saveDiegoInfo
-	 * @return            : DiegoVO
-	***************************************************/
-	@Transactional
-	public DiegoVO saveDiegoInfo(DiegoParamDTO.Diego dto) {
-		//Diego Key 정보
-		SessionInfoDTO sessionInfo = new SessionInfoDTO();
-		DiegoVO vo = diegoDao.selectDiegoKeyInfoById(Integer.parseInt(dto.getId()), CODE_NAME, DIEGO_KEY);
-		CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
-		
-		KeyVO keyvo = new KeyVO();
-		//2.1 Diego 정보	
-		vo.setUpdateUserId(sessionInfo.getUserId());
-		vo.setDiegoEncryptionKeys(dto.getDiegoEncryptionKeys());
-		//Diego 정보 저장
-		diegoDao.updateDiegoDefaultInfo(vo);
-		keyvo.setId(Integer.parseInt(dto.getId()));
-		keyvo.setDeployType(codeVo.getCodeName());
-		keyvo.setKeyType(DIEGO_KEY);
-		keyvo.setCaCert(dto.getDiegoCaCert());
-		keyvo.setHostKey(dto.getDiegoHostKey());
-		keyvo.setClientCert(dto.getDiegoClientCert());
-		keyvo.setClientKey(dto.getDiegoClientKey());
-		keyvo.setServerCert(dto.getDiegoServerCert());
-		keyvo.setServerKey(dto.getDiegoServerKey());
-		keyvo.setCreateUserId(sessionInfo.getUserId());
-		keyvo.setUpdateUserId(sessionInfo.getUserId());
-		if(vo.getKeys().size() > 0){
-			keyDao.updateKeyInfo(keyvo);
-		}else{
-			keyDao.insertKeyInfo(keyvo);
-		}
-		List<KeyVO> keyList = new ArrayList<KeyVO>();
-		keyList.add(keyvo);
-		vo.setKeys(keyList);
-		return vo;
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Diego ETCD 정보 저장  
-	 * @title               : saveEtcdInfo
-	 * @return            : DiegoVO
-	***************************************************/
-	@Transactional
-	public DiegoVO saveEtcdInfo(DiegoParamDTO.Etcd dto) {
-		SessionInfoDTO sessionInfo = new SessionInfoDTO();
-		DiegoVO vo = diegoDao.selectDiegoKeyInfoById(Integer.parseInt(dto.getId()), CODE_NAME, ETCD_KEY);
-		CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
-		KeyVO etcdKeyVo = new KeyVO();
-		//2.2 ETCD 정보
-		vo.setUpdateUserId(sessionInfo.getUserId());
-		diegoDao.updateDiegoDefaultInfo(vo);
-		etcdKeyVo.setId(Integer.parseInt(dto.getId()));
-		etcdKeyVo.setKeyType(ETCD_KEY);
-		etcdKeyVo.setDeployType(codeVo.getCodeName());
-		etcdKeyVo.setClientCert(dto.getEtcdClientCert());
-		etcdKeyVo.setClientKey(dto.getEtcdClientKey());
-		etcdKeyVo.setServerCert(dto.getEtcdServerCert());
-		etcdKeyVo.setServerKey(dto.getEtcdServerKey());
-		etcdKeyVo.setCreateUserId(sessionInfo.getUserId());
-		etcdKeyVo.setUpdateUserId(sessionInfo.getUserId());
-		if(vo.getKeys().size() > 0 ){
-			keyDao.updateKeyInfo(etcdKeyVo);
-		}else{
-			keyDao.insertKeyInfo(etcdKeyVo);
-		}
-		KeyVO PeerKeyvo = new KeyVO();
-		PeerKeyvo.setId(Integer.parseInt(dto.getId()));
-		PeerKeyvo.setKeyType(ETCD_PEER_KEY);
-		PeerKeyvo.setDeployType(codeVo.getCodeName());
-		PeerKeyvo.setCaCert(dto.getEtcdPeerCaCert());
-		PeerKeyvo.setServerKey(dto.getEtcdPeerKey());
-		PeerKeyvo.setServerCert(dto.getEtcdPeerCert());
-		PeerKeyvo.setCreateUserId(sessionInfo.getUserId());
-		PeerKeyvo.setUpdateUserId(sessionInfo.getUserId());
-		if(vo.getKeys().size() > 0){
-			keyDao.updateKeyInfo(PeerKeyvo);
-		}else{
-			keyDao.insertKeyInfo(PeerKeyvo);
-		}
-		List<KeyVO> keyList = new ArrayList<KeyVO>();
-		keyList.add(etcdKeyVo);
-		keyList.add(PeerKeyvo);
-		vo.setKeys(keyList);
-		return vo;
-	}
-	
+
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
 	 * @description   : Diego 네트워크 정보 저장   

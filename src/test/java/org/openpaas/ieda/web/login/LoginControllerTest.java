@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openpaas.ieda.OpenpaasIedaWebApplication;
+import org.openpaas.ieda.TestBeansConfiguration;
 import org.openpaas.ieda.web.common.BaseTestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {OpenpaasIedaWebApplication.class})
+@SpringApplicationConfiguration(classes = {OpenpaasIedaWebApplication.class, TestBeansConfiguration.class})
 @WebAppConfiguration
 @Transactional
 @TransactionConfiguration(defaultRollback=true)

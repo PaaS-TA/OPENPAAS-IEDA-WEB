@@ -21,8 +21,6 @@ import org.openpaas.ieda.web.config.setting.dao.DirectorConfigVO;
 import org.openpaas.ieda.web.deploy.cf.dao.CfDAO;
 import org.openpaas.ieda.web.deploy.cf.dao.CfVO;
 import org.openpaas.ieda.web.deploy.cf.dto.CfParamDTO;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyDAO;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyVO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkDAO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkVO;
 import org.openpaas.ieda.web.deploy.common.dao.resource.ResourceDAO;
@@ -48,7 +46,6 @@ public class CfServiceTest {
 	
 	@Autowired private CfDAO cfDao;
 	@Autowired private NetworkDAO networkDao;
-	@Autowired private KeyDAO keyDao;
 	@Autowired private ResourceDAO resourceDao;
 	@Autowired private CommonCodeDAO commonCodeDao;
 	
@@ -73,16 +70,7 @@ public class CfServiceTest {
 		//1.2 insert Network Info
 		List<NetworkVO> networkList = setNetworkInfo();
 		networkDao.insertNetworkList(networkList);
-		//1.3 insert Uaa Key Info
-		KeyVO uaaKeyVo = setUaaKeyInfo();
-		keyDao.insertKeyInfo(uaaKeyVo);
-		//1.4 insert Consul Key Info
-		KeyVO consulKeyVo = setConsulKeyInfo();
-		keyDao.insertKeyInfo(consulKeyVo);
-		//1.5 insert Blobstore Key Info
-		KeyVO blobstoreKeyVo = setBlobstoreKeyInfo();
-		keyDao.insertKeyInfo(blobstoreKeyVo);
-		//1.6 insert Resource Info
+		//1.3 insert Resource Info
 		ResourceVO resourceVo = setResourceInfo();
 		resourceDao.insertResourceInfo(resourceVo);
 		
@@ -250,7 +238,6 @@ public class CfServiceTest {
 				if ( vo != null ){
 					cfDao.deleteCfInfoRecord(vo.getId());
 					networkDao.deleteNetworkInfoRecord( vo.getId(), codeVo.getCodeName() );
-					keyDao.deleteKeyInfo( vo.getId(), codeVo.getCodeName() );
 					resourceDao.deleteResourceInfo( vo.getId(), codeVo.getCodeName() );
 				}
 				
@@ -313,28 +300,16 @@ public class CfServiceTest {
 		vo.setDomain("172.xx.xx.100.xip.io");
 		vo.setDescription("test-domain");
 		vo.setDomainOrganization("test-org");
-		vo.setLoginSecret("test-login-security");
-		//프록시 정보 - HAProxy 공인 IP
-		vo.setProxyStaticIps("172.XX.XXX.103");
+		vo.setProxyStaticIps("172.xx.xx.100");
+		vo.setLoginSecret("1234");
+		vo.setKeyFile("vsphere-cf-key-1.yml");
+		vo.setCountryCode("KR");
+		vo.setStateName("Seoul");
+		vo.setLocalityName("Seoul");
+		vo.setOrganizationName("PaaS");
+		vo.setUnitName("unit");
+		vo.setEmail("paas@example.co.kr");
 		
-		//프록시 정보 - HAProxy 인증서
-		String sslPemPub = "-----BEGIN CERTIFICATE-----" + "\n";
-		sslPemPub += "MIICnzCCAggCCQCKDfbzvFEfUTANBgkqhkiG9w0BAQsFADCBkzELMAkGA1UEBhMC" + "\n";
-		sslPemPub += "S1IxDjAMBgNVBAgMBVNlb3VsMQ4wDAYDVQQHDAVTZW91bDEQMA4GA1UECgwHY2xv" + "\n";
-		sslPemPub += "dWQ0dTEMMAoGA1UECwwDT0NQMSAwHgYDVQQDDBcqLjE3Mi4xNi4xMDAuMTA5Lnhp" + "\n";
-		sslPemPub += "...testing" + "\n";
-		vo.setSslPemPub(sslPemPub);
-		
-		//프록시 정보 - HAProxy 개인키
-		String sslPemRsa = "-----BEGIN RSA PRIVATE KEY-----" + "\n";
-		sslPemRsa += "MIICXQIBAAKBgQDpfkbjspe++72gufsWV7kfT9wjMTxeWp4LmML7qt2NSSuTQ05E" + "\n";
-		sslPemRsa += "choQei0FMj1AV2A2nHbnEahyPNNoUpV7Oc2DlJYREZVzfok+6qYSGbHZBKzp2kiO" + "\n";
-		sslPemRsa += "E07E75mLAs5vHAWv3CBKFsxfJ2GZf+3FfLChVsKpLImywHrwwq27SODnhQIDAQAB" + "\n";
-		sslPemRsa += "...testing" + "\n";
-		vo.setSslPemRsa(sslPemRsa);
-		
-		//암호화 키 
-		vo.setEncryptKeys("test-encryptKeys");
 		vo.setDeploymentFile("openstack-cf-1-test.yml");
 		vo.setUpdateUserId("tester");
 		vo.setCreateUserId("tester");
@@ -377,150 +352,6 @@ public class CfServiceTest {
 		return networkList;
 	}
 	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Uaa Key 정보 설정
-	 * @title               : setUaaKeyInfo
-	 * @return            : KeyVO
-	***************************************************/
-	public KeyVO setUaaKeyInfo(){
-		KeyVO keyVo = new KeyVO();
-		
-		//1.1 Uaa Info
-		keyVo.setId(1);
-		keyVo.setDeployType(CODE_NAME);
-		keyVo.setKeyType(1310);
-		//공개키
-		String verificationKey = "-----BEGIN PUBLIC KEY-----" +"\n";
-		verificationKey += "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1kp7Wg/cyq12DWTin7Tu"+"\n";
-		verificationKey += "HKZjUolmOxj93iMj4PePxrvHgTkLs4xA5smR9w6BhCMJ/B0fpJvca8TqXgvVtDfx" + "\n";
-		verificationKey += "2ui9NuDQKB477mOfg/SHrB2h9G9JZdsJdbIqSEiXW0XugJU/vm3qiV/RTisZYhX4" + "\n";
-		verificationKey += "...testing" + "\n";
-		verificationKey += "-----END PUBLIC KEY-----";
-		keyVo.setPublicKey(verificationKey);
-		
-		//개인키
-		String signingKey= "-----BEGIN RSA PRIVATE KEY-----" + "\n";
-		signingKey += "MIIEowIBAAKCAQEA1kp7Wg/cyq12DWTin7TuHKZjUolmOxj93iMj4PePxrvHgTkL" + "\n";
-		signingKey += "s4xA5smR9w6BhCMJ/B0fpJvca8TqXgvVtDfx2ui9NuDQKB477mOfg/SHrB2h9G9J" + "\n";
-		signingKey += "ZdsJdbIqSEiXW0XugJU/vm3qiV/RTisZYhX4P8kXcbQZJBKdqrHaAjJijrsUqp78" + "\n";
-		signingKey += "...testing" + "\n";
-		signingKey += "-----END RSA PRIVATE KEY-----";
-		keyVo.setPrivateKey(signingKey);
-		keyVo.setCreateUserId("tester");
-		keyVo.setUpdateUserId("tester");
-		
-		return keyVo;
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Consul Key 정보 설정
-	 * @title               : setConsulKeyInfo
-	 * @return            : KeyVO
-	***************************************************/
-	public KeyVO setConsulKeyInfo(){
-		KeyVO keyVo = new KeyVO();
-		
-		keyVo.setId(1);
-		keyVo.setDeployType(CODE_NAME);
-		keyVo.setKeyType(1320);
-		
-		String agentCert = "-----BEGIN CERTIFICATE-----" + "\n";
-		agentCert += "MIIEJjCCAg6gAwIBAgIRAJFxJohnE9e10yrz0P9QET0wDQYJKoZIhvcNAQELBQAw" + "\n";
-		agentCert += "EzERMA8GA1UEAxMIY29uc3VsQ0EwHhcNMTYwNjMwMDEwOTA4WhcNMTgwNjMwMDEw" + "\n";
-		agentCert += "OTA4WjAXMRUwEwYDVQQDEwxjb25zdWwgYWdlbnQwggEiMA0GCSqGSIb3DQEBAQUA" + "\n";
-		agentCert += "...testing" + "\n";
-		agentCert += "-----END CERTIFICATE-----";
-		keyVo.setAgentCert(agentCert);
-		
-		//에이전트 개인키
-		String agentKey = "-----BEGIN RSA PRIVATE KEY-----" + "\n";
-		agentKey += "MIIEogIBAAKCAQEAwAG6admvDNWfWgmH2PKAcqXPGiayFTcQZLQLxjFgjEmjyv8r" + "\n";
-		agentKey += "5A2mg58fLOG59VuGMLTjAsEuqR2rkBjsSEoVwiRkC108bGoGQi2eHj2UtImYAfw1" + "\n";
-		agentKey += "x2YAbpocIyAc70Rb90CF/R05BuLlLRZ+fVQOn0OoGd3Cba3PwMJ2Nz0HonrEBFcE" + "\n";
-		agentKey += "...testing" + "\n";
-		agentKey += "-----END RSA PRIVATE KEY-----";
-		keyVo.setAgentKey(agentKey);
-		
-		//서버 CA 인증서
-		String caCert = "-----BEGIN CERTIFICATE-----" + "\n";
-		caCert += "MIIFBzCCAu+gAwIBAgIBATANBgkqhkiG9w0BAQsFADATMREwDwYDVQQDEwhjb25z" + "\n";
-		caCert += "dWxDQTAeFw0xNjA2MzAwMTA4NTlaFw0yNjA2MzAwMTA5MDZaMBMxETAPBgNVBAMT" + "\n";
-		caCert += "CGNvbnN1bENBMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA21gc29p5" + "\n";
-		caCert += "...testing" + "\n";
-		caCert += "-----END CERTIFICATE-----";
-		keyVo.setCaCert(caCert);
-		
-		//서버 인증서
-		String serverCert = "-----BEGIN CERTIFICATE-----" + "\n";
-		serverCert += "MIIELzCCAhegAwIBAgIQC/1znIT58wJhzfjeFU9EbzANBgkqhkiG9w0BAQsFADAT" + "\n";
-		serverCert += "MREwDwYDVQQDEwhjb25zdWxDQTAeFw0xNjA2MzAwMTA5MDdaFw0xODA2MzAwMTA5" + "\n";
-		serverCert += "MDdaMCExHzAdBgNVBAMTFnNlcnZlci5kYzEuY2YuaW50ZXJuYWwwggEiMA0GCSqG" + "\n";
-		serverCert += "...testing" + "\n";
-		serverCert += "-----END CERTIFICATE-----";
-		keyVo.setServerCert(serverCert);
-		
-		//서버 개인키
-		String serverKey = "-----BEGIN RSA PRIVATE KEY-----" + "\n";
-		serverKey += "MIIEpAIBAAKCAQEA1V2Q0MwP2ucCvCDuXgVrShUH9g+uXDkyUQh1lXuylGW2tbQw" + "\n";
-		serverKey += "v8bijtVvGYJaWNFSPOoPBbU03nw7e+jPrHbNt1PcrmHTOLqvZZwJ1nGs93LefpMv" + "\n";
-		serverKey += "lUeg7omYDTi8BU3Y+zmZH3yik9QIcxRStTWJtFrg45H2DhP2DT1v+dIg2AjLgYtC" + "\n";
-		serverKey += "...testing" + "\n";
-		serverKey += "-----END RSA PRIVATE KEY-----";
-		keyVo.setServerKey(serverKey);
-		
-		keyVo.setCreateUserId("tester");
-		keyVo.setUpdateUserId("tester");
-		
-		return keyVo;
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Blobstore Key 정보 설정
-	 * @title               : setBlobstoreKeyInfo
-	 * @return            : KeyVO
-	***************************************************/
-	public KeyVO setBlobstoreKeyInfo(){
-		KeyVO keyVo = new KeyVO();
-		
-		keyVo.setId(1);
-		keyVo.setDeployType(CODE_NAME);
-		keyVo.setKeyType(1330);
-		
-		//1.1 Blobstore Tls Cert Info
-		String blobstoreTlsCert = "-----BEGIN CERTIFICATE-----" + "\n";
-		blobstoreTlsCert += "MIIENDCCAhygAwIBAgIQfZsdWwO8eOvEphuoeM3qsTANBgkqhkiG9w0BAQsFADAR" + "\n";
-		blobstoreTlsCert += "MQ8wDQYDVQQDEwZibG9iQ0EwHhcNMTYwNjMwMDEwOTQ1WhcNMTgwNjMwMDEwOTQ1" + "\n";
-		blobstoreTlsCert += "WjAoMSYwJAYDVQQDEx1ibG9ic3RvcmUuc2VydmljZS5jZi5pbnRlcm5hbDCCASIw" + "\n";
-		blobstoreTlsCert += "...testing" + "\n";
-		blobstoreTlsCert += "-----END CERTIFICATE-----";
-		keyVo.setTlsCert(blobstoreTlsCert);
-		
-		//1,2 Blobstore Private Key Info
-		String blobstorePrivateKey = "-----BEGIN RSA PRIVATE KEY-----" + "\n";
-		blobstorePrivateKey += "MIIEowIBAAKCAQEAxKqzlMyLyFRnw31br+nVbBI6SV+RRAnOaLq66MM37w/mRUoh" + "\n";
-		blobstorePrivateKey += "nk4EQVMLgHTnV3Rb7ZGpD2fS+ARd6HEmIl0RwLEgBu/TGD91PCzBsibipxxD8M/u" + "\n";
-		blobstorePrivateKey += "adYmJvQFGCpnXg9bJi42cUCWOy8QRTx4HGuqZAWBfbbFLKDZDFAcXu4/aNML+ZSu" + "\n";
-		blobstorePrivateKey += "...testing" + "\n";
-		blobstoreTlsCert += "-----END RSA PRIVATE KEY-----";
-		keyVo.setPrivateKey(blobstorePrivateKey);
-		
-		//1.3 blobstore Ca Cert Info
-		String blobstoreCaCert = "-----BEGIN CERTIFICATE-----" + "\n";
-		blobstoreCaCert += "MIIFAzCCAuugAwIBAgIBATANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQDEwZibG9i" + "\n";
-		blobstoreCaCert += "Q0EwHhcNMTYwNjMwMDEwOTQ0WhcNMjYwNjMwMDEwOTQ1WjARMQ8wDQYDVQQDEwZi" + "\n";
-		blobstoreCaCert += "bG9iQ0EwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQCpiIZ3VyNfK9CV" + "\n";
-		blobstoreCaCert += "...testing" + "\n";
-		blobstoreCaCert += "-----END CERTIFICATE-----";
-		keyVo.setCaCert(blobstoreCaCert);
-		
-		keyVo.setCreateUserId("tester");
-		keyVo.setUpdateUserId("tester");
-		
-		return keyVo;
-	}
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화

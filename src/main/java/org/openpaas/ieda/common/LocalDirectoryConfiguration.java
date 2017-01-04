@@ -15,9 +15,13 @@ public class LocalDirectoryConfiguration {
 	final private static String RELEASE_DIR    						= BASE_DIR + SEPARATOR + "release";
 	final private static String DEPLOYMENT_DIR 					= BASE_DIR + SEPARATOR + "deployment";
 	final private static String TEMP_DIR       							= BASE_DIR + SEPARATOR + "temp";
-	final private static String DEPLOYMENT_MANIFEST_DIR 	= DEPLOYMENT_DIR + SEPARATOR + "manifest";
-	final private static String MANIFEST_TEMPLATE_DIR	 	= System.getProperty("user.dir") + SEPARATOR + "src/main/resources/static/deploy_template";
-	final private static String LOCK_DIR									= BASE_DIR + SEPARATOR + "lock";
+	final private static String LOCK_DIR								= BASE_DIR + SEPARATOR + "lock";
+	final private static String KEY_DIR									= BASE_DIR + SEPARATOR + "key";
+	final private static String DEPLOYMENT_MANIFEST_DIR = DEPLOYMENT_DIR + SEPARATOR + "manifest";
+	
+	final private static String PROJECT_STATIC_DIR				= System.getProperty("user.dir") + SEPARATOR + "src/main/resources/static";
+	final private static String MANIFEST_TEMPLATE_DIR	 	= PROJECT_STATIC_DIR + SEPARATOR + "deploy_template";
+	final private static String GENERATE_CERTS_DIR			= PROJECT_STATIC_DIR + SEPARATOR + "generate-certs";
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(LocalDirectoryConfiguration.class);
 	
@@ -36,6 +40,8 @@ public class LocalDirectoryConfiguration {
 			getTempDir();
 			getManifastDir();
 			getLockDir();
+			getKeyDir();
+			getGenerateCertsDir();
 		} catch ( Exception e ) {
 			if( LOGGER.isErrorEnabled() ){
 				LOGGER.error(e.getMessage());
@@ -170,8 +176,33 @@ public class LocalDirectoryConfiguration {
 	***************************************************/
 	public static String getLockDir(){
 		if(!checkAndMakeDirectory(LOCK_DIR))
-			throw new CommonException("notfound.key.local.exception", "lock 파일 저장 위치가 존재 하지 않습니다.", HttpStatus.NOT_FOUND);
+			throw new CommonException("notfound.lock.local.exception", "lock 파일 저장 위치가 존재 하지 않습니다.", HttpStatus.NOT_FOUND);
 		return LOCK_DIR;
 	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : Key 파일 위치를 검사하고 없으면 생성하여 응답
+	 * @title               : getKeyDir
+	 * @return            : String
+	***************************************************/
+	public static String getKeyDir(){
+		if(!checkAndMakeDirectory(KEY_DIR))
+			throw new CommonException("notfound.key.local.exception", "key 파일 저장 위치가 존재 하지 않습니다.", HttpStatus.NOT_FOUND);
+		return KEY_DIR;
+	}
+
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : Generate Certs 파일 위치를 검사하고 없으면 생성하여 응답
+	 * @title               : getGenerateCertsDir
+	 * @return            : String
+	***************************************************/
+	public static String getGenerateCertsDir(){
+		if(!checkAndMakeDirectory(GENERATE_CERTS_DIR))
+			throw new CommonException("notfound.generateCerts.local.exception", "Generate Certs 파일 저장 위치가 존재 하지 않습니다.", HttpStatus.NOT_FOUND);
+		return GENERATE_CERTS_DIR;
+	}
+	
 	
 }

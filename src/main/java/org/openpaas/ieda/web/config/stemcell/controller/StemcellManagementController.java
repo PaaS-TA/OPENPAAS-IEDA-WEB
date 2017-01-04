@@ -1,6 +1,5 @@
 package org.openpaas.ieda.web.config.stemcell.controller;
 
-import java.math.BigDecimal;
 import java.security.Principal;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -8,13 +7,13 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.openpaas.ieda.common.ErrorResponse;
-import org.openpaas.ieda.common.LocalDirectoryConfiguration;
+import org.openpaas.ieda.common.CommonException;
 import org.openpaas.ieda.web.common.controller.BaseController;
 import org.openpaas.ieda.web.config.stemcell.dao.StemcellManagementVO;
 import org.openpaas.ieda.web.config.stemcell.dto.StemcellManagementDTO;
 import org.openpaas.ieda.web.config.stemcell.service.StemcellManagementDownloadAsyncService;
 import org.openpaas.ieda.web.config.stemcell.service.StemcellManagementService;
+import org.openpaas.ieda.web.config.stemcell.service.StemcellManagementUploadService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,18 +22,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
-import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 
 @Controller
 public class StemcellManagementController extends BaseController {
 	
 	@Autowired private StemcellManagementService service;
+	@Autowired private StemcellManagementUploadService uploadService;
 	@Autowired private StemcellManagementDownloadAsyncService donwonloadService;
 	
 	private final static Logger LOG = LoggerFactory.getLogger(StemcellManagementController.class);
@@ -58,18 +57,16 @@ public class StemcellManagementController extends BaseController {
 	 * @return            : ResponseEntity<HashMap<String,Object>>
 	***************************************************/
 	@RequestMapping(value="/config/stemcell/publicStemcells", method=RequestMethod.GET)
-	public ResponseEntity<HashMap<String, Object>> getPublicStemcells(
-			@RequestParam  HashMap<String, String> requestMap) {
+	public ResponseEntity<HashMap<String, Object>> getPublicStemcells() {
 		
 		if(LOG.isInfoEnabled()){ LOG.info("================================> public 스템셀 목록 조회 요청"); }
-		List<StemcellManagementVO> stemcellList = service.getStemcellList(requestMap.get("os").toUpperCase(),
-		requestMap.get("osVersion").toUpperCase(),
-		requestMap.get("iaas").toUpperCase());
+		List<StemcellManagementVO> stemcellList = service.getStemcellList();
 		
 		HashMap<String, Object> list = new HashMap<String, Object>();
-		list.put("total", stemcellList.size());
-		list.put("records", stemcellList);
-		
+		if(stemcellList != null){
+			list.put("total", stemcellList.size());
+			list.put("records", stemcellList);
+		}
 		if(LOG.isInfoEnabled()){ LOG.info("================================> public 스템셀 목록 조회 성공!"); }
 		
 		return new ResponseEntity<HashMap<String, Object> >(list, HttpStatus.OK);
@@ -77,69 +74,80 @@ public class StemcellManagementController extends BaseController {
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : 스템셀 다운로드
-	 * @title               : doDownloadStemcell
-	 * @return            : ResponseEntity<Object>
+	 * @description   : 스템셀 입력 정보 저장
+	 * @title               : systemStemcellRegist
+	 * @return            : ResponseEntity<ReleaseManagementVO>
 	***************************************************/
-	@MessageMapping("/config/stemcell/download/stemcellDownloading")
-	@SendTo("/config/stemcell/download/socket/downloadStemcell")
-	public ResponseEntity<Object> doDownloadStemcell(@RequestBody @Valid StemcellManagementDTO.Download dto, Principal principal) {
+	@RequestMapping(value="/config/stemcell/regist/savestemcell/{testFlag}",  method=RequestMethod.POST)
+	public ResponseEntity<StemcellManagementVO> systemStemcellRegist(@RequestBody StemcellManagementDTO.Regist dto, @PathVariable String testFlag ){
 		
-		if(LOG.isInfoEnabled()){ LOG.info("================================> public 스템셀 다운로드 요청!!"); }
-		if(LOG.isDebugEnabled()){
-			LOG.debug("stemcell dir : " + LocalDirectoryConfiguration.getStemcellDir());
-			LOG.debug("doDownload key      : " + dto.getSublink());
-			LOG.debug("doDownload fileName : " + dto.getFileName());
-			LOG.debug("doDownload fileSize : " + new BigDecimal(dto.getFileSize()));
+		if(LOG.isInfoEnabled()){ LOG.info("================================> 스템셀 등록 요청"); }
+		StemcellManagementVO result = null;
+		if("url".equals(dto.getFileType())){
+			result = service.registPublicStemcellDownLoadInfo(dto, testFlag);
+		}else if("version".equals(dto.getFileType())){
+			result = service.registPublicStemcellDownLoadInfo(dto, testFlag);
+		}else if("file".equals(dto.getFileType())){
+			result = service.registPublicStemcellUploadInfo(dto, testFlag);
 		}
 		
-		donwonloadService.doDownload(dto, principal);
-		if(LOG.isInfoEnabled()){ LOG.info("================================> public 스템셀 다운로드 성공!!"); }
+		if(LOG.isInfoEnabled()){ LOG.info("================================> 스템셀 등록 성공"); }
 		
+		return new ResponseEntity<StemcellManagementVO>(result, HttpStatus.CREATED);
+	}
+	
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : 스템셀 파일 업로드
+	 * @title               : doPublicStemcellUpload
+	 * @return            : ResponseEntity<?>
+	***************************************************/
+	@RequestMapping(value="/config/stemcell/regist/upload",  method=RequestMethod.POST)
+	public ResponseEntity<?> doPublicStemcellUpload( MultipartHttpServletRequest request ){
+		if(LOG.isInfoEnabled()){ LOG.info("================================> 스템셀 파일 업로드 요청"); }
+		uploadService.uploadStemcellFile(request);
+		if(LOG.isInfoEnabled()){ LOG.info("================================> 스템셀 파일 업로드 성공"); }
+		return new ResponseEntity<>(HttpStatus.OK);
+		
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : 원격지에 있는 스템셀 다운로드
+	 * @title               : doPublicStemcellDonwload
+	 * @return            : ResponseEntity<?>
+	***************************************************/
+	@MessageMapping("/config/stemcell/regist/stemcellDownloading")
+	@SendTo("/config/stemcell/regist/socket/logs")
+	public ResponseEntity<?> doPublicStemcellDonwload(@RequestBody @Valid StemcellManagementDTO.Regist dto, Principal principal){
+	
+		if(LOG.isInfoEnabled()){ LOG.info("================================>  스템셀 다운로드 요청"); }
+		donwonloadService.stemcellDownloadAsync(dto, principal);
+		if(LOG.isInfoEnabled()){ LOG.info("================================>  스템셀 다운로드 성공"); }
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : 스템셀 삭제
-	 * @title               : doDeleteStemcell
-	 * @return            : ResponseEntity<Object>
+	 * @description   :  스템셀 삭제
+	 * @title               : systemRelaseDelete
+	 * @return            : ResponseEntity<?>
 	***************************************************/
-	@RequestMapping(value="/config/stemcell/deletePublicStemcell", method=RequestMethod.DELETE)
-	public ResponseEntity<Object> doDeleteStemcell(@RequestBody HashMap<String, String> requestMap, BindingResult result) throws SQLException {
+	@RequestMapping(value="/config/stemcell/deletePublicStemcell",  method=RequestMethod.DELETE)
+	public ResponseEntity<?> publicStemcellDelete(@RequestBody StemcellManagementDTO.Delete dto ){
 		
-		if(LOG.isInfoEnabled()){ LOG.info("================================> public 스템셀 삭제 요청!!"); }
-		if ( result.hasErrors() ) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		if(LOG.isInfoEnabled()){ LOG.info("================================>  스템셀 삭제 요청"); }
+		try{
+			service.deletePublicStemcell(dto);
+		}catch(SQLException e){
+			throw new CommonException("sql.systemRelease.exception",
+					"스템셀 정보를 삭제하는데 실패하였습니다. ", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		String stemcellFileName = requestMap.get("stemcellFileName");
-		String id = requestMap.get("id");
-		if ( StringUtils.isEmpty(stemcellFileName) || StringUtils.isEmpty(id)) {
-			ErrorResponse errorResponse = new ErrorResponse();
-			errorResponse.setMessage("잘못된 요청입니다.");
-			errorResponse.setCode("bad.request");
-			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-		}
-		service.doDeleteStemcell(stemcellFileName, id);
-		if(LOG.isInfoEnabled()){ LOG.info("================================> public 스템셀 삭제 성공!!"); }
+		if(LOG.isInfoEnabled()){ LOG.info("================================>  스템셀 삭제 성공"); }
 		
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : 스템셀 목록 동기화
-	 * @title               : doSyncPublicStemcell
-	 * @return            : ResponseEntity<Object>
-	***************************************************/
-	@RequestMapping(value="/config/stemcell/syncPublicStemcell", method=RequestMethod.PUT)
-	public ResponseEntity<Object> doSyncPublicStemcell() {
-		
-		if(LOG.isInfoEnabled()){ LOG.info("============================> 스템셀 목록 동기화 요청"); }
-		service.syncPublicStemcell();
-		if(LOG.isInfoEnabled()){ LOG.info("============================> 스템셀 목록 동기화 성공"); }
-		
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
 	
 }

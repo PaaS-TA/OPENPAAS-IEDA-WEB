@@ -1,0 +1,46 @@
+meta:
+  ## Networks Block
+  network-0-range: [subnetRange]
+  network-0-gateway: [subnetGateway]
+  network-0-reserved: [[subnetReserved]]
+  network-0-dns: [[subnetDns]]
+  network-0-static: [[subnetStatic]]
+  network-0-net-id: [subnetId]
+  network-0-security-groups: [[cloudSecurityGroups]]
+
+  network-1-range: [subnetRange1]
+  network-1-gateway: [subnetGateway1]
+  network-1-reserved: [[subnetReserved1]]
+  network-1-dns: [[subnetDns1]]
+  network-1-static: [[subnetStatic1]]
+  network-1-net-id: [subnetId1]
+  network-1-security-groups: [[cloudSecurityGroups1]]
+
+  network-2-range: [subnetRange2]
+  network-2-gateway: [subnetGateway2]
+  network-2-reserved: [[subnetReserved2]]
+  network-2-dns: [[subnetDns2]]
+  network-2-static: [[subnetStatic2]]
+  network-2-net-id: [subnetId2]
+  network-2-security-groups: [[cloudSecurityGroups2]]
+
+  ## Stemcells Block
+  stemcell-name: [stemcellName]
+  stemcell-version: [stemcellVersion]
+  stemcell-password: [boshPassword]
+
+  ## Resouce_pools Block
+  small-instance-type: [smallInstanceType]
+  medium-instance-type: [mediumInstanceType]
+  large-instance-type: [largeInstanceType]
+  cell-instance-type: [cellInstanceType]
+
+  ## Releases Block
+  diego-release-name: [diegoReleaseName]
+  diego-release-version: [diegoReleaseVersion]
+  etcd-release-name: [etcdReleaseName]
+  etcd-release-version: [etcdReleaseVersion]
+  garden-runc-release-name: [gardenLinuxReleaseName]
+  garden-runc-release-version: [gardenLinuxReleaseVersion]
+  cflinuxfs2-rootfs-release-name: [cflinuxfs2RootfsReleaseName]
+  cflinuxfs2-rootfs-release-version: [cflinuxfs2RootfsReleaseVersion]

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e -x
+
+# Place keys and certificates here
+depot_path=${dir_cf_certs}/"ha_proxy_ssl"
+mkdir -p ${depot_path}
+
+# Generate a SSL certificate for your System Domain
+#openssl genrsa -out ${depot_path}/cf.key 1024
+#openssl req -new -key ${depot_path}/cf.key -out ${depot_path}/cf.csr
+openssl req -nodes -newkey rsa:2048 -keyout ${depot_path}/cf.key -out ${depot_path}/cf.csr -passin pass:"$password" -subj "/C=$country/ST=$state/L=$locality/O=$organization/OU=$organizationalunit/CN=$commonname/emailAddress=$email"
+
+# For the Common Name, you must enter "*." followed by your System Domain
+openssl x509 -req -in ${depot_path}/cf.csr -signkey ${depot_path}/cf.key -out ${depot_path}/cf.crt
+cat ${depot_path}/cf.crt > ${depot_path}/ha_proxy_ssl && cat ${depot_path}/cf.key >> ${depot_path}/ha_proxy_ssl

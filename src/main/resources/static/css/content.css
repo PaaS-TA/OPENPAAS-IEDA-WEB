@@ -1,1 +1,5 @@
 @CHARSET "UTF-8";
+
+/**cf & diego Table*/
+#popoverTable { line-height:24px; }
+#popoverTable th, #popoverTable td { border-top:1px solid #D6D6D6; padding:3px 10px }

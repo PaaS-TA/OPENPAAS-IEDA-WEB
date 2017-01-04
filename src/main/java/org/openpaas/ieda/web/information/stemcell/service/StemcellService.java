@@ -13,12 +13,9 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.openpaas.ieda.api.director.utility.DirectorRestHelper;
 import org.openpaas.ieda.api.stemcell.StemcellListDTO;
 import org.openpaas.ieda.common.CommonException;
-import org.openpaas.ieda.web.config.setting.dao.DirectorConfigDAO;
 import org.openpaas.ieda.web.config.setting.dao.DirectorConfigVO;
 import org.openpaas.ieda.web.config.setting.service.DirectorConfigService;
-import org.openpaas.ieda.web.config.stemcell.dao.StemcellManagementDAO;
 import org.openpaas.ieda.web.config.stemcell.dao.StemcellManagementVO;
-import org.openpaas.ieda.web.config.stemcell.service.StemcellManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,13 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class StemcellService {
-
-	@Autowired private StemcellManagementService stemcellManagementService;
+	
 	@Autowired private DirectorConfigService directorConfigService;
-	@Autowired private StemcellManagementDAO stemcellDao;
-	@Autowired private DirectorConfigDAO dao;
-
-	private String filterString;
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
@@ -45,7 +37,6 @@ public class StemcellService {
 	public List<StemcellManagementVO> listStemcell(String iaas) {
 
 		DirectorConfigVO defaultDirector = directorConfigService.getDefaultDirector();
-
 		List<StemcellManagementVO> stemcellInfoList = null;
 		try {
 			HttpClient client = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
@@ -90,37 +81,5 @@ public class StemcellService {
 		return stemcellInfoList;
 	}
 
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : 로컬에 다운로드된 스템셀 조회
-	 * @title               : listLocalStemcells
-	 * @return            : List<StemcellManagementVO>
-	***************************************************/
-	public List<StemcellManagementVO> listLocalStemcells() {
-
-		DirectorConfigVO directorConfig = dao.selectDirectorConfigByDefaultYn("Y");
-		
-		if ( directorConfig != null ) {
-			// 디럭터의 CPI에 맞는 로컬 스템셀 목록만 출력
-			if ( directorConfig.getDirectorCpi().toUpperCase().contains("AWS") ) filterString = "AWS";
-			if ( directorConfig.getDirectorCpi().toUpperCase().contains("OPENSTACK") ) filterString = "OPENSTACK";
-		}
-
-		List<StemcellManagementVO> returnList = null;
-		List<String> localStemcellList = stemcellManagementService.getLocalStemcellList();
-
-		if(!localStemcellList.isEmpty()){
-			if ( filterString != null && filterString.length() > 0 ){
-				returnList = stemcellDao.selectStemcellFileNameOrderByStemcellVersion(localStemcellList).stream()
-						.filter(t -> t.getIaas().equalsIgnoreCase(filterString))
-						.collect(Collectors.toList());
-			}
-			else{
-				returnList = stemcellDao.selectStemcellFileNameOrderByStemcellVersion(localStemcellList);
-			}
-		}
-		
-		return returnList;
-	}
 
 }

@@ -1,7 +1,5 @@
 /*******************************************************************************
  * 설명 : 기본설치관리자 정보 조회
- * 
- * @returns {Boolean}
  ******************************************************************************/
 function getDefaultDirector(url) {
 	var isOk = true;
@@ -13,8 +11,7 @@ function getDefaultDirector(url) {
 	directorInfoDiv += '<tr><th width="18%" >관리자 URL</th><td><b id="directorUrl"></b></td>';
 	directorInfoDiv += '<th width="18%" >관리자 UUID</th><td ><b id="directorUuid"></b></td></tr></table>';
 
-	$
-			.ajax({
+		$.ajax({
 				type : "get",
 				url : url,
 				async : false,
@@ -41,9 +38,8 @@ function getDefaultDirector(url) {
 }
 
 /*******************************************************************************
- * 설명 : 기본설치관리자 설정 Function :
- * 
- * @param data
+ * 설명 : 기본설치관리자 설정 
+ * Function : setDefaultDirectorInfo
  ******************************************************************************/
 function setDefaultDirectorInfo(data) {
 	$('#directorName').text(data.directorName + '(' + data.directorCpi + ')');
@@ -56,9 +52,8 @@ function setDefaultDirectorInfo(data) {
 }
 
 /*******************************************************************************
- * 설명 : Lock 파일 설정 Function :
- * 
- * @param URl
+ * 설명 : Lock 파일 설정 
+ * Function : commonLockFile
  ******************************************************************************/
 function commonLockFile(url, message) {
 
@@ -84,9 +79,70 @@ function commonLockFile(url, message) {
 }
 
 /*******************************************************************************
- * 설명 : 특수문자 유효성 Function : Keycode
- * 
- * @param e
+ * 설명 : 배포명 중복 체크
+ * Function : checkDeploymentNameDuplicate
+ ******************************************************************************/
+function checkDeploymentNameDuplicate( platform, deploymentName ) {
+	var check = true;
+	$.ajax({
+		type : "get",
+		url : "/common/deploy/deployments/"+platform,
+		async : false,
+		success : function(data) {
+			data.map(function(obj) {
+				console.log( "배포명 조회 :  " + obj );
+				if( deploymentName == obj){
+					check = false;
+					console.log("check2 : " + check);
+				}
+			});
+		}
+	});
+	return check;
+}
+
+/*******************************************************************************
+ * 설명 : 버전 비교
+ * Function : compare
+ ******************************************************************************/
+function compare(a, b) {
+    if (a === b) {
+       return 0;
+    }
+    var a_components = a.split(".");
+    var b_components = b.split(".");
+
+    var len = Math.min(a_components.length, b_components.length);
+
+    // loop while the components are equal
+    for (var i = 0; i < len; i++) {
+        // A bigger than B
+        if (parseInt(a_components[i]) > parseInt(b_components[i])) {
+            return 1;
+        }
+
+        // B bigger than A
+        if (parseInt(a_components[i]) < parseInt(b_components[i])) {
+            return -1;
+        }
+    }
+
+    // If one's a prefix of the other, the longer one is greater.
+    if (a_components.length > b_components.length) {
+        return 1;
+    }
+    if (a_components.length < b_components.length) {
+        return -1;
+    }
+    // Otherwise they are the same.
+    return 0;
+}
+
+
+
+/*******************************************************************************
+ * 설명 : 특수문자 유효성 
+ * Function : Keycode
  ******************************************************************************/
 function Keycode(e) {
 	var code = (window.event) ? event.keyCode : e.which; // IE : FF - Chrome
@@ -102,9 +158,8 @@ function Keycode(e) {
 }
 
 /*******************************************************************************
- * 설명 : 특수문자 유효성 메시지 Function : nAllow
- * 
- * @param e
+ * 설명 : 특수문자 유효성 메시지 
+ * Function : nAllow
  ******************************************************************************/
 function nAllow(e) {
 	setGuideMessage($(".w2ui-msg-body #codeValueSuccMsg"), "",
@@ -118,10 +173,8 @@ function nAllow(e) {
 }
 
 /*******************************************************************************
- * 설명 : 숫자만 입력 Function :
- * 
- * @param event
- * @returns {Boolean}
+ * 설명 : 숫자만 입력
+ *  Function : onlyNumber
  ******************************************************************************/
 function onlyNumber(event) {
 	event = event || window.event;
@@ -135,10 +188,8 @@ function onlyNumber(event) {
 }
 
 /*******************************************************************************
- * 설명 : _만 입력 Function : onlyNumberSpecialChar
- * 
- * @param event
- * @returns {Boolean}
+ * 설명 : _만 입력 
+ * Function : onlyNumberSpecialChar
  ******************************************************************************/
 function onlyNumberSpecialChar(event) {
 	var special_pattern = /[_]/gi;
@@ -151,9 +202,8 @@ function onlyNumberSpecialChar(event) {
 }
 
 /*******************************************************************************
- * 설명 : 문자 remove Function : removeChar
- * 
- * @param event
+ * 설명 : 문자 remove 
+ * Function : removeChar
  ******************************************************************************/
 function removeChar(event) {
 	event = event || window.event;
@@ -165,9 +215,8 @@ function removeChar(event) {
 }
 
 /*******************************************************************************
- * 설명 : 한글만 입력 Function : fn_press_han
- * 
- * @param obj
+ * 설명 : 한글만 입력 
+ * Function : fn_press_han
  ******************************************************************************/
 function fn_press_han(event, obj) {
 	// 좌우 방향키, 백스페이스, 딜리트, 탭키에 대한 예외
@@ -180,12 +229,8 @@ function fn_press_han(event, obj) {
 }
 
 /*******************************************************************************
- * 설명 : 입력값 오류 경고 Function : setGuideMessage
- * 
- * @param successObject
- * @param successMessage
- * @param errorObject
- * @param errorMessage
+ * 설명 : 입력값 오류 경고 
+ * Function : setGuideMessage
  ******************************************************************************/
 function setGuideMessage(successObject, successMessage, errorObject,
 		errorMessage) {
@@ -199,22 +244,16 @@ function setGuideMessage(successObject, successMessage, errorObject,
 }
 
 /*******************************************************************************
- * 설명 : 빈값 체크 Function :
- * 
- * @param value
- *            Function :
- * @returns
+ * 설명 : 빈값 체크 
+ * Function : checkEmpty
  ******************************************************************************/
 function checkEmpty(value) {
 	return (value == null || value == "") ? true : false;
 }
 
 /*******************************************************************************
- * 설명 : URL 확인 Function :
- * 
- * @param input
- *            Function :
- * @returns {Boolean}
+ * 설명 : URL 확인 
+ * Function : validateIP
  ******************************************************************************/
 function validateIP(input) {
 	if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
@@ -225,11 +264,8 @@ function validateIP(input) {
 }
 
 /*******************************************************************************
- * 설명 : 이메일 유효성 Function :
- * 
- * @param email
- *            Function :
- * @returns {Boolean}
+ * 설명 : 이메일 유효성 
+ * Function : emailValidation
  ******************************************************************************/
 function emailValidation(email) {
 	var email = email;
@@ -241,11 +277,8 @@ function emailValidation(email) {
 }
 
 /*******************************************************************************
- * 설명 : 특수 문자 유효성 Function :
- * 
- * @param input
- *            Function :
- * @returns {Boolean}
+ * 설명 : 특수 문자 유효성
+ * Function : specialCharacterValidation
  ******************************************************************************/
 function specialCharacterValidation(input) {
 	var txt = input;
@@ -258,11 +291,8 @@ function specialCharacterValidation(input) {
 }
 
 /*******************************************************************************
- * 설명 : 문자 길이 문자 유효성 Function :
- * 
- * @param input
- *            Function :
- * @returns {Boolean}
+ * 설명 : 문자 길이 문자 유효성 
+ * Function : textLengthValidation
  ******************************************************************************/
 function textLengthValidation(input) {
 	var txt = input;
@@ -273,6 +303,7 @@ function textLengthValidation(input) {
 		return false;
 	}
 }
+
 
 /*******************************************************************************
  * Popup ValidationCheck
@@ -310,8 +341,19 @@ function popupValidation() {
 								} else if ($(this).attr('name') == "deploymentName") {
 									checkValidation = true;
 								
-								} else {
-									if ($(this).attr('name') != "deploymentName") {
+								} else if ($(this).attr('name') == "stemcellPathVersion" || $(this).attr('name') == "stemcellPathUrl" || $(this).attr('name') == "stemcellPathFileName"){
+									if($(".w2ui-msg-body input[name=stemcellPathFileName]").val() != "" ||  $(".w2ui-msg-body input[name='stemcellPathUrl']").val() != "" 
+											|| $(".w2ui-msg-body input[name='stemcellPathVersion']").val() != ""){
+										checkValidation = true;
+									}else{
+										label = "시스템 다운 유형";
+										$(this).css({"border-color" : "red"});
+									}
+								} else if( $(this).attr('name') == 'appSshFingerprint' ){
+									checkValidation = true;
+								}else {
+									if ($(this).attr('name') != "deploymentName" ||  $(this).attr('name') != "stemcellPathVersion" || 
+											$(this).attr('name') != "stemcellPathFileName" || $(this).attr('name') != "stemcellPathUrl") {
 										label = $(this).parent().parent().find("label").text();
 										$(this).css({"border-color" : "red"}).parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color" : "red"});
 									}
@@ -339,16 +381,15 @@ function popupValidation() {
 									$(this).css({"border-color" : "red"});
 								}
 							}
-							if ($(this).attr('name') != "deploymentName") {
+							if ($(this).attr('name') != "deploymentName" &&  $(this).attr('name') != "stemcellPathVersion" && 
+									$(this).attr('name') != "stemcellPathFileName" && $(this).attr('name') != "stemcellPathUrl") {
 								$(this).css({"border-color" : "red"});
 							}
 						} else if (tagType.toLowerCase() == "textarea") {
 							label = $(this).parent().parent().find('label').text();
 							$(this).css({
 								"border-color" : "red"
-							}); // .parent().find(".isMessage").text(label +
-								// "를(을)
-							// 입력하세요").css({"color":"red"});
+							});
 						}
 						if (label)
 							emptyFieldLabels.push(label);
@@ -369,7 +410,6 @@ function popupValidation() {
 										|| $(this).attr('name') == 'subCodeName' || $(this).attr('name') == 'subCodeNameKR') {
 									
 									if (!specialCharacterValidation($(this).val())) {
-										
 										$(this).css({"border" : "1px solid #bbb"}).parent().find(".isMessage").text("");
 										if ($(this).attr('name') == 'roleName') {
 											if( textLengthValidation($(this).val()) ) {
@@ -377,12 +417,50 @@ function popupValidation() {
 											} else {
 												label = $(this).parent().parent().find("label").text();
 												$(this).css({"border-color" : "red"}).parent().find(".isMessage").text("2~15자 사이로 입력 해주세요.").css({"color" : "red"});
-												emptyFieldLabels.push(label);
+												k.push(label);
 											}
 										}
 									} else {
 										label = $(this).parent().parent().find("label").text();
 										$(this).css({"border-color" : "red"}).parent().find(".isMessage").text(label + " 특수 문자 입력 불가").css({"color" : "red"});
+										emptyFieldLabels.push(label);
+									}
+								} else if($(this).attr('name') == "stemcellPathFileName"){
+									if($(".w2ui-msg-body input[name=stemcellPathFileName]").val().indexOf($(".w2ui-msg-body input[name='iaasList']").val().toLowerCase())==-1){
+										label = "IaaS 유형";
+										emptyFieldLabels.push(label);
+									}
+									if($(".w2ui-msg-body input[name=stemcellPathFileName]").val().indexOf($(".w2ui-msg-body input[name='osList']").val().toLowerCase())==-1){
+										label = "OS 유형";
+										emptyFieldLabels.push(label);
+									}
+									var osVersion = "";
+									if($(".w2ui-msg-body input[name='osVersionList']").val() == "7.X"){
+										osVersion = "7";
+									}else{
+										osVersion = $(".w2ui-msg-body input[name='osVersionList']").val();
+									}
+									if($(".w2ui-msg-body input[name=stemcellPathFileName]").val().indexOf(osVersion.toLowerCase())==-1){
+										label = "OS 버전";
+										emptyFieldLabels.push(label);
+									}
+								} else if($(this).attr('name') == "stemcellPathUrl"){
+									if($(".w2ui-msg-body input[name=stemcellPathUrl]").val().indexOf($(".w2ui-msg-body input[name='iaasList']").val().toLowerCase())==-1){
+										label = "IaaS 유형";
+										emptyFieldLabels.push(label);
+									}
+									if($(".w2ui-msg-body input[name=stemcellPathUrl]").val().indexOf($(".w2ui-msg-body input[name='osList']").val().toLowerCase())==-1){
+										label = "OS 유형";
+										emptyFieldLabels.push(label);
+									}
+									var osVersion = "";
+									if($(".w2ui-msg-body input[name='osVersionList']").val() == "7.X"){
+										osVersion = "7";
+									}else{
+										osVersion = $(".w2ui-msg-body input[name='osVersionList']").val();
+									}
+									if($(".w2ui-msg-body input[name=stemcellPathUrl]").val().indexOf(osVersion.toLowerCase())==-1){
+										label = "OS 버전";
 										emptyFieldLabels.push(label);
 									}
 								}

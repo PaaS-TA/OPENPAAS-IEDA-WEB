@@ -410,10 +410,40 @@ function defaultInfoPopup(){
 				
 				w2popup.lock("릴리즈를 조회 중입니다.", true);
 				getReleaseVersionList();
+				$('[data-toggle="popover"]').popover();
+				getBoshReleaseVersionList();
 			}
 		},
 		onClose : popupClose
 	});
+}
+
+/********************************************************
+ * 설명 :  Bosh 릴리즈 버전 목록 정보 조회
+ * Function : getReleaseVersionList
+ *********************************************************/
+function getBoshReleaseVersionList(){
+	var contents = "";
+	$.ajax({
+		type :"GET",
+		url :"/common/deploy/list/releaseInfo/bosh/"+iaas, 
+		contentType :"application/json",
+		success :function(data, status) {
+			if (data != null && data != "") {
+				contents = "<table id='popoverTable'><tr><th>IaaS 유형</th><th>릴리즈 최소 버전</th></tr>";
+				data.map(function(obj) {
+					contents += "<tr><td>" + obj.iaasType+ "</td><td>" +  obj.minReleaseVersion +"</td></tr>";
+				});
+				contents += "</table>";
+				$('.boshRelase-info').attr('data-content', contents);
+			}
+		},
+		error :function(request, status, error) {
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message, "bosh 릴리즈 정보 목록 조회");
+		}
+	});
+	
 }
 
 /********************************************************
@@ -855,9 +885,9 @@ function createSettingFile(data){
 			var errorResult = JSON.parse(request.responseText);
 			w2alert(errorResult.message, "Bosh 배포 파일 생성");
 			if(iaas!="VSPHERE"){
-				networkInfoPopup();	
+				resourceInfoPopup();
 			}else{
-				vSpherenetworkInfoPopup();
+				vSphereresourceInfoPopup();
 			}
 		}
 	});
@@ -1024,7 +1054,7 @@ function deletePopup(record, force){
 		var message = "";
 		var body = '<textarea id="deleteLogs" style="width:95%;height:90%;overflow-y:visible;resize:none;background-color: #FFF; margin:2%" readonly="readonly"></textarea>';
 		w2popup.open({
-			width : 610,
+			width : 700,
 			height : 500,
 			title : "<b>BOSH 삭제</b>",
 			body  : body,
@@ -1449,6 +1479,7 @@ function initSetting(){
 						</div>
 				        <div class="w2ui-field">
 				            <label style="text-align: left;width:40%;font-size:11px;">BOSH 릴리즈</label>
+				            <img alt="boshRelase-help-info" class="boshRelase-info" style="width:18px; position:absolute; left:19%; margin-top:5px" data-trigger="hover" data-toggle="popover" title="Bosh 릴리즈 버전 정보"  data-html="true" src="../images/help-Info-icon.png">	
 				            <div>
 				                <input name="releaseVersion" type="list"  style="float:left;width:60%;" required placeholder="BOSH 릴리즈를 선택하세요." />
 				            </div>

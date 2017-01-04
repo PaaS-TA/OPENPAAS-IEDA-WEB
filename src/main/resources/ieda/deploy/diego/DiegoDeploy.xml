@@ -11,36 +11,21 @@
 		<result property="updateUserId" column="UPDATE_USER_ID"/>
 		<result property="updateDate" column="UPDATE_DATE" />
 		<result property="deploymentName" column="DEPLOYMENT_NAME" />
-		<result property="directorUuid" column="director_uuid" />
-		<result property="diegoReleaseName" column="diego_release_name" />
-		<result property="diegoReleaseVersion" column="diego_release_version" />
-		<result property="gardenReleaseName" column="garden_release_name" />
-		<result property="gardenReleaseVersion" column="garden_release_version" />
-		<result property="etcdReleaseName" column="etcd_release_name" />
-		<result property="etcdReleaseVersion" column="etcd_release_version" />
-		<result property="diegoEncryptionKeys" column="diego_encryption_keys" />
-		<result property="deploymentFile" column="deployment_file" />
-		<result property="deployStatus" column="deploy_status" />
-		<result property="taskId" column="task_id" />
-		<result property="cfDeployment" column="cf_deployment" />
-		<result property="cfName" column="cfName" />
-		<result property="cflinuxfs2rootfsreleaseName" column="cflinuxfs2_rootfs_release_name" />
-		<result property="cflinuxfs2rootfsreleaseVersion" column="cflinuxfs2_rootfs_release_version" />
-		<collection property="keys"   ofType="org.openpaas.ieda.web.deploy.common.dao.key.KeyVO"  javaType="ArrayLIst" >
-			<id property="keyType" column="KEY_TYPE" />
-			<result property="id" column="KEY_ID"/>
-			<result property="caCert" column="CA_CERT" />
-			<result property="serverCert" column="SERVER_CERT" />
-			<result property="serverKey" column="SERVER_KEY" />
-			<result property="clientCert" column="CLIENT_CERT" />
-			<result property="clientKey" column="CLIENT_KEY" />
-			<result property="agentCert" column="AGENT_CERT" />
-			<result property="agentKey" column="AGENT_KEY" />
-			<result property="tlsCert" column="TLS_CERT" />
-			<result property="privateKey" column="PRIVATE_KEY" />
-			<result property="publicKey" column="PUBLIC_KEY"/>
-			<result property="hostKey" column="HOST_KEY" />
-		</collection>
+		<result property="directorUuid" column="DIRECTOR_UUID" />
+		<result property="diegoReleaseName" column="DIEGO_RELEASE_NAME" />
+		<result property="diegoReleaseVersion" column="DIEGO_RELEASE_VERSION" />
+		<result property="gardenReleaseName" column="GARDEN_RELEASE_NAME" />
+		<result property="gardenReleaseVersion" column="GARDEN_RELEASE_VERSION" />
+		<result property="etcdReleaseName" column="ETCD_RELEASE_NAME" />
+		<result property="etcdReleaseVersion" column="ETCD_RELEASE_VERSION" />
+		<result property="keyFile" column="KEY_FILE" />
+		<result property="deploymentFile" column="DEPLOYMENT_FILE" />
+		<result property="deployStatus" column="DEPLOY_STATUS" />
+		<result property="taskId" column="TASK_ID" />
+		<result property="cfDeployment" column="CF_DEPLOYMENT" />
+		<result property="cfName" column="CFNAME" />
+		<result property="cflinuxfs2rootfsreleaseName" column="CFLINUXFS2_ROOTFS_RELEASE_NAME" />
+		<result property="cflinuxfs2rootfsreleaseVersion" column="CFLINUXFS2_ROOTFS_RELEASE_VERSION" />
 		<collection property="resource" ofType="org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO"  javaType="org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO">
 			<result property="id" column="RESOURCE_ID" />
 			<result property="deployType" column="RESOURCE_DEPLOY_TYPE"/>
@@ -79,7 +64,6 @@
 			,cf_deployment
 			,deployment_File
 			,deployment_name
-			,diego_encryption_keys
 			,diego_release_name 
 			,diego_release_version
 			,cflinuxfs2_rootfs_release_name
@@ -109,7 +93,6 @@
 			,a.deployment_file
 			,a.cf_deployment
 			,a.deployment_name
-			,a.diego_encryption_keys
 			,a.diego_release_name
 			,a.diego_release_version
 			,a.cflinuxfs2_rootfs_release_name
@@ -119,6 +102,7 @@
 			,a.garden_release_version
 			,a.etcd_release_name
 			,a.etcd_release_version
+			,a.key_file
 			,a.task_id
 			,a.update_date
 			,(select c.deployment_name from ieda_diego a, ieda_cf c where c.deployment_file = a.cf_deployment and a.id=#{id}) as cfName
@@ -145,7 +129,7 @@
 			,etcd_release_version
 			,deployment_file
 			,cf_deployment
-			,diego_encryption_keys
+			,key_file
 			,create_date
 			,update_date
 		) values (
@@ -165,7 +149,7 @@
 			,#{diego.etcdReleaseVersion}
 			,#{diego.deploymentFile}
 			,#{diego.cfDeployment}
-			,#{diego.diegoEncryptionKeys}
+			,#{diego.keyFile}
 			,now()
 			,now()
 		)
@@ -186,7 +170,6 @@
 			,deploy_status
 			,cf_deployment
 			,deployment_name
-			,diego_encryption_keys
 			,diego_release_name
 			,diego_release_version
 			,cflinuxfs2_rootfs_release_name
@@ -213,7 +196,6 @@
 			,cf_deployment
 			,deployment_name
 			,deployment_file
-			,diego_encryption_keys
 			,diego_release_name
 			,diego_release_version
 			,cflinuxfs2_rootfs_release_name
@@ -223,6 +205,7 @@
 			,garden_release_version
 			,etcd_release_name
 			,etcd_release_version
+			,key_file
 			,task_id
 			,resource.id as resource_id
 			,resource.deploy_type as resource_deploy_type
@@ -267,7 +250,7 @@
 			garden_release_version=#{diego.gardenReleaseVersion}, 
 			etcd_release_name=#{diego.etcdReleaseName}, 
 			etcd_release_version=#{diego.etcdReleaseVersion}, 
-			diego_encryption_keys=#{diego.diegoEncryptionKeys}, 
+			key_file=#{diego.keyFile},
 			deployment_file=#{diego.deploymentFile}, 
 			deploy_status=#{diego.deployStatus}, 
 			task_id=#{diego.taskId}, 

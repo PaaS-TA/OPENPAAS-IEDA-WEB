@@ -17,8 +17,6 @@ import org.openpaas.ieda.api.director.utility.DirectorRestHelper;
 import org.openpaas.ieda.common.CommonException;
 import org.openpaas.ieda.web.config.setting.dao.DirectorConfigVO;
 import org.openpaas.ieda.web.config.setting.service.DirectorConfigService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -79,7 +77,6 @@ public class VmsLogDownloadService {
 				getResultOutput.setRequestHeader("Range", range);
 				
 				statusCode = httpClient.executeMethod(getResultOutput);
-				
 				if ( statusCode == HttpStatus.OK.value() || statusCode == HttpStatus.PARTIAL_CONTENT.value()){
 						
 					byte[] content = getResultOutput.getResponseBody();

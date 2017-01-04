@@ -42,7 +42,6 @@ public class SnapshotService {
 	public List<SnapshotListDTO> getSnapshotList(String deploymentName){
 		//1.1 git director Info
 		DirectorConfigVO defaultDirector = directorConfigService.getDefaultDirector();
-		
 		if ( defaultDirector == null ) {
 			throw new CommonException("nofound.director.exception",
 					"설치 관리자 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
@@ -58,7 +57,6 @@ public class SnapshotService {
 					defaultDirector.getDirectorPort(), deploymentName));
 			getMethod = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)getMethod);
 			int statusCode = client.executeMethod(getMethod);
-			
 			if (HttpStatus.valueOf(statusCode) != HttpStatus.OK) {
 				throw new CommonException("notfound.snapshot.exception", 
 						" 스냅샷 조회 중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
@@ -123,7 +121,6 @@ public class SnapshotService {
 				deleteMethod = new DeleteMethod(DirectorRestHelper.deleteSnapshotURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), dto.getDeploymentName(),  dto.getSnapshotCid()));
 			}
 			deleteMethod = (DeleteMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)deleteMethod);
-			
 			int statusCode = client.executeMethod(deleteMethod);
 			if ( statusCode == HttpStatus.MOVED_PERMANENTLY.value()
 			  || statusCode == HttpStatus.MOVED_TEMPORARILY.value()	) {

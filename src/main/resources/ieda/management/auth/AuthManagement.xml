@@ -8,12 +8,12 @@
 		<result property="roleName" column ="role_name"/>
 		<result property="roleDescription" column ="role_description"/>
 		<result property="activeYn" column ="auth_code"/>
+		<result property="authCode" column ="authCode"/>
+		<result property="seq" column ="seq"/>
 		<result property="createUserId" column ="create_user_id"/>
 		<result property="createDate" column ="create_date"/>
 		<result property="updateUserId" column ="update_user_id"/>
 		<result property="updateDate" column ="update_date"/>
-		<result property="authCode" column ="authCode"/>
-		<result property="seq" column ="seq"/>
 	</resultMap> 
 	
 	<resultMap id="findDetailAushMap" type="java.util.HashMap">
@@ -88,7 +88,7 @@
 		<foreach collection="activeYn" item="item" index="index" separator=" , ">
 		(		
 			#{authVO.roleId},
-			#{index}+1,
+			#{index},
 			#{item},
 			#{authVO.createUserId},
 			now(),

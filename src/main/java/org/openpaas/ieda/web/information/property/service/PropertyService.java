@@ -19,8 +19,6 @@ import org.openpaas.ieda.common.CommonException;
 import org.openpaas.ieda.web.config.setting.dao.DirectorConfigVO;
 import org.openpaas.ieda.web.config.setting.service.DirectorConfigService;
 import org.openpaas.ieda.web.information.property.dto.PropertyDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -55,7 +53,6 @@ public class PropertyService {
 			get = new GetMethod(DirectorRestHelper.getPropertyListURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(),deployment));
 			get = (GetMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)get);
 			httpClient.executeMethod(get);
-			
 			if ( !StringUtils.isEmpty(get.getResponseBodyAsString()) ) {
 				ObjectMapper mapper = new ObjectMapper();
 				propertyList = mapper.readValue(get.getResponseBodyAsString(), PropertyDTO[].class);
@@ -153,7 +150,6 @@ public class PropertyService {
 				postMethod = new PostMethod(DirectorRestHelper.createPropertURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), dto.getDeploymentName()));
 				postMethod = (PostMethod)DirectorRestHelper.setAuthorization(defaultDirector.getUserId(), defaultDirector.getUserPassword(), (HttpMethodBase)postMethod); //헤더 정보 셋팅
 				postMethod.setRequestHeader("Content-Type", "application/json"); //header 정의
-				
 				JSONObject jsonobject = new JSONObject();
 				jsonobject.put("name", dto.getName());
 				jsonobject.put("value", dto.getValue());
@@ -172,7 +168,8 @@ public class PropertyService {
 					throw new CommonException("http.property.exception", "Property 생성 요청 중 문제가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (IOException e) {
 			throw new CommonException("ioFileRead.property.exception", "Property 생성 중 문제가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
-		} finally{
+		} 
+		finally{
 			if( postMethod != null ){
 				postMethod.releaseConnection();
 			}
@@ -187,6 +184,7 @@ public class PropertyService {
 	***************************************************/
 	public void updateProperyInfo(PropertyDTO dto, Principal principal) {
 		DirectorConfigVO defaultDirector = directorConfigService.getDefaultDirector();
+		int statusCode;
 		if ( defaultDirector == null ) {
 			throw new CommonException("notfound.director.exception",
 					"기본 설치관리자 존재하지 않습니다.", HttpStatus.NOT_FOUND);
@@ -204,8 +202,10 @@ public class PropertyService {
 			StringRequestEntity params = new StringRequestEntity(resultJson,"application/json","UTF-8");
 			putMethod.setRequestEntity(params);
 			
-			httpClient.executeMethod(putMethod);
-			
+			statusCode = httpClient.executeMethod(putMethod);
+			if(statusCode==404){
+				throw new CommonException("notFound.PropertyUpdate.exception", "해당 Property를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+			}
 		} catch(RuntimeException e){
 			throw new CommonException("runtime.propertyUpdate.excepiton",
 					"Property 수정 중 문제가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);

@@ -17,8 +17,6 @@ import org.openpaas.ieda.web.common.dto.ReplaceItemDTO;
 import org.openpaas.ieda.web.common.service.CommonUtils;
 import org.openpaas.ieda.web.common.service.Sha512Crypt;
 import org.openpaas.ieda.web.deploy.bootstrap.service.BootstrapService;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyDAO;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyVO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkDAO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkVO;
 import org.openpaas.ieda.web.deploy.common.dao.resource.ResourceDAO;
@@ -42,7 +40,6 @@ public class DiegoService {
 	@Autowired private DiegoDAO diegoDao; 
 	@Autowired private CommonDAO commonDao;
 	@Autowired private NetworkDAO networkDao;
-	@Autowired private KeyDAO keyDao;
 	@Autowired private ResourceDAO resourceDao;
 	@Autowired private CommonCodeDAO commonCodeDao;
 	
@@ -157,7 +154,6 @@ public class DiegoService {
 			CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
 			
 			vo.setNetworks(networkDao.selectNetworkList(id, codeVo.getCodeName()));
-			vo.setKeys(keyDao.selectKeyInfoLIst(id, codeVo.getCodeName()));
 			vo.setResource(resourceDao.selectResourceInfo(id, codeVo.getCodeName()));
 		}
 		return vo;
@@ -175,7 +171,7 @@ public class DiegoService {
 		InputStream inputs  = null;
 		
 		try {
-			result = commonDao.getManifetTemplate(vo.getIaasType().toLowerCase(), vo.getDiegoReleaseVersion(), "DIEGO",vo.getDiegoReleaseName());
+			result = commonDao.selectManifetTemplate(vo.getIaasType().toLowerCase(), vo.getDiegoReleaseVersion(), "DIEGO",vo.getDiegoReleaseName());
 			ManifestTemplateVO manifestTemplate = null;
 			if(result != null){
 				inputs =  this.getClass().getClassLoader().getResourceAsStream("static/deploy_template/diego/"+result.getTemplateVersion()+ SEPARATOR+vo.getIaasType().toLowerCase() + SEPARATOR +result.getInputTemplate());
@@ -240,19 +236,11 @@ public class DiegoService {
 		} else{
 			manifestTemplate.setIaasPropertyTemplate("");
 		}
-		//네트워크를 추가할 경우(2개 이상) - vSphere
-		if((vo.getIaasType().toLowerCase().equals("vsphere")) ){
-			if( vo.getNetworks().size() > 2 && result.getOptionNetworkTemplate() != null && !(StringUtils.isEmpty( result.getOptionNetworkTemplate())) ){
-				manifestTemplate.setOptionNetworkTemplate(vo.getIaasType().toLowerCase() +SEPARATOR+ result.getOptionNetworkTemplate() );
-			} else{
-				manifestTemplate.setOptionNetworkTemplate("");
-			}
-		} else{//네트워크를 추가할 경우(1개 이상) - openstack/aws
-			if( vo.getNetworks().size() > 1 && result.getOptionNetworkTemplate() != null && !(StringUtils.isEmpty( result.getOptionNetworkTemplate())) ){
-				manifestTemplate.setOptionNetworkTemplate(vo.getIaasType().toLowerCase() +SEPARATOR+ result.getOptionNetworkTemplate() );
-			} else{
-				manifestTemplate.setOptionNetworkTemplate("");
-			}
+		//네트워크를 추가할 경우(2개 이상)
+		if( vo.getNetworks().size() > 1 && result.getOptionNetworkTemplate() != null && !StringUtils.isEmpty( result.getOptionNetworkTemplate()) ){
+			manifestTemplate.setOptionNetworkTemplate(vo.getIaasType().toLowerCase() +SEPARATOR+ result.getOptionNetworkTemplate() );
+		} else{
+			manifestTemplate.setOptionNetworkTemplate("");
 		}
 		//option resource Template File 
 		if( result.getCommonOptionTemplate() != null  && !(StringUtils.isEmpty( result.getCommonOptionTemplate())) ){
@@ -260,7 +248,7 @@ public class DiegoService {
 		} else{
 			manifestTemplate.setOptionResourceTemplate("");	
 		}
-		//option etc Template File
+		//option etc Template File(Network 3개 일 경우)
 		if( result.getOptionEtc() != null && vo.getNetworks().size() == 3 && !(StringUtils.isEmpty( result.getOptionEtc())) ){
 			manifestTemplate.setOptionEtc( vo.getIaasType().toLowerCase() +SEPARATOR+ result.getOptionEtc() );
 		} else{
@@ -371,34 +359,7 @@ public class DiegoService {
 			items.add(new ReplaceItemDTO("[cloudSecurityGroups2]", ""));
 		}
 				
-		for(KeyVO keyVo : vo.getKeys()){
-			// 3 Diego 정보
-			if(keyVo.getKeyType() == 1410){
-				//3.1 Diego 정보				
-				items.add(new ReplaceItemDTO("[diegoCaCert]", CommonUtils.lineAddSpace(keyVo.getCaCert(),4)));
-				//3.2 프록시 정보
-				items.add(new ReplaceItemDTO("[diegoHostKey]",  CommonUtils.lineAddSpace(keyVo.getHostKey(),4)));
-				//3.3 BBS 인증정보
-				items.add(new ReplaceItemDTO("[diegoClientCert]", CommonUtils.lineAddSpace(keyVo.getClientCert(),4)));
-				items.add(new ReplaceItemDTO("[diegoClientKey]", CommonUtils.lineAddSpace(keyVo.getClientKey(),4)));
-				items.add(new ReplaceItemDTO("[diegoEncryptionKeys]", vo.getDiegoEncryptionKeys()));
-				items.add(new ReplaceItemDTO("[diegoServerCert]", CommonUtils.lineAddSpace(keyVo.getServerCert(),4)));
-				items.add(new ReplaceItemDTO("[diegoServerKey]", CommonUtils.lineAddSpace(keyVo.getServerKey(),4)));
-			}else if(keyVo.getKeyType() == 1420){
-				//4. ETCD 정보
-				items.add(new ReplaceItemDTO("[etcdClientCert]", CommonUtils.lineAddSpace(keyVo.getClientCert(),4)));
-				items.add(new ReplaceItemDTO("[etcdClientKey]", CommonUtils.lineAddSpace(keyVo.getClientKey(),4)));
-				items.add(new ReplaceItemDTO("[etcdServerCert]", CommonUtils.lineAddSpace(keyVo.getServerCert(),4)));
-				items.add(new ReplaceItemDTO("[etcdServerKey]", CommonUtils.lineAddSpace(keyVo.getServerKey(),4)));
-			}else if(keyVo.getKeyType() == 1430){
-				//5. PEER 정보
-				items.add(new ReplaceItemDTO("[etcdPeerCaCert]", CommonUtils.lineAddSpace(keyVo.getCaCert(),4)));
-				items.add(new ReplaceItemDTO("[etcdPeerCert]", CommonUtils.lineAddSpace(keyVo.getServerCert(),4)));
-				items.add(new ReplaceItemDTO("[etcdPeerKey]", CommonUtils.lineAddSpace(keyVo.getServerKey(),4)));
-			}
-			
-		}
-		//6.리소스 정보
+		//3.리소스 정보
 		items.add(new ReplaceItemDTO("[stemcellName]", vo.getResource().getStemcellName() ));
 		items.add(new ReplaceItemDTO("[stemcellVersion]", "\"" + vo.getResource().getStemcellVersion() + "\"" ));	
 		items.add(new ReplaceItemDTO("[boshPassword]", Sha512Crypt.Sha512_crypt(vo.getResource().getBoshPassword(), RandomStringUtils.randomAlphabetic(10), 0)));
@@ -441,7 +402,6 @@ public class DiegoService {
 		diegoDao.deleteDiegoInfoRecord(Integer.parseInt(dto.getId()));
 		if( dto.getId() != null ){
 			CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
-			keyDao.deleteKeyInfo(Integer.parseInt(dto.getId()), codeVo.getCodeName());
 			networkDao.deleteNetworkInfoRecord(Integer.parseInt(dto.getId()), codeVo.getCodeName());
 			resourceDao.deleteResourceInfo(Integer.parseInt(dto.getId()), codeVo.getCodeName());
 		}

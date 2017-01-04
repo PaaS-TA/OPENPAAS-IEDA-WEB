@@ -551,7 +551,7 @@ function lock (msg) {
 	</div>
 	
 	<!-- 설치관리자 목록 조회-->
-	<div id="config_directorGrid" style="width:100%; height:650px"></div>	
+	<div id="config_directorGrid" style="width:100%; height:610px"></div>	
 </div>
 
 <!-- 설치관리자 정보추가/수정 팝업 -->

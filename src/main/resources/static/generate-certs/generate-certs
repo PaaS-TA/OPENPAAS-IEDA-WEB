@@ -1,0 +1,131 @@
+#!/bin/bash
+
+set -e -x
+
+#############################################################################
+#  SYNOPSIS:
+#   Generate cert files for a cf or diego deploy
+#
+#  USAGE:
+#   generate-certs $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
+#
+#  MANDATORY ARGUMENTS:
+#   $1          Base Directory
+#   $2          generate certs type
+#   $3          name of a cf-certs manifest
+#  OPTIONAL ARGUMENTS:
+#   $4          cf Domain
+#   $5          Country code
+#   $6          State name
+#   $7          Locality name
+#   $8          Organization name
+#   $9          Organizational unit name
+#   $10         Email
+#
+#  EXAMPLE:
+#   generate-certs \
+#    /home/ubuntu/OPENPAAS-IEDA-WEB \
+#    1 \
+#    cf-cert-247 \
+#    paasta.com \
+#    KR \
+#    Seoul \
+#    Seoul \
+#    paasta-team \
+#    dev \
+#    admin@example.com
+#############################################################################
+
+#############################################
+#  INPUT VALIDATION CHECK
+#############################################
+if [ -z "$1" ]; then
+  >&2 echo "ERROR: base directory is missing"
+  argument_error=true
+fi
+
+if [ -z "$2" ]; then
+  >&2 echo "ERROR: generate certs type is missing"
+  argument_error=true
+fi
+
+if [ -z "$3" ]; then
+  >&2 echo "ERROR: certs file name is missing"
+  argument_error=true
+fi
+
+if [ ! -z $argument_error ]; then
+  exit 1
+fi
+
+BASEDIR=${1}
+KEYDIR=~/.bosh_plugin/key
+
+commonname=*."$4"
+country=$5
+state=$6
+locality=$7
+organization=$8
+organizationalunit=$9
+email=${10}
+password=""
+
+#############################################
+#  GENERATE CERTS
+#############################################
+case "$2" in
+  1)  echo "generate cf certs"
+    dir_cf_certs=$(mktemp -d /tmp/cf-certs.XXXXX)
+    mkdir -p $dir_cf_certs
+    
+    . $BASEDIR/scripts/keygen-cf-certs
+    ;;
+  2)  echo "generate diego certs"
+    dir_diego_certs=$(mktemp -d /tmp/diego-certs.XXXXX)
+    mkdir -p $dir_diego_certs
+    
+    . $BASEDIR/scripts/keygen-diego-certs
+    ;;
+  3)  echo "generate cf and diego certs"
+    dir_cf_certs=$(mktemp -d /tmp/cf-certs.XXXXX)
+    mkdir -p $dir_cf_certs
+    dir_diego_certs=$(mktemp -d /tmp/diego-certs.XXXXX)
+    mkdir -p $dir_diego_certs
+    
+    . $BASEDIR/scripts/keygen-cf-certs    
+    . $BASEDIR/scripts/keygen-diego-certs
+    ;;
+  *)  echo "generate certs type is invalid"
+    exit 1
+    ;;
+esac
+wait
+
+#############################################
+#  GENERATE CERTS YAML FILE
+#############################################
+dir_certs=$(mktemp -d /tmp/certs.XXXXX)
+mkdir -p $dir_certs
+
+key_file_name="$3".yml
+key_file=${dir_certs}/$key_file_name
+
+case "$2" in
+  1)  echo "generate cf certs manifest"
+    . $BASEDIR/scripts/generate-cf-certs-mainifest
+    ;;
+  2)  echo "generate diego certs manifest"    
+    . $BASEDIR/scripts/generate-diego-certs-mainifest
+    ;;
+  3)  echo "generate cf and diego certs manifest"      
+    . $BASEDIR/scripts/generate-cf-certs-mainifest
+    . $BASEDIR/scripts/generate-diego-certs-mainifest
+    ;;
+  *)  echo "generate certs type is invalid"
+    exit 1
+    ;;
+esac
+
+mv $key_file $KEYDIR/$key_file_name
+
+exit 0

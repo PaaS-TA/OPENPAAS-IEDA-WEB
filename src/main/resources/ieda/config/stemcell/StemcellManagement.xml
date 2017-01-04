@@ -5,7 +5,7 @@
     <resultMap id="stemcellManagement" type="org.openpaas.ieda.web.config.stemcell.dao.StemcellManagementVO">
         <id property="id" column="id" />
         <result property="recid" column="id"/>
-        <result property="sublink" column ="sublink"/>
+        <result property="stemcellName" column ="stemcell_name"/>
         <result property="lastModified" column ="last_modified"/>
         <result property="etag" column ="etag"/>
         <result property="size" column ="size"/>
@@ -23,22 +23,13 @@
         <result property="createDate" column="create_date"/>
         <result property="updateDate" column="update_date"/>
     </resultMap>
-     
-    <select id="selectCount" resultType="int">
-        /** stemcellManagement.count **/
-        Select 
-            count(*) 
-        From 
-            ieda_public_stemcells
-    </select>
-     
+    
     <select id="selectPublicStemcellList" resultMap="stemcellManagement">
-        /** stemcellManagement.findByOsAndOsVersionAndIaasAllIgnoreCaseOrderByOsVersionDesc **/
         Select 
             id,
             download_status, 
+            stemcell_name,
             iaas, 
-            sublink, 
             os, 
             os_version, 
             size, 
@@ -46,146 +37,140 @@
             stemcell_version 
         From
             ieda_public_stemcells 
-        Where 
-            upper(os)=upper(#{os})
-        And 
-            upper(os_version)=upper(#{osVersion}) 
-        And 
-            upper(iaas)=upper(#{iaas}) 
         Order by 
             os_version desc
     </select>
-     
-    <select id="selectStemcellFileNameOrderByOsVersion" resultMap="stemcellManagement">
-        /** stemcellManagement.findByStemcellFileNameInOrderByOsVersionDesc **/
-        Select 
-            id as recid,
-            id, 
-            download_status, 
-            iaas, 
-            sublink, 
-            os, 
-            os_version, 
-            size, 
-            stemcell_filename, 
-            stemcell_version 
-        From
-            ieda_public_stemcells 
-        Where 
-             stemcell_filename in
-              <foreach item="item" index="index" collection="stemcellFileName"
-                 open="(" separator="," close=")">
-                #{item}
-             </foreach>
-        Order by 
-            os_version desc
+    
+    <select id="selectPublicStemcell" resultMap="stemcellManagement">
+    	Select 
+			id,
+			id as recid,  
+			stemcell_name, 
+			os, 
+			iaas,
+			download_status, 
+			os_version,
+			size,
+			stemcell_filename, 
+			stemcell_version,
+			create_user_id,
+			create_date,
+			update_user_id,
+			update_date 
+		From ieda_public_stemcells 
+		where stemcell_filename = #{stemcellFileName}
     </select>
-     
-    <select id="selectStemcellFileNameOrderByStemcellVersion" resultMap="stemcellManagement">
-        /** stemcellManagement.findByStemcellFileNameInOrderByStemcellVersionDesc **/
-        Select 
-            id,
-            id as recid,  
-            download_status, 
-            iaas, 
-            sublink,
-            os, 
-            os_version, 
-            size, 
-            stemcell_filename, 
-            stemcell_version 
-        From
-            ieda_public_stemcells 
-        Where 
-             stemcell_filename in
-             <foreach item="item" index="index" collection="stemcellFileName"
-                 open="(" separator="," close=")">
-                   #{item}
-             </foreach>
-        Order by 
-            stemcell_version desc
+    
+    <insert id="insertPublicStemcell">
+    	INSERT INTO ieda_public_stemcells(
+    		<if test="dto.id != null">
+				id,
+			</if>
+			stemcell_name
+			,os
+			,os_version
+			,iaas
+			,size
+			,stemcell_filename
+			,stemcell_version
+			,download_status
+			,create_user_id
+			,create_date
+			,update_user_id
+			,update_date)
+		VALUES(
+			<if test="dto.id != null">
+			#{dto.id},
+			</if>
+			 #{dto.stemcellName},
+			 #{dto.osName},
+			 #{dto.osVersion},
+			 #{dto.iaasType},
+			 #{dto.stemcellSize},
+			 #{dto.stemcellFileName},
+			 #{dto.stemcellVersion},
+			 #{dto.downloadStatus},
+			 #{dto.createUserId},
+			 now(),
+			 #{dto.updateUserId},
+			 now()
+		)
+		<selectKey keyProperty="dto.id" resultType="int" order="AFTER">
+			<if test="dto.id != null"> SELECT 1 AS id from dual; </if>
+			<if test="dto.id == null"> SELECT LAST_INSERT_ID(); </if>
+		</selectKey>
+    </insert>
+    
+    <update id="updatePublicStemcell">
+    	update ieda_public_stemcells set
+    	stemcell_name = #{dto.stemcellName},
+    	os = #{dto.osName},
+    	os_version = #{dto.osVersion},
+    	size = #{dto.stemcellSize},
+    	iaas = #{dto.iaasType},
+    	stemcell_filename = #{dto.stemcellFileName},
+    	stemcell_version = #{dto.stemcellVersion},
+    	download_status=#{dto.downloadStatus},
+		update_user_id = #{dto.updateUserId},
+		update_date = now()
+		where 
+		id = #{dto.id}
+    </update>
+    
+    <select id="selectPublicStemcellById" resultMap="stemcellManagement">
+    	Select 
+			id,
+			id as recid,  
+			stemcell_name, 
+			os,
+			iaas,
+			os_version,
+			download_status, 
+			size,
+			stemcell_filename, 
+			stemcell_version,
+			create_user_id,
+			create_date,
+			update_user_id,
+			update_date 
+		From ieda_public_stemcells 
+		where id = #{id}
     </select>
-     
-    <select id="selectLocalStemcellList" resultMap="stemcellManagement">
-        /**stemcellManagement.selectLocalStemcellList**/
+    
+    <update id="updatePublicStemcellById">
+		update ieda_public_stemcells set
+			<if test="dto.stemcellSize != null">
+				size = #{dto.stemcellSize},
+			</if>
+			download_status = #{dto.downloadStatus},
+			<if test="dto.stemcellFileName != null">
+				stemcell_filename = #{dto.stemcellFileName},
+			</if>
+			update_user_id = #{dto.updateUserId},
+			update_date = now()
+		where id = #{dto.id}
+	</update>
+	
+	<delete id="deletePublicStemcell">
+		delete from ieda_public_stemcells where id = #{dto.id}
+	</delete>
+	
+	<select id="selectLocalStemcellList" resultMap="stemcellManagement">
         select 
+        	id,
             id as recid,
             os,
             iaas,
             stemcell_filename,
             stemcell_version,
-            os_version
+            os_version,
+            download_status
         from ieda_public_stemcells 
         where download_status is not null
-        and download_status = 'Y'
+        and download_status = 'downloaded'
         <if test="iaas != '' and iaas != null">
             and iaas = #{iaas}
         </if>
         order by iaas desc
     </select>
-     
-    <insert id="insertPublicStemcells" parameterType="java.util.List">
-        /** stemcellManagement.savePublicStemcells **/
-        insert into ieda_public_stemcells (
-            download_status, 
-            iaas, 
-            sublink, 
-            os, 
-            os_version, 
-            size, 
-            stemcell_filename, 
-            stemcell_version,
-            create_user_id,
-            update_user_id,
-            create_date,
-            update_date
-        ) 
-        Values
-            <foreach collection="publicStemcells" item="item" open="(" separator="),("  close=")">
-                #{item.downloadStatus},
-                #{item.iaas},
-                #{item.sublink},
-                #{item.os},
-                #{item.osVersion},
-                #{item.size},
-                #{item.stemcellFileName},
-                #{item.stemcellVersion},
-                #{item.createUserId},
-                #{item.updateUserId},
-                now(),
-                now()
-            </foreach>
-    </insert>
-     
-    <update id="insertDownloadStatusById">
-        update 
-            ieda_public_stemcells
-        set download_status = #{stemcell.downloadStatus},
-            update_user_id = #{stemcell.updateUserId},
-            update_user_id = now()
-        where id = #{stemcell.id}
-        AND stemcell_filename = #{stemcell.fileName}
-    </update>
-    <update id="updateDownloadStatusByStemcellFileName">
-        Update 
-            ieda_public_stemcells
-        SET 
-            download_status = #{downStatus}
-        WHERE stemcell_filename = #{stemcellFileName}
-    </update>
-     
-    <delete id="deletePublicStemcells">
-        /** stemcellManagement.deleteAll **/
-        DELETE FROM ieda_public_stemcells 
-    </delete>
-    <delete id="updateDownloadStatusById">
-        /** stemcellManagement.deleteById **/
-        Update 
-            ieda_public_stemcells
-        SET 
-            download_status = null
-        WHERE id = #{id}
-    </delete>
-     
-     
 </mapper>

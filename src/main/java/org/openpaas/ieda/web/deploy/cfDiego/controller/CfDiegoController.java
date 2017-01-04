@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.openpaas.ieda.common.CommonException;
-import org.openpaas.ieda.web.deploy.cf.dao.CfVO;
+import org.openpaas.ieda.web.common.dto.KeyInfoDTO;
 import org.openpaas.ieda.web.deploy.cf.dto.CfListDTO;
 import org.openpaas.ieda.web.deploy.cf.dto.CfParamDTO;
 import org.openpaas.ieda.web.deploy.cf.service.CfDeployAsyncService;
@@ -22,7 +22,6 @@ import org.openpaas.ieda.web.deploy.cfDiego.service.CfDiegoSaveService;
 import org.openpaas.ieda.web.deploy.cfDiego.service.CfDiegoService;
 import org.openpaas.ieda.web.deploy.common.dto.network.NetworkDTO;
 import org.openpaas.ieda.web.deploy.common.dto.resource.ResourceDTO;
-import org.openpaas.ieda.web.deploy.diego.dao.DiegoVO;
 import org.openpaas.ieda.web.deploy.diego.dto.DiegoParamDTO;
 import org.openpaas.ieda.web.deploy.diego.service.DiegoDeployAsyncService;
 import org.openpaas.ieda.web.deploy.diego.service.DiegoSaveService;
@@ -165,6 +164,22 @@ public class CfDiegoController {
 		
 		return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
 	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : 키 생성 정보 저장
+	 * @title               : saveKeyInfo
+	 * @return            : ResponseEntity<?>
+	***************************************************/
+	@RequestMapping(value="/deploy/cfDiego/install/saveKeyInfo", method=RequestMethod.PUT)
+	public ResponseEntity<?> saveKeyInfo(@RequestBody @Valid KeyInfoDTO dto){
+		
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF 기본 정보 저장 요청"); }
+		cfSaveService.saveKeyInfo(dto);
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF 기본 정보 저장 성공!!"); }
+		
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
 
 	
 	/***************************************************
@@ -188,90 +203,6 @@ public class CfDiegoController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : CF UAA 정보 저장
-	 * @title               : saveUaaCfInfo
-	 * @return            : ResponseEntity<Map<String,Object>>
-	***************************************************/
-	@RequestMapping(value="/deploy/cfDiego/install/saveUaaInfo", method=RequestMethod.PUT)
-	public ResponseEntity<Map<String, Object>> saveUaaCfInfo(@RequestBody @Valid CfParamDTO.Uaa dto){
-		
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego UAA 정보 저장 요청"); }
-		CfVO vo = cfSaveService.saveUaaCfInfo(dto);
-		Map<String, Object> result  = new HashMap<>();
-		result.put("content", vo);
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego UAA 정보 저장 성공!!"); }
-		
-		return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : CF CONSUL 정보 저장 
-	 * @title               : saveConsulCfInfo
-	 * @return            : ResponseEntity<Map<String,Object>>
-	***************************************************/
-	@RequestMapping(value="/deploy/cfDiego/install/saveConsulInfo", method=RequestMethod.PUT)
-	public ResponseEntity<Map<String, Object>> saveConsulCfInfo(@RequestBody @Valid CfParamDTO.Consul dto){
-		
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego CONSUL 정보 저장 요청"); }
-		Map<String, Object> result  = new HashMap<>();
-		CfVO vo = cfSaveService.saveConsulCfInfo(dto);
-		result.put("content", vo);
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego CONSUL 정보 저장 성공!!"); }
-		
-		return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : CF BlobStore 정보 저장
-	 * @title               : saveBlobstoreInfo
-	 * @return            : ResponseEntity<Map<String,Object>>
-	***************************************************/
-	@RequestMapping(value="/deploy/cfDiego/install/saveBlobstoreInfo", method=RequestMethod.PUT)
-	public ResponseEntity<Map<String, Object>> saveBlobstoreInfo(@RequestBody @Valid CfParamDTO.Blobstore dto){
-		
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego BlobStore 정보 저장 요청"); }
-		CfVO vo = cfSaveService.saveBlobstoreInfo(dto);
-		Map<String, Object> result  = new HashMap<>();
-		result.put("content", vo);
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego BlobStore 정보 저장 성공!!"); }
-		
-		return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Diego 정보 저장  
-	 * @title               : saveDiegoInfo
-	 * @return            : ResponseEntity<DiegoVO>
-	***************************************************/
-	@RequestMapping(value="/deploy/cfDiego/install/saveDiegoInfo", method=RequestMethod.PUT)
-	public ResponseEntity<DiegoVO> saveDiegoInfo(@RequestBody @Valid DiegoParamDTO.Diego dto){
-
-		if(LOGGER.isInfoEnabled()){ LOGGER.debug("========================================> CF & Diego Diego 정보 저장 요청"); }
-		DiegoVO config = diegoSaveService.saveDiegoInfo(dto);
-		if(LOGGER.isInfoEnabled()){ LOGGER.debug("========================================> CF & Diego Diego 정보 저장 성공"); }
-		return new ResponseEntity<DiegoVO>(config, HttpStatus.CREATED);
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : ETCD 정보 저장  
-	 * @title               : saveEtcdInfo
-	 * @return            : ResponseEntity<DiegoVO>
-	***************************************************/
-	@RequestMapping(value="/deploy/cfDiego/install/saveEtcdInfo", method=RequestMethod.PUT)
-	public ResponseEntity<DiegoVO> saveEtcdInfo(@RequestBody @Valid DiegoParamDTO.Etcd dto){
-
-		if(LOGGER.isInfoEnabled()){ LOGGER.debug("========================================> CF & Diego ETCD 정보 저장 요청"); }
-		DiegoVO config = diegoSaveService.saveEtcdInfo(dto);
-		if(LOGGER.isInfoEnabled()){ LOGGER.debug("========================================> CF & Diego ETCD 정보 저장 성공"); }
-
-		return new ResponseEntity<DiegoVO>(config, HttpStatus.CREATED);
-	}
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
@@ -306,27 +237,48 @@ public class CfDiegoController {
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : CF & Diego 플랫폼 설치
-	 * @title               : installCfDiego
+	 * @description   : CF 설치
+	 * @title               : installCf
 	 * @return            : ResponseEntity<?>
 	***************************************************/
-	@MessageMapping("/deploy/cfDiego/install/cfDiegoinstall")
-	@SendTo("/deploy/cfDiego/install/logs")
-	public ResponseEntity<?> installCfDiego(@RequestBody @Valid CfDiegoParamDTO.Install dto, Principal principal){
+	@MessageMapping("/deploy/cfDiego/install/cfInstall")
+	@SendTo("/deploy/cfDiego/install/cfLogs")
+	public ResponseEntity<?> installCf(@RequestBody @Valid CfDiegoParamDTO.Install dto, Principal principal){
 		
 		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego  플랫폼 설치 요청"); }
 		ObjectMapper mapper = new ObjectMapper();
 		String json =  new Gson().toJson(dto);
 		try{
-			if( "cf".equals(dto.getPlatform()) ){
-				CfParamDTO.Install cfDto = mapper.readValue(json, CfParamDTO.Install.class);
-				cfDeployAsyncService.deployAsync(cfDto, principal, "cfDiego");
-			}else{
-				DiegoParamDTO.Install diegoDto = mapper.readValue(json, DiegoParamDTO.Install.class);
-				diegoDeployAsyncService.deployAsync(diegoDto, principal, "cfDiego");
-			}
+			CfParamDTO.Install cfDto = mapper.readValue(json, CfParamDTO.Install.class);
+			cfDeployAsyncService.deployAsync(cfDto, principal, "cfDiego");
 		}catch (IOException e){
-			throw new CommonException("illigalArgument.cfDiego.exception",
+			throw new CommonException("notfound.cfDiego.exception",
+					"CF & DIEGO 설치 정보를 읽어올 수 없습니다. ", HttpStatus.NOT_FOUND);
+		}
+		
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego  플랫폼 설치 성공!!"); }
+		
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : Diego 설치
+	 * @title               : installDiego
+	 * @return            : ResponseEntity<?>
+	***************************************************/
+	@MessageMapping("/deploy/cfDiego/install/diegoInstall")
+	@SendTo("/deploy/cfDiego/install/diegoLogs")
+	public ResponseEntity<?> installDiego(@RequestBody @Valid CfDiegoParamDTO.Install dto, Principal principal){
+		
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego  플랫폼 설치 요청"); }
+		ObjectMapper mapper = new ObjectMapper();
+		String json =  new Gson().toJson(dto);
+		try{
+			DiegoParamDTO.Install diegoDto = mapper.readValue(json, DiegoParamDTO.Install.class);
+			diegoDeployAsyncService.deployAsync(diegoDto, principal, "cfDiego");
+		}catch (IOException e){
+			throw new CommonException("notfound.cfDiego.exception",
 					"CF & DIEGO 설치 정보를 읽어올 수 없습니다. ", HttpStatus.NOT_FOUND);
 		}
 		

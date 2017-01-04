@@ -9,15 +9,7 @@ networks:
 - name: op_public
   type: vip
   cloud_properties: {}
-#   subnets:
-#   - gateway: 172.16.100.1
-#     dns: (( merge ))
-#     reserved: (( merge ))
-#     static: (( merge ))
-#  cloud_properties:
-#    net_id: 17241b92-b38b-440a-8514-547941dd999f
-#    security_groups:
-#    - bosh-security
+
 - name: op_private
   type: manual
   subnets:
@@ -70,7 +62,8 @@ jobs:
     default: [dns, gateway]
     static_ips: (( static_ips(1) ))
   properties:
-    ha_proxy: (( merge ))
+    ha_proxy:
+      ssl_pem: (( cf-certs.ha-proxy-ssl ))
     metron_agent:
       zone: z1
       deployment: (( .name ))
@@ -494,7 +487,7 @@ properties:
   acceptance_tests: null
   app_domains: [(( domain ))]
   app_ssh: 
-    host_key_fingerprint: (( merge || null ))
+    host_key_fingerprint: (( diego-certs.ssh-key-fingerprint || merge || nil ))
     oauth_client_id: ssh-proxy
     
   cc:
@@ -724,13 +717,13 @@ properties:
       log_level: null
       servers:
         lan: (( jobs.consul.networks.op_private.static_ips ))
-    agent_cert: (( merge ))
-    agent_key: (( merge ))
-    ca_cert: (( merge ))
-    encrypt_keys: (( merge ))
+    agent_cert: (( cf-certs.consul-agent-cert ))
+    agent_key: (( cf-certs.consul-agent-key ))
+    ca_cert: (( cf-certs.consul-ca-cert ))
+    encrypt_keys: (( cf-certs.consul-encrypt-keys ))
     require_ssl: true
-    server_cert: (( merge ))
-    server_key: (( merge ))
+    server_cert: (( cf-certs.consul-server-cert ))
+    server_key: (( cf-certs.consul-server-key ))
   databases:
     additional_config: null
     address: (( jobs.postgres.networks.op_private.static_ips.[0] ))
@@ -957,8 +950,8 @@ properties:
     database: null
     issuer: (( "https://uaa." domain ))
     jwt:
-      signing_key: (( merge ))
-      verification_key: (( merge ))
+      signing_key: (( cf-certs.jwt-signing-key ))
+      verification_key: (( cf-certs.jwt-verification-key ))
     ldap: null
     login: null
     newrelic: null
@@ -1051,3 +1044,6 @@ update:
   max_in_flight: 1
   serial: true
   update_watch_time: 5000-600000
+  
+cf-certs: ~
+diego-certs: ~

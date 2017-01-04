@@ -33,7 +33,7 @@ public class CommonCodeService {
 		
 		if (SUB_CODE_TYPE_3.equals(type) && (list == null || list.isEmpty() || list.size() == 0 )) {
 				throw new CommonException("notfound.code.exception",
-						" 해당하는 하위 코드가 존재하지 않습니다.", HttpStatus.BAD_REQUEST);
+						" 해당하는 하위 코드가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 		
 		return list;
@@ -46,14 +46,9 @@ public class CommonCodeService {
 	 * @return            : int
 	***************************************************/
 	public int createCode(CommonCodeDTO.Regist createCodeDto) {
-
 		// 해당 코드가 존재하는지 확인한다
-		List<CommonCodeVO> codeList = dao.selectCodeName(createCodeDto.getCodeName());
 		int codeValCheck = dao.selectCodeValueCheck(createCodeDto);
-		if ( codeList != null && !codeList.isEmpty() ){
-			throw new CommonException("notfound.code.exception",
-					"코드 그룹을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
-		}else if( codeValCheck > 0 ){  
+		if( codeValCheck > 0 ){  
 			throw new CommonException("existCode.code.exception",
 					"이미 등록되어 있는 코드 그룹값입니다.", HttpStatus.CONFLICT);
 		}
@@ -84,13 +79,14 @@ public class CommonCodeService {
 		// 해당 코드가 존재하는지 확인한다
 		List<CommonCodeVO> codeList = dao.selectCodeName(createCodeDto.getCodeName());
 		int codeValCheck = dao.selectCodeValueCheck(createCodeDto);
-		
-		if ( codeList != null && !codeList.isEmpty() ) {
-			throw new CommonException("notfound.code.exception",
-					"코드 그룹을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
-		}else if( codeValCheck > 0 ){  
-			throw new CommonException("existCode.code.exception",
-					"이미 등록되어 있는 코드값 입니다.", HttpStatus.CONFLICT);
+		if(codeList.size()!=0){
+			if ( codeList.get(0).getParentCode() == null || codeList.get(0).getParentCode().isEmpty() ) {
+				throw new CommonException("notfound.code.exception",
+						"코드 그룹을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+			}else if( codeValCheck > 0 ){  
+				throw new CommonException("existCode.code.exception",
+						"이미 등록되어 있는 코드값 입니다.", HttpStatus.CONFLICT);
+			}
 		}
 		
 		Integer maxSorderOrder = 0;
@@ -174,6 +170,21 @@ public class CommonCodeService {
 		if (list == null || list.isEmpty() || list.size() == 0 ) {
 			throw new CommonException("notfound.code.exception",
 					"상세 권한 코드를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+		}
+		return list;
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : 국가 코드 조회(KR 기준 정렬)
+	 * @title               : getCountryCodeList
+	 * @return            : List<CommonCodeVO>
+	***************************************************/
+	public List<CommonCodeVO> getCountryCodeList(String parentCode){
+		List<CommonCodeVO> list = dao.selectCountryCodeList(parentCode);
+		if ( list.size() == 0 ) {
+			throw new CommonException("notfound.code.exception",
+					"국가 코드를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 		}
 		return list;
 	}

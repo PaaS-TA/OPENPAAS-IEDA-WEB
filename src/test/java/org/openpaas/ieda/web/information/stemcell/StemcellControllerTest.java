@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openpaas.ieda.OpenpaasIedaWebApplication;
+import org.openpaas.ieda.TestBeansConfiguration;
 import org.openpaas.ieda.web.common.BaseTestController;
 import org.openpaas.ieda.web.config.stemcell.dao.StemcellManagementVO;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {OpenpaasIedaWebApplication.class})
+@SpringApplicationConfiguration(classes = {OpenpaasIedaWebApplication.class, TestBeansConfiguration.class})
 @WebAppConfiguration
 @Transactional
 @TransactionConfiguration(defaultRollback=true)
@@ -50,7 +51,7 @@ public class StemcellControllerTest extends BaseTestController{
 	/************************* URL ************************************/
 	final static String VIEW_URL = "/info/stemcell"; //스템셀 업로드 화면 요청
 	final static String UPLOAD_STEMCELL_LIST_URL = "/info/stemcell/list/upload"; //업로드된 스템셀 목록 정보 조회
-	final static String DOWNLOAD_STEMCELL_LIST_URL = "/info/stemcell/list/local"; //로컬에 다운로드 된 스템셀 목록 정보 조회
+	final static String DOWNLOAD_STEMCELL_LIST_URL = "/info/stemcell/list/local/OPENSTACK"; //로컬에 다운로드 된 스템셀 목록 정보 조회
 	/************************* URL **********************************/
 	
 	/***************************************************
@@ -112,7 +113,8 @@ public class StemcellControllerTest extends BaseTestController{
 	public void testGetLocalStemcellList() throws Exception {
 		if(LOGGER.isInfoEnabled()){  LOGGER.info("=================  로컬에 다운로드 된 스템셀 정보 조회 START  ================="); }
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(DOWNLOAD_STEMCELL_LIST_URL)
-				.contentType(MediaType.APPLICATION_JSON));
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("iaaS", "OPENSTACK"));
 		
 		result.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())

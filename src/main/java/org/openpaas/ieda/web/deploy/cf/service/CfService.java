@@ -16,13 +16,10 @@ import org.openpaas.ieda.web.common.dao.ManifestTemplateVO;
 import org.openpaas.ieda.web.common.dto.ReplaceItemDTO;
 import org.openpaas.ieda.web.common.service.CommonUtils;
 import org.openpaas.ieda.web.common.service.Sha512Crypt;
-import org.openpaas.ieda.web.deploy.bootstrap.service.BootstrapService;
 import org.openpaas.ieda.web.deploy.cf.dao.CfDAO;
 import org.openpaas.ieda.web.deploy.cf.dao.CfVO;
 import org.openpaas.ieda.web.deploy.cf.dto.CfListDTO;
 import org.openpaas.ieda.web.deploy.cf.dto.CfParamDTO;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyDAO;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyVO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkDAO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkVO;
 import org.openpaas.ieda.web.deploy.common.dao.resource.ResourceDAO;
@@ -43,16 +40,17 @@ public class CfService {
 	@Autowired private CfDAO cfDao;
 	@Autowired private CommonDAO commonDao;
 	@Autowired private NetworkDAO networkDao;
-	@Autowired private KeyDAO keyDao;
 	@Autowired private ResourceDAO resourceDao;
 	@Autowired private CommonCodeDAO commonCodeDao;
 	
 	final private static String PARENT_CODE="1000"; //배포 코드
 	final private static String SUB_GROUP_CODE="1100"; //배포 유형 코드
 	final private static String CODE_NAME="DEPLOY_TYPE_CF"; //배포 할 플랫폼명
+	
 	final private static String SEPARATOR = System.getProperty("file.separator");
 	final private static String MANIFEST_TEMPLATE_LOCATION = LocalDirectoryConfiguration.getManifastTemplateDir() + SEPARATOR +"cf" + SEPARATOR;
-	final private static Logger LOGGER = LoggerFactory.getLogger(BootstrapService.class);
+	
+	final private static Logger LOGGER = LoggerFactory.getLogger(CfService.class);
 	
 	
 	/***************************************************
@@ -90,9 +88,7 @@ public class CfService {
 				cfInfo.setDomain(vo.getDomain());
 				cfInfo.setDescription(vo.getDescription());
 				cfInfo.setDomainOrganization(vo.getDomainOrganization());
-
-				cfInfo.setProxyStaticIps(vo.getProxyStaticIps());
-
+				
 				//NETWORK
 				List<NetworkVO> netowrks = networkDao.selectNetworkList(vo.getId(),  codeVo.getCodeName());
 				String br = "";
@@ -158,9 +154,7 @@ public class CfService {
 		try{
 			vo = cfDao.selectCfInfoById(id);
 			CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
-			
 			vo.setNetworks(networkDao.selectNetworkList(id,  codeVo.getCodeName()) );
-			vo.setKeys(keyDao.selectKeyInfoLIst(id, codeVo.getCodeName()) );
 			vo.setResource(resourceDao.selectResourceInfo(id,  codeVo.getCodeName()));
 		} catch (NullPointerException e){
 			throw new CommonException("notfound.cf.exception",
@@ -170,12 +164,12 @@ public class CfService {
 	}
 
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : 입력 정보를 바탕으로 manifest 파일 생성
-	 * @title               : createSettingFile
-	 * @return            : void
+	 * @title         : createSettingFile
+	 * @return        : void
 	***************************************************/
-	public void createSettingFile(CfVO vo, String test) {
+	public void createSettingFile(CfVO vo) {
 
 		String content = "";
 		ManifestTemplateVO result = null;
@@ -183,7 +177,7 @@ public class CfService {
 		
 		try {
 			//1. get Manifest Template info
-			result = commonDao.getManifetTemplate(vo.getIaasType(), vo.getReleaseVersion(), "CF", vo.getReleaseName());
+			result = commonDao.selectManifetTemplate(vo.getIaasType(), vo.getReleaseVersion(), "CF", vo.getReleaseName());
 			
 			ManifestTemplateVO manifestTemplate = null;
 			if(result != null){
@@ -194,16 +188,17 @@ public class CfService {
 				manifestTemplate = setOptionManifestTemplateInfo(result, manifestTemplate, vo);
 			}else {
 				throw new CommonException("notFound.cfRelease.exception",
-						"지원하지 않는 릴리즈 또는 릴리즈 버전입니다.", HttpStatus.NOT_FOUND);
+						"해당하는 CF 배포 명이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 			}
 
 			List<ReplaceItemDTO> replaceItems = setReplaceItems(vo, vo.getIaasType());
 			for (ReplaceItemDTO item : replaceItems) {
 				content = content.replace(item.getTargetItem(), item.getSourceItem());
 			}
+			LOGGER.debug("content: " + content);
 
 			IOUtils.write(content, new FileOutputStream(LocalDirectoryConfiguration.getTempDir() + SEPARATOR + vo.getDeploymentFile()), "UTF-8");
-			CommonUtils.setSpiffMerge(vo.getIaasType().toLowerCase(), vo.getId(), "cf",  vo.getDeploymentFile(),  manifestTemplate);
+			CommonUtils.setSpiffMerge(vo.getIaasType().toLowerCase(), vo.getId(), vo.getKeyFile(),  vo.getDeploymentFile(),  manifestTemplate);
 		} catch (IOException e) {
 			if( LOGGER.isErrorEnabled() ){
 				LOGGER.error( e.getMessage() );
@@ -303,6 +298,9 @@ public class CfService {
 		items.add(new ReplaceItemDTO("[deaDiskMB]", String.valueOf(vo.getDeaDiskMB())));
 		items.add(new ReplaceItemDTO("[deaMemoryMB]", String.valueOf(vo.getDeaMemoryMB())));
 		items.add(new ReplaceItemDTO("[deaMemoryMB]", String.valueOf(vo.getDeaMemoryMB())));
+		items.add(new ReplaceItemDTO("[proxyStaticIps]", vo.getProxyStaticIps()));
+		items.add(new ReplaceItemDTO("[loginSecret]", vo.getLoginSecret()));
+		//핑커프린트(diego 연동 유무)
 		if("TRUE".equals(vo.getDiegoYn().toUpperCase())){
 			items.add(new ReplaceItemDTO("[appSshFingerprint]", vo.getAppSshFingerprint()));
 		}else{
@@ -353,50 +351,6 @@ public class CfService {
 			items.add(new ReplaceItemDTO("[cloudSecurityGroups1]", ""));
 		}
 		
-		// 3.1 프록시 정보
-		items.add(new ReplaceItemDTO("[proxyStaticIps]", vo.getProxyStaticIps()));
-		items.add(new ReplaceItemDTO("[sslPemPub]", CommonUtils.lineAddSpace(vo.getSslPemPub(),4)));
-		items.add(new ReplaceItemDTO("[sslPemRsa]", CommonUtils.lineAddSpace(vo.getSslPemRsa(),4)));
-				
-		for(KeyVO keyVo : vo.getKeys()){
-			// 3.2 UAA 정보
-			if(keyVo.getKeyType() == 1310){
-				items.add(new ReplaceItemDTO("[loginSecret]", vo.getLoginSecret()));
-				items.add(new ReplaceItemDTO("[signingKey]", CommonUtils.lineAddSpace(keyVo.getPrivateKey(),4)));
-				items.add(new ReplaceItemDTO("[verificationKey]", CommonUtils.lineAddSpace(keyVo.getPublicKey(),4)));
-			}
-			//4. Consul
-			else if(keyVo.getKeyType() == 1320){
-				items.add(new ReplaceItemDTO("[agentCert]", CommonUtils.lineAddSpace(keyVo.getAgentCert(),4)));
-				items.add(new ReplaceItemDTO("[agentKey]", CommonUtils.lineAddSpace(keyVo.getAgentKey(),4)));
-				items.add(new ReplaceItemDTO("[caCert]", CommonUtils.lineAddSpace(keyVo.getCaCert(),4)));
-				items.add(new ReplaceItemDTO("[encryptKeys]", vo.getEncryptKeys()));
-				items.add(new ReplaceItemDTO("[serverCert]", CommonUtils.lineAddSpace(keyVo.getServerCert(),4)));
-				items.add(new ReplaceItemDTO("[serverKey]", CommonUtils.lineAddSpace(keyVo.getServerKey(),4)));
-			}
-			//5. BlobStore
-			else if(keyVo.getKeyType() == 1330){
-				items.add(new ReplaceItemDTO("[blobstoreTlsCert]", CommonUtils.lineAddSpace(keyVo.getTlsCert(),4)));
-				items.add(new ReplaceItemDTO("[blobstorePrivateKey]", CommonUtils.lineAddSpace(keyVo.getPrivateKey(),4)));
-				items.add(new ReplaceItemDTO("[blobstoreCaCert]", CommonUtils.lineAddSpace(keyVo.getCaCert(),4)));
-			}
-			//6. Hm9000
-			else if(keyVo.getKeyType() == 1340 && !("TRUE".equals(vo.getDiegoYn()))){
-					items.add(new ReplaceItemDTO("[hm9000ServerKey]", CommonUtils.lineAddSpace(keyVo.getServerKey(),4)));
-					items.add(new ReplaceItemDTO("[hm9000ServerCert]", CommonUtils.lineAddSpace(keyVo.getServerCert(),4)));
-					items.add(new ReplaceItemDTO("[hm9000ClientKey]", CommonUtils.lineAddSpace(keyVo.getClientKey(),4)));
-					items.add(new ReplaceItemDTO("[hm9000ClientCert]", CommonUtils.lineAddSpace(keyVo.getClientCert(),4)));
-					items.add(new ReplaceItemDTO("[hm9000CaCert]", CommonUtils.lineAddSpace(keyVo.getCaCert(),4)));
-			}
-		}
-		if("TRUE".equals(vo.getDiegoYn().toUpperCase())){
-			//hm9000
-			items.add(new ReplaceItemDTO("[hm9000ServerKey]", ""));
-			items.add(new ReplaceItemDTO("[hm9000ServerCert]", ""));
-			items.add(new ReplaceItemDTO("[hm9000ClientKey]", ""));
-			items.add(new ReplaceItemDTO("[hm9000ClientCert]", ""));
-			items.add(new ReplaceItemDTO("[hm9000CaCert]", ""));
-		}
 		
 		// 7. 리소스 정보
 		items.add(new ReplaceItemDTO("[stemcellName]", vo.getResource().getStemcellName() ));
@@ -442,8 +396,9 @@ public class CfService {
 		CommonCodeVO codeVo = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, CODE_NAME);
 		if( dto.getId() != null ){
 			networkDao.deleteNetworkInfoRecord(Integer.parseInt( dto.getId()), codeVo.getCodeName() );
-			keyDao.deleteKeyInfo( Integer.parseInt(dto.getId()),  codeVo.getCodeName() );
 			resourceDao.deleteResourceInfo( Integer.parseInt(dto.getId()),  codeVo.getCodeName() );
 		}
 	}
+	
+	
 }

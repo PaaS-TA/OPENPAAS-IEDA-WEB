@@ -19,6 +19,7 @@
 var uploadClient = null;
 var deleteClient = null;
 var bDefaultDirector = "";
+var iaas = "";
 $(function() {
 	
 	/********************************************************
@@ -34,6 +35,7 @@ $(function() {
 		show: {selectColumn: true, footer: true},
 		multiSelect: false,
 		method: 'GET',
+		msgAJAXerror : '업로드 된 스템셀 조회 실패',
 		style: 'text-align:center',
 		columns	:[
 		           {field: 'recid', caption: 'recid', hidden: true}
@@ -57,6 +59,7 @@ $(function() {
 				event.preventDefault();
 			}
 		}, onError:function(evnet){
+			
 		}
 	});
 	
@@ -153,7 +156,13 @@ function doSearchUploadedStemcells() {
  * Function : doSearchLocalStemcells
  *********************************************************/
 function doSearchLocalStemcells() {
-	w2ui['us_localStemcellsGrid'].load("<c:url value='/info/stemcell/list/local'/>");
+		var directorName = $("#directorName").text().toUpperCase();
+		if( directorName.indexOf("_CPI") > 0  ) {
+				var start = directorName.indexOf("(");
+				var end = directorName.indexOf("_CPI)", start+1);
+				iaas = directorName.substring(start+1, end)
+		}
+	w2ui['us_localStemcellsGrid'].load("<c:url value='/info/stemcell/list/local/"+iaas+"'/>");
 }
 
 /********************************************************
@@ -225,7 +234,12 @@ function uploadLogPopup(requestParameter){
 			doUploadConnect(requestParameter);
 		},
 		onClose : function(){
+			$("textarea").text("");
 			initView(bDefaultDirector);
+			if( uploadClient != null){
+				uploadClient.disconnect();
+				uploadClient = null;
+			}
 		}
 	});
 }
@@ -327,6 +341,11 @@ function deleteLogPopup(requestParameter){
 			doDeleteConnect(requestParameter);
 		},
 		onClose : function(){
+			if(deleteClient != null){
+			$("textarea").text("");
+			deleteClient.disconnect();
+			deleteClient = null;
+			}
 			initView(bDefaultDirector);
 		}
 	});
@@ -354,6 +373,7 @@ function doDeleteConnect(requestParameter){
 		            if ( response.state.toLowerCase() == "done" )	message = message + " 삭제되었습니다."; 
 		    		if ( response.state.toLowerCase() == "error" ) message = message + " 삭제 중 오류가 발생하였습니다.";
 		    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 삭제 중 취소되었습니다.";
+		    		deleteClient.disconnect();
 					w2alert(message, "스템셀 삭제");
 		       	}
 	        }
@@ -426,7 +446,7 @@ $( window ).resize(function() {
 			</sec:authorize>
 	    </div>
 	</div>
-	<div id="us_uploadStemcellsGrid" style="width:100%; height:298px"></div>
+	<div id="us_uploadStemcellsGrid" style="width:100%; height:278px"></div>
 	
 	<!-- 로컬 스템셀 목록-->
 	<div class="pdt20">
@@ -438,5 +458,5 @@ $( window ).resize(function() {
 	    </div>
 	</div>
 		
-	<div id="us_localStemcellsGrid" style="width:100%; height:298px"></div>
+	<div id="us_localStemcellsGrid" style="width:100%; height:278px"></div>
 </div>

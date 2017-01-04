@@ -47,7 +47,6 @@ $(function() {
 			,{field: 'releaseSize', caption: '릴리즈 파일 크기', size: '7%'}
 			,{field: 'downloadStatus', caption: '다운로드 여부', size: '10%',
 				render: function(record) {
-					console.log( "downloadStatus : " + downloadStatus );
 					if ( record.downloadStatus == 'DOWNLOADED'  ){
 						return '<div class="btn btn-success btn-xs" id= "downloaded_'+record.id+'" style="width:100px;">Downloaded</div>';
 					}else if(record.downloadStatus == 'DOWNLOADING'){ //다른 사용자가다운로드 중일 경우
@@ -77,6 +76,7 @@ $(function() {
 		onError : function(event) {
 		}
 	});
+	
 	/********************************************************
 	 * 설명 :  릴리즈 등록 팝업
 	 *********************************************************/
@@ -92,10 +92,24 @@ $(function() {
  				doSearch();
  			}
  		});
- 		$('.w2ui-msg-body input:radio[name=fileType]:input[value=url]').attr("checked", true);	
+ 		$('.w2ui-msg-body input:radio[name=fileType]:input[value=url]').attr("checked", true);
  		//릴리즈 유형 조회
+ 		$('[data-toggle="popover"]').popover();
+ 	 	//스템셀 버전 정보
+ 	 	$(".release-info").attr('data-content', "http://bosh.io/releases");
  		getReleaseTyps();
  		changReleasePathType("url");
+ 		
+ 	 	 //다른 곳 클릭 시 popover hide 이벤트
+ 	 	$('.w2ui-popup').on('click', function (e) {
+ 	 	    $('[data-toggle="popover"]').each(function () {
+ 	 	        //the 'is' for buttons that trigger popups
+ 	 	        //the 'has' for icons within a button that triggers a popup
+ 	 	        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+ 	 	            $(this).popover('hide');
+ 	 	        }
+ 	 	    });
+ 	 	});
  	});
 	
 	/********************************************************
@@ -121,7 +135,7 @@ $(function() {
 			},
 			no_text : "취소",
 			no_callBack	: function(){
-				doSearch();
+				initView();
 			}
 		});
 	});
@@ -223,9 +237,11 @@ function setReleasePath(value){
  * Function	: setReleaseFilePath
  *********************************************************/
 function setReleaseFilePath(fileInput){
-	
+	console.log(fileInput);
 	var file = fileInput.files;
+	console.log(file);
 	var files = $('#releasePathFile')[0].files;
+	console.log(files);
 	$(".w2ui-msg-body input[name='releaseSize']").val(files[0].size);
 	$(".w2ui-msg-body input[name=releasePath]").val(file[0].name);
 	$(".w2ui-msg-body #releasePathFileName").val(file[0].name);
@@ -247,7 +263,6 @@ function releaseRegist(){
 			releaseSize			: $(".w2ui-msg-body input[name='releaseSize']").val(),
 			downloadStatus		: ""
 	}
-	
 	if(releaseInfo.fileType == "file"){
 		var files = $('#releasePathFile')[0].files;
 		if(files[0].size == 0){
@@ -357,8 +372,11 @@ function socketDwonload(releaseInfo){
 		    }else if( status == "done") {
 		    	downloadStatus = '';
 		    	$("#isExisted_" + id).parent().html(completeButton);
-		    	downloadClient.disconnect();
-		    	initsetting();
+		    	if(downloadClient != ""){
+		    		downloadClient.disconnect();
+		    		downloadClient = "";
+		    	}
+		    	doSearch();
 		    }      		
 		});
 		downloadClient.send("<c:url value='/send/config/systemRelease/regist/download/releaseDownloading'/>", {}, JSON.stringify(releaseInfo));
@@ -476,8 +494,7 @@ function releaseFileUpload(releaseInfo){
 					downloadClient.disconnect();
 					downloadClient ="";
 				}
-				
-				doSearch();
+				initView();
 			},
 			error : function(request, status, error) {
 				var errorResult = JSON.parse(request.responseText);
@@ -501,8 +518,11 @@ function releaseFileUpload(releaseInfo){
 	 * Function	: initSetting
 	 *********************************************************/
 	function initSetting() {
-		 downloadClient="";
-		 doSearch();
+		 if(  downloadClient != "") {
+				downloadClient.disconnect();
+				downloadClient ="";
+		}
+		 doSearch(); 
 	}
 
 	 /********************************************************
@@ -546,7 +566,7 @@ function releaseFileUpload(releaseInfo){
 		</div>
 	</div>
 	<!-- 릴리즈 grid -->
-	<div id="config_releaseGrid" style="width:100%; height:758px"></div>	
+	<div id="config_releaseGrid" style="width:100%; height:718px"></div>	
 		
 	<!-- 릴리즈 등록 팝업 -->
 	<form id="settingForm" action="POST" style="padding:5px 0 5px 0;margin:0;">
@@ -571,6 +591,7 @@ function releaseFileUpload(releaseInfo){
 					</div>
 					<div class="w2ui-field">
 						<label style="width:30%;text-align: left;padding-left: 20px;">파	&nbsp;&nbsp;&nbsp;&nbsp;일</label>
+						<img alt="release-help-info" class="release-info" style="width:18px; position:absolute; left:20%; margin-top:6px" data-toggle="popover" title="공개 릴리즈 참조 사이트"  data-html="true" src="../images/help-Info-icon.png">	
 						<div style="width:70%">
 							<span onclick="changReleasePathType('file');" style="width:30%;"><label><input type="radio" name="fileType" value="file" />&nbsp;로컬에서 선택</label></span>
 							&nbsp;&nbsp;

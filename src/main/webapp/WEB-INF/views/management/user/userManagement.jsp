@@ -134,9 +134,6 @@
 		
 		doSearch();
 	})
-	/***********************************************************************
- 						Start Main View Event Function
-	***********************************************************************/
 	
 	/********************************************************
 	 * 설명		: 사용자 조회
@@ -344,6 +341,8 @@
 				error : function(request, status, error) {
 					// ajax가 실패할때 처리...
 					w2popup.unlock();
+					w2ui['user_GroupGrid'].clear();
+					doSearch();
 					w2popup.close();			
 					var errorResult = JSON.parse(request.responseText);
 					w2alert(errorResult.message);
@@ -370,6 +369,8 @@
 			},
 			error : function(request, status, error) {
 				var errorResult = JSON.parse(request.responseText);
+				w2ui['user_GroupGrid'].clear();
+				doSearch();
 				w2alert(errorResult.message, "삭제 실패");
 			}
 		});
@@ -392,7 +393,7 @@
 			<span id="deleteBtn" class="btn btn-danger" style="width:120px">삭제</span>
 	    </div>
 	</div>
-	<div id="user_GroupGrid" style="width:100%;  height:758px;"></div>
+	<div id="user_GroupGrid" style="width:100%;  height:718px;"></div>
 	<!-- 사용자 추가/수정 팝업 -->
 	<div id="regPopupDiv" hidden="true">
 		<form id="settingForm" action="POST" style="padding:2%; margin:0;">
@@ -433,11 +434,11 @@
 					<div class="w2ui-field">
 						<label style="width:100%;text-align: left;padding-left: 20px;">권한</label>
 						<div  style="width:85%; float:left; height:44px;  position:relative; margin:0px 0px 0px 40px;  ">
-							<table class="table table-striped"; >
+							<table class="table table-striped" >
 								<tr class="info" style="line-height: 25px;">
 									<th width="12%" style="background-color: #d9d9da; border-right:1px solid #9e9e9e;background: linear-gradient(to bottom,#f1f1f1 0,#c8c8c8 100%); box-shadow: 3px 2px 10px #c1c1c1;" >비고</th>
-									<th width="41%" style="background-color: #d9d9da; border-right:1px solid #9e9e9e;background: linear-gradient(to bottom,#f1f1f1 0,#c8c8c8 100%); box-shadow: 3px 2px 10px #c1c1c1;"">권한</th>
-									<th style="background-color: #d9d9da; background: linear-gradient(to bottom,#f1f1f1 0,#c8c8c8 100%);box-shadow: 3px 2px 10px #c1c1c1;"" >권한 설명</th>
+									<th width="41%" style="background-color: #d9d9da; border-right:1px solid #9e9e9e;background: linear-gradient(to bottom,#f1f1f1 0,#c8c8c8 100%); box-shadow: 3px 2px 10px #c1c1c1;">권한</th>
+									<th style="background-color: #d9d9da; background: linear-gradient(to bottom,#f1f1f1 0,#c8c8c8 100%);box-shadow: 3px 2px 10px #c1c1c1;">권한 설명</th>
 								</tr>
 							</table>
 						</div>

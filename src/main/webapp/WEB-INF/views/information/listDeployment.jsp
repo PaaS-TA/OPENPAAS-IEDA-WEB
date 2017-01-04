@@ -24,6 +24,7 @@ $(function() {
 		name	: 'sq_deploymentsGrid',
 		style	: 'text-align:center',
 		method	: 'GET',
+		msgAJAXerror : '배포 정보 조회 실패',
 		show: {	
 			footer: true},
 		multiSelect : false,
@@ -78,6 +79,6 @@ $( window ).resize(function() {
 	<!-- 설치 목록 -->
 	<div class="title">설치 목록</div>
 	</div>
-	<div id="sq_deploymentsGrid" style="width:100%; height:650px"></div>	
+	<div id="sq_deploymentsGrid" style="width:100%; height:610px"></div>	
 	
 </div>

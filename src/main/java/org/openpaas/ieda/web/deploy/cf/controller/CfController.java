@@ -10,6 +10,7 @@ import javax.validation.Valid;
 
 import org.openpaas.ieda.common.CommonException;
 import org.openpaas.ieda.web.common.controller.BaseController;
+import org.openpaas.ieda.web.common.dto.KeyInfoDTO;
 import org.openpaas.ieda.web.deploy.cf.dao.CfVO;
 import org.openpaas.ieda.web.deploy.cf.dto.CfListDTO;
 import org.openpaas.ieda.web.deploy.cf.dto.CfParamDTO;
@@ -127,6 +128,22 @@ public class CfController extends BaseController{
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : KEY 생성 정보 저장
+	 * @title               : saveKeyInfo
+	 * @return            : ResponseEntity<?>
+	***************************************************/
+	@RequestMapping(value="/deploy/cf/install/saveKeyInfo", method=RequestMethod.PUT)
+	public ResponseEntity<?> saveKeyInfo(@RequestBody @Valid KeyInfoDTO dto){
+		
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF 기본 정보 저장 요청"); }
+		cfSaveService.saveKeyInfo(dto);
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF 기본 정보 저장 성공!!"); }
+		
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
 	 * @description   : 네트워크 정보 저장 
 	 * @title               : saveNetworkCfInfo
 	 * @return            : ResponseEntity<?>
@@ -141,75 +158,6 @@ public class CfController extends BaseController{
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : UAA 정보 저장
-	 * @title               : saveUaaCfInfo
-	 * @return            : ResponseEntity<Map<String,Object>>
-	***************************************************/
-	@RequestMapping(value="/deploy/cf/install/saveUaaInfo", method=RequestMethod.PUT)
-	public ResponseEntity<Map<String, Object>> saveUaaCfInfo(@RequestBody @Valid CfParamDTO.Uaa dto){
-		
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF UAA 정보 저장 요청"); }
-		Map<String, Object> result  = new HashMap<>();
-		
-		CfVO vo = cfSaveService.saveUaaCfInfo(dto);
-		result.put("content", vo);
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF UAA 정보 저장 성공!!"); }
-		
-		return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : CONSUL 정보 저장 
-	 * @title               : saveConsulCfInfo
-	 * @return            : ResponseEntity<Map<String,Object>>
-	***************************************************/
-	@RequestMapping(value="/deploy/cf/install/saveConsulInfo", method=RequestMethod.PUT)
-	public ResponseEntity<Map<String, Object>> saveConsulCfInfo(@RequestBody @Valid CfParamDTO.Consul dto){
-		
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF CONSUL 정보 저장 요청"); }
-		Map<String, Object> result  = new HashMap<>();
-		CfVO vo = cfSaveService.saveConsulCfInfo(dto);
-		result.put("content", vo);
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF CONSUL 정보 저장 성공!!"); }
-		
-		return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : BlobStore 정보 저장
-	 * @title               : saveBlobstoreInfo
-	 * @return            : ResponseEntity<Map<String,Object>>
-	***************************************************/
-	@RequestMapping(value="/deploy/cf/install/saveBlobstoreInfo", method=RequestMethod.PUT)
-	public ResponseEntity<Map<String, Object>> saveBlobstoreInfo(@RequestBody @Valid CfParamDTO.Blobstore dto){
-		
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF BlobStore 정보 저장 요청"); }
-		Map<String, Object> result  = new HashMap<>();
-		CfVO vo = cfSaveService.saveBlobstoreInfo(dto);
-		result.put("content", vo);
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF BlobStore 정보 저장 성공!!"); }
-		
-		return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Hm9000 정보 저장
-	 * @title               : saveHm9000Info
-	 * @return            : ResponseEntity<?>
-	***************************************************/
-	@RequestMapping(value="/deploy/cf/install/saveHm9000Info", method=RequestMethod.PUT)
-	public ResponseEntity<?> saveHm9000Info(@RequestBody @Valid CfParamDTO.Hm9000 dto){
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF Hm9000 정보 저장 요청"); }
-		cfSaveService.saveHm9000Info(dto);
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF Hm9000 정보 저장 요청"); }
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
 
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
@@ -236,9 +184,8 @@ public class CfController extends BaseController{
 	@RequestMapping(value="/deploy/cf/install/createSettingFile/{test}", method=RequestMethod.POST)
 	public ResponseEntity<?> makeDeploymentFile(@RequestBody CfParamDTO.Install dto, @PathVariable String test){
 		if(LOGGER.isInfoEnabled()){ LOGGER.info("====================================> CF 배포 파일 생성 및 정보 저장 요청"); }
-		//Manifest file Create
 		CfVO vo = cfService.getCfInfo( Integer.parseInt(dto.getId()) );
-		cfService.createSettingFile(vo, test);
+		cfService.createSettingFile(vo);
 		if(LOGGER.isInfoEnabled()){ LOGGER.info("====================================> CF 배포 파일 생성 및 정보 저장 성공"); }
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
@@ -298,7 +245,6 @@ public class CfController extends BaseController{
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
 	
 	
 }

@@ -50,18 +50,23 @@ public class CfDeployAsyncService {
 	 * @title               : deploy
 	 * @return            : void
 	***************************************************/
-	public void deploy(CfParamDTO.Install dto, Principal principal, String platform) {
+	public void deploy(CfParamDTO.Install dto, Principal principal, String menu) {
 		
 		CfVO vo = null;
 		String deploymentFileName = null;
 		CommonCodeVO commonCode = null;
 		SessionInfoDTO sessionInfo = new SessionInfoDTO(principal);
-		String messageEndpoint = "/deploy/" +platform + "/install/logs"; 
+		String messageEndpoint =  "";
+		if( menu.toLowerCase().equals("cf") ){
+			messageEndpoint = "/deploy/cf/install/logs"; 
+		}else{
+			messageEndpoint = "/deploy/cfDiego/install/cfLogs"; 
+		}
 		
 		vo = cfDao.selectCfInfoById(Integer.parseInt(dto.getId()));
 		
 		if ( vo != null ) deploymentFileName = vo.getDeploymentFile();
-			
+		
 		if ( StringUtils.isEmpty(deploymentFileName) ) {
 			throw new CommonException("notfound.cfdelete.exception",
 					"배포파일 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
@@ -85,7 +90,7 @@ public class CfDeployAsyncService {
 		BufferedReader br = null;
 		InputStreamReader isr = null;
 		FileInputStream fis = null;
-
+		
 		try {
 			HttpClient httpClient = DirectorRestHelper.getHttpClient(defaultDirector.getDirectorPort());
 			
@@ -153,7 +158,7 @@ public class CfDeployAsyncService {
 			commonCode = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, deployStatus);
 			if( commonCode != null ){
 				vo.setDeployStatus(commonCode.getCodeName());
-				if( StringUtils.isEmpty(taskId) ) vo.setTaskId(Integer.parseInt(taskId));
+				if( !StringUtils.isEmpty(taskId) ) vo.setTaskId(Integer.parseInt(taskId));
 				vo.setUpdateUserId(sessionInfo.getUserId());
 				saveDeployStatus(vo);
 			}

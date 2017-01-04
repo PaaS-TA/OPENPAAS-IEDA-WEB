@@ -21,7 +21,6 @@
  ***************************************************************** */
 var iaas = "";//iaas
 var bDefaultDirector = ""; //기본 설치 관리자
-var deploymentName = []; //grid 화면의 배포명 array
 var diegoUse=""; //diego 사용 유무
 var installStep = 0;
 var menu = "";
@@ -65,12 +64,7 @@ $(function() {
 				}
 			, {field: 'taskId', caption: 'TASK ID', size: '100px', hidden: true}
 			//1.1 Deployment 정보
-			, {field: 'deploymentName', caption: '배포명', size: '100px'
-				,render:function(record){
-					deploymentName.push(record.deploymentName);
-					return record.deploymentName;
-				}	
-			}
+			, {field: 'deploymentName', caption: '배포명', size: '100px'}
 			, {field: 'iaas', caption: 'IaaS', size: '100px'
 				, render: function(record) {
 					return record.iaas.toLowerCase();
@@ -229,7 +223,6 @@ $(function() {
 	$("#deleteBtn").click( function() {
 		if($("#deleteBtn").attr('disabled') == "disabled") return;
 		
-		//cf & diego 통합 설치 사용 여부
 		var selected = w2ui['config_cfGrid'].getSelection();
 		var record = w2ui['config_cfGrid'].get(selected);
 
@@ -361,7 +354,7 @@ $(window).resize(function() {
 			<!-- //Btn -->
 		</div>
 	</div>
-	<div id="config_cfGrid" style="width: 100%; height: 650px"></div>
+	<div id="config_cfGrid" style="width: 100%; height: 610px"></div>
 </div>
 
 <!--  Diego 설정 유무-->

@@ -50,13 +50,19 @@ public class DiegoDeployAsyncService {
 	 * @title               : deploy
 	 * @return            : void
 	***************************************************/
-	public void deploy(DiegoParamDTO.Install dto, Principal principal, String install) {
+	public void deploy(DiegoParamDTO.Install dto, Principal principal, String deploy) {
 		
 		DiegoVO vo = null;
 		String deploymentFileName = null;
 		CommonCodeVO commonCode = null;
 		SessionInfoDTO sessionInfo = new SessionInfoDTO(principal);
-		String messageEndpoint = "/deploy/" + install + "/install/logs"; 
+		String messageEndpoint = "";
+		if( deploy.toLowerCase().equals("diego") ){
+			messageEndpoint = "/deploy/diego/install/logs"; 
+		}else{
+			messageEndpoint = "/deploy/cfDiego/install/diegoLogs";
+		}
+		
 		
 		vo = diegoDao.selectDiegoInfo(Integer.parseInt(dto.getId()));
 		if ( vo != null ) deploymentFileName = vo.getDeploymentFile();
@@ -106,7 +112,7 @@ public class DiegoDeployAsyncService {
 			int statusCode = httpClient.executeMethod(postMethod);
 			if ( statusCode == HttpStatus.MOVED_PERMANENTLY.value()
 			  || statusCode == HttpStatus.MOVED_TEMPORARILY.value()	) {
-				
+			
 				Header location = postMethod.getResponseHeader("Location");
 				taskId = DirectorRestHelper.getTaskId(location.getValue());
 				
@@ -146,7 +152,7 @@ public class DiegoDeployAsyncService {
 				}
 				commonCode = commonCodeDao.selectCommonCodeByCodeName(PARENT_CODE, SUB_GROUP_CODE, deployStatus);
 				vo.setDeployStatus(commonCode.getCodeName());
-				if( StringUtils.isEmpty(taskId) ) vo.setTaskId(Integer.parseInt(taskId));
+				if( !StringUtils.isEmpty(taskId) ) vo.setTaskId(Integer.parseInt(taskId));
 				vo.setUpdateUserId(sessionInfo.getUserId());
 				diegoDao.updateDiegoDefaultInfo(vo);
 			}

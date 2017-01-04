@@ -1,9 +1,6 @@
 package org.openpaas.ieda.web.deploy.diego.dto;
 
 import java.util.Date;
-import java.util.List;
-
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyVO;
 
 
 public class DiegoListDTO {
@@ -27,6 +24,7 @@ public class DiegoListDTO {
 	private String etcdReleaseVersion; //ETCD 릴리즈 버전
 	private String cflinuxfs2rootfsreleaseName; //cflinuxfs2rootf 릴리즈 명
 	private String cflinuxfs2rootfsreleaseVersion; //cflinuxfs2rootf 릴리즈 버전
+	private String keyFile;
 
 	//3.1 네트워크 정보
 	private String publicStaticIp;
@@ -37,16 +35,7 @@ public class DiegoListDTO {
 	private String subnetStaticIp; //VM 할당 IP대역 From ~ to
 	private String subnetId; //서브넷 ID(NET ID)
 	private String cloudSecurityGroups; //시큐리티 그룹명
-
 	
-	//key List
-	private List<KeyVO> keys;
-	//key 정보
-	private KeyVO key;
-	
-	//3.2 프록시 정보
-	private String diegoServers; //SSH 서버 IP
-
 	//4 리소스 정보	
 	private String stemcellName; //스템셀명
 	private String stemcellVersion; //스템셀 버전
@@ -56,6 +45,7 @@ public class DiegoListDTO {
 	private String deploymentFile; //배포파일명
 	private String deployStatus; //배포상태
 	private Integer taskId; //TASK ID
+	
 	public int getRecid() {
 		return recid;
 	}
@@ -158,6 +148,12 @@ public class DiegoListDTO {
 	public void setCflinuxfs2rootfsreleaseVersion(String cflinuxfs2rootfsreleaseVersion) {
 		this.cflinuxfs2rootfsreleaseVersion = cflinuxfs2rootfsreleaseVersion;
 	}
+	public String getKeyFile() {
+		return keyFile;
+	}
+	public void setKeyFile(String keyFile) {
+		this.keyFile = keyFile;
+	}
 	public String getPublicStaticIp() {
 		return publicStaticIp;
 	}
@@ -205,24 +201,6 @@ public class DiegoListDTO {
 	}
 	public void setCloudSecurityGroups(String cloudSecurityGroups) {
 		this.cloudSecurityGroups = cloudSecurityGroups;
-	}
-	public List<KeyVO> getKeys() {
-		return keys;
-	}
-	public void setKeys(List<KeyVO> keys) {
-		this.keys = keys;
-	}
-	public KeyVO getKey() {
-		return key;
-	}
-	public void setKey(KeyVO key) {
-		this.key = key;
-	}
-	public String getDiegoServers() {
-		return diegoServers;
-	}
-	public void setDiegoServers(String diegoServers) {
-		this.diegoServers = diegoServers;
 	}
 	public String getStemcellName() {
 		return stemcellName;

@@ -344,8 +344,9 @@ function setDiegoPopup(history){
  * 설명		:  CF Install
  * Function	: cfInstallPopup
  *********************************************************/
-function cfInstallPopup(){
-	var deploymentName =  defaultInfo.cfDeploymentName;
+var installClient="";
+function cfInstallPopup( cfDeploymentName, diegoDeployment ){
+	var deploymentName =  cfDeploymentName;
 	var message = "CF(배포명:" + deploymentName +  ") ";
 	
 	var requestParameter = {
@@ -362,10 +363,10 @@ function cfInstallPopup(){
 		onOpen : function(event){
 			event.onComplete = function(){
 				//deployFileName
-				var socket = new SockJS('/deploy/cfDiego/install/cfDiegoinstall');
+				var socket = new SockJS('/deploy/cfDiego/install/cfInstall');
 				installClient = Stomp.over(socket); 
 				installClient.connect({}, function(frame) {
-			        installClient.subscribe('/deploy/cfDiego/install/logs', function(data){
+			        installClient.subscribe('/user/deploy/cfDiego/install/cfLogs', function(data){
 			        	
 			        	var installLogs = $(".w2ui-msg-body #cfInstallLogs");
 			        	var response = JSON.parse(data.body);
@@ -376,31 +377,31 @@ function cfInstallPopup(){
 					       	}
 					       	
 					       	if ( response.state.toLowerCase() != "started" ) {
-					            if ( response.state.toLowerCase() == "done" )	message = message + " 설치가 완료되었습니다."; 
 					    		if ( response.state.toLowerCase() == "error" ) message = message + " 설치 중 오류가 발생하였습니다.";
 					    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 설치 중 취소되었습니다.";
+					    		if ( response.state.toLowerCase() == "done" )	message = message + " 설치가 완료되었습니다."; 
 					    		
 					    		installStatus = response.state.toLowerCase();
 					    		$('.w2ui-msg-buttons #cfDeployPopupBtn').prop("disabled", false);
 					    		
-					    		installClient.disconnect();
-								w2alert(message, "CF 설치");
-								if( response.state.toLowerCase() == "done" ){
-									diegoInstallPopup();
-								}
+					    		w2alert(message, "CF 설치");
+					    		installClient.disconnect(diegoInstallPopup(diegoDeployment));
+					    		
 					       	}
 			        	}
 			        });
-			        installClient.send('/send/deploy/cfDiego/install/cfDiegoinstall', {}, JSON.stringify(requestParameter));
+			        installClient.send('/send/deploy/cfDiego/install/cfInstall', {}, JSON.stringify(requestParameter));
 			    });
 			}
 		}, onClose : function (event){
 			event.onComplete= function(){
 				$("textarea").text("");
 				w2ui['config_cfDiegoGrid'].reset();
-				initSetting();
-				installClient.disconnect();
-				installClient = "";
+				if( installClient  != ""){
+					installClient.disconnect();
+					installClient = "";
+				}
+				cfDiegoInitSetting();
 				doSearch();
 			}
 		}
@@ -411,9 +412,12 @@ function cfInstallPopup(){
  * 설명		:  Diego Install Popup 
  * Function	: diegoInstallPopup
  *********************************************************/
-function diegoInstallPopup(){
-	var deploymentName = defaultInfo.deploymentName;
+function diegoInstallPopup( diegoDeploymentName ){
+	 if(installStatus != "done") return;
+
+	 var deploymentName = diegoDeploymentName;
 	var message = "DIEGO(배포명:" + deploymentName +  ") ";
+	installClient="";
 	
 	var requestParameter = {
 			id 				: diegoId,
@@ -429,10 +433,10 @@ function diegoInstallPopup(){
 		onOpen :function(event){
 			event.onComplete = function(){
 				//deployFileName
-				var socket = new SockJS('/deploy/cfDiego/install/cfDiegoinstall');
+				var socket = new SockJS('/deploy/cfDiego/install/diegoInstall');
 				installClient = Stomp.over(socket); 
 				installClient.connect({}, function(frame) {
-			        installClient.subscribe('/deploy/cfDiego/install/logs', function(data){
+			        installClient.subscribe('/user/deploy/cfDiego/install/diegoLogs', function(data){
 			        	
 			        	var installLogs = $(".w2ui-msg-body #diegoInstallLogs");
 			        	
@@ -445,8 +449,14 @@ function diegoInstallPopup(){
 					       	
 					       	if ( response.state.toLowerCase() != "started" ) {
 					            if ( response.state.toLowerCase() == "done" )	message = message + " 설치가 완료되었습니다."; 
-					    		if ( response.state.toLowerCase() == "error" ) message = message + " 설치 중 오류가 발생하였습니다.";
-					    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 설치 중 취소되었습니다.";
+					    		if ( response.state.toLowerCase() == "error" ) {
+					    			message = message + " 설치 중 오류가 발생하였습니다.";
+					    			installClient ="";
+					    		}
+					    		if ( response.state.toLowerCase() == "cancelled" ){
+					    			message = message + " 설치 중 취소되었습니다.";
+					    			installClient ="";
+					    		}
 					    		
 					    		installStatus = response.state.toLowerCase();
 					    		$('.w2ui-msg-buttons #deployPopupBtn').prop("disabled", false);
@@ -457,16 +467,18 @@ function diegoInstallPopup(){
 			        	}
 
 			        });
-			        installClient.send('/send/deploy/cfDiego/install/cfDiegoinstall', {}, JSON.stringify(requestParameter));
+			        installClient.send('/send/deploy/cfDiego/install/diegoInstall', {}, JSON.stringify(requestParameter));
 			    });
 			}
 		}, onClose : function (event){
 			event.onComplete= function(){
 				$("textarea").text("");
 				w2ui['config_cfDiegoGrid'].reset();
-				initSetting();
-				installClient.disconnect();
-				installClient = "";
+				if( installClient  != ""){
+					installClient.disconnect();
+					installClient = "";
+				}
+				cfDiegoInitSetting();
 				doSearch();
 			}
 		}
@@ -493,7 +505,12 @@ function cfDiegoDeletePopup(record, type){
 			data : JSON.stringify(requestParameter),
 			contentType : "application/json",
 			success : function(data, status) {
-				doSearch();
+				if(  type == "diego"){
+					cfDiegoDeletePopup(record, "cf");
+					doSearch();
+				}else{
+					doSearch();
+				}
 			},
 			error : function(request, status, error) {
 				w2alert( JSON.parse(request.responseText).message, "CF Diego 삭제");
@@ -514,7 +531,7 @@ function cfDiegoDeletePopup(record, type){
 					var socket = new SockJS('/deploy/cfDiego/delete/instance');
 					deleteClient = Stomp.over(socket); 
 					deleteClient.connect({}, function(frame) {
-						deleteClient.subscribe('/deploy/cfDiego/delete/logs', function(data){
+						deleteClient.subscribe('/user/deploy/cfDiego/delete/logs', function(data){
 				        	var deleteLogs = $(".w2ui-msg-body #deleteLogs");
 				        	var response = JSON.parse(data.body);
 				        	
@@ -547,9 +564,11 @@ function cfDiegoDeletePopup(record, type){
 				event.onComplete= function(){
 					$("textarea").text("");
 					w2ui['config_cfDiegoGrid'].reset();
-					initSetting();
-					deleteClient.disconnect();
-					deleteClient = "";
+					if(  deleteClient != "" ){
+						deleteClient.disconnect();
+						deleteClient = "";
+					}
+					cfDiegoInitSetting();
 					doSearch();
 				}
 			}
@@ -574,7 +593,7 @@ function popupComplete(){
 		yes_text: "확인",
 		yes_callBack : function(envent){
 			w2popup.close();
-			initSetting();
+			cfDiegoInitSetting();
 		},
 		no_text : "취소"
 	});
@@ -595,6 +614,22 @@ function doButtonStyle() {
 		$('#modifyBtn').attr('disabled', true);
 		$('#deleteBtn').attr('disabled', true);
 	}
+}
+
+/********************************************************
+ * 설명		: 변수 초기 셋팅
+ * Function	: cfDiegoInitSetting
+ *********************************************************/
+function cfDiegoInitSetting(){
+	iaas = "";
+	bDefaultDirector = "";
+	diegoUse="";
+	deploymentName = [];
+	deigoDeploymentName = new Array();
+	installStep = 0;
+	menu = "";
+	cfInfo = "";
+	cfId  = "";
 }
 
 /********************************************************
@@ -643,7 +678,7 @@ $(window).resize(function() {
 			<!-- //Btn -->
 		</div>
 	</div>
-	<div id="config_cfDiegoGrid" style="width: 100%; height: 650px"></div>
+	<div id="config_cfDiegoGrid" style="width: 100%; height: 610px"></div>
 </div>
 <!-- IaaS 설정 DIV -->
 <div id="bootSelectBody" style="width: 100%; height: 80px;" hidden="true">
@@ -691,7 +726,7 @@ $(window).resize(function() {
 
 <!-- diego 설치화면 -->
 <div id="diegoInstallDiv" style="width:100%; height:100%;" hidden="true">
-	<div rel="title">CF & DIEGO 통합 설치</div>
+	<div rel="title"><b>CF & DIEGO 통합 설치</b></div>
 	<div rel="body" style="width:100%;height:100%;padding:15px 5px 0 5px;margin:0 auto;">
 		<div style="margin-left:2%;display:inline-block;width:97%;">
 			<ul class="progressStep_7">

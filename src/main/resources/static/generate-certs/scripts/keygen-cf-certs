@@ -1,0 +1,117 @@
+#!/bin/bash
+
+set -e -x
+
+#############################################################################
+#  SYNOPSIS:
+#    Generate cert files for a cf deploy
+#
+#  USAGE:
+#    keygen-cf-certs
+#
+#  MANDATORY ARGUMENTS:
+#   $3          cf Domain
+#   $4          Country code
+#   $5          State name
+#   $6          Locality name
+#   $7          Organization name
+#   $8          Organizational unit name
+#   $9          Email
+#
+#  EXAMPLE:
+#    keygen-cf-certs 
+#############################################################################
+
+export GOPATH=$BASEDIR/certstrap
+export PATH=$PATH:$GOPATH/bin
+
+#############################################
+#  INPUT VALIDATION CHECK
+#############################################
+if [ -z "$commonname" ]; then  
+  >&2 echo "ERROR: domain is missing"
+  argument_error=true
+fi
+
+if [ -z "$country" ]; then
+  >&2 echo "ERROR: country is missing"
+  argument_error=true
+fi
+
+if [ -z "$state" ]; then
+  >&2 echo "ERROR: state is missing"
+  argument_error=true
+fi
+
+if [ -z "$locality" ]; then
+  >&2 echo "ERROR: locality is missing"
+  argument_error=true
+fi
+
+if [ -z "$organization" ]; then
+  >&2 echo "ERROR: organization is missing"
+  argument_error=true
+fi
+
+if [ -z "$organizationalunit" ]; then
+  >&2 echo "ERROR: organizationalunit is missing"
+  argument_error=true
+fi
+
+if [ -z "$email" ]; then
+  >&2 echo "ERROR: email is missing"
+  argument_error=true
+fi
+
+if [ ! -z $argument_error ]; then
+  exit 1
+fi
+
+#############################################
+#  GENERATE CONSUL CERTS
+#############################################
+. $BASEDIR/scripts/cf/generate-consul-certs &
+
+#############################################
+#  GENERATE HM9000 CERTS
+#############################################
+. $BASEDIR/scripts/cf/generate-hm9000-certs &
+
+#############################################
+#  GENERATE DEA CERTS
+#############################################
+. $BASEDIR/scripts/cf/generate-dea-certs &
+
+#############################################
+#  GENERATE HA-PROYX SSL PEM
+#############################################
+. $BASEDIR/scripts/cf/generate-ha-proxy-ssl &
+
+#############################################
+#  GENERATE BLOB CERTS
+#############################################
+. $BASEDIR/scripts/cf/generate-blobstore-certs &
+
+#############################################
+#  GENERATE UAA CERTS
+#############################################
+. $BASEDIR/scripts/cf/generate-uaa-certs &
+
+#############################################
+#  GENERATE LOGGREGATOR CERTS
+#############################################
+. $BASEDIR/scripts/cf/generate-loggregator-certs &
+
+#############################################
+#  GENERATE ETCD CERTS
+#############################################
+. $BASEDIR/scripts/cf/generate-etcd-certs &
+
+#############################################
+#  GENERATE JWT KEYS
+#############################################
+openssl genrsa -out ${dir_cf_certs}/jwt-signing.key 2048
+openssl rsa -pubout -in ${dir_cf_certs}/jwt-signing.key -out \
+	${dir_cf_certs}/jwt-verification.key
+
+wait

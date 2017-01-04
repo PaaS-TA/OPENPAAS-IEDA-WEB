@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyVO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkVO;
 import org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO;
 
@@ -32,32 +31,27 @@ public class CfVO {
 	private String domain;//도메인
 	private String description;//도메인 설명
 	private String domainOrganization;//도메인 그룹
+	private String proxyStaticIps;//HAProxy 공인 IP
+	private String loginSecret; //로그인 비밀번호
 	
 	//2. 네트워크 목록 정보
 	private List<NetworkVO> networks;
 	//2.1 네트워크 정보
 	private NetworkVO network;
 	
-	//3. key List
-	private List<KeyVO> keys;
-	//3.1 key 정보
-	private KeyVO key;
+	//3. key 생성 정보
+	private String countryCode;//국가
+	private String stateName;//시/도
+	private String localityName;//시/구/군
+	private String organizationName;//회사명
+	private String unitName;//부서명
+	private String email;//이메일
+	private String keyFile;//키 파일명
 	
-	// 4. UAA 정보
-	private String loginSecret;//로그인 비밀번호
-	
-	// 4.1 프록시 정보
-	private String proxyStaticIps;//HAProxy 공인 IP
-	private String sslPemPub;//HAProxy 인증서
-	private String sslPemRsa; //HAProxy 개인키
-	
-	// 5. Consul 정보
-	private String encryptKeys;//암호화 키
-	
-	// 6. 리소스 정보
+	// 4. 리소스 정보
 	ResourceVO resource;
 	
-	// 7. Deploy 정보
+	// 5. Deploy 정보
 	private String deploymentFile;//배포파일명
 	private String deployStatus;//배포상태
 	private int taskId;//TASK ID
@@ -65,8 +59,6 @@ public class CfVO {
 	public CfVO(){
 		network = new NetworkVO();
 		networks = new ArrayList<NetworkVO>();
-		key = new KeyVO();
-		keys= new ArrayList<KeyVO>();
 		resource = new ResourceVO();
 	}
 	
@@ -184,48 +176,54 @@ public class CfVO {
 	public void setNetwork(NetworkVO network) {
 		this.network = network;
 	}
-	public List<KeyVO> getKeys() {
-		return keys;
+	public String getCountryCode() {
+		return countryCode;
 	}
-	public void setKeys(List<KeyVO> keys) {
-		this.keys = keys;
+
+	public void setCountryCode(String countryCode) {
+		this.countryCode = countryCode;
 	}
-	public KeyVO getKey() {
-		return key;
+
+	public String getStateName() {
+		return stateName;
 	}
-	public void setKey(KeyVO key) {
-		this.key = key;
+
+	public void setStateName(String stateName) {
+		this.stateName = stateName;
 	}
-	public String getLoginSecret() {
-		return loginSecret;
+
+	public String getLocalityName() {
+		return localityName;
 	}
-	public void setLoginSecret(String loginSecret) {
-		this.loginSecret = loginSecret;
+
+	public void setLocalityName(String localityName) {
+		this.localityName = localityName;
 	}
-	public String getProxyStaticIps() {
-		return proxyStaticIps;
+
+	public String getOrganizationName() {
+		return organizationName;
 	}
-	public void setProxyStaticIps(String proxyStaticIps) {
-		this.proxyStaticIps = proxyStaticIps;
+
+	public void setOrganizationName(String organizationName) {
+		this.organizationName = organizationName;
 	}
-	public String getSslPemPub() {
-		return sslPemPub;
+
+	public String getUnitName() {
+		return unitName;
 	}
-	public void setSslPemPub(String sslPemPub) {
-		this.sslPemPub = sslPemPub;
+
+	public void setUnitName(String unitName) {
+		this.unitName = unitName;
 	}
-	public String getSslPemRsa() {
-		return sslPemRsa;
+
+	public String getEmail() {
+		return email;
 	}
-	public void setSslPemRsa(String sslPemRsa) {
-		this.sslPemRsa = sslPemRsa;
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
-	public String getEncryptKeys() {
-		return encryptKeys;
-	}
-	public void setEncryptKeys(String encryptKeys) {
-		this.encryptKeys = encryptKeys;
-	}
+
 	public ResourceVO getResource() {
 		return resource;
 	}
@@ -250,4 +248,28 @@ public class CfVO {
 	public void setTaskId(int taskId) {
 		this.taskId = taskId;
 	}
+	public String getKeyFile() {
+		return keyFile;
+	}
+	public void setKeyFile(String keyFile) {
+		this.keyFile = keyFile;
+	}
+
+	public String getProxyStaticIps() {
+		return proxyStaticIps;
+	}
+
+	public void setProxyStaticIps(String proxyStaticIps) {
+		this.proxyStaticIps = proxyStaticIps;
+	}
+
+	public String getLoginSecret() {
+		return loginSecret;
+	}
+
+	public void setLoginSecret(String loginSecret) {
+		this.loginSecret = loginSecret;
+	}
+	
+	
 }

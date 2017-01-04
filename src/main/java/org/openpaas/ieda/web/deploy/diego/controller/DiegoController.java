@@ -147,38 +147,6 @@ public class DiegoController extends BaseController{
 
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Diego 정보 저장 
-	 * @title               : saveDiegoInfo
-	 * @return            : ResponseEntity<DiegoVO>
-	***************************************************/
-	@RequestMapping(value="/deploy/diego/install/saveDiegoInfo", method=RequestMethod.PUT)
-	public ResponseEntity<DiegoVO> saveDiegoInfo(@RequestBody @Valid DiegoParamDTO.Diego dto){
-
-		if(LOGGER.isInfoEnabled()){ LOGGER.debug("========================================> DIEGO 정보 저장 요청"); }
-		DiegoVO vo = diegoSaveService.saveDiegoInfo(dto);
-		if(LOGGER.isInfoEnabled()){ LOGGER.debug("========================================> DIEGO 정보 저장 성공"); }
-
-		return new ResponseEntity<DiegoVO>(vo, HttpStatus.CREATED);
-	}
-
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Diego ETCD 정보 저장  
-	 * @title               : saveEtcdInfo
-	 * @return            : ResponseEntity<DiegoVO>
-	***************************************************/
-	@RequestMapping(value="/deploy/diego/install/saveEtcdInfo", method=RequestMethod.PUT)
-	public ResponseEntity<DiegoVO> saveEtcdInfo(@RequestBody @Valid DiegoParamDTO.Etcd dto){
-
-		if(LOGGER.isInfoEnabled()){ LOGGER.debug("========================================> ETCD 정보 저장 요청"); }
-		DiegoVO vo = diegoSaveService.saveEtcdInfo(dto);
-		if(LOGGER.isInfoEnabled()){ LOGGER.debug("========================================> ETCD 정보 저장 성공"); }
-
-		return new ResponseEntity<DiegoVO>(vo, HttpStatus.CREATED);
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
 	 * @description   : Diego 네트워크 정보 저장  
 	 * @title               : saveNetworkInfo
 	 * @return            : ResponseEntity<DiegoVO>

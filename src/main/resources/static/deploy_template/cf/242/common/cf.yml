@@ -4,7 +4,7 @@ director_uuid: (( merge ))
 
 default_releases: [{name: cf, version: latest}]
 cf_releases: (( [meta.cf_release] || default_releases ))
-releases: (( cf_releases))
+releases: (( cf_releases ))
 
 security_group_overrides: (( merge ))
 

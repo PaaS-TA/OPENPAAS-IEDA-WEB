@@ -223,7 +223,7 @@ public class BoshController extends BaseController {
 		if(LOGGER.isInfoEnabled()){ LOGGER.info("====================================> BOSH 배포 파일 생성 및 정보 저장 요청"); }
 		//Manifest file Create
 		vo.setId(id);
-		 boshService.createSettingFile(vo, test);
+		boshService.createSettingFile(vo, test);
 		if(LOGGER.isInfoEnabled()){ LOGGER.info("====================================> BOSH 배포 파일 생성 및 정보 저장 성공"); }
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
@@ -258,7 +258,7 @@ public class BoshController extends BaseController {
 		try {
 			boshService.deleteBoshInfoRecord(dto);
 		} catch (SQLException e) {
-			throw new CommonException("illigalArgument.boshdelete.exception",
+			throw new CommonException("notfound.boshdelete.exception",
 					"삭제중 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
 		}
 		if(LOGGER.isInfoEnabled()){ LOGGER.info("====================================> BOSH 레코드 단순 삭제 성공"); }

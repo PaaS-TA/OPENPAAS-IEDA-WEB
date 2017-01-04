@@ -37,8 +37,6 @@ var installStatus ="";//설치 상태
 var defaultInfo = "";
 var deployInfo = "";
 var boshCpiReleases;
-
-
 /******************************************************************
  * Function : getBootstrapData
  * 설명		 : Bootstrap 상세 조회
@@ -530,9 +528,40 @@ function defaultInfoPop(){
 				getLocalBoshList('bosh');
 				//BOSH CPI 릴리즈 정보 가져오기
 				getLocalBoshCpiList('bosh_cpi', iaas);
+				$('[data-toggle="popover"]').popover();
+				getReleaseVersionList();
+				
 			}
 		}
 	});
+}
+
+/********************************************************
+ * 설명 :  Bosh 릴리즈 버전 목록 정보 조회
+ * Function : getReleaseVersionList
+ *********************************************************/
+function getReleaseVersionList(){
+	 var contents = "";
+	$.ajax({
+		type :"GET",
+		url :"/common/deploy/list/releaseInfo/bootstrap/"+iaas, 
+		contentType :"application/json",
+		success :function(data, status) {
+			if (data != null && data != "") {
+				contents = "<table id='popoverTable'><tr><th>IaaS 유형</th><th>릴리즈 최소 버전</th></tr>";
+				data.map(function(obj) {
+					contents += "<tr><td>" + obj.iaasType+ "</td><td>" +  obj.minReleaseVersion +"</td></tr>";
+				});
+				contents += "</table>";
+				$('.boshRelase-info').attr('data-content', contents);
+			}
+		},
+		error :function(request, status, error) {
+			var errorResult = JSON.parse(request.responseText);
+			w2alert(errorResult.message, "bosh 릴리즈 정보 목록 조회");
+		}
+	});
+	
 }
 
 /******************************************************************
@@ -998,52 +1027,6 @@ function popupComplete(){
 }
 
  /******************************************************************
- * Function : getDeployLogMsg
- * 설명		  : 설치 로그 조회
- ***************************************************************** */
-function getDeployLogMsg(id){
-	$.ajax({
-		type : "GET",
-		url : "/deploy/bootstrap/list/"+id,
-		contentType : "application/json",
-		success : function(data, status) {
-			if(!checkEmpty(data)){
-				deployLogMsgPopup(data);
-			}
-			else{
-				w2alert("배포 로그가 존재 하지 않습니다.",  "BOOTSTRAP 배포로그");
-			}
-		},
-		error : function(request, status, error) {
-			var errorResult = JSON.parse(request.responseText);
-			w2alert(errorResult.message, "BOOTSTRAP 배포로그");
-		}
-	});	
-}
-
-  /******************************************************************
- * Function : deployLogMsgPopup
- * 설명		  : 배포 로그 팝업창
- ***************************************************************** */
-function deployLogMsgPopup(msg){
-	var body = '<textarea id="deployLogMsg" style="margin-left:2%;width:95%;height:93%;overflow-y:visible;resize:none;background-color: #FFF; margin:2%" readonly="readonly"></textarea>';
-	
-	w2popup.open({
-		width : 800,
-		height : 700,
-		title : "<b>BOOTSTRAP 배포로그"+"</b>",
-		body  : body,
-		buttons : '<button class="btn" style="float: right; padding-right: 15%;" onclick="w2popup.close();">닫기</button>',
-		showMax : true,
-		onOpen : function(event){
-			event.onComplete = function(){
-				$("#deployLogMsg").text(msg);
-			}
-		}
-	});	
-}
- 
- /******************************************************************
   * Function : bootstrapInstallSocket
   * 설명		  : Boostrap 설치
   ***************************************************************** */
@@ -1144,7 +1127,7 @@ function installPopup(){
 		var body = '<textarea id="deleteLogs" style="width:95%;height:90%;overflow-y:visible;resize:none;background-color: #FFF; margin:2%" readonly="readonly"></textarea>';
 		
 		w2popup.open({
-			width   : 610,
+			width   : 700,
 			height  : 500,
 			title   : "<b>BOOTSTRAP 삭제</b>",
 			body    : body,
@@ -1599,6 +1582,7 @@ function popupClose() {
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align: left;width:40%;font-size:11px;">BOSH 릴리즈</label>
+							<img alt="boshRelase-help-info" class="boshRelase-info" style="width:18px; position:absolute; left:19%; margin-top:5px" data-trigger="hover" data-toggle="popover" title="Bosh 릴리즈 버전 정보"  data-html="true" src="../images/help-Info-icon.png">	
 							<div id="boshReleaseDiv"></div>
 						</div>
 						<div class="w2ui-field">

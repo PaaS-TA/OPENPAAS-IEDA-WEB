@@ -19,8 +19,6 @@ import org.openpaas.ieda.api.director.utility.DirectorRestHelper;
 import org.openpaas.ieda.common.CommonException;
 import org.openpaas.ieda.web.common.dto.SessionInfoDTO;
 import org.openpaas.ieda.web.config.setting.dao.DirectorConfigVO;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyDAO;
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyVO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkDAO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkVO;
 import org.openpaas.ieda.web.deploy.common.dao.resource.ResourceDAO;
@@ -47,7 +45,6 @@ import org.springframework.util.StringUtils;
 public class DiegoServiceTest {
 	
 	@Autowired private DiegoDAO diegoDao;
-	@Autowired private KeyDAO keyDao;
 	@Autowired private NetworkDAO networkDao;
 	@Autowired private ResourceDAO resourceDao;
 	@Autowired private SimpMessagingTemplate messagingTemplate;
@@ -71,12 +68,6 @@ public class DiegoServiceTest {
 		diegoDao.insertDiegoDefaultInfo(setDefaultDiegoInfo());
 		//save the netowrk info
 		networkDao.insertNetworkList(setNetworkList());
-		//save the key dieigo info
-		keyDao.insertKeyInfo(setDiegoInfo());
-		//save the etcd info
-		keyDao.insertKeyInfo(setEtcdInfo());
-		//save the peerEtcd Info
-		keyDao.insertKeyInfo(setPeerEtcdInfo());
 		//save the resource info
 		resourceDao.insertResourceInfo(setResource());
 	}
@@ -103,7 +94,6 @@ public class DiegoServiceTest {
 		vo.setEtcdReleaseVersion("63");
 		vo.setUpdateUserId("tester");
 		vo.setCfDeployment("openstack-cf-test-1.yml");
-		vo.setDiegoEncryptionKeys("encryptionkey");
 		vo.setCreateUserId("tester");
 		vo.setUpdateUserId("tester");
 		vo.setDeploymentFile("openstack-diego-test-1.yml");
@@ -171,118 +161,7 @@ public class DiegoServiceTest {
 		return resourceVo;
 	}
 	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Diego 정보 설정
-	 * @title               : setDiegoInfo
-	 * @return            : KeyVO
-	***************************************************/
-	public KeyVO setDiegoInfo(){
-		KeyVO keyvo = new KeyVO();
-		keyvo.setId(1);
-		keyvo.setDeployType(CODE_NAME);
-		keyvo.setKeyType(1410);
-		keyvo.setCaCert("-----BEGIN CERTIFICATE-----\n"+
-"MIIFBTCCAu2gAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdkaWVn\n"+
-"b0NBMB4XDTE2MDcxMzAzNTgyNFoXDTI2MDcxMzAzNTgyN1owEjEQMA4GA1UEAxMH\n"+
-"ZGllZ29DQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOe2lsw3rRaG...TEST");
-		
-		keyvo.setHostKey("-----BEGIN RSA PRIVATE KEY-----\n"+
-"MIIEpAIBAAKCAQEA0k+NS+z0n7w1caSMswmHpbl1ECGLkV+zZZrNXPpProi5FEDt\n"+
-"oQuGPLVGwM9S78pFrzHECCyF0HfRSt/gMptzeeQY82Cz0Z+SUF64IfiFggYjWw6e\n"+
-"oGxsrU6LLXuO2gcbEn37T8RQTW7A1QWDG6im1B//uPf/X3BoOSvDYKwpwsvI0NDM...TEST");
-		
-		keyvo.setClientCert("-----BEGIN CERTIFICATE-----\n"+
-"MIIEIjCCAgqgAwIBAgIQSggNzWsVu2zV+hl9UcI4jTANBgkqhkiG9w0BAQsFADAS\n"+
-"MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgzMFoXDTE4MDcxMzAzNTgz\n"+
-"MFowFTETMBEGA1UEAxMKYmJzIGNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEP...TEST");
-		
-		keyvo.setClientKey("-----BEGIN RSA PRIVATE KEY-----\n"+
-"MIIEogIBAAKCAQEAwqvB4Ec1otV0W+vYsiQxR/bd0+HOiKB8MDYOJErbBit2xh3y\n"+
-"4imQ8KgZcIbsVzR+esWih6CfkWFd3Xf5/RsR0H7kHnaqLWhkafdPeR5GIXWzet/w\n"+
-"+v04+HXQ2vXxRyRsjb7xzwgilDchtt40Mer/6g5Dw2nkoKx+ZNUPdt/J1tyhBLjX...TEST");
-		
-		keyvo.setServerCert("-----BEGIN CERTIFICATE-----\n"+
-"MIIEcTCCAlmgAwIBAgIRAJjV9zqnfRSpbi4gCs0ya+EwDQYJKoZIhvcNAQELBQAw\n"+
-"EjEQMA4GA1UEAxMHZGllZ29DQTAeFw0xNjA3MTMwMzU4MjlaFw0xODA3MTMwMzU4\n"+
-"MjlaMCIxIDAeBgNVBAMTF2Jicy5zZXJ2aWNlLmNmLmludGVybmFsMIIBIjANBgkq...TEST");
-		
-		keyvo.setServerKey("-----BEGIN RSA PRIVATE KEY-----\n"+
-"MIIEpAIBAAKCAQEAwPN+KUBYftQZ6f4ycY/R4dAr/n7shFBdTzEJNrO4F+VVHKwO\n"+
-"nqoZuFcJxL5DnCNLaan4tCXTKt4UxabXSoFUIJm4HhcygT/3+CoAG53+7lrwNCGu\n"+
-"JWH0cVYKw1tbpO3j6xjLjiYinliFiQMpM89lDtElZ8dsdf8KbSYHAJlBDDq7my6Y...TEST");
-		
-		keyvo.setCreateUserId("tester");
-		keyvo.setUpdateUserId("tester");
-		return keyvo;
-	}
 	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : ETCD 정보 설정
-	 * @title               : setEtcdInfo
-	 * @return            : KeyVO
-	***************************************************/
-	public KeyVO setEtcdInfo(){
-		KeyVO etcdKeyVo = new KeyVO();
-		etcdKeyVo.setId(1);
-		etcdKeyVo.setKeyType(1420);
-		etcdKeyVo.setDeployType(CODE_NAME);
-		etcdKeyVo.setClientCert("-----BEGIN CERTIFICATE-----\n"+
-"MIIEKTCCAhGgAwIBAgIQP2jEsUKg8Qoi8gMWji9T3jANBgkqhkiG9w0BAQsFADAS\n"+
-"MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgyOFoXDTE4MDcxMzAzNTgy\n"+
-"OFowHDEaMBgGA1UEAxMRZGllZ28gZXRjZCBjbGllbnQwggEiMA0GCSqGSIb3DQEB...TEST");
-		
-		etcdKeyVo.setClientKey("-----BEGIN RSA PRIVATE KEY-----\n"+
-"MIIEpQIBAAKCAQEAp4VuVixP56r+4FMQ+wbceKBHHbAYF9yVr8C6zjXVfO3L/UQi\n"+
-"KsnB7Bp4FC1UGcph5TPWE8G4rgeGNxykBIlkj0yIA8f5swTaa9zAt3C5fDyZKCEx\n"+
-"/SLEQqgeekjAt9vvswOdVGQ8nPsGaiLJ66kiEzvdoQ3rKCGQeEjvIaGFBRSovsYP...TEST");
-		
-		etcdKeyVo.setServerCert("-----BEGIN CERTIFICATE-----\n"+
-"MIIEdDCCAlygAwIBAgIRAOK5xOGEOpaTykT5575SeKEwDQYJKoZIhvcNAQELBQAw\n"+
-"EjEQMA4GA1UEAxMHZGllZ29DQTAeFw0xNjA3MTMwMzU4MjhaFw0xODA3MTMwMzU4\n"+
-"MjhaMCMxITAfBgNVBAMTGGV0Y2Quc2VydmljZS5jZi5pbnRlcm5hbDCCASIwDQYJ...TEST");
-		
-		etcdKeyVo.setServerKey("-----BEGIN RSA PRIVATE KEY-----\n"+
-"MIIEowIBAAKCAQEA6OfNM/avsWoO5oCZ/5jsa8SQQ+vFBajGf2Iyfvab75KgYcK0\n"+
-"ou45C1PmHQpP8t1Nfzs65zfawUYnvbN1j8L4f3vZZpJyP88YODXlbq0+vdYGy7KF\n"+
-"I5wXnw1bTSUVBXObFutYHMOHnP3gMQjjiZnebihaJyzgJ/MW3coWUzUqXRA7evqD...TEST");
-		
-		etcdKeyVo.setCreateUserId("tester");
-		etcdKeyVo.setUpdateUserId("tester");
-		return etcdKeyVo;
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : PEER ETCD 정보 설정
-	 * @title               : setPeerEtcdInfo
-	 * @return            : KeyVO
-	***************************************************/
-	public KeyVO setPeerEtcdInfo(){
-		KeyVO PeerKeyvo = new KeyVO();
-		PeerKeyvo.setId(1);
-		PeerKeyvo.setKeyType(1430);
-		PeerKeyvo.setDeployType(CODE_NAME);
-		PeerKeyvo.setCaCert("-----BEGIN CERTIFICATE-----\n"+
-"MIIFCzCCAvOgAwIBAgIBATANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwpldGNk\n"+
-"UGVlckNBMB4XDTE2MDcxMzAzNTgyN1oXDTI2MDcxMzAzNTgyOFowFTETMBEGA1UE\n"+
-"AxMKZXRjZFBlZXJDQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAKNW...TEST");
-		
-		PeerKeyvo.setServerKey("-----BEGIN RSA PRIVATE KEY-----\n"+
-"MIIEowIBAAKCAQEAqAEf782+SZrIaR74gZAiXnhHvM9Pzg2YK2WvqwHj0bdH4IIR\n"+
-"NCXj20hjxNPK0Lyci6a0eClll3IFzeUaMfqI9285CY1p/7HbbiRVnNnTG3/In4Pt\n"+
-"xzCOCGTRLpI6Z1bbPhRdHA92b9aLA2g2IRgZNWzdErY0sAdG5ry41YoaujuKuvUP...TEST");
-		
-		PeerKeyvo.setServerCert("-----BEGIN CERTIFICATE-----\n"+
-"MIIEdjCCAl6gAwIBAgIQM97ap+d6hRI8DqCtMhDHKDANBgkqhkiG9w0BAQsFADAV\n"+
-"MRMwEQYDVQQDEwpldGNkUGVlckNBMB4XDTE2MDcxMzAzNTgyOVoXDTE4MDcxMzAz\n"+
-"NTgyOVowIzEhMB8GA1UEAxMYZXRjZC5zZXJ2aWNlLmNmLmludGVybmFsMIIBIjAN...TEST");
-		
-		PeerKeyvo.setCreateUserId("tester");
-		PeerKeyvo.setUpdateUserId("tester");
-		return PeerKeyvo;		
-	}
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
@@ -307,9 +186,7 @@ public class DiegoServiceTest {
 	public void testDeploy(DiegoParamDTO.Install dto,Principal principal, String install) {
 		
 		DiegoVO vo = null;
-		
 		String deploymentFileName = null;
-		
 		SessionInfoDTO sessionInfo = new SessionInfoDTO(principal);
 		
 		insertDiegoInfo();

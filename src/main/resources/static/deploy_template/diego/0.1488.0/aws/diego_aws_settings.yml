@@ -1,0 +1,156 @@
+meta: ~
+
+iaas_settings:
+  zones:
+    z1: (( meta.network-0-availability-zone ))
+    z2: (( meta.network-1-availability-zone ))
+    z3: (( meta.network-2-availability-zone ))
+
+  disk_pools:
+    - name: database_disks
+      <<: (( merge ))
+      cloud_properties:
+        <<: (( merge ))
+        type: gp2
+  stemcell:
+    name: (( meta.stemcell-name ))
+    version: (( meta.stemcell-version || "latest" ))
+  subnet_configs:
+    - name: diego1
+      subnets:
+      - range: (( meta.network-0-range ))
+        gateway: (( meta.network-0-gateway ))
+        static: (( meta.network-0-static ))
+        reserved: (( meta.network-0-reserved ))
+        dns: (( meta.network-0-dns ))
+        cloud_properties:
+          subnet: (( meta.network-0-net-id ))
+          security_groups: (( meta.network-0-security-groups ))
+    - name: diego2
+      subnets: (( merge || iaas_settings.subnet_configs.diego1.subnets ))
+    - name: diego3
+      subnets: (( merge || iaas_settings.subnet_configs.diego1.subnets ))
+    - name: diego-vizzini
+      subnets: (( merge || nil ))
+    - name: diego-benchmarks
+      subnets: (( merge || nil ))
+  compilation_cloud_properties:
+    instance_type: t2.medium
+    availability_zone: (( iaas_settings.zones.z1 ))
+  resource_pool_cloud_properties:
+    - name: access_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z1 ))
+        #elbs:
+        #- (( merge ))
+    - name: access_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z2 ))
+        #elbs:
+        #- (( merge ))
+    - name: access_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z3 ))
+        #elbs:
+        #- (( merge ))
+    - name: brain_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z1 ))
+    - name: brain_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z2 ))
+    - name: brain_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z3 ))
+    - name: cc_bridge_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z1 ))
+    - name: cc_bridge_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z2 ))
+    - name: cc_bridge_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z3 ))
+    - name: cell_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.cell-instance-type || "r3.xlarge" ))
+        availability_zone: (( iaas_settings.zones.z1 ))
+    - name: cell_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.cell-instance-type || "r3.xlarge" ))
+        availability_zone: (( iaas_settings.zones.z2 ))
+    - name: cell_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.cell-instance-type || "r3.xlarge" ))
+        availability_zone: (( iaas_settings.zones.z3 ))
+    - name: colocated_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.cell-instance-type || "r3.xlarge" ))
+        availability_zone: (( iaas_settings.zones.z1 ))
+    - name: colocated_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.cell-instance-type || "r3.xlarge" ))
+        availability_zone: (( iaas_settings.zones.z2 ))
+    - name: colocated_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.cell-instance-type || "r3.xlarge" ))
+        availability_zone: (( iaas_settings.zones.z3 ))
+    - name: database_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.large-instance-type || "m4.large" ))
+        availability_zone: (( iaas_settings.zones.z1 ))
+    - name: database_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.large-instance-type || "m4.large" ))
+        availability_zone: (( iaas_settings.zones.z2 ))
+    - name: database_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.large-instance-type || "m4.large" ))
+        availability_zone: (( iaas_settings.zones.z3 ))
+    - name: route_emitter_z1
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z1 ))
+    - name: route_emitter_z2
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z2 ))
+    - name: route_emitter_z3
+      cloud_properties:
+        <<: (( merge ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z3 ))
+    - name: errand
+      cloud_properties:
+        <<: (( merge || nil ))
+        instance_type: (( meta.medium-instance-type || "t2.medium" ))
+        availability_zone: (( iaas_settings.zones.z1 ))

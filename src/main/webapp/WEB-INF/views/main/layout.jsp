@@ -28,6 +28,7 @@
 <link rel="stylesheet" type="text/css" href="<c:url value='/webjars/bootstrap/3.3.5/css/bootstrap.min.css'/>"/>
 <link rel="stylesheet" type="text/css" href="<c:url value='/webjars/w2ui/1.4.2/w2ui.min.css'/>"/>
 <link rel="stylesheet" type="text/css" href="<c:url value='/webjars/jquery-ui/1.11.4/jquery-ui.css'/>"/>
+
 <link rel="stylesheet" type="text/css" href="<c:url value='/css/default.css'/>"/>
 <link rel="stylesheet" type="text/css" href="<c:url value='/css/guide.css'/>"/>
 <link rel="stylesheet" type="text/css" href="<c:url value='/css/common.css'/>"/>
@@ -35,8 +36,10 @@
 
 <link rel="stylesheet" type="text/css" href="<c:url value='/css/progress-step.css'/>"/>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <!-- JQuery -->
-<script type="text/javascript" src="<c:url value='/webjars/jquery/2.1.1/jquery.min.js'/>"></script>
+<%-- <script type="text/javascript" src="<c:url value='/webjars/jquery/2.1.1/jquery.min.js'/>"></script> --%>
 <script type="text/javascript" src="<c:url value='/webjars/jquery-ui/1.11.4/jquery-ui.js'/>"></script>
 
 <!-- JQuery Form -->
@@ -97,7 +100,9 @@ function setLayoutContainerHeight(login){
     }
 }
 </script>
-
+<style>
+    .w2ui-popup .w2ui-popup-message{ z-index:1500; }
+</style>
 </head>
 <body>
 

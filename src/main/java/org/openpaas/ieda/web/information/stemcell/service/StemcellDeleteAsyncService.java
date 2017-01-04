@@ -52,12 +52,13 @@ public class StemcellDeleteAsyncService {
 				DirectorRestHelper.trackToTask(defaultDirector, messagingTemplate, MESSAGE_ENDPOINT, httpClient, taskId, "event", principal.getName());
 				
 			} else {
-				DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("스템셀 삭제 중 오류가 발생하였습니다.[" + statusCode + "]"));
+				DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("스템셀 삭제 중 오류가 발생하였습니다."));
 			}
 			
 		} catch ( RuntimeException e) {
 			DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("스템셀 삭제 중 Exception이 발생하였습니다."));
 		} catch ( Exception e) {
+			e.printStackTrace();
 			DirectorRestHelper.sendTaskOutput(principal.getName(), messagingTemplate, MESSAGE_ENDPOINT, "error", Arrays.asList("스템셀 삭제 중 Exception이 발생하였습니다."));
 		}
 

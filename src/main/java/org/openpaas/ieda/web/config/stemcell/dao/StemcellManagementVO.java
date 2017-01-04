@@ -7,8 +7,10 @@ import javax.persistence.Transient;
 public class StemcellManagementVO {
 	
 	private Integer recid; //recid
-	private Integer id;//야
-	private String sublink; //key
+	private Integer id;//id
+	private String stemcellName;
+	private String stemcellUrl; // 스템셀 url
+	
 	@Transient
 	private String lastModified; //LastModified
 	@Transient
@@ -45,13 +47,21 @@ public class StemcellManagementVO {
 	public void setRecid(Integer recid) {
 		this.recid = recid;
 	}
-
-	public String getSublink() {
-		return sublink;
+	
+	public String getStemcellName() {
+		return stemcellName;
 	}
 
-	public void setSublink(String sublink) {
-		this.sublink = sublink;
+	public void setStemcellName(String stemcellName) {
+		this.stemcellName = stemcellName;
+	}
+
+	public String getStemcellUrl() {
+		return stemcellUrl;
+	}
+
+	public void setStemcellUrl(String stemcellUrl) {
+		this.stemcellUrl = stemcellUrl;
 	}
 
 	public String getLastModified() {

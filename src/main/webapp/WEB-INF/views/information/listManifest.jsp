@@ -24,6 +24,7 @@ $(function() {
 		name: 'us_manifestGrid',
 		header: '<b>Manifest 목록</b>',
 		style	: 'text-align:center',
+		msgAJAXerror : 'Manifset 조회 실패',
 		method	: 'GET',
 		multiSelect: false,
 		show: {	
@@ -39,13 +40,13 @@ $(function() {
 		       	   , {field: 'description', caption: '설명', size: '70%', style: 'text-align:center'}
 		       	   , {field: 'deployStatus', caption: '배포 상태', size: '20%', style: 'text-align:center',
 		       		   render: function(record) {
-		       			   if( record.deployStatus == "processing" ){
+		       			   if( record.deployStatus == "DEPLOY_STATUS_PROCESSING" ){
 		       					return '<span class="btn btn-primary" style="width:60px">배포 중</span>';
-		       			   }else if( record.deployStatus == "done" ){
+		       			   }else if( record.deployStatus == "DEPLOY_STATUS_DONE" ){
 		       					return '<span class="btn btn-primary" style="width:60px">배포 완료</span>';
-		       			   }else if( record.deployStatus == "cancelled" ){
+		       			   }else if( record.deployStatus == "DEPLOY_STATUS_CANCELLED" ){
 		       					return '<span class="btn btn-primary" style="width:60px">배포 취소</span>';
-		       			   }else if( record.deployStatus == "error" ){
+		       			   }else if( record.deployStatus == "DEPLOY_STATUS_FAILED" ){
 		       					return '<span class="btn btn-primary" style="width:60px">배포 실패</span>';
 		       			   }
 		       		   }
@@ -470,7 +471,7 @@ $( window ).resize(function() {
 		</div>
 	</div>
 	<!-- Manifest Grid -->
-	<div id="us_manifestGrid" style="width:100%; height:758px"></div>	
+	<div id="us_manifestGrid" style="width:100%; height:718px"></div>	
 	<!-- Manifest 업로드  -->
 	<form id="settingForm" action="POST" >
 		<div id="uploadPopupDiv" hidden="true">

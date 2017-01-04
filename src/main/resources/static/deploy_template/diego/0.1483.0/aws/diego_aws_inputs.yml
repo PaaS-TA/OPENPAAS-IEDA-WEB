@@ -1,46 +1,4 @@
 meta:
-  ## Jobs Block
-  etcd-server-cert: |
-[etcdServerCert]
-
-  etcd-server-key: |
-[etcdServerKey]
-
-  etcd-client-cert: |
-[etcdClientCert]
-
-  etcd-client-key: |
-[etcdClientKey]
-
-  etcd-peer-ca-cert: |
-[etcdPeerCaCert]
-
-  etcd-peer-cert: |
-[etcdPeerCert]
-
-  etcd-peer-key: |
-[etcdPeerKey]
-
-  bbs-encryption-keys: [diegoEncryptionKeys]
-
-  bbs-ca-cert: |
-[diegoCaCert]
-
-  bbs-server-cert: |
-[diegoServerCert]
-
-  bbs-server-key: |
-[diegoServerKey]
-
-  bbs-client-cert: |
-[diegoClientCert]
-
-  bbs-client-key: |
-[diegoClientKey]
-
-  ssh-proxy-host-key: |
-[diegoHostKey]
-
   ## Networks Block
   network-0-range: [subnetRange]
   network-0-gateway: [subnetGateway]
@@ -59,7 +17,7 @@ meta:
   network-1-net-id: [subnetId1]
   network-1-security-groups: [[cloudSecurityGroups1]]
   network-1-availability-zone: [availabilityZone1]
-  
+
   network-2-range: [subnetRange2]
   network-2-gateway: [subnetGateway2]
   network-2-reserved: [[subnetReserved2]]
@@ -68,12 +26,12 @@ meta:
   network-2-net-id: [subnetId2]
   network-2-security-groups: [[cloudSecurityGroups2]]
   network-2-availability-zone: [availabilityZone2]
-  
+
   ## Stemcells Block
   stemcell-name: [stemcellName]
   stemcell-version: [stemcellVersion]
   stemcell-password: [boshPassword]
-  
+
   ## Resouce_pools Block
   small-instance-type: [smallInstanceType]
   medium-instance-type: [mediumInstanceType]
@@ -88,7 +46,4 @@ meta:
   garden-linux-release-name: [gardenLinuxReleaseName]
   garden-linux-release-version: [gardenLinuxReleaseVersion]
   cflinuxfs2-rootfs-release-name: [cflinuxfs2RootfsReleaseName]
-  cflinuxfs2-rootfs-release-version: [cflinuxfs2RootfsReleaseVersion] 
-  
-  ## Don't change the following properties
-  etcd-ca-cert: (( bbs-ca-cert ))
+  cflinuxfs2-rootfs-release-version: [cflinuxfs2RootfsReleaseVersion]

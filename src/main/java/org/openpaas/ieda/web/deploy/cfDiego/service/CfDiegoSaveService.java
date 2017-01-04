@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.openpaas.ieda.common.CommonException;
 import org.openpaas.ieda.web.common.dto.SessionInfoDTO;
+import org.openpaas.ieda.web.deploy.cf.dao.CfDAO;
 import org.openpaas.ieda.web.deploy.cf.dao.CfVO;
 import org.openpaas.ieda.web.deploy.cf.dto.CfParamDTO;
 import org.openpaas.ieda.web.deploy.cf.service.CfSaveService;
@@ -34,6 +35,7 @@ public class CfDiegoSaveService {
 	@Autowired CfDiegoDAO cfDiegoDao;
 	@Autowired CfSaveService cfSaveService;
 	@Autowired DiegoSaveService diegoSaveService;
+	@Autowired CfDAO cfDao;
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
@@ -58,6 +60,8 @@ public class CfDiegoSaveService {
 				vo = cfDiegoDao.selectCfDiegoInfoByPlaform( dto.getPlatform(), cfVo.getId());
 			}else{ //diego update/insert
 				diegoDto = mapper.readValue(cfJson, DiegoParamDTO.Default.class);
+				String keyFileName = cfDao.selectCfInfoById(diegoDto.getCfId()).getKeyFile();
+				diegoDto.setKeyFile(keyFileName);
 				diegoVo = diegoSaveService.saveDefaultInfo(diegoDto, test);
 				vo = cfDiegoDao.selectCfDiegoInfoByPlaform( "cf", diegoVo.getCfId());
 				if ( vo != null ){
@@ -125,7 +129,7 @@ public class CfDiegoSaveService {
 			}
 			cfDiegoDao.updateCfDiegoInfo(vo);
 		} catch(NullPointerException e){
-			throw new CommonException("illigalArgument.cfDiego.exception",
+			throw new CommonException("nullPoint.cfDiego.exception",
 					"네트워크 정보를 저장할 수 없습니다. ", HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.openpaas.ieda.web.deploy.common.dao.key.KeyVO;
 import org.openpaas.ieda.web.deploy.common.dao.network.NetworkVO;
 import org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO;
 
@@ -33,17 +32,15 @@ public class DiegoVO {
 	private String etcdReleaseVersion; //ETCD 릴리즈 버전
 	private String cflinuxfs2rootfsreleaseName; //cflinuxfs2rootf 릴리즈 명
 	private String cflinuxfs2rootfsreleaseVersion; //cflinuxfs2rootf 릴리즈 버전
-	private String diegoEncryptionKeys; //암호화키
+	private String keyFile;
+	
 	//2. 네트워크 정보
 	private List<NetworkVO> networks;
 	private NetworkVO network;
-	//3. key List
-	private List<KeyVO> keys;
-	private KeyVO key;
 	
-	//4. 리소스 정보	
+	//3. 리소스 정보	
 	ResourceVO resource;
-	//5. Deploy 정보
+	//4. Deploy 정보
 	private String deploymentFile; //배포파일명
 	private String deployStatus; //배포상태
 	private Integer taskId; //TASK ID
@@ -51,8 +48,6 @@ public class DiegoVO {
 	public DiegoVO(){
 		network = new NetworkVO();
 		networks = new ArrayList<NetworkVO>();
-		key = new KeyVO();
-		keys= new ArrayList<KeyVO>();
 		resource = new ResourceVO();
 	}
 	
@@ -182,29 +177,17 @@ public class DiegoVO {
 	public void setCflinuxfs2rootfsreleaseVersion(String cflinuxfs2rootfsreleaseVersion) {
 		this.cflinuxfs2rootfsreleaseVersion = cflinuxfs2rootfsreleaseVersion;
 	}
-	public String getDiegoEncryptionKeys() {
-		return diegoEncryptionKeys;
+	public String getKeyFile() {
+		return keyFile;
 	}
-	public void setDiegoEncryptionKeys(String diegoEncryptionKeys) {
-		this.diegoEncryptionKeys = diegoEncryptionKeys;
+	public void setKeyFile(String keyFile) {
+		this.keyFile = keyFile;
 	}
 	public List<NetworkVO> getNetworks() {
 		return networks;
 	}
 	public void setNetworks(List<NetworkVO> networks) {
 		this.networks = networks;
-	}
-	public List<KeyVO> getKeys() {
-		return keys;
-	}
-	public void setKeys(List<KeyVO> keys) {
-		this.keys = keys;
-	}
-	public KeyVO getKey() {
-		return key;
-	}
-	public void setKey(KeyVO key) {
-		this.key = key;
 	}
 	public ResourceVO getResource() {
 		return resource;

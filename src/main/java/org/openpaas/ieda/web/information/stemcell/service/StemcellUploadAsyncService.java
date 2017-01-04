@@ -38,7 +38,7 @@ public class StemcellUploadAsyncService {
 	 * @return            : void
 	***************************************************/
 	public void uploadStemcell(String stemcellDir, String stemcellFileName, String userId) {
-
+		
 		DirectorConfigVO defaultDirector = directorConfigService.getDefaultDirector();
 		PostMethod postMethod = null;
 		HttpClient httpClient = null;
@@ -55,7 +55,6 @@ public class StemcellUploadAsyncService {
 			DirectorRestHelper.sendTaskOutputWithTag(userId, messagingTemplate, MESSAGE_ENDPOINT, "Started", stemcellFileName, Arrays.asList("Uploading Stemcell ...", ""));
 			
 			int statusCode = httpClient.executeMethod(postMethod);
-			
 			if ( statusCode == HttpStatus.MOVED_PERMANENTLY.value()
 			  || statusCode == HttpStatus.MOVED_TEMPORARILY.value()	) {
 				
@@ -64,7 +63,7 @@ public class StemcellUploadAsyncService {
 				
 				DirectorRestHelper.trackToTaskWithTag(defaultDirector, messagingTemplate, MESSAGE_ENDPOINT, stemcellFileName , httpClient, taskId, "event", userId);
 			} else {
-				DirectorRestHelper.sendTaskOutputWithTag(userId, messagingTemplate, MESSAGE_ENDPOINT, "error", stemcellFileName, Arrays.asList("스템셀 업로드 중 오류가 발생하였습니다.[" + statusCode + "]"));
+				DirectorRestHelper.sendTaskOutputWithTag(userId, messagingTemplate, MESSAGE_ENDPOINT, "error", stemcellFileName, Arrays.asList("스템셀 업로드 중 오류가 발생하였습니다."));
 			}
 		} catch( HttpException e){
 			DirectorRestHelper.sendTaskOutputWithTag(userId, messagingTemplate, MESSAGE_ENDPOINT, "error", stemcellFileName, Arrays.asList("스템셀 업로드 중 Exception이 발생하였습니다."));
@@ -77,9 +76,6 @@ public class StemcellUploadAsyncService {
 				if( LOGGER.isDebugEnabled() ){
 					LOGGER.debug("check delete lock File  : "  + check);
 				}
-			}
-			if( postMethod != null ){
-				postMethod.releaseConnection();
 			}
 		}
 	}

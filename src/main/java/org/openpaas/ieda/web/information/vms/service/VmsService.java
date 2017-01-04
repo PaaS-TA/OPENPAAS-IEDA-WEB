@@ -41,7 +41,6 @@ public class VmsService {
 	public List<VmsListDTO> getVmList(String deployment){
 		//1.1 git director Info
 		DirectorConfigVO defaultDirector = directorConfigService.getDefaultDirector();
-		
 		if ( defaultDirector == null ) {
 			throw new CommonException("notfound.dirctor.exception",
 					"설치 관리자 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
@@ -77,7 +76,6 @@ public class VmsService {
 					.getTaskStatusURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), taskId));
 			getTaskStaus = (GetMethod) DirectorRestHelper.setAuthorization(defaultDirector.getUserId(),
 					defaultDirector.getUserPassword(), (HttpMethodBase) getTaskStaus);
-			
 			client.executeMethod(getTaskStaus);
 			Thread.sleep(THREAD_SLEEP_TIME);
 			
@@ -89,7 +87,6 @@ public class VmsService {
 			String range = "bytes=" + offset + "-";
 			getTaskOutput.setRequestHeader("Range", range);
 			int taskStatusCode = client.executeMethod(getTaskOutput);
-			
 			if (taskStatusCode == HttpStatus.OK.value() || taskStatusCode == HttpStatus.PARTIAL_CONTENT.value()) {
 
 				vmInfoList = new ArrayList<VmsListDTO>();

@@ -38,51 +38,11 @@ meta:
   description: [description]
   system-domain-organization: [domainOrganization]
 
-  consul-encrypt-keys: [[encryptKeys]]
-
-  consul-ca-cert: |
-[caCert]
-  consul-server-cert: |
-[serverCert]
-  consul-server-key: |
-[serverKey]
-  consul-agent-cert: |
-[agentCert]
-  consul-agent-key: |
-[agentKey]
-
-  blobstore-tls-cert: |
-[blobstoreTlsCert]
-  blobstore-private-key: |
-[blobstorePrivateKey]
-  blobstore-ca-cert: |
-[blobstoreCaCert]
-
-  jwt-verification-key: |
-[verificationKey]
-  jwt-signing-key: |
-[signingKey]
-
-  hm9000-server-key: |
-[hm9000ServerKey]
-  hm9000-server-cert: |
-[hm9000ServerCert]
-  hm9000-client-key: |
-[hm9000ClientKey]
-  hm9000-client-cert: |
-[hm9000ClientCert]
-  hm9000-ca-cert: |
-[hm9000CaCert]
-
-  ha-proxy-ssl-pem: |
-[sslPemPub]
-[sslPemRsa]
-
   login-password: [loginSecret]
 
   vcap-password: [boshPassword]
 
-  host-key-fingerprint: [appSshFingerprint]
+  ssh-key-fingerprint: [appSshFingerprint]
 
   small-instance-type:
    ram: [sInsTypeRAM]

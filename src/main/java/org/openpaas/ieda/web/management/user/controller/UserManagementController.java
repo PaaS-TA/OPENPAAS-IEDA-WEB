@@ -1,12 +1,12 @@
 package org.openpaas.ieda.web.management.user.controller;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.openpaas.ieda.common.CommonException;
 import org.openpaas.ieda.web.common.controller.BaseController;
 import org.openpaas.ieda.web.management.auth.controller.AuthManagementController;
 import org.openpaas.ieda.web.management.user.dao.UserManagementVO;
@@ -93,8 +93,12 @@ public class UserManagementController extends BaseController{
 		if (LOG.isInfoEnabled()) {
 			LOG.info("================================================> 사용자 수정 요청");
 		}
-		service.updateUserInfo(dto,userId);
-		
+		try {
+			service.updateUserInfo(dto,userId);
+		} catch (SQLException e) {
+			throw new CommonException("sql.user.exception",
+					"사용자 정보 수정 중 에러가 발생 했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 		if (LOG.isInfoEnabled()) {
 			LOG.info("================================================> 사용자 수정 요청 성공");
 		}
@@ -108,11 +112,11 @@ public class UserManagementController extends BaseController{
 	 * @return            : ResponseEntity<?>
 	***************************************************/
 	@RequestMapping(value="/admin/user/delete/{userId}", method = RequestMethod.DELETE)
-	public  ResponseEntity<?> deleteUserInfo(@PathVariable String userId, HttpServletRequest request, HttpServletResponse response){
+	public  ResponseEntity<?> deleteUserInfo(@PathVariable String userId){
 		if (LOG.isInfoEnabled()) {
 			LOG.info("================================================> 사용자 삭제 요청");
 		}
-		service.deleteUserInfo(request, response, userId);
+		service.deleteUserInfo(userId);
 		if (LOG.isInfoEnabled()) {
 			LOG.info("================================================> 사용자 삭제 요청 성공");
 		}

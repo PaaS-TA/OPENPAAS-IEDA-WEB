@@ -7,12 +7,15 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openpaas.ieda.OpenpaasIedaWebApplication;
+import org.openpaas.ieda.TestBeansConfiguration;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.common.BaseTestController;
+import org.openpaas.ieda.web.common.dto.KeyInfoDTO;
 import org.openpaas.ieda.web.deploy.cf.CfServiceTest;
 import org.openpaas.ieda.web.deploy.cf.dto.CfParamDTO;
 import org.openpaas.ieda.web.deploy.cfDiego.dto.CfDiegoParamDTO;
@@ -45,7 +48,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {OpenpaasIedaWebApplication.class})
+@SpringApplicationConfiguration(classes = {OpenpaasIedaWebApplication.class, TestBeansConfiguration.class})
 @WebAppConfiguration
 @Transactional
 @TransactionConfiguration(defaultRollback=true)
@@ -60,6 +63,9 @@ public class CfDiegoControllerTest extends BaseTestController {
 	private MockMvc mockMvc;
 	private Principal principal = null;
 	private final static Logger LOGGER = LoggerFactory.getLogger(CfDiegoControllerTest.class);
+	final private static String SEPARATOR = System.getProperty("file.separator");
+	final private static String CF_KEY_DIR = LocalDirectoryConfiguration.getKeyDir() + SEPARATOR + "openstack-cf-key-1.yml";
+	final private static String DIEGO_KEY_DIR = LocalDirectoryConfiguration.getKeyDir() + SEPARATOR + "openstack-diego-key-1.yml";
 	
 	/*************************************** URL *******************************************/
 	final static String VIEW_URL = "/deploy/cfDiego"; //Cf & Diego menu 화면
@@ -69,12 +75,10 @@ public class CfDiegoControllerTest extends BaseTestController {
 	final static String CF_DIEGO_DETAIL_URL = "/deploy/cfDiego/install/detail/1"; //CF & Diego 정보 상세 조회
 	final static String CF_LIST_URL = "/deploy/cfDiego/list/cf/openstack";//CF 정보 목록 조회
 	final static String SAVE_DEFAULT_INFO_URL = "/deploy/cfDiego/install/saveDefaultInfo/Y";//기본 정보 저장 
+	final static String GET_COUNTRY_CODELIST_URL = "/common/deploy/codes/countryCode/20000";//국가 코드 조회
+	final static String CREAT_KEY_INFO_URL ="/common/deploy/key/createKey";//Key 생성
+	final static String SAVE_KEY_INFO_URL ="/deploy/cfDiego/install/saveKeyInfo";//키 정보 저장
 	final static String SAVE_NETWORK_INFO_URL="/deploy/cfDiego/install/saveNetworkInfo";//네트워크 정보 저장 
-	final static String SAVE_UAA_INFO_URL = "/deploy/cfDiego/install/saveUaaInfo";//CF UAA 정보 저장
-	final static String SAVE_CONSUL_INFO_URL = "/deploy/cfDiego/install/saveConsulInfo";//CF CONSUL 정보 저장 
-	final static String SAVE_BLOBSTORE_INFO_URL = "/deploy/cfDiego/install/saveBlobstoreInfo";//CF BlobStore 정보 저장
-	final static String SAVE_DIEGO_INFO_URL = "/deploy/cfDiego/install/saveDiegoInfo";//Diego 정보 저장  
-	final static String SAVE_ETCD_INFO_URL = "/deploy/cfDiego/install/saveEtcdInfo";//ETCD 정보 저장  
 	final static String SAVE_RESOURCE_INFO_URL = "/deploy/cfDiego/install/saveResourceInfo/Y";//리소스 정보 저장
 	final static String MAKE_DEPLOYMENTFILE_URL = "/deploy/cfDiego/install/createSettingFile/Y";//배포 파일 생성
 	final static String DELETE_CF_DIEGO_RECORD_URL = "/deploy/cfDiego/delete/data";//CF&Diego 단순 레코드 삭제
@@ -256,6 +260,88 @@ public class CfDiegoControllerTest extends BaseTestController {
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : 국가 코드 조회
+	 * @title               : testGetCountryCodeList
+	 * @return            : void
+	***************************************************/
+	@Test
+	public void testGetCountryCodeList() throws Exception{
+		if(LOGGER.isInfoEnabled()){ 
+			LOGGER.info("=================  국가 코드 조회 테스트 요청  ================="); 
+		}
+		ResultActions result = mockMvc.perform(get(GET_COUNTRY_CODELIST_URL)
+				.param("parentCode", "20000")
+	    		.contentType(APPLICATION_JSON_UTF8));
+		
+		result.andDo(MockMvcResultHandlers.print())
+		.andExpect(MockMvcResultMatchers.status().isOk())
+		.andReturn();
+		
+		
+		if(LOGGER.isInfoEnabled()){ 
+			LOGGER.info("=================  국가 코드 조회 테스트 요청 성공  ================="); 
+		}
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : 키 생성
+	 * @title               : testCreateKeyInfo
+	 * @return            : void
+	***************************************************/
+	@Rollback(true)
+	@Test
+	public void testCreateKeyInfo() throws Exception {
+		if(LOGGER.isInfoEnabled()){ 
+			LOGGER.info("=================  CF 키 생성 TEST 요청  ================="); 
+		}
+		testSaveDefaultInfo(); //기본 정보 저장
+		String requestJson = setKeyInfo();
+		
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post(CREAT_KEY_INFO_URL)
+	    		.contentType(APPLICATION_JSON_UTF8)
+				.content(requestJson));
+		
+		result.andDo(MockMvcResultHandlers.print())
+		.andExpect(MockMvcResultMatchers.status().isOk())
+		.andReturn();
+		
+		if(LOGGER.isInfoEnabled()){ 
+			LOGGER.info("=================  CF 키 생성 TEST 요청 성공 ================="); 
+		}
+		
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : 키 생성 정보 저장
+	 * @title               : testSaveKeyInfo
+	 * @return            : void
+	***************************************************/
+	@Rollback(true)
+	@Test
+	public void testSaveKeyInfo() throws Exception{
+		if(LOGGER.isInfoEnabled()){ 
+			LOGGER.info("=================  CF KEY 생성 정보 저장 TEST START  ================="); 
+		}
+		testSaveDefaultInfo(); //기본 정보 저장
+		String requestJson = setKeyInfo();
+		
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.put(SAVE_KEY_INFO_URL)
+	    		.contentType(APPLICATION_JSON_UTF8)
+				.content(requestJson));
+		
+		result.andDo(MockMvcResultHandlers.print())
+		.andExpect(MockMvcResultMatchers.status().isNoContent())
+		.andReturn();
+		
+		if(LOGGER.isInfoEnabled()){ 
+			LOGGER.info("=================  CF KEY 생성 정보 저장 TEST START  ================="); 
+		}
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
 	 * @description   : 네트워크 정보 저장 
 	 * @title               : testSaveNetworkCfInfo
 	 * @return            : void
@@ -280,135 +366,7 @@ public class CfDiegoControllerTest extends BaseTestController {
 	}
 	
 	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : CF UAA 정보 저장
-	 * @title               : testSaveUaaCfInfo
-	 * @return            : void
-	***************************************************/
-	@Rollback(true)
-	@Test
-	public void testSaveUaaCfInfo() throws Exception{
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego UAA 정보 저장 요청"); }
-			//set the default info
-			saveDefaultInfo("cf");
-			//request for storing the Uaa info 
-			String requestJson = setUaaInfo();
-			ResultActions result = mockMvc.perform(MockMvcRequestBuilders.put( SAVE_UAA_INFO_URL )
-					.content(requestJson)
-					.contentType(MediaType.APPLICATION_JSON));
-			
-			result.andDo( MockMvcResultHandlers.print() )
-				.andExpect( MockMvcResultMatchers.status().isOk() )
-				.andReturn();
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego UAA 정보 저장 성공!!"); }
-		
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : CF CONSUL 정보 저장 
-	 * @title               : testSaveConsulCfInfo
-	 * @return            : void
-	***************************************************/
-	@Rollback(true)
-	@Test
-	public void testSaveConsulCfInfo() throws Exception{
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego Consul 정보 저장 요청"); }
-			//set the default info
-			saveDefaultInfo("cf");
-			//request for storing the Consul info 
-			String requestJson = setConsulInfo();
-			ResultActions result = mockMvc.perform(MockMvcRequestBuilders.put( SAVE_CONSUL_INFO_URL )
-					.content(requestJson)
-					.contentType(MediaType.APPLICATION_JSON));
-			
-			result.andDo( MockMvcResultHandlers.print() )
-				.andExpect( MockMvcResultMatchers.status().isOk() )
-				.andReturn();
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego Consul 정보 저장 성공!!"); }
-		
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : CF BlobStore 정보 저장
-	 * @title               : testSaveBlobstoreInfo
-	 * @return            : void
-	***************************************************/
-	@Rollback(true)
-	@Test
-	public void testSaveBlobstoreInfo() throws Exception{
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego Blobstore 정보 저장 요청"); }
-			//set the default info
-			saveDefaultInfo("cf");
-			//request for storing the Blobstore info 
-			String requestJson = setBlobstoreInfo();
-			ResultActions result = mockMvc.perform(MockMvcRequestBuilders.put( SAVE_BLOBSTORE_INFO_URL )
-					.content(requestJson)
-					.contentType(MediaType.APPLICATION_JSON));
-			
-			result.andDo( MockMvcResultHandlers.print() )
-				.andExpect( MockMvcResultMatchers.status().isOk() )
-				.andReturn();
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego Blobstore 정보 저장 성공!!"); }
-		
-	}
 
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Diego 정보 저장  
-	 * @title               : testSaveDiegoInfo
-	 * @return            : void
-	***************************************************/
-	@Rollback(true)
-	@Test
-	public void testSaveDiegoInfo() throws Exception{
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego DIEGO 정보 저장 요청"); }
-			//set the cf default info
-			saveDefaultInfo("cf");
-			//set the Diego default info
-			saveDefaultInfo("diego");
-			//request for storing the Diego info 
-			String requestJson = setDiegoInfo();
-			ResultActions result = mockMvc.perform(MockMvcRequestBuilders.put( SAVE_DIEGO_INFO_URL )
-					.content(requestJson)
-					.contentType(MediaType.APPLICATION_JSON));
-			
-			result.andDo( MockMvcResultHandlers.print() )
-				.andExpect( MockMvcResultMatchers.status().isCreated() )
-				.andReturn();
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego DIEGO 정보 저장 성공!!"); }
-		
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Diego ETCD 정보 저장
-	 * @title               : testEtcdInfoSave
-	 * @return            : void
-	***************************************************/
-	@Rollback(true)
-	@Test
-	public void testEtcdInfoSave() throws Exception{
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego ETCD 정보 저장 요청"); }
-			//set the cf default info
-			saveDefaultInfo("cf");
-			//set the Diego default info
-			saveDefaultInfo("diego");
-			//request for storing the Diego info 
-			String requestJson = setDiegoEtcdInfo();
-			ResultActions result = mockMvc.perform(MockMvcRequestBuilders.put( SAVE_ETCD_INFO_URL )
-					.content(requestJson)
-					.contentType(MediaType.APPLICATION_JSON));
-			
-			result.andDo( MockMvcResultHandlers.print() )
-				.andExpect( MockMvcResultMatchers.status().isCreated() )
-				.andReturn();
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego ETCD 정보 저장 성공!!"); }
-		
-	}
-	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
 	 * @description   : CF & Diego 리소스 정보 저장
@@ -550,6 +508,24 @@ public class CfDiegoControllerTest extends BaseTestController {
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : 하나의 메소드가 동작한 직후 실행
+	 * @title               : tearDown
+	 * @return            : void
+	***************************************************/
+	@After
+	public void tearDown(){
+		//키 파일 삭제
+		File cfKeyFile = new File( CF_KEY_DIR );
+		File diegoKeyFile = new File( DIEGO_KEY_DIR );
+		if( cfKeyFile.exists() ){
+			cfKeyFile.delete();
+		}else if( diegoKeyFile.exists() ){
+			diegoKeyFile.delete();
+		}
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
 	 * @description   : CF 기본 정보 설정
 	 * @title               : setCfDefaultInfo
 	 * @return            : String
@@ -570,6 +546,33 @@ public class CfDiegoControllerTest extends BaseTestController {
 		dto.setDomain("172.12.34.100.xip.io");
 		dto.setDescription("test-domain");
 		dto.setDomainOrganization("test-org");
+		
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+	    String requestJson=ow.writeValueAsString(dto);
+	
+		return requestJson;
+	}
+	
+	/***************************************************
+	 * @project          : Paas 플랫폼 설치 자동화
+	 * @description   : 키 생성 정보 설정
+	 * @title               : setKeyInfo
+	 * @return            : String
+	***************************************************/
+	public String setKeyInfo() throws Exception{
+		KeyInfoDTO dto = new KeyInfoDTO();
+		dto.setId("1");
+		dto.setIaas("openstack");
+		dto.setPlatform("cf");
+		dto.setDomain("172.12.34.100.xip.io");//도메인
+		dto.setCountryCode("KR");//국가코드
+		dto.setStateName("Seoul");//시/도
+		dto.setLocalityName("Seoul");//시/구/군
+		dto.setOrganizationName("PaaS");//회사명
+		dto.setUnitName("unit");//부서명
+		dto.setEmail("paas@example.co.kr");
 		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
@@ -603,6 +606,7 @@ public class CfDiegoControllerTest extends BaseTestController {
 		dto.setEtcdReleaseVersion("63");
 		dto.setCfDeployment("cf-openstack-test");
 		dto.setCfDeploymentName("cf-openstack-test");
+		dto.setKeyFile("vsphere-diego-key-1.yml");
 		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
@@ -653,298 +657,7 @@ public class CfDiegoControllerTest extends BaseTestController {
 		return requestJson;
 	}
 	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : UAA 정보 설정 
-	 * @title               : setUaaInfo
-	 * @return            : String
-	***************************************************/
-	public String setUaaInfo() throws Exception {
-		CfParamDTO.Uaa dto = new CfParamDTO.Uaa();
-		
-		dto.setId("1");
-		dto.setIaas("openstack");
-		dto.setLoginSecret("test-login-security");
-		//공개키
-		String verificationKey = "-----BEGIN PUBLIC KEY-----" +"\n";
-		verificationKey += "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1kp7Wg/cyq12DWTin7Tu"+"\n";
-		verificationKey += "HKZjUolmOxj93iMj4PePxrvHgTkLs4xA5smR9w6BhCMJ/B0fpJvca8TqXgvVtDfx" + "\n";
-		verificationKey += "2ui9NuDQKB477mOfg/SHrB2h9G9JZdsJdbIqSEiXW0XugJU/vm3qiV/RTisZYhX4" + "\n";
-		verificationKey += "...testing";
-		dto.setVerificationKey(verificationKey);
-		
-		//개인키
-		String signingKey= "-----BEGIN RSA PRIVATE KEY-----" + "\n";
-		signingKey += "MIIEowIBAAKCAQEA1kp7Wg/cyq12DWTin7TuHKZjUolmOxj93iMj4PePxrvHgTkL" + "\n";
-		signingKey += "s4xA5smR9w6BhCMJ/B0fpJvca8TqXgvVtDfx2ui9NuDQKB477mOfg/SHrB2h9G9J" + "\n";
-		signingKey += "ZdsJdbIqSEiXW0XugJU/vm3qiV/RTisZYhX4P8kXcbQZJBKdqrHaAjJijrsUqp78" + "\n";
-		signingKey += "...testing";
-		dto.setSigningKey(signingKey);
-		
-		//프록시 정보 - HAProxy 공인 IP
-		dto.setProxyStaticIps("172.12.34.100");
-		
-		//프록시 정보 - HAProxy 인증서
-		String sslPemPub = "-----BEGIN CERTIFICATE-----" + "\n";
-		sslPemPub += "MIICnzCCAggCCQCKDfbzvFEfUTANBgkqhkiG9w0BAQsFADCBkzELMAkGA1UEBhMC" + "\n";
-		sslPemPub += "S1IxDjAMBgNVBAgMBVNlb3VsMQ4wDAYDVQQHDAVTZW91bDEQMA4GA1UECgwHY2xv" + "\n";
-		sslPemPub += "dWQ0dTEMMAoGA1UECwwDT0NQMSAwHgYDVQQDDBcqLjE3Mi4xNi4xMDAuMTA5Lnhp" + "\n";
-		sslPemPub += "...testing";
-		dto.setSslPemPub(sslPemPub);
-		
-		//프록시 정보 - HAProxy 개인키
-		String sslPemRsa = "-----BEGIN RSA PRIVATE KEY-----" + "\n";
-		sslPemRsa += "MIICXQIBAAKBgQDpfkbjspe++72gufsWV7kfT9wjMTxeWp4LmML7qt2NSSuTQ05E" + "\n";
-		sslPemRsa += "choQei0FMj1AV2A2nHbnEahyPNNoUpV7Oc2DlJYREZVzfok+6qYSGbHZBKzp2kiO" + "\n";
-		sslPemRsa += "E07E75mLAs5vHAWv3CBKFsxfJ2GZf+3FfLChVsKpLImywHrwwq27SODnhQIDAQAB" + "\n";
-		sslPemRsa += "...testing";
-		dto.setSslPemRsa(sslPemRsa);
-		
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(dto);
 	
-		return requestJson;
-		
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Consul 정보 설정 
-	 * @title               : setConsulInfo
-	 * @return            : String
-	***************************************************/
-	public String setConsulInfo() throws Exception {
-		CfParamDTO.Consul dto = new CfParamDTO.Consul();
-		
-		dto.setId("1");
-		dto.setIaas("openstack");
-		//에이전트 인증서
-		String agentCert = "-----BEGIN CERTIFICATE-----" + "\n";
-		agentCert += "MIIEJjCCAg6gAwIBAgIRAJFxJohnE9e10yrz0P9QET0wDQYJKoZIhvcNAQELBQAw" + "\n";
-		agentCert += "EzERMA8GA1UEAxMIY29uc3VsQ0EwHhcNMTYwNjMwMDEwOTA4WhcNMTgwNjMwMDEw" + "\n";
-		agentCert += "OTA4WjAXMRUwEwYDVQQDEwxjb25zdWwgYWdlbnQwggEiMA0GCSqGSIb3DQEBAQUA" + "\n";
-		agentCert += "...testing" + "\n";
-		dto.setAgentCert(agentCert);
-		
-		//에이전트 개인키
-		String agentKey = "-----BEGIN RSA PRIVATE KEY-----" + "\n";
-		agentKey += "MIIEogIBAAKCAQEAwAG6admvDNWfWgmH2PKAcqXPGiayFTcQZLQLxjFgjEmjyv8r" + "\n";
-		agentKey += "5A2mg58fLOG59VuGMLTjAsEuqR2rkBjsSEoVwiRkC108bGoGQi2eHj2UtImYAfw1" + "\n";
-		agentKey += "x2YAbpocIyAc70Rb90CF/R05BuLlLRZ+fVQOn0OoGd3Cba3PwMJ2Nz0HonrEBFcE" + "\n";
-		agentKey += "...testing" + "\n";
-		dto.setAgentKey(agentKey);
-		
-		//서버 CA 인증서
-		String caCert = "-----BEGIN CERTIFICATE-----" + "\n";
-		caCert += "MIIFBzCCAu+gAwIBAgIBATANBgkqhkiG9w0BAQsFADATMREwDwYDVQQDEwhjb25z" + "\n";
-		caCert += "dWxDQTAeFw0xNjA2MzAwMTA4NTlaFw0yNjA2MzAwMTA5MDZaMBMxETAPBgNVBAMT" + "\n";
-		caCert += "CGNvbnN1bENBMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA21gc29p5" + "\n";
-		caCert += "...testing" + "\n";
-		dto.setCaCert(caCert);
-		
-		//암호화 키 
-		dto.setEncryptKeys("test-encryptKeys");
-		
-		//서버 인증서
-		String serverCert = "-----BEGIN CERTIFICATE-----" + "\n";
-		serverCert += "MIIELzCCAhegAwIBAgIQC/1znIT58wJhzfjeFU9EbzANBgkqhkiG9w0BAQsFADAT" + "\n";
-		serverCert += "MREwDwYDVQQDEwhjb25zdWxDQTAeFw0xNjA2MzAwMTA5MDdaFw0xODA2MzAwMTA5" + "\n";
-		serverCert += "MDdaMCExHzAdBgNVBAMTFnNlcnZlci5kYzEuY2YuaW50ZXJuYWwwggEiMA0GCSqG" + "\n";
-		serverCert += "...testing" + "\n";
-		dto.setServerCert(serverCert);
-		
-		//서버 개인키
-		String serverKey = "-----BEGIN RSA PRIVATE KEY-----" + "\n";
-		serverKey += "MIIEpAIBAAKCAQEA1V2Q0MwP2ucCvCDuXgVrShUH9g+uXDkyUQh1lXuylGW2tbQw" + "\n";
-		serverKey += "v8bijtVvGYJaWNFSPOoPBbU03nw7e+jPrHbNt1PcrmHTOLqvZZwJ1nGs93LefpMv" + "\n";
-		serverKey += "lUeg7omYDTi8BU3Y+zmZH3yik9QIcxRStTWJtFrg45H2DhP2DT1v+dIg2AjLgYtC" + "\n";
-		serverKey += "...testing" + "\n";
-		dto.setServerKey(serverKey);
-	
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(dto);
-	
-		return requestJson;
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Blobstore 정보 설정 
-	 * @title               : setBlobstoreInfo
-	 * @return            : String
-	***************************************************/
-	public String setBlobstoreInfo() throws Exception {
-		
-		CfParamDTO.Blobstore dto = new CfParamDTO.Blobstore();
-		dto.setId("1");
-	
-		//1.1 Blobstore Tls Cert Info
-		String blobstoreTlsCert = "-----BEGIN CERTIFICATE-----" + "\n";
-		blobstoreTlsCert += "MIIENDCCAhygAwIBAgIQfZsdWwO8eOvEphuoeM3qsTANBgkqhkiG9w0BAQsFADAR" + "\n";
-		blobstoreTlsCert += "MQ8wDQYDVQQDEwZibG9iQ0EwHhcNMTYwNjMwMDEwOTQ1WhcNMTgwNjMwMDEwOTQ1" + "\n";
-		blobstoreTlsCert += "WjAoMSYwJAYDVQQDEx1ibG9ic3RvcmUuc2VydmljZS5jZi5pbnRlcm5hbDCCASIw" + "\n";
-		blobstoreTlsCert += "...testing" + "\n";
-		dto.setBlobstoreTlsCert(blobstoreTlsCert);
-		
-		//1,2 Blobstore Private Key Info
-		String blobstorePrivateKey = "-----BEGIN RSA PRIVATE KEY-----" + "\n";
-		blobstorePrivateKey += "MIIEowIBAAKCAQEAxKqzlMyLyFRnw31br+nVbBI6SV+RRAnOaLq66MM37w/mRUoh" + "\n";
-		blobstorePrivateKey += "nk4EQVMLgHTnV3Rb7ZGpD2fS+ARd6HEmIl0RwLEgBu/TGD91PCzBsibipxxD8M/u" + "\n";
-		blobstorePrivateKey += "adYmJvQFGCpnXg9bJi42cUCWOy8QRTx4HGuqZAWBfbbFLKDZDFAcXu4/aNML+ZSu" + "\n";
-		blobstorePrivateKey += "...testing" + "\n";
-		dto.setBlobstorePrivateKey(blobstorePrivateKey);
-		
-		//1.3 blobstore Ca Cert Info
-		String blobstoreCaCert = "-----BEGIN CERTIFICATE-----" + "\n";
-		blobstoreCaCert += "MIIFAzCCAuugAwIBAgIBATANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQDEwZibG9i" + "\n";
-		blobstoreCaCert += "Q0EwHhcNMTYwNjMwMDEwOTQ0WhcNMjYwNjMwMDEwOTQ1WjARMQ8wDQYDVQQDEwZi" + "\n";
-		blobstoreCaCert += "bG9iQ0EwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQCpiIZ3VyNfK9CV" + "\n";
-		blobstoreCaCert += "...testing" + "\n";
-		dto.setBlobstoreCaCert(blobstoreCaCert);
-		
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(dto);
-	
-		return requestJson;
-	}
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Diego 정보 설정
-	 * @title               : setDiegoInfo
-	 * @return            : String
-	***************************************************/
-	public String setDiegoInfo() throws Exception{
-		DiegoParamDTO.Diego dto = new DiegoParamDTO.Diego();
-		//Diego 정보 저장
-		dto.setId("1");
-		dto.setIaas("OPENSTACK");
-		dto.setDiegoEncryptionKeys("CGIGDy0h4tH2EFbVBbp9yw==");
-		
-		String diegoCaCert = "-----BEGIN CERTIFICATE-----" + "\n";
-		diegoCaCert += "MIIFBTCCAu2gAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdkaWVn" + "\n";
-		diegoCaCert += "b0NBMB4XDTE2MDcxMzAzNTgyNFoXDTI2MDcxMzAzNTgyN1owEjEQMA4GA1UEAxMH" +"\n";
-		diegoCaCert += "ZGllZ29DQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOe2lsw3rRaG"+"\n";
-		diegoCaCert += "...testing";
-		dto.setDiegoCaCert(diegoCaCert);
-		
-		String diegoHostKey = "-----BEGIN RSA PRIVATE KEY-----"+"\n";
-		diegoHostKey += "MIIEpAIBAAKCAQEA0k+NS+z0n7w1caSMswmHpbl1ECGLkV+zZZrNXPpProi5FEDt"+"\n";
-		diegoHostKey += "oQuGPLVGwM9S78pFrzHECCyF0HfRSt/gMptzeeQY82Cz0Z+SUF64IfiFggYjWw6e"+"\n";
-		diegoHostKey += "oGxsrU6LLXuO2gcbEn37T8RQTW7A1QWDG6im1B//uPf/X3BoOSvDYKwpwsvI0NDM"+"\n";
-		diegoHostKey += "...testing";
-		dto.setDiegoHostKey(diegoHostKey);
-		
-		String diegoClientCert ="-----BEGIN CERTIFICATE-----"+"\n";
-		diegoClientCert += "MIIEIjCCAgqgAwIBAgIQSggNzWsVu2zV+hl9UcI4jTANBgkqhkiG9w0BAQsFADAS"+"\n";
-		diegoClientCert += 	"MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgzMFoXDTE4MDcxMzAzNTgz"+"\n";
-		diegoClientCert += "MFowFTETMBEGA1UEAxMKYmJzIGNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEP"+"\n";
-		diegoClientCert += "...testing";
-		dto.setDiegoClientCert(diegoClientCert);
-		
-		String diegoClientKey ="-----BEGIN RSA PRIVATE KEY-----"+"\n";
-		diegoClientKey += "MIIEogIBAAKCAQEAwqvB4Ec1otV0W+vYsiQxR/bd0+HOiKB8MDYOJErbBit2xh3y"+"\n";
-		diegoClientKey += "4imQ8KgZcIbsVzR+esWih6CfkWFd3Xf5/RsR0H7kHnaqLWhkafdPeR5GIXWzet/w"+"\n";
-		diegoClientKey += "+v04+HXQ2vXxRyRsjb7xzwgilDchtt40Mer/6g5Dw2nkoKx+ZNUPdt/J1tyhBLjX"+"\n";
-		diegoClientKey += "...testing";
-		dto.setDiegoClientKey(diegoClientKey);
-		
-		String diegoServerCert = "-----BEGIN CERTIFICATE-----"+"\n";
-		diegoServerCert += "MIIEcTCCAlmgAwIBAgIRAJjV9zqnfRSpbi4gCs0ya+EwDQYJKoZIhvcNAQELBQAw"+"\n";
-		diegoServerCert += "EjEQMA4GA1UEAxMHZGllZ29DQTAeFw0xNjA3MTMwMzU4MjlaFw0xODA3MTMwMzU4"+"\n";
-		diegoServerCert += "MjlaMCIxIDAeBgNVBAMTF2Jicy5zZXJ2aWNlLmNmLmludGVybmFsMIIBIjANBgkq"+"\n";
-		diegoServerCert += "...testing";
-		dto.setDiegoServerCert(diegoServerCert);
-		
-		String diegoServerKey = "-----BEGIN RSA PRIVATE KEY-----"+"\n";
-		diegoServerKey += "MIIEpAIBAAKCAQEAwPN+KUBYftQZ6f4ycY/R4dAr/n7shFBdTzEJNrO4F+VVHKwO"+"\n";
-		diegoServerKey += "nqoZuFcJxL5DnCNLaan4tCXTKt4UxabXSoFUIJm4HhcygT/3+CoAG53+7lrwNCGu"+"\n";
-		diegoServerKey += "JWH0cVYKw1tbpO3j6xjLjiYinliFiQMpM89lDtElZ8dsdf8KbSYHAJlBDDq7my6Y"+"\n";
-		diegoServerKey += "...testing";
-		dto.setDiegoServerKey(diegoServerKey);
-		
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(dto);
-	    return requestJson;
-	}
-	
-	
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Diego Etcd 정보 설정
-	 * @title               : setDiegoEtcdInfo
-	 * @return            : String
-	***************************************************/
-	public String setDiegoEtcdInfo() throws Exception{
-		DiegoParamDTO.Etcd dto = new DiegoParamDTO.Etcd();
-		//2.2 ETCD 정보
-		dto.setId("1");
-		dto.setIaas("OPENSTACK");
-		
-		String etcdClientCert = "-----BEGIN CERTIFICATE-----"+"\n";
-		etcdClientCert += "MIIEKTCCAhGgAwIBAgIQP2jEsUKg8Qoi8gMWji9T3jANBgkqhkiG9w0BAQsFADAS"+"\n";
-		etcdClientCert += "MRAwDgYDVQQDEwdkaWVnb0NBMB4XDTE2MDcxMzAzNTgyOFoXDTE4MDcxMzAzNTgy"+"\n";
-		etcdClientCert += "OFowHDEaMBgGA1UEAxMRZGllZ28gZXRjZCBjbGllbnQwggEiMA0GCSqGSIb3DQEB"+"\n";
-		etcdClientCert += "...testing";
-		dto.setEtcdClientCert(etcdClientCert);
-
-		String etcdClientKey = "-----BEGIN RSA PRIVATE KEY-----"+"\n";
-		etcdClientKey += "MIIEpQIBAAKCAQEAp4VuVixP56r+4FMQ+wbceKBHHbAYF9yVr8C6zjXVfO3L/UQi"+"\n";
-		etcdClientKey += "KsnB7Bp4FC1UGcph5TPWE8G4rgeGNxykBIlkj0yIA8f5swTaa9zAt3C5fDyZKCEx"+"\n";
-		etcdClientKey += "/SLEQqgeekjAt9vvswOdVGQ8nPsGaiLJ66kiEzvdoQ3rKCGQeEjvIaGFBRSovsYP"+"\n";
-		etcdClientKey += "...testing";
-		dto.setEtcdClientKey(etcdClientKey);
-		
-		String etcdServerCert =  "-----BEGIN CERTIFICATE-----"+"\n";
-		etcdServerCert += "MIIEdDCCAlygAwIBAgIRAOK5xOGEOpaTykT5575SeKEwDQYJKoZIhvcNAQELBQAw"+"\n";
-		etcdServerCert += "EjEQMA4GA1UEAxMHZGllZ29DQTAeFw0xNjA3MTMwMzU4MjhaFw0xODA3MTMwMzU4"+"\n";
-		etcdServerCert += "MjhaMCMxITAfBgNVBAMTGGV0Y2Quc2VydmljZS5jZi5pbnRlcm5hbDCCASIwDQYJ"+"\n";
-		etcdServerCert += "...testing";
-		dto.setEtcdServerCert(etcdServerCert);
-		
-		String etcdServerKey = "-----BEGIN RSA PRIVATE KEY-----"+"\n";
-		etcdServerKey += "MIIEowIBAAKCAQEA6OfNM/avsWoO5oCZ/5jsa8SQQ+vFBajGf2Iyfvab75KgYcK0"+"\n";
-		etcdServerKey += "ou45C1PmHQpP8t1Nfzs65zfawUYnvbN1j8L4f3vZZpJyP88YODXlbq0+vdYGy7KF"+"\n";
-		etcdServerKey += "I5wXnw1bTSUVBXObFutYHMOHnP3gMQjjiZnebihaJyzgJ/MW3coWUzUqXRA7evqD"+"\n";
-		etcdServerKey += "...testing";
-		dto.setEtcdServerKey(etcdServerKey);
-		
-		String etcdPeerCaCert ="-----BEGIN CERTIFICATE-----"+"\n";
-		etcdPeerCaCert += "MIIFCzCCAvOgAwIBAgIBATANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwpldGNk"+"\n";
-		etcdPeerCaCert += "UGVlckNBMB4XDTE2MDcxMzAzNTgyN1oXDTI2MDcxMzAzNTgyOFowFTETMBEGA1UE"+"\n";
-		etcdPeerCaCert += "AxMKZXRjZFBlZXJDQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAKNW"+"\n";
-		etcdPeerCaCert += "...testing";
-		dto.setEtcdPeerCaCert(etcdPeerCaCert);
-
-
-		String etcdPeerCert ="-----BEGIN RSA PRIVATE KEY-----"+"\n";
-		etcdPeerCert += "MIIEowIBAAKCAQEAqAEf782+SZrIaR74gZAiXnhHvM9Pzg2YK2WvqwHj0bdH4IIR"+"\n";
-		etcdPeerCert += "NCXj20hjxNPK0Lyci6a0eClll3IFzeUaMfqI9285CY1p/7HbbiRVnNnTG3/In4Pt"+"\n";
-		etcdPeerCert += "xzCOCGTRLpI6Z1bbPhRdHA92b9aLA2g2IRgZNWzdErY0sAdG5ry41YoaujuKuvUP"+"\n";
-		etcdPeerCert +=  "...testing";
-		dto.setEtcdPeerCert(etcdPeerCert);
-		
-		String etcdPeerKey = "-----BEGIN CERTIFICATE-----"+"\n";
-		etcdPeerKey += "MIIEdjCCAl6gAwIBAgIQM97ap+d6hRI8DqCtMhDHKDANBgkqhkiG9w0BAQsFADAV"+"\n";
-		etcdPeerKey += "MRMwEQYDVQQDEwpldGNkUGVlckNBMB4XDTE2MDcxMzAzNTgyOVoXDTE4MDcxMzAz"+"\n";
-		etcdPeerKey += "NTgyOVowIzEhMB8GA1UEAxMYZXRjZC5zZXJ2aWNlLmNmLmludGVybmFsMIIBIjAN"+"\n";
-		etcdPeerKey += "...testing";
-		dto.setEtcdPeerKey(etcdPeerKey);
-
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(dto);
-	    return requestJson;
-	}
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화

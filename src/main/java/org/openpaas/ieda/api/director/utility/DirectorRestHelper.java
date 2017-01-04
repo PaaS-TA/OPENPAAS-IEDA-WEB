@@ -417,9 +417,7 @@ public class DirectorRestHelper {
 						.getTaskStatusURI(defaultDirector.getDirectorUrl(), defaultDirector.getDirectorPort(), taskId));
 				getTaskStaus = (GetMethod) DirectorRestHelper.setAuthorization(defaultDirector.getUserId(),
 						defaultDirector.getUserPassword(), (HttpMethodBase) getTaskStaus);
-				
 				int statusCode = client.executeMethod(getTaskStaus);
-				
 				if (HttpStatus.valueOf(statusCode) != HttpStatus.OK) {
 					sendTaskOutput(userId, messageTemplate, messageEndpoint, ERROR,
 							Arrays.asList("Task " + taskId + " : 상태 조회 중 오류가 발생하였습니다."));
@@ -516,7 +514,7 @@ public class DirectorRestHelper {
 							}
 							lastStage = output.getStage();
 						}
-						Thread.sleep(THREAD_SLEEP_TIME);
+						Thread.sleep(3000);
 						sendTaskOutput(userId, messageTemplate, messageEndpoint, STARTED, responseMessage);
 					}
 				}
@@ -657,7 +655,7 @@ public class DirectorRestHelper {
 			String messageEndpoint, String tag, HttpClient client, String taskId, String logType, String userId) {
 		
 		String status = "";
-
+		
 		try {
 			sendTaskOutputWithTag(userId, messageTemplate, messageEndpoint, STARTED, tag, Arrays.asList("Director task " + taskId));
 
