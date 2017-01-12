@@ -19,6 +19,7 @@ import org.openpaas.ieda.web.deploy.cfDiego.dao.CfDiegoVO;
 import org.openpaas.ieda.web.deploy.cfDiego.dto.CfDiegoParamDTO;
 import org.openpaas.ieda.web.deploy.common.dto.network.NetworkDTO;
 import org.openpaas.ieda.web.deploy.common.dto.resource.ResourceDTO;
+import org.openpaas.ieda.web.deploy.diego.dao.DiegoDAO;
 import org.openpaas.ieda.web.deploy.diego.dao.DiegoVO;
 import org.openpaas.ieda.web.deploy.diego.dto.DiegoParamDTO;
 import org.openpaas.ieda.web.deploy.diego.service.DiegoSaveService;
@@ -36,6 +37,7 @@ public class CfDiegoSaveService {
 	@Autowired CfSaveService cfSaveService;
 	@Autowired DiegoSaveService diegoSaveService;
 	@Autowired CfDAO cfDao;
+	@Autowired DiegoDAO diegoDao;
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
@@ -60,19 +62,18 @@ public class CfDiegoSaveService {
 				vo = cfDiegoDao.selectCfDiegoInfoByPlaform( dto.getPlatform(), cfVo.getId());
 			}else{ //diego update/insert
 				diegoDto = mapper.readValue(cfJson, DiegoParamDTO.Default.class);
-				String keyFileName = cfDao.selectCfInfoById(diegoDto.getCfId()).getKeyFile();
-				diegoDto.setKeyFile(keyFileName);
 				diegoVo = diegoSaveService.saveDefaultInfo(diegoDto, test);
 				vo = cfDiegoDao.selectCfDiegoInfoByPlaform( "cf", diegoVo.getCfId());
 				if ( vo != null ){
 					dto.setId( String.valueOf( diegoVo.getId()) );	
 				}
 			}
+			
+			//cfDiego
 			if( (dto.getId() == null || StringUtils.isEmpty(dto.getId()))
 					|| ( "cf".equals(dto.getPlatform()) && "Y".equals(test)) ){ 
-				//1.1 insert cf & diego
 				if( cfVo != null || diegoVo != null ){
-					//1.1.2 insert cfDiego
+					//insert cfDiego
 					vo = new CfDiegoVO();
 					if( "Y".equals(test) ) vo.setId( Integer.parseInt(dto.getId()) );
 					vo.setCreateUserId(sessionInfo.getUserId());
@@ -83,7 +84,7 @@ public class CfDiegoSaveService {
 					cfDiegoDao.insertCfDiegoInfo(vo);
 				}
 			} else{
-				//1.2 id != null => cfDiego update
+				//id != null => cfDiego update
 				if( "diego".equals(dto.getPlatform()) ){
 					if ( "Y".equals(test) ||  vo.getDiegoVo().getId() == null ) {
 						vo.getDiegoVo().setId( Integer.parseInt(dto.getId()) );
@@ -147,6 +148,9 @@ public class CfDiegoSaveService {
 		if( "cf".equals(dto.getPlatform()) ){
 			map = cfSaveService.saveResourceInfo(dto, test);
 		} else {
+			CfDiegoVO cfDiegoVo = cfDiegoDao.selectCfDiegoInfoByPlaform( "cf", Integer.parseInt(dto.getCfId()) );
+			String keyFile = cfDiegoVo.getCfVo().getKeyFile();
+			dto.setKeyFile(keyFile);
 			map = diegoSaveService.saveResourceInfo(dto, test);
 		}
 		CfDiegoVO result = cfDiegoDao.selectCfDiegoInfoByPlaform( dto.getPlatform(), Integer.parseInt(map.get("id").toString()) );

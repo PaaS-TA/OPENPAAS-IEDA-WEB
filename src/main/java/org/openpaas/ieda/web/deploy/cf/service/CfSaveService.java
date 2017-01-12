@@ -73,7 +73,6 @@ public class CfSaveService {
 		vo.setDomain(dto.getDomain());
 		vo.setDescription(dto.getDescription());
 		vo.setDomainOrganization(dto.getDomainOrganization());
-		vo.setProxyStaticIps(dto.getProxyStaticIps());
 		vo.setLoginSecret(dto.getLoginSecret());
 		vo.setUpdateUserId(sessionInfo.getUserId());
 		
@@ -138,6 +137,7 @@ public class CfSaveService {
 				vo.setSubnetStaticTo(network.getSubnetStaticTo());
 				vo.setSubnetId(network.getSubnetId());
 				vo.setCloudSecurityGroups(network.getCloudSecurityGroups());
+				vo.setAvailabilityZone(network.getAvailabilityZone());
 				vo.setCreateUserId(sessionInfo.getUserId());
 				vo.setUpdateUserId(sessionInfo.getUserId());
 				

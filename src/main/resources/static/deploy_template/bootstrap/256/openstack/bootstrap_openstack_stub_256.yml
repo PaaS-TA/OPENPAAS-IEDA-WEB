@@ -49,8 +49,8 @@ jobs:
       postgres: &db
         listen_address: 127.0.0.1
         host: 127.0.0.1
-        user: postgres
-        password: postgres-password
+        user: (( merge || "postgres" ))
+        password: (( merge || "postgres-password" ))
         database: bosh
         adapter: postgres
 
@@ -58,9 +58,12 @@ jobs:
         address: (( meta.private-static-ips.[0] ))
         host: (( meta.private-static-ips.[0] ))
         db: *db
-        http: {user: admin, password: admin, port: 25777}
-        username: admin
-        password: admin
+        http: 
+          user: (( merge || "admin" ))
+          password: (( merge || "admin" ))
+          port: 25777
+        username: (( merge || "admin" ))
+        password: (( merge || "admin" ))
         port: 25777
 
       director:

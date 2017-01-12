@@ -38,7 +38,9 @@ public class DiegoParamDTO {
 		private String cflinuxfs2rootfsreleaseVersion; //cflinuxfs2rootf 릴리즈 버전
 		
 		@NotNull
-		private String keyFile;
+		private String paastaMonitoringUse;//PaaS-TA 모니터링 사용 유무
+		private String cadvisorDriverIp;//PaaS-TA 모니터링 DB 서버 IP
+		private String cadvisorDriverPort;//PaaS-TA 모니터링 DB 서버 PORT
 		
 		public String getId() {
 			return id;
@@ -130,12 +132,25 @@ public class DiegoParamDTO {
 		public void setCflinuxfs2rootfsreleaseVersion(String cflinuxfs2rootfsreleaseVersion) {
 			this.cflinuxfs2rootfsreleaseVersion = cflinuxfs2rootfsreleaseVersion;
 		}
-		public String getKeyFile() {
-			return keyFile;
+		public String getCadvisorDriverIp() {
+			return cadvisorDriverIp;
 		}
-		public void setKeyFile(String keyFile) {
-			this.keyFile = keyFile;
+		public void setCadvisorDriverIp(String cadvisorDriverIp) {
+			this.cadvisorDriverIp = cadvisorDriverIp;
 		}
+		public String getCadvisorDriverPort() {
+			return cadvisorDriverPort;
+		}
+		public void setCadvisorDriverPort(String cadvisorDriverPort) {
+			this.cadvisorDriverPort = cadvisorDriverPort;
+		}
+		public String getPaastaMonitoringUse() {
+			return paastaMonitoringUse;
+		}
+		public void setPaastaMonitoringUse(String paastaMonitoringUse) {
+			this.paastaMonitoringUse = paastaMonitoringUse;
+		}
+		
 		
 	}
 	

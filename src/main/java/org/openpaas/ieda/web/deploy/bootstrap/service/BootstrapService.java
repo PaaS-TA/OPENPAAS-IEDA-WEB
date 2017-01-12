@@ -192,6 +192,12 @@ public class BootstrapService {
 		}else{
 			manifestTemplate.setCommonJobTemplate("");
 		}
+		//iaasProperty
+		if(result.getIaasPropertyTemplate() != null && !(StringUtils.isEmpty( result.getIaasPropertyTemplate()) )){
+			manifestTemplate.setIaasPropertyTemplate(  MANIFEST_TEMPLATE_PATH +  result.getTemplateVersion()  + SEPARATOR + vo.getIaasType().toLowerCase() + SEPARATOR  +  result.getIaasPropertyTemplate() );
+		}else{
+			manifestTemplate.setIaasPropertyTemplate("");
+		}
 		//meta
 		if(result.getMetaTemplate() != null && !(StringUtils.isEmpty( result.getMetaTemplate()) )){
 			manifestTemplate.setMetaTemplate(MANIFEST_TEMPLATE_PATH +  result.getTemplateVersion()  + SEPARATOR + vo.getIaasType().toLowerCase() + SEPARATOR  +  result.getMetaTemplate());

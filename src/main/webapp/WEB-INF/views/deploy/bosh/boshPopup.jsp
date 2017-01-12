@@ -31,7 +31,7 @@ var boshId = "";
 var networkId = "";
 var deployInfo="";
 var deployFileName = "";
-
+var resourceInfo = "";
 
 /********************************************************
  * 설명 :  Bosh 조회 시 데이터 조회
@@ -430,9 +430,9 @@ function getBoshReleaseVersionList(){
 		contentType :"application/json",
 		success :function(data, status) {
 			if (data != null && data != "") {
-				contents = "<table id='popoverTable'><tr><th>IaaS 유형</th><th>릴리즈 최소 버전</th></tr>";
+				contents = "<table id='popoverTable'><tr><th>릴리즈 유형</th><th>릴리즈 버전</th></tr>";
 				data.map(function(obj) {
-					contents += "<tr><td>" + obj.iaasType+ "</td><td>" +  obj.minReleaseVersion +"</td></tr>";
+					contents += "<tr><td>" + obj.releaseType+ "</td><td>" +  obj.minReleaseVersion +"</td></tr>";
 				});
 				contents += "</table>";
 				$('.boshRelase-info').attr('data-content', contents);
@@ -1000,8 +1000,10 @@ var installClient = "";
 					    		
 					    		installStatus = response.state.toLowerCase();
 					    		$('.w2ui-msg-buttons #deployPopupBtn').prop("disabled", false);
-					    		
-					    		installClient.disconnect();
+					    		if(installClient!=""){
+					    			installClient.disconnect();
+						    		installClient = "";
+					    		}
 								w2alert(message, "BOSH 설치");
 					       	}
 			        	}
@@ -1015,6 +1017,7 @@ var installClient = "";
 				w2ui['config_boshGrid'].reset();
 				if( installClient != ""){
 					installClient.disconnect();
+					installClient = "";
 				}
 				popupClose();
 			}
@@ -1026,6 +1029,7 @@ var installClient = "";
   * 설명		: BOSH 삭제
   * Function	:  deletePopup
   *********************************************************/
+var deleteClient = "";
 function deletePopup(record, force){
 	
 	var requestParameter = {
@@ -1063,7 +1067,7 @@ function deletePopup(record, force){
 			onOpen : function(event){
 				event.onComplete = function(){
 					var socket = new SockJS('/deploy/bosh/delete/instance');
-					var deleteClient = Stomp.over(socket); 
+					deleteClient = Stomp.over(socket); 
 					deleteClient.connect({}, function(frame) {
 						deleteClient.subscribe('/user/deploy/bosh/delete/logs', function(data){
 				        	var deleteLogs = $(".w2ui-msg-body #deleteLogs");
@@ -1082,6 +1086,7 @@ function deletePopup(record, force){
 						    		installStatus = response.state.toLowerCase();
 						    		if( deleteClient != ""){
 						    			deleteClient.disconnect();
+						    			deleteClient = "";
 						    		}
 									w2alert(message, "BOSH 삭제");
 						       	}
@@ -1097,6 +1102,7 @@ function deletePopup(record, force){
 					w2ui['config_boshGrid'].reset();
 					if( deleteClient != ""){
 						deleteClient.disconnect();
+						deleteClient = "";
 					}
 					popupClose();
 				}
@@ -1479,7 +1485,7 @@ function initSetting(){
 						</div>
 				        <div class="w2ui-field">
 				            <label style="text-align: left;width:40%;font-size:11px;">BOSH 릴리즈</label>
-				            <img alt="boshRelase-help-info" class="boshRelase-info" style="width:18px; position:absolute; left:19%; margin-top:5px" data-trigger="hover" data-toggle="popover" title="Bosh 릴리즈 버전 정보"  data-html="true" src="../images/help-Info-icon.png">	
+				            <img alt="boshRelase-help-info" class="boshRelase-info" style="width:18px; position:absolute; left:19%; margin-top:5px" data-trigger="hover" data-toggle="popover" title="설치 지원 버전 목록"  data-html="true" src="../images/help-Info-icon.png">	
 				            <div>
 				                <input name="releaseVersion" type="list"  style="float:left;width:60%;" required placeholder="BOSH 릴리즈를 선택하세요." />
 				            </div>
@@ -1511,7 +1517,7 @@ function initSetting(){
 	</div>
 </div>	
 
-<!-- 네트워크 정보 -->
+<!-- aws/openstack 네트워크 정보 -->
 <div id="networkInfoDiv" style="width:100%;height:100%;" hidden="true">
 	<div rel="title"><b>BOSH 설치</b></div>
 	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
@@ -1530,7 +1536,7 @@ function initSetting(){
 						<div  class="panel-heading" style="padding:5px 5% 10px 5%;"><b>External</b></div>
 						<div class="panel-body">
 							<div class="w2ui-field">
-								<label id="ExternalLabel" style="text-align: left;width:40%;font-size:11px;">Floating IP</label> 
+								<label id="ExternalLabel" style="text-align: left;width:40%;font-size:11px;">설치관리자 IPs</label> 
 								<div>
 									<input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.20"/>
 									<div class="isMessage"></div>
@@ -1544,14 +1550,14 @@ function initSetting(){
 						</div>
 						<div class="panel-body">
 					    	<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">네트워크 ID</label>
+								<label style="text-align: left;width:40%;font-size:11px;">서브넷 아이디</label>
 								<div>
-									<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 ID를 입력하세요."/>
+									<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="서브넷 아이디를 입력하세요."/>
 									<div class="isMessage"></div>
 								</div>
 							</div>
 							<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">네트워크 범위</label>
+								<label style="text-align: left;width:40%;font-size:11px;">서브넷 범위</label>
 								<div>
 									<input name="subnetRange" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.0/24"/>
 									<div class="isMessage"></div>
@@ -1619,21 +1625,21 @@ function initSetting(){
 						<div  class="panel-heading" style="padding:5px 5% 10px 5%;"><b>External</b></div>
 						<div class="panel-body">
 							<div class="w2ui-field">
-								<label id="ExternalLabel" style="text-align: left;width:40%;font-size:11px;">디렉터 공인 IPs</label> 
+								<label id="ExternalLabel" style="text-align: left;width:40%;font-size:11px;">설치관리자 IPs</label> 
 								<div>
 									<input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.20"/>
 									<div class="isMessage"></div>
 								</div>
 							</div>
 							<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">네트워크 ID</label>
+								<label style="text-align: left;width:40%;font-size:11px;">포트 그룹명</label>
 								<div>
-									<input name="publicSubnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 ID를 입력하세요."/>
+									<input name="publicSubnetId" type="text"  style="float:left;width:60%;" required placeholder="포트 그룹명을 입력하세요."/>
 									<div class="isMessage"></div>
 								</div>
 							</div>
 							<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">네트워크 범위</label>
+								<label style="text-align: left;width:40%;font-size:11px;">서브넷 범위</label>
 								<div>
 									<input name="publicSubnetRange" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.0/24"/>
 									<div class="isMessage"></div>
@@ -1662,14 +1668,14 @@ function initSetting(){
 						</div>
 						<div class="panel-body">
 					    	<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">네트워크 ID</label>
+								<label style="text-align: left;width:40%;font-size:11px;">포트 그룹명</label>
 								<div>
-									<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 명을 입력하세요."/>
+									<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="포트 그룹명을 입력하세요."/>
 									<div class="isMessage"></div>
 								</div>
 							</div>
 							<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">네트워크 범위</label>
+								<label style="text-align: left;width:40%;font-size:11px;">서브넷 범위</label>
 								<div>
 									<input name="subnetRange" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.0/24"/>
 									<div class="isMessage"></div>

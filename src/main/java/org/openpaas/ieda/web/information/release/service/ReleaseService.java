@@ -116,6 +116,7 @@ public class ReleaseService {
 			client.executeMethod(get);
 			
 			if ( !StringUtils.isEmpty(get.getResponseBodyAsString()) ) {
+				releaseInfoList = new ArrayList<ReleaseInfoDTO>();
 				
 				ObjectMapper mapper = new ObjectMapper();
 				ReleaseDTO[] releases = mapper.readValue(get.getResponseBodyAsString(), ReleaseDTO[].class);
@@ -123,9 +124,11 @@ public class ReleaseService {
 				int idx = 0;
 				List<ReleaseDTO> releaseList = Arrays.asList(releases);
 				for ( ReleaseDTO release : releaseList ) {
-					if(type.equals(release.getName()) || 
-							( type.equals("cf") && release.getName().indexOf("paas-controller") > -1 
-									|| release.getName().indexOf("paas-container")> -1 )){
+					if( type.equals(release.getName()) ||
+							(type.equals("cf") && release.getName().indexOf("-controller") > -1)  
+							|| (type.equals("diego") && release.getName().indexOf("-container") > -1) 
+							|| (type.equals("garden") && release.getName().indexOf("garden") > -1) ){
+						
 						List<ReleaseVersionDTO> versionList = release.getReleaseVersions();
 						for (ReleaseVersionDTO releaseVersion : versionList) {
 							ReleaseInfoDTO releaseInfo = new ReleaseInfoDTO();
@@ -134,19 +137,16 @@ public class ReleaseService {
 							releaseInfo.setName(release.getName());
 							releaseInfo.setVersion(releaseVersion.getVersion());
 							
-							if ( releaseInfoList == null ) 
-								releaseInfoList = new ArrayList<ReleaseInfoDTO>();
 							releaseInfoList.add(releaseInfo);
+								
 						}
 					}
 				}
-				if ( releaseInfoList != null ) {
-					// 릴리즈 버전 역순으로 정렬
-					Comparator<ReleaseInfoDTO> byReleaseVersion = Collections.reverseOrder(Comparator.comparing(ReleaseInfoDTO::getVersion));
-					releaseInfoList = releaseInfoList.stream()
-							.sorted(byReleaseVersion)
-							.collect(Collectors.toList());
-				}
+				// 릴리즈 버전 역순으로 정렬
+				Comparator<ReleaseInfoDTO> byReleaseVersion = Collections.reverseOrder(Comparator.comparing(ReleaseInfoDTO::getVersion));
+				releaseInfoList = releaseInfoList.stream()
+						.sorted(byReleaseVersion)
+						.collect(Collectors.toList());
 			}
 			
 		}catch(RuntimeException e){

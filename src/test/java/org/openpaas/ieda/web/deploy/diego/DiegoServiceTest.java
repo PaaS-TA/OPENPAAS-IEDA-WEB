@@ -92,11 +92,15 @@ public class DiegoServiceTest {
 		vo.setGardenReleaseVersion("0.339.0");
 		vo.setEtcdReleaseName("etcd");
 		vo.setEtcdReleaseVersion("63");
+		vo.setPaastaMonitoringUse("true");
+		vo.setCadvisorDriverIp("10.10.10.10");
+		vo.setCadvisorDriverPort("7777");
 		vo.setUpdateUserId("tester");
 		vo.setCfDeployment("openstack-cf-test-1.yml");
 		vo.setCreateUserId("tester");
 		vo.setUpdateUserId("tester");
 		vo.setDeploymentFile("openstack-diego-test-1.yml");
+		vo.setKeyFile("test-diego-key-1.yml");
 		return vo;
 	}
 	

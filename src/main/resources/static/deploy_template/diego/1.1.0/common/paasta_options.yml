@@ -1,0 +1,13 @@
+meta: (( merge ))
+
+paasta_overrides:
+  templates:
+  - name: cadvisor
+    release: (( meta.diego-release-name || "paasta-container" ))
+
+  cadvisor_properties:
+    storage_driver: "influxdb"
+    storage_driver_db: (( meta.cadvisor-db || "container_metric_db" ))
+    storage_driver_ip: (( meta.cadvisor-driver-ip ))
+    storage_driver_port: (( meta.cadvisor-driver-port || "8069" ))
+    container_housekeeping_interval: (( meta.cadvisor-interval || "15s" ))

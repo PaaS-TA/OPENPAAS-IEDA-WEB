@@ -330,20 +330,21 @@ public class ReleaseManagementService {
 		Boolean check = false;
 		File file = new File(RELEASEDIRECTORY +  dto.getReleaseFileName());
 		dao.deleteSystemRelase(dto);
+		//delete lock file
+		int index = dto.getReleaseFileName().indexOf(".tgz");
+		String lockFileName = dto.getReleaseFileName().substring(0, index) + "-download.lock";
+		File lcokFile = new File(LocalDirectoryConfiguration.getLockDir() + lockFileName );
+		if(  lcokFile.exists() ) check = lcokFile.delete();
+		//delete release File
 		if(file.exists()){ 
-			int index =dto.getReleaseFileName().indexOf(".tgz");
-			String lockFileName = dto.getReleaseFileName().substring(0, index) + "-download.lock";
-			File lcokFile = new File(LocalDirectoryConfiguration.getLockDir() + lockFileName );
-			if(  lcokFile.exists() ) check = lcokFile.delete();
 			boolean delete = file.delete(); 
 			if(!delete){
-				throw new CommonException("sqlException Error.systemRelease.exception",
-						"시스템 릴리즈 삭제 실패", HttpStatus.INTERNAL_SERVER_ERROR);
+				throw new CommonException("delete.systemRelease.exception", "시스템 릴리즈 삭제에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}else{
-			throw new CommonException("notfound.systemRelease.exception",
-					"해당하는 릴리즈 파일이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
-		}   
+			throw new CommonException("notfound.systemRelease.exception", "해당하는 릴리즈 파일이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+		} 
+		
 		return check;
 	}
 	

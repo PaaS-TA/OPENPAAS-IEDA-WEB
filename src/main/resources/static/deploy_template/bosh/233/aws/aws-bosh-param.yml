@@ -6,7 +6,7 @@ networks:
   default:
     subnets:
     - static: [[subnetStatic]]
-#      reserved: [subnetReserved]
+      reserved: [subnetReserved]
       range: [subnetRange]
       gateway: [subnetGateway]
       dns: [[subnetDns]]
@@ -19,7 +19,7 @@ resource_pools:
       name: [stemcellName]
       version: [stemcellVersion]
     cloud_properties:
-      instance_type: [cloudInstanceType]
+      instance_type: [smallInstanceType]
   medium:
     stemcell:
       name: [stemcellName]
@@ -28,15 +28,13 @@ resource_pools:
       bosh:
         password: [boshPassword]
     cloud_properties:
-      instance_type: [cloudInstanceType]
+      instance_type: [directorInstanceType]
 jobs:
   director:
     networks:
       elastic:
         static_ips: [[publicStaticIp]]
 properties:
-#  dns:
-#    recursor: 52.23.2.85
   aws:
     access_key_id: [accessKeyId]
     secret_access_key: [secretAccessKey]

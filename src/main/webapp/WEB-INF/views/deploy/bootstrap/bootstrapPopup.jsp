@@ -548,9 +548,9 @@ function getReleaseVersionList(){
 		contentType :"application/json",
 		success :function(data, status) {
 			if (data != null && data != "") {
-				contents = "<table id='popoverTable'><tr><th>IaaS 유형</th><th>릴리즈 최소 버전</th></tr>";
+				contents = "<table id='popoverTable'><tr><th>릴리즈 유형</th><th>릴리즈 버전</th></tr>";
 				data.map(function(obj) {
-					contents += "<tr><td>" + obj.iaasType+ "</td><td>" +  obj.minReleaseVersion +"</td></tr>";
+					contents += "<tr><td>" + obj.releaseType+ "</td><td>" +  obj.minReleaseVersion +"</td></tr>";
 				});
 				contents += "</table>";
 				$('.boshRelase-info').attr('data-content', contents);
@@ -1582,7 +1582,7 @@ function popupClose() {
 						</div>
 						<div class="w2ui-field">
 							<label style="text-align: left;width:40%;font-size:11px;">BOSH 릴리즈</label>
-							<img alt="boshRelase-help-info" class="boshRelase-info" style="width:18px; position:absolute; left:19%; margin-top:5px" data-trigger="hover" data-toggle="popover" title="Bosh 릴리즈 버전 정보"  data-html="true" src="../images/help-Info-icon.png">	
+							<img alt="boshRelase-help-info" class="boshRelase-info" style="width:18px; position:absolute; left:19%; margin-top:5px" data-trigger="hover" data-toggle="popover" title="설치 지원 버전 목록"  data-html="true" src="../images/help-Info-icon.png">	
 							<div id="boshReleaseDiv"></div>
 						</div>
 						<div class="w2ui-field">
@@ -1615,6 +1615,7 @@ function popupClose() {
 		</div>
 	</div>	
 	
+	<!-- Aws/Openstack 네트워크 div -->
 	<div id="NetworkInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
@@ -1636,7 +1637,7 @@ function popupClose() {
 							<div  class="panel-heading" style="padding:5px 5% 10px 5%;"><b>External</b></div>
 							<div class="panel-body">
 								<div class="w2ui-field">
-									<label style="text-align: left;width:40%;font-size:11px;">디렉터 공인 IP</label> 
+									<label style="text-align: left;width:40%;font-size:11px;">설치관리자 IPs</label> 
 									<div>
 										<input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.20"/>
 										<div class="isMessage"></div>
@@ -1648,16 +1649,16 @@ function popupClose() {
 							<div  class="panel-heading" style="padding:5px 5% 10px 5%;"><b>Internal</b></div>
 							<div class="panel-body">
 								<div class="w2ui-field" >
-									<label style="text-align: left;width:40%;font-size:11px;">디렉터 내부 IP</label> 
+									<label style="text-align: left;width:40%;font-size:11px;">설치관리자 내부망 IPs</label> 
 									<div>
 										<input name="privateStaticIp" type="text"  style="float:left;width:60%;" required placeholder="예) 10.0.0.20"/>
 										<div class="isMessage"></div>
 									</div>
 								</div>
 						    	<div class="w2ui-field">
-									<label style="text-align: left;width:40%;font-size:11px;">네트워크 ID</label>
+									<label style="text-align: left;width:40%;font-size:11px;">서브넷 아이디</label>
 									<div>
-										<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 ID를 입력하세요."/>
+										<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="서브넷 아이디를 입력하세요."/>
 										<div class="isMessage"></div>
 									</div>
 								</div>
@@ -1695,6 +1696,7 @@ function popupClose() {
 		</div>
 	</div>
 	
+	<!-- vSphere 네트워크 div -->
 	<div id="VsphereNetworkInfoDiv" style="width:100%;height:100%;" hidden="true">
 		<div rel="title"><b>BOOTSTRAP 설치</b></div>
 		<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
@@ -1712,12 +1714,53 @@ function popupClose() {
 				<div class="panel panel-info">	
 					<div class="panel-heading"><b>네트워크 정보</b></div>
 					<div class="panel-body">
+						<!-- External -->
+						<div class="panel panel-info">	
+							<div  class="panel-heading" style="padding:5px 5% 10px 5%;"><b>External</b></div>
+							<div class="panel-body">
+								<div class="w2ui-field">
+									<label style="text-align: left;width:40%;font-size:11px;">설치관리자 IPs</label> 
+									<div>
+										<input name="publicStaticIp" type="text"  style="float:left;width:60%;" required placeholder="예) 10.0.0.20"/>
+										<div class="isMessage"></div>
+									</div>
+								</div>
+								<div class="w2ui-field">
+									<label style="text-align: left;width:40%;font-size:11px;">포트 그룹명</label>
+									<div>
+										<input name="publicSubnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 명을 입력하세요."/>
+										<div class="isMessage"></div>
+									</div>
+								</div>
+								<div class="w2ui-field">
+									<label style="text-align: left;width:40%;font-size:11px;">서브넷 범위</label>
+									<div>
+										<input name="publicSubnetRange" type="text"  style="float:left;width:60%;" required placeholder="예) 10.0.0.0/24"/>
+										<div class="isMessage"></div>
+									</div>
+								</div>
+								<div class="w2ui-field">
+									<label style="text-align: left;width:40%;font-size:11px;">게이트웨이</label>
+									<div>
+										<input name="publicSubnetGateway" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.1"/>
+										<div class="isMessage"></div>
+									</div>
+								</div>
+								<div class="w2ui-field">
+									<label style="text-align: left;width:40%;font-size:11px;">DNS</label>
+									<div>
+										<input name="publicSubnetDns" type="text"  style="float:left;width:60%;"  required placeholder="예) 8.8.8.8"/>
+										<div class="isMessage"></div>
+									</div>
+								</div>
+							</div>
+						</div>
 						<!-- Internal -->
 						<div class="panel panel-info">	
 							<div  class="panel-heading" style="padding:5px 5% 10px 5%;"><b>Internal</b></div>
 							<div class="panel-body">
 								<div class="w2ui-field" >
-									<label style="text-align: left;width:40%;font-size:11px;">디렉터 내부 IPs</label> 
+									<label style="text-align: left;width:40%;font-size:11px;">설치관리자 내부망 IPs</label> 
 									<div>
 										<input name="privateStaticIp" type="text"  style="float:left;width:60%;" required placeholder="예) 10.0.0.20"/>
 										<div class="isMessage"></div>
@@ -1748,47 +1791,6 @@ function popupClose() {
 									<label style="text-align: left;width:40%;font-size:11px;">DNS</label>
 									<div>
 										<input name="subnetDns" type="text"  style="float:left;width:60%;" required placeholder="예) 8.8.8.8"/>
-										<div class="isMessage"></div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<!-- External -->
-						<div class="panel panel-info">	
-							<div  class="panel-heading" style="padding:5px 5% 10px 5%;"><b>External</b></div>
-							<div class="panel-body">
-								<div class="w2ui-field">
-									<label style="text-align: left;width:40%;font-size:11px;">설치관리자 IPs</label> 
-									<div>
-										<input name="publicStaticIp" type="text"  style="float:left;width:60%;" required placeholder="예) 10.0.0.20"/>
-										<div class="isMessage"></div>
-									</div>
-								</div>
-								<div class="w2ui-field">
-									<label style="text-align: left;width:40%;font-size:11px;">네트워크 명</label>
-									<div>
-										<input name="publicSubnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 명을 입력하세요."/>
-										<div class="isMessage"></div>
-									</div>
-								</div>
-								<div class="w2ui-field">
-									<label style="text-align: left;width:40%;font-size:11px;">서브넷 범위</label>
-									<div>
-										<input name="publicSubnetRange" type="text"  style="float:left;width:60%;" required placeholder="예) 10.0.0.0/24"/>
-										<div class="isMessage"></div>
-									</div>
-								</div>
-								<div class="w2ui-field">
-									<label style="text-align: left;width:40%;font-size:11px;">게이트웨이</label>
-									<div>
-										<input name="publicSubnetGateway" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.1"/>
-										<div class="isMessage"></div>
-									</div>
-								</div>
-								<div class="w2ui-field">
-									<label style="text-align: left;width:40%;font-size:11px;">DNS</label>
-									<div>
-										<input name="publicSubnetDns" type="text"  style="float:left;width:60%;"  required placeholder="예) 8.8.8.8"/>
 										<div class="isMessage"></div>
 									</div>
 								</div>

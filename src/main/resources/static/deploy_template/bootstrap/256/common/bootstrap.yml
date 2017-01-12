@@ -41,14 +41,14 @@ jobs:
   properties:
     nats:
       address: 127.0.0.1
-      user: nats
-      password: nats-password
+      user: (( merge || "nats" ))
+      password: (( merge || "nats-password" ))
 
     postgres: &db
       listen_address: 127.0.0.1
       host: 127.0.0.1
-      user: postgres
-      password: postgres-password
+      user: (( merge || "postgres" ))
+      password: (( merge || "postgres-password" ))
       database: bosh
       adapter: postgres
 
@@ -56,8 +56,12 @@ jobs:
       address: (( meta.private-static-ips.[0] ))
       port: 25250
       provider: dav
-      director: {user: director, password: director-password}
-      agent: {user: agent, password: agent-password}
+      director: 
+        user: (( merge || "director" ))
+        password: (( merge || "director-password ))
+      agent:
+        user: (( merge || "agent" ))
+        password: (( merge || "agent-password" ))
 
     director:
       <<: (( merge ))
@@ -69,11 +73,15 @@ jobs:
         provider: local
         local:
           users:
-          - {name: admin, password: admin}
-          - {name: hm, password: hm-password}
+          - name: (( merge || "admin" ))
+            password: (( merge || "admin" ))
+          - name: (( merge || "hm" ))
+            password: (( merge || "hm-password" ))
 
     hm:
-      director_account: {user: hm, password: hm-password}
+      director_account: 
+        user: (( merge || "hm" ))
+        password: (( merge || "hm-password" ))
       resurrector_enabled: true
 
     <<: (( merge ))

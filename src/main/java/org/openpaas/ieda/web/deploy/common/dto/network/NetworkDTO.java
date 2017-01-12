@@ -33,7 +33,7 @@ public class NetworkDTO {
 	@NotNull
 	private String subnetId; //네트워크 ID
 	private String cloudSecurityGroups; //시큐리티 그룹
-	
+	private String availabilityZone;
 	
 	public String getDiegoId() {
 		return diegoId;
@@ -144,5 +144,10 @@ public class NetworkDTO {
 	public void setCloudSecurityGroups(String cloudSecurityGroups) {
 		this.cloudSecurityGroups = cloudSecurityGroups;
 	}
-	
+	public String getAvailabilityZone() {
+		return availabilityZone;
+	}
+	public void setAvailabilityZone(String availabilityZone) {
+		this.availabilityZone = availabilityZone;
+	}
 }

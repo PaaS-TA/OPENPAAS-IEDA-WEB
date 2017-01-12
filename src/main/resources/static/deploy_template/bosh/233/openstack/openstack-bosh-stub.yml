@@ -27,6 +27,7 @@ networks:
     type: manual
     subnets:
     - static: (( merge ))
+      reserved: (( merge ))
       range: (( merge ))
       gateway: (( merge ))
       dns: (( merge ))

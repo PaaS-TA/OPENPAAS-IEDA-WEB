@@ -22,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -78,11 +77,13 @@ public class StemcellController extends BaseController {
 	 * @title               : getLocalStemcellList
 	 * @return            : ResponseEntity<HashMap<String,Object>>
 	***************************************************/
-	@RequestMapping(value = "/info/stemcell/list/local/{iaas}", method = RequestMethod.GET)
-	public ResponseEntity<HashMap<String, Object>> getLocalStemcellList(@PathVariable String iaas) {
+	@RequestMapping(value = "/info/stemcell/list/local", method = RequestMethod.GET)
+	public ResponseEntity<HashMap<String, Object>> getLocalStemcellList() {
 		
 		if(LOG.isInfoEnabled()){ LOG.info("=======================> 다운로드 된 스템셀 목록 조회 요청!"); }
+		String iaas = "";
 		List<StemcellManagementVO> contents = stemcellManagementService.listLocalStemcells(iaas);
+		
 		HashMap<String, Object> result = null;
 		if ( contents != null ) {
 			result = new HashMap<String, Object>();

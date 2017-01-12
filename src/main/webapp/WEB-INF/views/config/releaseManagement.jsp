@@ -49,7 +49,7 @@ $(function() {
 				render: function(record) {
 					if ( record.downloadStatus == 'DOWNLOADED'  ){
 						return '<div class="btn btn-success btn-xs" id= "downloaded_'+record.id+'" style="width:100px;">Downloaded</div>';
-					}else if(record.downloadStatus == 'DOWNLOADING'){ //다른 사용자가다운로드 중일 경우
+					}else if(record.downloadStatus == 'DOWNLOADING'){
 						return '<div class="btn btn-info btn-xs" id= "downloading_'+record.id+'" style="width:100px;">Downloading</div>';
 					} else{
 						return '<div class="btn" id="isExisted_'+record.id+'" style="position: relative;width:100px;"></div>';
@@ -116,7 +116,10 @@ $(function() {
 	 * 설명 :  릴리즈 삭제 팝업
 	 *********************************************************/
 	$("#doDelete").click(function(){
-		if($("#deleteBtn").attr('disabled') == "disabled") return;
+		if($("#deleteBtn").attr('disabled') == "disabled"){
+			return;
+		}
+		
 		var selected = w2ui['config_releaseGrid'].getSelection();
 		var record = w2ui['config_releaseGrid'].get(selected);
 		var message = "";
@@ -176,9 +179,11 @@ function getReleaseTyps() {
  * Function	: initView
  *********************************************************/
 function initView() {
-	 downloadStatus = "";
+	downloadStatus = "";
 	doSearch();
+	w2ui['config_releaseGrid'].selectNone();
 	$('#doDelete').attr('disabled', true);
+	
 }
 
 /********************************************************
@@ -237,11 +242,8 @@ function setReleasePath(value){
  * Function	: setReleaseFilePath
  *********************************************************/
 function setReleaseFilePath(fileInput){
-	console.log(fileInput);
 	var file = fileInput.files;
-	console.log(file);
 	var files = $('#releasePathFile')[0].files;
-	console.log(files);
 	$(".w2ui-msg-body input[name='releaseSize']").val(files[0].size);
 	$(".w2ui-msg-body input[name=releasePath]").val(file[0].name);
 	$(".w2ui-msg-body #releasePathFileName").val(file[0].name);
@@ -372,7 +374,13 @@ function socketDwonload(releaseInfo){
 		    }else if( status == "done") {
 		    	downloadStatus = '';
 		    	$("#isExisted_" + id).parent().html(completeButton);
-		    	if(downloadClient != ""){
+		    	var flag = true;
+		    	w2ui['config_releaseGrid'].records.map(function(obj) {
+		    		if( id != obj.id && obj.downloadStatus.toUpperCase() == "DOWNLOADING" ){
+		    			flag= false;
+		    		}
+				});
+		    	if(downloadClient != "" && flag ){
 		    		downloadClient.disconnect();
 		    		downloadClient = "";
 		    	}
@@ -490,11 +498,12 @@ function releaseFileUpload(releaseInfo){
 			data : JSON.stringify(requestParameter),
 			contentType : "application/json",
 			success : function(data, status) {
-				if(  downloadClient != "") {
+				if( downloadClient != "") {
 					downloadClient.disconnect();
 					downloadClient ="";
 				}
 				initView();
+				w2ui['config_releaseGrid'].reset();
 			},
 			error : function(request, status, error) {
 				var errorResult = JSON.parse(request.responseText);

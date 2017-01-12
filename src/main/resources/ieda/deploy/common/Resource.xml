@@ -34,8 +34,8 @@
 			/**ResourceInfo.selectResourceInfo**/
 			Select *
 			From ieda_resource
-		  Where id=#{id}
-			  And deploy_type=#{deployType}
+		   Where id=#{id}
+			 And deploy_type=#{deployType}
 		</select>
 		
 		<insert id="insertResourceInfo">

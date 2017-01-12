@@ -48,14 +48,6 @@ public interface DiegoDAO {
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : Diego Key 정보 상세 조회
-	 * @title               : selectDiegoKeyInfoById
-	 * @return            : DiegoVO
-	***************************************************/
-	DiegoVO selectDiegoKeyInfoById(@Param("id")int id, @Param("deployType")String deployType, @Param("keyType")int keyType);
-
-	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
 	 * @description   : DIEGO 리소스 정보 상세 조회
 	 * @title               : selectResourceInfoById
 	 * @return            : DiegoVO

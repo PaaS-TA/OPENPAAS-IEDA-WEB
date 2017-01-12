@@ -105,7 +105,7 @@ public class StemcellManagementControllerTest extends BaseTestController{
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : 시스템 스템셀 목록 정보 조회
+	 * @description   : 스템셀 목록 정보 조회
 	 * @title               : testGetSystemstemcells
 	 * @return            : void
 	***************************************************/

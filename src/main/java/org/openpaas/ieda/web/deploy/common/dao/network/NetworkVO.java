@@ -22,7 +22,7 @@ public class NetworkVO {
 		private String cloudSecurityGroups;//시큐리티 그룹
 		private Date createDate; // 생성일자
 		private Date updateDate; // 수정일자
-		
+		private String availabilityZone;
 		public Integer getId() {
 			return id;
 		}
@@ -151,5 +151,11 @@ public class NetworkVO {
 			} else {
 				this.createDate = new Date(createDate.getTime());
 			}
+		}
+		public String getAvailabilityZone() {
+			return availabilityZone;
+		}
+		public void setAvailabilityZone(String availabilityZone) {
+			this.availabilityZone = availabilityZone;
 		}
 }

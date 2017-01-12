@@ -204,33 +204,33 @@ jobs:
   - name: api_z1
     templates:
       - name: consul_agent
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: go-buildpack
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: binary-buildpack
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: nodejs-buildpack
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: ruby-buildpack
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: php-buildpack
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: python-buildpack
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: staticfile-buildpack
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: cloud_controller_ng
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: cloud_controller_clock
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: cloud_controller_worker
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: metron_agent
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: statsd-injector
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
       - name: route_registrar
-        release: cf
+        release: (( meta.cf_release.name || "cf" ))
 
   - name: api_worker_z1
     instances: 0

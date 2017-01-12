@@ -372,8 +372,10 @@
 						    		
 						    		installStatus = response.state.toLowerCase();
 						    		$('.w2ui-msg-buttons #deployPopupBtn').prop("disabled", false);
-						    		
-						    		installClient.disconnect();
+						    		if(installClient!=""){
+						    			installClient.disconnect();
+						    			installClient = "";
+						    		}
 									w2alert(message, "서비스팩 설치");
 						       	}
 				        	}
@@ -448,8 +450,10 @@
 							            if ( response.state.toLowerCase() == "done" )	message = message + " 삭제가 완료되었습니다."; 
 							    		if ( response.state.toLowerCase() == "error" ) message = message + " 삭제 중 오류가 발생하였습니다.";
 							    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 삭제 중 취소되었습니다.";
-							    		
-							    		deleteClient.disconnect();
+							    		if(deleteClient != ""){
+							    			deleteClient.disconnect();
+							    			deleteClient = "";
+							    		}
 										w2alert(message, "서비스팩 삭제");
 							       	}
 					        	}
@@ -551,9 +555,7 @@
 		deploymentId = "";
 		deploymentFile = "";
 		iaasType = "";
-		installStatus = "";
 		installClient = "";
-		deleteClient="";
 		deploymentName = "";
 		gridReload();
 	}

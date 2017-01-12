@@ -40,20 +40,12 @@ var cfInfoYn = false;
 var diegoKeyFile = "";
 
 $(function() {
-	//릴리즈 정보 popup over
- 	$('[data-toggle="popover"]').popover();
- 	//Diego Release Info
- 	getReleaseVersionList();
- 	
- 	$(".gardenRelease-info").attr('data-content', "https://github.com/cloudfoundry/diego-cf-compatibility");
- 	$(".cflinux-info").attr('data-content', "https://github.com/cloudfoundry/diego-cf-compatibility");
- 	$(".etcd-info").attr('data-content', "https://github.com/cloudfoundry/diego-cf-compatibility");
- 	
  	//Diego 릴리즈 popover가 나타난 후
  	$('.diego-info').on('show.bs.popover', function () {
  		$(".gardenRelease-info").popover('hide')
  		$(".cflinux-info").popover('hide')
  	 	$(".etcd-info").popover('hide')
+//  	 	$(".paastaMonitoring-info").popover('hide');
  	 })
  	 
  	 //다른 곳 클릭 시 popover hide 이벤트
@@ -74,16 +66,16 @@ $(function() {
  * Function : getReleaseVersionList
  *********************************************************/
 function getReleaseVersionList(){
-	 var contents = "";
+	var contents = "";
 	$.ajax({
 		type :"GET",
 		url :"/common/deploy/list/releaseInfo/diego/"+iaas, 
 		contentType :"application/json",
 		success :function(data, status) {
 			if (data != null && data != "") {
-				contents = "<table id='popoverTable'><tr><th>IaaS 유형</th><th>릴리즈 버전</th></tr>";
+				contents = "<table id='popoverTable'><tr><th>릴리즈 유형</th><th>릴리즈 버전</th></tr>";
 				data.map(function(obj) {
-					contents += "<tr><td>" + obj.iaasType+ "</td><td>" +  obj.minReleaseVersion +"</td></tr>";
+					contents += "<tr><td>" + obj.releaseType+ "</td><td>" +  obj.minReleaseVersion +"</td></tr>";
 				});
 				contents += "</table>";
 				$('.diego-info').attr('data-content', contents);
@@ -119,6 +111,7 @@ function getDiegoData(record) {
 	});
 }
 
+
 /********************************************************
  * 설명 :  Diego Data Setting
  * Function : setCfData
@@ -133,78 +126,85 @@ function setDiegoData(contents) {
 		internalCnt = contents.networks.length-1;
 		if( menu == "cfDiego" ) internalCnt = contents.networks.length;
 	}
-	 //기본 정보 설정
-	 diegoKeyFile = contents.keyFile
-	 defaultInfo = {
-			 iaas										: contents.iaas,
-			 cfId										: cfId,
-			deploymentName 					: contents.deploymentName,
-			directorUuid 							: contents.directorUuid,
-			diegoReleaseName 				: contents.diegoReleaseName,
-			diegoReleaseVersion 				: contents.diegoReleaseVersion,
-			gardenReleaseName 				: contents.gardenReleaseName,
-			gardenReleaseVersion 			: contents.gardenReleaseVersion,
-			etcdReleaseName 					: contents.etcdReleaseName,
-			etcdReleaseVersion 				: contents.etcdReleaseVersion,
-			cfDeploymentName 					: contents.cfName,
-			cflinuxfs2rootfsreleaseName 	: contents.cflinuxfs2rootfsreleaseName,
-			cflinuxfs2rootfsreleaseVersion	: contents.cflinuxfs2rootfsreleaseVersion,
+	 
+	defaultInfo = {
+			iaas                            : contents.iaas,
+			cfId                            : cfId,
+			deploymentName                  : contents.deploymentName,
+			directorUuid                    : contents.directorUuid,
+			diegoReleaseName                : contents.diegoReleaseName,
+			diegoReleaseVersion             : contents.diegoReleaseVersion,
+			gardenReleaseName               : contents.gardenReleaseName,
+			gardenReleaseVersion            : contents.gardenReleaseVersion,
+			etcdReleaseName                 : contents.etcdReleaseName,
+			etcdReleaseVersion              : contents.etcdReleaseVersion,
+			cfDeploymentName                : contents.cfName,
+			cflinuxfs2rootfsreleaseName     : contents.cflinuxfs2rootfsreleaseName,
+			cflinuxfs2rootfsreleaseVersion  : contents.cflinuxfs2rootfsreleaseVersion,
+			paastaMonitoringUse             : contents.paastaMonitoringUse,
+			cadvisorDriverIp                : contents.cadvisorDriverIp,
+			cadvisorDriverPort              : contents.cadvisorDriverPort
 		}
 	
 		//네트워크 정보 설정
 		for(var i=0; i<contents.networks.length; i++){
 		 	var arr = {
-		 		id								: contents.id,
-				deployType				: contents.networks[i].deployType,
+		 		id                          : contents.id,
+				deployType                  : contents.networks[i].deployType,
 				seq							: i,
 				net							: contents.networks[i].net,
 				publicStaticIp				: contents.networks[i].publicStaticIp,
 				subnetRange 				: contents.networks[i].subnetRange,
-				subnetGateway 			: contents.networks[i].subnetGateway,
-				subnetDns 				: contents.networks[i].subnetDns,
-				subnetReservedFrom 	: contents.networks[i].subnetReservedFrom,
-				subnetReservedTo 		: contents.networks[i].subnetReservedTo,
-				subnetStaticFrom 		: contents.networks[i].subnetStaticFrom,
-				subnetStaticTo 			: contents.networks[i].subnetStaticTo,
+				subnetGateway               : contents.networks[i].subnetGateway,
+				subnetDns                   : contents.networks[i].subnetDns,
+				subnetReservedFrom          : contents.networks[i].subnetReservedFrom,
+				subnetReservedTo            : contents.networks[i].subnetReservedTo,
+				subnetStaticFrom            : contents.networks[i].subnetStaticFrom,
+				subnetStaticTo              : contents.networks[i].subnetStaticTo,
 				subnetId 					: contents.networks[i].subnetId,
-				cloudSecurityGroups 	: contents.networks[i].cloudSecurityGroups
+				cloudSecurityGroups         : contents.networks[i].cloudSecurityGroups,
+				availabilityZone        : contents.networks[i].availabilityZone
 			}
 		 	networkInfo.push(arr);
-		 	
 		}
 		internalCnt = networkInfo.length;
+		
 		//리소스 정보 설정
 		if(contents.resource != null && contents.resource != ""){
+			//기본 정보 설정
+			diegoKeyFile = contents.keyFile
 			resourceInfo = {
-					id 									: contents.id,
-					stemcellName 				: contents.resource.stemcellName,
-					stemcellVersion 			: contents.resource.stemcellVersion,
-					boshPassword 				: contents.resource.boshPassword,
-					smallFlavor					: contents.resource.smallFlavor,
-					mediumFlavor				: contents.resource.mediumFlavor,
-					largeFlavor					: contents.resource.largeFlavor,
-					runnerFlavor					: contents.resource.runnerFlavor,
-					smallRam						: contents.resource.smallRam,
-					smallDisk						: contents.resource.smallDisk,
-					smallCpu						: contents.resource.smallCpu,
-					mediumRam					: contents.resource.mediumRam,
-					mediumDisk					: contents.resource.mediumDisk,
-					mediumCpu					: contents.resource.mediumCpu,
-					largeRam						: contents.resource.largeRam						,
-					largeDisk						: contents.resource.largeDisk,
-					largeCpu						: contents.resource.largeCpu,
-					runnerRam					: contents.resource.runnerRam,
-					runnerDisk					: contents.resource.runnerDisk,
-					runnerCpu						: contents.resource.runnerCpu
+					id                     : contents.id,
+					stemcellName           : contents.resource.stemcellName,
+					stemcellVersion        : contents.resource.stemcellVersion,
+					boshPassword           : contents.resource.boshPassword,
+					smallFlavor            : contents.resource.smallFlavor,
+					mediumFlavor           : contents.resource.mediumFlavor,
+					largeFlavor            : contents.resource.largeFlavor,
+					runnerFlavor           : contents.resource.runnerFlavor,
+					smallRam               : contents.resource.smallRam,
+					smallDisk              : contents.resource.smallDisk,
+					smallCpu               : contents.resource.smallCpu,
+					mediumRam              : contents.resource.mediumRam,
+					mediumDisk             : contents.resource.mediumDisk,
+					mediumCpu              : contents.resource.mediumCpu,
+					largeRam               : contents.resource.largeRam						,
+					largeDisk              : contents.resource.largeDisk,
+					largeCpu               : contents.resource.largeCpu,
+					runnerRam              : contents.resource.runnerRam,
+					runnerDisk             : contents.resource.runnerDisk,
+					runnerCpu              : contents.resource.runnerCpu
 				}
 		}
 }
+
 
 /********************************************************
  * 설명		:  기본정보 팝업
  * Function	: defaultPopup
  *********************************************************/
 function defaultPopup() {
+	 
 	$("#defaultInfoDiv").w2popup({
 		width : 750,
 		height :500,
@@ -212,14 +212,31 @@ function defaultPopup() {
 		showMax :false,
 		onOpen :function(event) {
 			event.onComplete = function() {
+				
+				//릴리즈 정보 popup over
+			 	$('[data-toggle="popover"]').popover();
+			 	//Diego Release Info
+			 	getReleaseVersionList();
+			 	
+			 	$(".gardenRelease-info").attr('data-content', "https://github.com/cloudfoundry/diego-cf-compatibility");
+			 	$(".cflinux-info").attr('data-content', "https://github.com/cloudfoundry/diego-cf-compatibility");
+			 	$(".etcd-info").attr('data-content', "https://github.com/cloudfoundry/diego-cf-compatibility");
+// 			 	$(".paastaMonitoring-info").attr('data-content', "paasta-container v2.0 이상에서 지원")
+				 	
 				if( menu == "cfDiego") {
 					$('.w2ui-msg-buttons #defaultPopupBtn').show();
-					$('.w2ui-msg-body #keyBtn').css("display","none");
 				}
+			 	
 				if (defaultInfo != "") {
 					$(".w2ui-msg-body input[name='deploymentName']").val(defaultInfo.deploymentName);
 					$(".w2ui-msg-body input[name='directorUuid']").val(defaultInfo.directorUuid);
 					$(".w2ui-msg-body input[name='cfId']").val(cfId);
+					if( !checkEmpty(defaultInfo.cadvisorDriverIp) ){//PaaS-TA 모니터링 체크
+						$(".w2ui-msg-body input:checkbox[name='paastaMonitoring']").attr("checked", true);
+						checkPaasTAMonitoringUseYn();
+						$(".w2ui-msg-body input[name='cadvisorDriverIp']").val(defaultInfo.cadvisorDriverIp);
+						$(".w2ui-msg-body input[name='cadvisorDriverPort']").val(defaultInfo.cadvisorDriverPort);
+					}
 				}else{
 					if( !checkEmpty($("#directorUuid").text()) ){
 						$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
@@ -235,6 +252,7 @@ function defaultPopup() {
 		}
 	});
 }
+
 
 /********************************************************
  * 설명		: Diego 설치 릴리즈 목록 조회 
@@ -276,6 +294,7 @@ function getDiegoRelease() {
 		}
 	});
 }
+
 
 /********************************************************
  * 설명		: cflinuxfs2Rootfs 릴리즈 조회 
@@ -331,7 +350,7 @@ function getCfRelease() {
 							var input = '<input name="cfInfo" type="text" style="float:left; width:60%;" readonly onchange="setCfDeployFile(this.value);"  required placeholder="Diego와 연동하여 배포 할 CF정보를 선택 하세요." />';
 							getCfInfo.html(input);
 							$(".w2ui-msg-body input[name='cfInfo']").val(obj.deploymentName);
-							 $(".w2ui-msg-body input[name='cfId']").val(obj.id);
+							$(".w2ui-msg-body input[name='cfId']").val(obj.id);
 							$(".w2ui-msg-body input[name='deploymentName']").val(obj.deploymentName+"-diego");
 						}
 					} else{
@@ -378,7 +397,7 @@ function setCfDeployFile(value){
 function getgardenRelease() {
 	$.ajax({
 		type :"GET",
-		url :"/common/deploy/release/list/garden-linux",
+		url :"/common/deploy/release/list/garden",
 		contentType :"application/json",
 		async :true,
 		success :function(data, status) {
@@ -442,6 +461,7 @@ function setReleaseList(){
  * Function	: setcflinuxDisplay
  *********************************************************/
 function setcflinuxDisplay(val){
+	var diegoReleaseName = val.split("/")[0];
 	var diegoReleaseVersion = val.split("/")[1];
 	if( compare( diegoReleaseVersion, "0.1463.0" ) > 0 ){
 		$('.w2ui-msg-body #cflinux').css('display','block');
@@ -449,6 +469,9 @@ function setcflinuxDisplay(val){
 		$('.w2ui-msg-body #cflinux').css('display','none');
 		$(".w2ui-msg-body input[name='cflinuxfs2rootfsrelease']").val("");
 	}
+	
+	setDisabledMonitoring(val);
+	
 }
 
 /********************************************************
@@ -456,6 +479,7 @@ function setcflinuxDisplay(val){
  * Function	: setReleaseData
  *********************************************************/
 function setReleaseData(){
+	 
 	if( !checkEmpty(defaultInfo.diegoReleaseName) && !checkEmpty(defaultInfo.diegoReleaseVersion) ){//diego 릴리즈
 		$(".w2ui-msg-body input[name='diegoReleases']").data('selected',{text :defaultInfo.diegoReleaseName + "/"+ defaultInfo.diegoReleaseVersion});
 	}
@@ -472,7 +496,56 @@ function setReleaseData(){
 		$('.w2ui-msg-body #cflinux').css('display','block');
 		$(".w2ui-msg-body input[name='cflinuxfs2rootfsrelease']").data('selected',{text :defaultInfo.cflinuxfs2rootfsreleaseName + "/"+ defaultInfo.cflinuxfs2rootfsreleaseVersion});
 	}
+	setDisabledMonitoring(defaultInfo.diegoReleaseName + "/"+ defaultInfo.diegoReleaseVersion);
 	w2popup.unlock();
+}
+
+
+/********************************************************
+ * 설명		: paasta-container v2.0 이상에서 지원
+ * Function	: setDisabledMonitoring
+ *********************************************************/
+function setDisabledMonitoring(val){
+	if( !checkEmpty(val)){
+		var diegoReleaseName = val.split("/")[0];
+		var diegoReleaseVersion = val.split("/")[1];
+		
+		//paasta-container v2.0 이상 PaaS-TA 모니터링 지원 checkbox
+		if( diegoReleaseName.indexOf("-container") > -1 && compare(diegoReleaseVersion, "2.0") > -1 ){
+			$('.w2ui-msg-body #paastaMonitoring').attr('disabled',false);
+		}else{
+			if( $(".w2ui-msg-body input:checkbox[name='paastaMonitoring']").is(":checked")){
+				$(".w2ui-msg-body input:checkbox[name='paastaMonitoring']").prop('checked',false);
+				checkPaasTAMonitoringUseYn();
+			}
+			$('.w2ui-msg-body #paastaMonitoring').attr('disabled',true);
+		}
+	}
+	
+}
+
+/********************************************************
+ * 설명		: PaaS-TA 모니터링 사용 체크 검사
+ * Function	: checkPaasTAMonitoringUseYn
+ *********************************************************/
+function checkPaasTAMonitoringUseYn(value){
+	var cnt = $("input[name=paastaMonitoring]:checkbox:checked").length;
+	
+	if(cnt > 0 ){
+		$(".w2ui-msg-body input[name='cadvisorDriverIp']").attr("disabled", false);
+		$(".w2ui-msg-body input[name='cadvisorDriverPort']").attr("disabled", false);
+		
+	}else{
+		$(".w2ui-msg-body input[name='cadvisorDriverIp']").css({"border-color" : "rgb(187, 187, 187)"}).parent().find(".isMessage").text("");
+		$(".w2ui-msg-body input[name='cadvisorDriverPort']").css({"border-color" : "rgb(187, 187, 187)"}).parent().find(".isMessage").text("");
+		//값 초기화
+		$(".w2ui-msg-body input[name='cadvisorDriverIp']").val("");
+		$(".w2ui-msg-body input[name='cadvisorDriverPort']").val("");
+		//Read-only
+		$(".w2ui-msg-body input[name='cadvisorDriverIp']").attr("disabled", true);
+		$(".w2ui-msg-body input[name='cadvisorDriverPort']").attr("disabled", true);
+	}
+	 
 }
 
 
@@ -492,8 +565,8 @@ function createKeyConfirm(){
 	 w2confirm({
 		width 			: 350,
 		height 			: 180,
-		title 				: '<b>Key 생성 여부</b>',
-		msg 				: message,
+		title 			: '<b>Key 생성 여부</b>',
+		msg 			: message,
 		modal			: true,
 		yes_text 		: "확인",
 		no_text 		: "취소",
@@ -552,6 +625,7 @@ function createKey(){
  * Function	: saveDefaultInfo
  *********************************************************/
 function saveDefaultInfo(type) {
+	//CF 정보
 	if(cfInfoYn==true){
 		w2alert("Diego와 연동 할 CF를 설치해 주세요.", "DIEGO 설치");
 		return;
@@ -563,36 +637,38 @@ function saveDefaultInfo(type) {
 		return;
 	}
 	
-   //key 생성하지 하지 않았을 경우
-  	if( checkEmpty(diegoKeyFile) && menu =='diego' ){
-  		w2alert("Diego Key를 먼저 생성해주세요.", "DIEGO 설치");
-		return;
-  	}
-  	
 	var diegoRelease = $(".w2ui-msg-body input[name='diegoReleases']").val();
 	var gardenRelease = $(".w2ui-msg-body input[name='gardenReleaseName']").val();
 	var etcdRelease = $(".w2ui-msg-body input[name='etcdReleases']").val();
 	var cflinuxfs2rootfsrelease = $(".w2ui-msg-body input[name='cflinuxfs2rootfsrelease']").val();
 	var cfName = $(".w2ui-msg-body input[name='cfInfo']").val();
+	var monitoringUse = "";
+	if( $(".w2ui-msg-body input:checkbox[name='paastaMonitoring']").is(":checked")){
+		monitoringUse = "true";
+	}else{
+		monitoringUse = "false";
+	}
 	
 	defaultInfo = {
-				id 											: (diegoId) ? diegoId :"",
-				iaas 										: iaas.toUpperCase(),
-				platform									: "diego",
-				deploymentName 					: $(".w2ui-msg-body input[name='deploymentName']").val(),
-				directorUuid 							: $(".w2ui-msg-body input[name='directorUuid']").val(),
-				diegoReleaseName 				: diegoRelease.split("/")[0],
-				diegoReleaseVersion				: diegoRelease.split("/")[1],
-				cfDeploymentName 				: cfName,
-				cfId 										: $(".w2ui-msg-body input[name='cfId']").val(),
-				cfDeployment							: $(".w2ui-msg-body input[name='cfDeployment']").val(),
-				gardenReleaseName 				: gardenRelease.split("/")[0],
-				gardenReleaseVersion			: gardenRelease.split("/")[1],
-				etcdReleaseName 					: etcdRelease.split("/")[0],
-				etcdReleaseVersion				: etcdRelease.split("/")[1],
-				cflinuxfs2rootfsreleaseName 	: cflinuxfs2rootfsrelease.split("/")[0],
-				cflinuxfs2rootfsreleaseVersion	: cflinuxfs2rootfsrelease.split("/")[1],
-				keyFile										: diegoKeyFile
+				id                              : (diegoId) ? diegoId :"",
+				iaas                            : iaas.toUpperCase(),
+				platform                        : "diego",
+				deploymentName                  : $(".w2ui-msg-body input[name='deploymentName']").val(),
+				directorUuid                    : $(".w2ui-msg-body input[name='directorUuid']").val(),
+				diegoReleaseName                : diegoRelease.split("/")[0],
+				diegoReleaseVersion             : diegoRelease.split("/")[1],
+				cfDeploymentName                : cfName,
+				cfId                            : $(".w2ui-msg-body input[name='cfId']").val(),
+				cfDeployment                    : $(".w2ui-msg-body input[name='cfDeployment']").val(),
+				gardenReleaseName               : gardenRelease.split("/")[0],
+				gardenReleaseVersion            : gardenRelease.split("/")[1],
+				etcdReleaseName                 : etcdRelease.split("/")[0],
+				etcdReleaseVersion              : etcdRelease.split("/")[1],
+				cflinuxfs2rootfsreleaseName     : cflinuxfs2rootfsrelease.split("/")[0],
+				cflinuxfs2rootfsreleaseVersion  : cflinuxfs2rootfsrelease.split("/")[1],
+				paastaMonitoringUse             : monitoringUse,
+				cadvisorDriverIp                : $(".w2ui-msg-body input[name='cadvisorDriverIp']").val(),
+				cadvisorDriverPort              : $(".w2ui-msg-body input[name='cadvisorDriverPort']").val()
 	}
 	if( type == 'after'){
 		if (popupValidation()) {
@@ -631,6 +707,12 @@ function saveDefaultInfo(type) {
  * Function	: networkPopup
  *********************************************************/
 function networkPopup(){
+	if(iaas.toLowerCase() == "aws"){
+		$('#availabilityZone').css('display','block');
+	}else{
+		$('#availabilityZone').css('display','none');
+		$(".w2ui-msg-body input[name='availabilityZone']").val("");
+	}
 	$("#networkInfoDiv").w2popup({
 		width  : 750,
 		height 	:700,
@@ -654,6 +736,7 @@ function networkPopup(){
 						$(".w2ui-msg-body input[name='subnetStaticTo']").eq(cnt).val(networkInfo[i].subnetStaticTo);
 						$(".w2ui-msg-body input[name='subnetId']").eq(cnt).val(networkInfo[i].subnetId);
 						$(".w2ui-msg-body input[name='cloudSecurityGroups']").eq(cnt).val(networkInfo[i].cloudSecurityGroups);
+						$(".w2ui-msg-body input[name='availabilityZone']").eq(cnt).val(networkInfo[i].availabilityZone);
 					}
 				}						
 			}
@@ -825,7 +908,8 @@ function saveNetworkInfo(type) {
 					subnetStaticFrom			: $(".w2ui-msg-body input[name='subnetStaticFrom']").eq(i).val(),
 					subnetStaticTo				: $(".w2ui-msg-body input[name='subnetStaticTo']").eq(i).val(),
 					subnetId						: $(".w2ui-msg-body input[name='subnetId']").eq(i).val(),
-					cloudSecurityGroups		: $(".w2ui-msg-body input[name='cloudSecurityGroups']").eq(i).val()
+					cloudSecurityGroups		: $(".w2ui-msg-body input[name='cloudSecurityGroups']").eq(i).val(),
+					availabilityZone		: $(".w2ui-msg-body input[name='availabilityZone']").eq(i).val()
 			}
 		 networkInfo.push(InternalArr);
 	 }
@@ -871,6 +955,11 @@ function resourcePopup() {
 		showMax :false,
 		onOpen :function(event) {
 			event.onComplete = function() {
+				
+				if( menu == "cfDiego" ){
+					$('.w2ui-msg-body #keyBtn').css("display","none");
+				}
+				
 				if (resourceInfo != "") {
 					$(".w2ui-msg-body input[name='boshPassword']").val(resourceInfo.boshPassword);
 					$(".w2ui-msg-body input[name='smallFlavor']").val(resourceInfo.smallFlavor);
@@ -897,11 +986,16 @@ function resourcePopup() {
 function vSphereResourceInfoPopup() {
 	$("#vSphereResourceInfoDiv").w2popup({
 		width : 750,
-		height : 800,
+		height : 820,
 		modal : true,
 		showMax : false,
 		onOpen : function(event) {
 			event.onComplete = function() {
+				
+				if( menu == "cfDiego" ){
+					$('.w2ui-msg-body #keyBtn').css("display","none");
+				}
+				
 				if (resourceInfo != "") {
 					$(".w2ui-msg-body input[name='boshPassword']").val(resourceInfo.boshPassword);
 					$(".w2ui-msg-body input[name='smallFlavorRam']").val(resourceInfo.smallRam);
@@ -964,33 +1058,42 @@ function vSphereResourceInfoPopup() {
 function saveResourceInfo(type) {
 	var stemcellInfos = $(".w2ui-msg-body input[name='stemcells']").val().split("/");
 	resourceInfo = {
-			id 								: diegoId,
-			iaas							: iaas.toUpperCase(),
-			platform						: "diego",
-			stemcellName 			: stemcellInfos[0],
-			stemcellVersion 			: stemcellInfos[1],
-			boshPassword 			: $(".w2ui-msg-body input[name='boshPassword']").val(),
-			smallFlavor				: $(".w2ui-msg-body input[name='smallFlavor']").val(),
-			smallCpu					: $(".w2ui-msg-body input[name='smallFlavorCpu']").val(),
-			smallRam					: $(".w2ui-msg-body input[name='smallFlavorRam']").val(),
-			smallDisk					: $(".w2ui-msg-body input[name='smallFlavorDisk']").val(),
-			mediumFlavor				: $(".w2ui-msg-body input[name='mediumFlavor']").val(),
-			mediumCpu				: $(".w2ui-msg-body input[name='mediumFlavorCpu']").val(),
-			mediumRam				: $(".w2ui-msg-body input[name='mediumFlavorRam']").val(),
-			mediumDisk				: $(".w2ui-msg-body input[name='mediumFlavorDisk']").val(),
-			largeFlavor					: $(".w2ui-msg-body input[name='largeFlavor']").val(),
-			largeCpu					: $(".w2ui-msg-body input[name='largeFlavorCpu']").val(),
-			largeRam					: $(".w2ui-msg-body input[name='largeFlavorRam']").val(),
-			largeDisk					: $(".w2ui-msg-body input[name='largeFlavorDisk']").val(),
-			runnerFlavor				: $(".w2ui-msg-body input[name='runnerFlavor']").val(),
-			runnerCpu					: $(".w2ui-msg-body input[name='runnerFlavorCpu']").val(),
-			runnerRam					: $(".w2ui-msg-body input[name='runnerFlavorRam']").val(),
-			runnerDisk					: $(".w2ui-msg-body input[name='runnerFlavorDisk']").val()
+			id                      : diegoId,
+			cfId                    : cfId,
+			iaas                    : iaas.toUpperCase(),
+			platform                : "diego",
+			stemcellName            : stemcellInfos[0],
+			stemcellVersion         : stemcellInfos[1],
+			boshPassword            : $(".w2ui-msg-body input[name='boshPassword']").val(),
+			smallFlavor             : $(".w2ui-msg-body input[name='smallFlavor']").val(),
+			smallCpu                : $(".w2ui-msg-body input[name='smallFlavorCpu']").val(),
+			smallRam                : $(".w2ui-msg-body input[name='smallFlavorRam']").val(),
+			smallDisk               : $(".w2ui-msg-body input[name='smallFlavorDisk']").val(),
+			mediumFlavor            : $(".w2ui-msg-body input[name='mediumFlavor']").val(),
+			mediumCpu               : $(".w2ui-msg-body input[name='mediumFlavorCpu']").val(),
+			mediumRam               : $(".w2ui-msg-body input[name='mediumFlavorRam']").val(),
+			mediumDisk              : $(".w2ui-msg-body input[name='mediumFlavorDisk']").val(),
+			largeFlavor             : $(".w2ui-msg-body input[name='largeFlavor']").val(),
+			largeCpu                : $(".w2ui-msg-body input[name='largeFlavorCpu']").val(),
+			largeRam                : $(".w2ui-msg-body input[name='largeFlavorRam']").val(),
+			largeDisk               : $(".w2ui-msg-body input[name='largeFlavorDisk']").val(),
+			runnerFlavor            : $(".w2ui-msg-body input[name='runnerFlavor']").val(),
+			runnerCpu               : $(".w2ui-msg-body input[name='runnerFlavorCpu']").val(),
+			runnerRam               : $(".w2ui-msg-body input[name='runnerFlavorRam']").val(),
+			runnerDisk              : $(".w2ui-msg-body input[name='runnerFlavorDisk']").val(),
+			keyFile                 : diegoKeyFile
 	}
 
 	if (type == 'after') {
+		
+		//key 생성하지 하지 않았을 경우
+	    if( checkEmpty(diegoKeyFile) && menu =='diego' ){
+	  		w2alert("Diego Key를 먼저 생성해주세요.", "DIEGO 설치");
+			return;
+	    } 
+		
 		if(popupValidation()){	
-			var url = "/deploy/diego/install/saveResourceInfo/N";
+			var url = "/deploy/"+ menu +"/install/saveResourceInfo/N";
 			//Server send Diego Info
 			$.ajax({
 				type 		:"PUT",
@@ -1189,8 +1292,10 @@ function installPopup(){
 					    		
 					    		installStatus = response.state.toLowerCase();
 					    		$('.w2ui-msg-buttons #deployPopupBtn').prop("disabled", false);
-					    		
-					    		installClient.disconnect();
+					    		if(installClient!=""){
+					    			installClient.disconnect();
+					    			installClient = "";
+					    		}
 								w2alert(message, "DIEGO 설치");
 					       	}
 			        	}
@@ -1286,7 +1391,11 @@ function diegoDeletePopup(record){
 						    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 삭제 중 취소되었습니다.";
 						    		
 						    		installStatus = response.state.toLowerCase();
-						    		deleteClient.disconnect();
+						    		if(deleteClient != ""){
+						    			deleteClient.disconnect();
+						    			deleteClient = "";
+						    		}
+						    		
 									w2alert(message, "DIEGO 삭제");
 						       	}
 				        	}
@@ -1415,7 +1524,7 @@ function gridReload() {
 					</div>
 					<div class="w2ui-field" >
 						<label style="text-align:left; width:40%; font-size:11px;">DIEGO 릴리즈</label>
-						<img alt="diego-help-info"  src="../images/help-Info-icon.png" class="diego-info" style="width:18px; position:absolute; left:20%; margin-top:3px"  data-toggle="popover"  data-trigger="hover" data-html="true" title="Diego 릴리즈 설치 지원 버전 목록"/>
+						<img alt="diego-help-info"  src="../images/help-Info-icon.png" class="diego-info" style="width:18px; position:absolute; left:20%; margin-top:3px"  data-toggle="popover"  data-trigger="hover" data-html="true" title="설치 지원 버전 목록"/>
 						<div>
 							<input name="diegoReleases" onchange='setcflinuxDisplay(this.value);' type="list" style="float:left; width:60%;" required placeholder="DIEGO 릴리즈를 선택하세요." />
 						</div>
@@ -1436,9 +1545,9 @@ function gridReload() {
 					</div>
 					<div class="w2ui-field" >
 						<label style="text-align:left; width:40%; font-size:11px;">ETCD 릴리즈</label>
-						<img alt="etcdReleases-help-info" class="etcd-info" style="width:18px; position:absolute; left:18%; margin-top:3px"  data-toggle="popover" title="ETCD 릴리즈 호환성 정보 참조 사이트 "  data-html="true" src="../images/help-Info-icon.png">
+						<img alt="etcdReleases-help-info" class="etcd-info" style="width:18px; position:absolute; left:18%; margin-top:3px"  data-toggle="popover" title="ETCD 릴리즈 호환성 정보 참조 사이트 "  data-html="true" src="../images/help-Info-icon.png"/>
 						<div>
-							<input name="etcdReleases" type="list" style="float:left; width:60%;" required placeholder="ETCD 릴리즈를 선택하세요." />
+							<input name="etcdReleases" type="list" style="float:left;width:60%;" required placeholder="ETCD 릴리즈를 선택하세요." />
 						</div>
 					</div>
 					<div class="w2ui-field" >
@@ -1447,9 +1556,35 @@ function gridReload() {
 						<input name="cfId" type="hidden"/>
 						<input name="cfDeploymentFile" type="hidden"/>
 					</div>
+<!-- 					<div class="w2ui-field"> -->
+<!-- 						<label style="text-align:left; width:40%; font-size:11px;">PaaS-TA 모니터링</label> -->
+<!-- 						<img alt="paasta-monitoring-help-info" class="paastaMonitoring-info" style="width:18px; position:absolute; left:22%; margin-top:3px" data-toggle="popover" data-html="true" src="../images/help-Info-icon.png" /> -->
+<!-- 						<div> -->
+<!-- 							<input name="paastaMonitoring" type="checkbox" id="paastaMonitoring" onchange="checkPaasTAMonitoringUseYn(this);" disabled />사용 -->
+<!-- 						</div> -->
+<!-- 					</div> -->
 				</div>
-				<button class="btn" style="float: right; margin-top:10px;" id="keyBtn" onclick="createKeyConfirm();" >Key 생성</button>
 			</div>
+			
+<!-- 			<div class="panel panel-info">	 -->
+<!-- 				<div class="panel-heading"><b>PaaS-TA 모니터링 정보</b></div> -->
+<!-- 				<div class="panel-body" style="padding:5px 5% 10px 5%;"> -->
+<!-- 					<div class="w2ui-field"> -->
+<!-- 						<label style="text-align: left; width: 40%; font-size: 11px;">PaaS-TA 모니터링 DB 서버 IP</label> -->
+<!-- 						<div> -->
+<!-- 							<input name="cadvisorDriverIp" type="text" style="float: left; width: 60%;" disabled placeholder="예)10.0.0.0" /> -->
+<!-- 							<div class="isMessage cadvisorDriverIp"></div> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 					<div class="w2ui-field"> -->
+<!-- 						<label style="text-align: left; width: 40%; font-size: 11px;">PaaS-TA 모니터링 DB 서버 PORT</label> -->
+<!-- 						<div> -->
+<!-- 							<input name="cadvisorDriverPort" type="text" style="float: left; width: 60%;" disabled required placeholder="예)8063" /> -->
+<!-- 							<div class="isMessage cadvisorDriverPort"></div> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
 		</div>
 		<br />
 		<div class="w2ui-buttons" rel="buttons" hidden="true">
@@ -1459,7 +1594,7 @@ function gridReload() {
 	</div>
 </div>
 
-<!-- network 정보 -->
+<!-- Aws/Openstack Network 정보 -->
 <div id="networkInfoDiv" style="width:100%; height:100%;" hidden="true">
 	<div rel="title">DIEGO 설치</div>
 	<div rel="body" style="width:100%; height:100%; padding:15px 5px 0 5px; margin:0 auto;">
@@ -1492,10 +1627,17 @@ function gridReload() {
 									<div class="isMessage"></div>
 								</div>
 							</div>
-					    	<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">네트워크 ID</label>
+							<div class="w2ui-field" id ="availabilityZone" style="display:none">
+								<label style="text-align: left; width: 40%; font-size: 11px;">Availability Zone</label>
 								<div>
-									<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 ID를 입력하세요."/>
+									<input name="availabilityZone" type="text" style="float: left; width: 60%;" required placeholder="예) cf-AvaliailityZone" />
+									<div class="isMessage"></div>
+								</div>
+							</div>
+					    	<div class="w2ui-field">
+								<label style="text-align: left;width:40%;font-size:11px;">서브넷 아이디</label>
+								<div>
+									<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="서브넷 아이디를 입력하세요."/>
 									<div class="isMessage"></div>
 								</div>
 							</div>
@@ -1569,74 +1711,74 @@ function gridReload() {
 			</ul>
 		</div>
         <div class="w2ui-page page-0" style="margin-top:15px;padding:0 3%;">
-					<!-- Internal -->
-					<div class="panel panel-info"  id="panel-body2">
-						<div  class="panel-heading" style="padding:5px 5% 17px 5%;">
-							<b>Internal</b>
-							<div style="float:right">
-								<button class="btn addInternal" onclick="addNetwork();">추가</button>
-								<button class="btn delInternal" onclick="delNetwork(this);">삭제</button>
-							</div>
-						</div>
-						<div class="panel-body">
-					    	<div class="w2ui-field">
-								<label class="subnetId" style="text-align: left;width:40%;font-size:11px;">포트 그룹명</label>
-								<div>
-									<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="포트 그룹명을 입력하세요."/>
-									<div class="isMessage"></div>
-								</div>
-							</div>
-							<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">서브넷 범위</label>
-								<div>
-									<input name="subnetRange" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.0/24"/>
-									<div class="isMessage"></div>
-								</div>
-							</div>
-							<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">게이트웨이</label>
-								<div>
-									<input name="subnetGateway" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.1"/>
-									<div class="isMessage"></div>
-								</div>
-							</div>
-							<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">DNS</label>
-								<div>
-									<input name="subnetDns" type="text"  style="float:left;width:60%;" required placeholder="예) 8.8.8.8"/>
-									<div class="isMessage"></div>
-								</div>
-							</div>
-							<div class="w2ui-field">
-								<label style="text-align: left; width: 40%; font-size: 11px;">IP할당 제외 대역</label>
-								<div>
-									<input name="subnetReservedFrom" id="subnetStaticFrom" type="url" style="float:left;width:27%;" placeholder="예) 10.0.0.100" />
-									<span style="float: left; width: 6%; text-align: center;">&nbsp;&ndash; &nbsp;</span>
-									<input name="subnetReservedTo" id="subnetStaticTo" type="url" style="float:left;width:27%;" placeholder="예) 10.0.0.106" />
-									<div class="isMessage"></div>
-								</div>
-							</div>
-							<div class="w2ui-field">
-								<label style="text-align: left; width: 40%; font-size: 11px;">IP할당 대역(최소 15개)</label>
-								<div>
-									<input name="subnetStaticFrom" type="url" style="float:left;width:27%;" placeholder="예) 10.0.0.100" />
-									<span style="float: left; width: 6%; text-align: center;">&nbsp;&ndash; &nbsp;</span>
-									<input name="subnetStaticTo" type="url" style="float:left;width:27%;" placeholder="예) 10.0.0.106" />
-									<div class="isMessage"></div>
-								</div>
-							</div>
+			<!-- Internal -->
+			<div class="panel panel-info"  id="panel-body2">
+				<div  class="panel-heading" style="padding:5px 5% 17px 5%;">
+					<b>Internal</b>
+					<div style="float:right">
+						<button class="btn addInternal" onclick="addNetwork();">추가</button>
+						<button class="btn delInternal" onclick="delNetwork(this);">삭제</button>
+					</div>
+				</div>
+				<div class="panel-body">
+			    	<div class="w2ui-field">
+						<label class="subnetId" style="text-align: left;width:40%;font-size:11px;">포트 그룹명</label>
+						<div>
+							<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="포트 그룹명을 입력하세요."/>
+							<div class="isMessage"></div>
 						</div>
 					</div>
-					<!-- 추가 네트워크 div_1 -->
-					<div  id="VsphereNetworkInfoDiv_1" ></div>
-					<div  id="VsphereNetworkInfoDiv_2" ></div>
-				</div><br/>
-		    <div class="w2ui-buttons" rel="buttons" hidden="true">
-		        <button class="btn" style="float: left;" onclick="saveNetworkInfo('before');" >이전</button>
-				<button class="btn" style="float: right; padding-right: 15%" onclick="saveNetworkInfo('after');" >다음>></button>
-		    </div>
-		</div>
-	  </div>
+					<div class="w2ui-field">
+						<label style="text-align: left;width:40%;font-size:11px;">서브넷 범위</label>
+						<div>
+							<input name="subnetRange" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.0/24"/>
+							<div class="isMessage"></div>
+						</div>
+					</div>
+					<div class="w2ui-field">
+						<label style="text-align: left;width:40%;font-size:11px;">게이트웨이</label>
+						<div>
+							<input name="subnetGateway" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.1"/>
+							<div class="isMessage"></div>
+						</div>
+					</div>
+					<div class="w2ui-field">
+						<label style="text-align: left;width:40%;font-size:11px;">DNS</label>
+						<div>
+							<input name="subnetDns" type="text"  style="float:left;width:60%;" required placeholder="예) 8.8.8.8"/>
+							<div class="isMessage"></div>
+						</div>
+					</div>
+					<div class="w2ui-field">
+						<label style="text-align: left; width: 40%; font-size: 11px;">IP할당 제외 대역</label>
+						<div>
+							<input name="subnetReservedFrom" id="subnetStaticFrom" type="url" style="float:left;width:27%;" placeholder="예) 10.0.0.100" />
+							<span style="float: left; width: 6%; text-align: center;">&nbsp;&ndash; &nbsp;</span>
+							<input name="subnetReservedTo" id="subnetStaticTo" type="url" style="float:left;width:27%;" placeholder="예) 10.0.0.106" />
+							<div class="isMessage"></div>
+						</div>
+					</div>
+					<div class="w2ui-field">
+						<label style="text-align: left; width: 40%; font-size: 11px;">IP할당 대역(최소 15개)</label>
+						<div>
+							<input name="subnetStaticFrom" type="url" style="float:left;width:27%;" placeholder="예) 10.0.0.100" />
+							<span style="float: left; width: 6%; text-align: center;">&nbsp;&ndash; &nbsp;</span>
+							<input name="subnetStaticTo" type="url" style="float:left;width:27%;" placeholder="예) 10.0.0.106" />
+							<div class="isMessage"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 추가 네트워크 div_1 -->
+			<div  id="VsphereNetworkInfoDiv_1" ></div>
+			<div  id="VsphereNetworkInfoDiv_2" ></div>
+		</div><br/>
+	    <div class="w2ui-buttons" rel="buttons" hidden="true">
+	        <button class="btn" style="float: left;" onclick="saveNetworkInfo('before');" >이전</button>
+			<button class="btn" style="float: right; padding-right: 15%" onclick="saveNetworkInfo('after');" >다음>></button>
+	    </div>
+	</div>
+</div>
 
 
 <!-- Resource  설정 DIV -->
@@ -1720,6 +1862,9 @@ function gridReload() {
 						</div>
 					</div>
 				</div>
+			</div>
+			<div class="w2ui-buttons">
+				<button class="btn" style="float: right; margin-top:10px;" id="keyBtn" onclick="createKeyConfirm();" >Key 생성</button>
 			</div>
 		</div>
 	</div>
@@ -1845,21 +1990,21 @@ function gridReload() {
 				<div class="panel-heading"><b>Cell Resource Type</b></div>
 				<div class="panel-body"  style="padding:5px 5% 10px 5%;">
 					<div class="w2ui-field">
-						<label style="text-align: left;  width: 40%;">Runner Type Ram</label>
+						<label style="text-align: left;  width: 40%;">Cell Type Ram</label>
 						<div>
 							<input name="runnerFlavorRam" type="text" style="float: left; width: 60%;"  onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' style='ime-mode:disabled;'  required placeholder="Ram을 입력하세요. 예) 16384"  />
 							<div class="isMessage"></div>
 						</div>
 					</div>
 					<div class="w2ui-field">	
-						<label style="text-align: left;  width: 40%;">Runner Type Disk</label>
+						<label style="text-align: left;  width: 40%;">Cell Type Disk</label>
 						<div>
 							<input name="runnerFlavorDisk" type="text" style="float: left; width: 60%;"  onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' style='ime-mode:disabled;'  required placeholder="Disk를 입력하세요. 예) 32768"  />
 							<div class="isMessage"></div>
 						</div>
 					</div>
 					<div class="w2ui-field">	
-						<label style="text-align: left;  width: 40%;">Runner Type Cpu</label>
+						<label style="text-align: left;  width: 40%;">Cell Type Cpu</label>
 						<div>
 							<input name="runnerFlavorCpu" type="text" style="float: left; width: 60%;"  onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' style='ime-mode:disabled;'  required placeholder="Cpu를 입력하세요. 예) 2"  />
 							<div class="isMessage"></div>
@@ -1867,8 +2012,11 @@ function gridReload() {
 					</div>
 				</div>
 			</div>
+			<div class="w2ui-buttons">
+				<button class="btn" style="float: right; margin-bottom:10px;" id="keyBtn" onclick="createKeyConfirm();" >Key 생성</button>
+			</div>
 		</div>
-</div>
+	</div>
 	<div class="w2ui-buttons" rel="buttons" hidden="true">
 		<button class="btn" style="float: left;" onclick="saveResourceInfo('before');">이전</button>
 		<button class="btn" style="float: right; padding-right: 15%" onclick="saveResourceInfo('after');">다음>></button>

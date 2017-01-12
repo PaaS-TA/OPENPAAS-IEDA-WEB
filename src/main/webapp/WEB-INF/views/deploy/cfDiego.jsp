@@ -292,7 +292,7 @@ function doSearch() {
 	if( directorName.indexOf("_CPI") > 0  ) {
 			var start = directorName.indexOf("(");
 			var end = directorName.indexOf("_CPI)", start+1);
-			iaas = directorName.substring(start+1, end)
+			iaas = directorName.substring(start+1, end);
 	}
 	if(iaas != ""){
 	w2ui['config_cfDiegoGrid'].load("<c:url value='/deploy/cfDiego/list/"+iaas+"'/>",

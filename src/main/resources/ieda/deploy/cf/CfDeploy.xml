@@ -21,7 +21,6 @@
 		<result property="domainOrganization" column="DOMAIN_ORGANIZATION" />
 		<result property="deaMemoryMB" column="DEA_MEMORY_MB" />
 		<result property="deaDiskMB" column="DEA_DISK_MB" />
-		<result property="proxyStaticIps" column="PROXY_STATIC_IPS" />
 		<result property="loginSecret" column="LOGIN_SECRET" />
 		<result property="countryCode" column="COUNTRY_CODE" />
 		<result property="stateName" column="STATE_NAME" />
@@ -76,7 +75,6 @@
 			,director_uuid
 			,domain
 			,domain_organization
-			,proxy_static_ips
 			,login_secret
 			,release_name
 			,release_version
@@ -108,7 +106,6 @@
 			,director_uuid
 			,domain
 			,domain_organization
-			,proxy_static_ips
 			,login_secret
 			,release_name
 			,release_version
@@ -142,7 +139,6 @@
 			,director_uuid
 			,domain
 			,domain_organization
-			,proxy_static_ips
 			,login_secret
 			,release_name
 			,release_version
@@ -195,7 +191,6 @@
 			,domain
 			,description
 			,domain_organization
-			,proxy_static_ips
 			,login_secret
 			,dea_memory_mb
 			,dea_disk_mb
@@ -224,7 +219,6 @@
 			,#{cf.domain}
 			,#{cf.description}
 			,#{cf.domainOrganization}
-			,#{cf.proxyStaticIps}
 			,#{cf.loginSecret}
 			,#{cf.deaMemoryMB}
 			,#{cf.deaDiskMB}
@@ -260,7 +254,6 @@
 			,domain=#{cf.domain}
 			,description=#{cf.description}
 			,domain_organization=#{cf.domainOrganization}
-			,proxy_static_ips=#{cf.proxyStaticIps}
 			,login_secret=#{cf.loginSecret}
 			,country_code = #{cf.countryCode}
 			,state_name=#{cf.stateName}

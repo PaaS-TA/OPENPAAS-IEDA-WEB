@@ -84,7 +84,7 @@ public class CfService {
 				cfInfo.setReleaseName(vo.getReleaseName());
 				cfInfo.setReleaseVersion(vo.getReleaseVersion());
 				cfInfo.setAppSshFingerprint(vo.getAppSshFingerprint());
-
+				
 				cfInfo.setDomain(vo.getDomain());
 				cfInfo.setDescription(vo.getDescription());
 				cfInfo.setDomainOrganization(vo.getDomainOrganization());
@@ -95,8 +95,8 @@ public class CfService {
 				int cnt = 0;
 				String subnetRange , subnetGateway , subnetDns , subnetReservedIp;
 				subnetRange = subnetGateway = subnetDns = subnetReservedIp = "";
-				String subnetStaticIp ,subnetId , cloudSecurityGroups;
-				subnetStaticIp  = subnetId = cloudSecurityGroups=  "";
+				String subnetStaticIp ,subnetId , cloudSecurityGroups, availabilityZone;
+				subnetStaticIp  = subnetId = cloudSecurityGroups = availabilityZone =  "";
 				
 				if(netowrks  != null){
 					for(NetworkVO networkVO: netowrks){
@@ -113,6 +113,7 @@ public class CfService {
 							subnetStaticIp += networkVO.getSubnetStaticFrom() +" - " + networkVO.getSubnetStaticTo() + br;
 							subnetId += networkVO.getSubnetId() + br;
 							cloudSecurityGroups += networkVO.getCloudSecurityGroups() + br;
+							availabilityZone += networkVO.getAvailabilityZone() + br;
 						}
 					}
 					cfInfo.setSubnetRange(subnetRange);
@@ -122,6 +123,7 @@ public class CfService {
 					cfInfo.setSubnetStaticIp(subnetStaticIp);
 					cfInfo.setSubnetId(subnetId);
 					cfInfo.setCloudSecurityGroups(cloudSecurityGroups);
+					cfInfo.setAvailabilityZone(availabilityZone);
 				}
 				
 				//Resource
@@ -297,8 +299,6 @@ public class CfService {
 		items.add(new ReplaceItemDTO("[domainOrganization]", vo.getDomainOrganization()));
 		items.add(new ReplaceItemDTO("[deaDiskMB]", String.valueOf(vo.getDeaDiskMB())));
 		items.add(new ReplaceItemDTO("[deaMemoryMB]", String.valueOf(vo.getDeaMemoryMB())));
-		items.add(new ReplaceItemDTO("[deaMemoryMB]", String.valueOf(vo.getDeaMemoryMB())));
-		items.add(new ReplaceItemDTO("[proxyStaticIps]", vo.getProxyStaticIps()));
 		items.add(new ReplaceItemDTO("[loginSecret]", vo.getLoginSecret()));
 		//핑커프린트(diego 연동 유무)
 		if("TRUE".equals(vo.getDiegoYn().toUpperCase())){
@@ -321,6 +321,9 @@ public class CfService {
 					items.add(new ReplaceItemDTO("[cloudNetId]", vo.getNetworks().get(i).getSubnetId()));			
 					if( !("VSPHERE".equals(vo.getIaasType().toUpperCase())) ){
 						items.add(new ReplaceItemDTO("[cloudSecurityGroups]", vo.getNetworks().get(i).getCloudSecurityGroups()));
+						if("AWS".equals(vo.getIaasType().toUpperCase())){
+							items.add(new ReplaceItemDTO("[availabilityZone]", vo.getNetworks().get(i).getAvailabilityZone()));
+						}
 					}
 				}else if( InternalCnt > 1){
 					items.add(new ReplaceItemDTO("[subnetRange1]", vo.getNetworks().get(i).getSubnetRange()));
@@ -331,6 +334,9 @@ public class CfService {
 					items.add(new ReplaceItemDTO("[cloudNetId1]", vo.getNetworks().get(i).getSubnetId()));			
 					if( !("VSPHERE".equals(vo.getIaasType().toUpperCase())) ){
 						items.add(new ReplaceItemDTO("[cloudSecurityGroups1]", vo.getNetworks().get(i).getCloudSecurityGroups()));
+						if("AWS".equals(vo.getIaasType().toUpperCase())){
+							items.add(new ReplaceItemDTO("[availabilityZone1]", vo.getNetworks().get(i).getAvailabilityZone()));
+						}
 					}
 				}
 			}else if( "EXTERNAL".equals(vo.getNetworks().get(i).getNet().toUpperCase()) &&  "VSPHERE".equals(vo.getIaasType().toUpperCase()) ){
@@ -339,6 +345,9 @@ public class CfService {
 				items.add(new ReplaceItemDTO("[publicSubnetDns]", vo.getNetworks().get(i).getSubnetDns()));
 				items.add(new ReplaceItemDTO("[publicSubnetStatic]", vo.getNetworks().get(i).getSubnetStaticFrom() + " - " + vo.getNetworks().get(i).getSubnetStaticTo()));
 				items.add(new ReplaceItemDTO("[publicCloudNetId]", vo.getNetworks().get(i).getSubnetId()));			
+				items.add(new ReplaceItemDTO("[proxyStaticIps]", vo.getNetworks().get(i).getSubnetStaticFrom()) );
+			}else{
+				items.add(new ReplaceItemDTO("[proxyStaticIps]", vo.getNetworks().get(i).getSubnetStaticFrom()) );
 			}
 		} 
 		if( InternalCnt < 2 ){
@@ -349,6 +358,7 @@ public class CfService {
 			items.add(new ReplaceItemDTO("[subnetStatic1]", ""));
 			items.add(new ReplaceItemDTO("[cloudNetId1]", ""));			
 			items.add(new ReplaceItemDTO("[cloudSecurityGroups1]", ""));
+			items.add(new ReplaceItemDTO("[availabilityZone1]", ""));
 		}
 		
 		

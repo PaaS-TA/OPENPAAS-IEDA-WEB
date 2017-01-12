@@ -75,10 +75,10 @@ final public class CommonUtils {
 	}
 
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : Manifest 템플릿 파일과 merge하여 deployment 경로에 최종 Manifest 파일 생성
-	 * @title               : setSpiffMerge
-	 * @return            : void
+	 * @title         : setSpiffMerge
+	 * @return        : void
 	***************************************************/
 	public static void setSpiffMerge(String iaas, Integer id, String keyFile, String settingFileName,
 			ManifestTemplateVO manifestTemplate) {
@@ -125,10 +125,9 @@ final public class CommonUtils {
 				if (!StringUtils.isEmpty(manifestTemplate.getOptionEtc())) {
 					cmd.add(manifestTemplate.getOptionEtc());
 				}
-				if( !keyFile.equals("microbosh") && !StringUtils.isEmpty(keyPath) ){
+				if( !(keyFile.equals("microbosh") || keyFile.equals("bosh")) && !StringUtils.isEmpty(keyPath) ){
 					cmd.add(keyPath);//생성한 key.yml파일 추가
 				}
-				
 				cmd.add(inputFile);
 				builder.command(cmd);
 				builder.redirectErrorStream(true);
@@ -145,10 +144,6 @@ final public class CommonUtils {
 				if( !deloymentContent.equals("") ){
 					IOUtils.write(deloymentContent, new FileOutputStream(deploymentPath), "UTF-8");
 				}
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("deloymentContent :" + "\n" + deloymentContent);
-				}
-				
 			} else {
 				throw new CommonException("notfound.manifest.exception", "Merge할 File이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 			}
@@ -254,6 +249,12 @@ final public class CommonUtils {
 				} else {
 					cmd.add("");
 				}
+				//2.4 Path to Path to PaaSTA-overrides stub file.
+				if( !StringUtils.isEmpty(manifestTemplate.getCommonOptionTemplate()) && "true".equals(vo.getPaastaMonitoringUse().toLowerCase()) ){
+					cmd.add(manifestTemplate.getCommonOptionTemplate());
+				}else{
+					cmd.add("");
+				}
 				
 				
 				builder.command(cmd);
@@ -272,9 +273,6 @@ final public class CommonUtils {
 				String deloymentContent = deployBuffer.toString();
 				if (!deloymentContent.equals("")) {
 					IOUtils.write(deloymentContent, new FileOutputStream( DEPLOYMENT_FILE + vo.getDeploymentFile()), "UTF-8");
-				}
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("deloymentContent :" + "\n" + deloymentContent);
 				}
 			} else {
 				throw new CommonException("notfound.diegoManifest.exception",  "Merge할 File이 존재하지 않습니다.", HttpStatus.NOT_FOUND);

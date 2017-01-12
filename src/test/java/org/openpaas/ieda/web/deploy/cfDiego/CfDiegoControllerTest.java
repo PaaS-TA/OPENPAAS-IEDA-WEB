@@ -607,6 +607,9 @@ public class CfDiegoControllerTest extends BaseTestController {
 		dto.setCfDeployment("cf-openstack-test");
 		dto.setCfDeploymentName("cf-openstack-test");
 		dto.setKeyFile("vsphere-diego-key-1.yml");
+		dto.setPaastaMonitoringUse("true");
+		dto.setCadvisorDriverIp("10.10.10.10");
+		dto.setCadvisorDriverPort("7777");
 		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);

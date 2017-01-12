@@ -16,14 +16,6 @@ meta:
 
   elastic_static_ips: [[proxyStaticIps]]
   
-  network-external-range: [subnetExternalRange]
-  network-external-gateway: [subnetExternalGateway]
-  network-external-dns: [[subnetExternalReserved]]
-  network-external-static: [[subnetExternalStatic]]
-  network-external-subnet-id: [externalCloudNetId]
-  network-external-security-groups: [[externalCloudSecurityGroups]]
-  network-external-availability-zone: [externalAvailabilityZone]
-
   network-0-range: [subnetRange]
   network-0-gateway: [subnetGateway]
   network-0-reserved: [[subnetReserved]]

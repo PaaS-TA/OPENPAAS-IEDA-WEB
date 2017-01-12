@@ -75,7 +75,6 @@ public class StemcellManagementDownloadAsyncService {
 			
 			inputStream = process.getInputStream();
 			bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"UTF-8"));
-			String percentage  = "0%";
 			//2.2 실행 출력하는 로그를 읽어온다.
 			while ((info = bufferedReader.readLine()) != null){ 
 				Pattern pattern = Pattern.compile("\\d+\\%");
@@ -89,7 +88,6 @@ public class StemcellManagementDownloadAsyncService {
 			if( "done".equals(status) ){
 				dto.setDownloadStatus("DOWNLOADED");
 				savePublicStemcell(dto, principal);
-				messagingTemplate.convertAndSendToUser(principal.getName() ,MESSAGE_ENDPOINT, dto.getId()+"/done");
 			}
 			
 		} catch(IOException e){
@@ -123,12 +121,12 @@ public class StemcellManagementDownloadAsyncService {
 				LOGGER.debug("fileDelete",checkDeleteStemcellFile);
 			}
 		}
-		//덮어쓰기 가능
+		//덮어쓰기 불가능
 		if(stemcellFile.exists() && "false".equals(dto.getOverlayCheck()) ){
 			deleteLockFile(status, dto.getStemcellFileName());
 			throw new CommonException("conflict.PublicStemcell.exception",
 					"이미 동일한 스템셀 파일이 존재합니다.", HttpStatus.CONFLICT);
-		}else{//덮어쓰기 불가능.
+		}else{//덮어쓰기 가능.
 			try {
 				FileUtils.moveFile(tmpFile,stemcellFile);
 			} catch (IOException e) {
@@ -147,7 +145,9 @@ public class StemcellManagementDownloadAsyncService {
 					if( LOGGER.isErrorEnabled() ){
 						LOGGER.debug("fileDelete",checkLockStemcellFile);
 					}
+					
 				}
+				messagingTemplate.convertAndSendToUser(principal.getName() ,MESSAGE_ENDPOINT, dto.getId()+"/done");
 			}
 		}
 	}

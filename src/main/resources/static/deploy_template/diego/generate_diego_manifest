@@ -7,7 +7,7 @@ set -e
 #    Generate a manifest for a Diego deployment to accompany an existing CF deployment.
 #
 # USAGE:
-#    generate_diego_manifest $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 $11 $12
+#    generate_diego_manifest $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 $11 $12 $13 $14
 #
 # MANDATORY ARGUMENTS:
 #    $1                 Path to USER home directory ex) /home/ubuntu
@@ -19,27 +19,29 @@ set -e
 #    $7                 Path to CF manifest file.
 #    $8                 Path to DIEGO input file.
 #    $9                 Path to DIEGO manifest file.
-#    $10               Path to DIEGO Certs manifest file.
+#    $10                Path to DIEGO Certs manifest file.
 # OPTIONAL ARGUMENTS:
 #    $11                Path to DIEGO Network 1 stub file.
 #    $12                Path to DIEGO Network 2 stub file.
 #    $13                Path to Resource-overrides stub file.
+#    $14                Path to PaaSTA-overrides stub file.
 #
 # EXAMPLE:
 #    generante_diego_manifest \
 #       /path/to/user/home \
 #       236 \
-#       base_template.yml \
-#       job_template.yml \
+#       common_base_template.yml \
+#       common_job_template.yml \
 #       meta_template.yml \
-#       option_property_template.yml \
+#       iaas_property_template.yml \
 #       /path/to/openstack-1-cf.yml \
 #       input_template.yml \
 #       openstack-1-diego.yml \
 #       openstack-1-diego-certs.yml \
 #       optioin_network_template.yml \
 #       option_etc.yml \
-#       option_resource_template.yml
+#       option_resource_template.yml \
+#       common_option_template.yml
 #############################################################################
 
 ## INITIALIZE
@@ -53,7 +55,6 @@ stub_template_dir="${user_home}/OPENPAAS-IEDA-WEB/src/main/resources/static/depl
 diego_cert_dir="${base_dir}/key"
 template_common_dir="${stub_template_dir}/common"
 
-
 base_template=""
 diego_jobs=""
 meta_stub=""
@@ -65,6 +66,7 @@ diego_certs=""
 network1_override=""
 network2_override=""
 resources_override=""
+paasta_override=""
 
 #### MANIFEST COMMON FILES
 ## BOSH MANIFEST TEMPLATE
@@ -172,6 +174,16 @@ if [ ! -z "${13}" ]; then
   fi
 fi
 
+## COMMON PROPERTIES FOR PAASTA
+if [ ! -z "${14}" ]; then
+  paasta_override=${template_common_dir}/${14}
+
+  if [ ! -f "$paasta_override" ]; then
+    >&2 echo "ERROR: PaaSTA property inputs '${paasta_override}' is not a regular file"
+    argument_error=true
+  fi
+fi
+
 if [ ! -z $argument_error ]; then
   exit 1
 fi
@@ -191,6 +203,7 @@ spiff merge \
   ${diego_jobs} \
   ${meta_stub} \
   ${iaas_settings} \
+  ${paasta_override} \
   ${network1_override} \
   ${network2_override} \
   ${resources_override} \

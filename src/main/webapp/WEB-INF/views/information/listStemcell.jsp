@@ -148,7 +148,7 @@ function initView(bDefaultDirector) {
  * Function : doSearchUploadedStemcells
  *********************************************************/
 function doSearchUploadedStemcells() {
-	w2ui['us_uploadStemcellsGrid'].load("<c:url value='/info/stemcell/list/upload/'/>");
+	w2ui['us_uploadStemcellsGrid'].load("<c:url value='/info/stemcell/list/upload'/>");
 }
 
 /********************************************************
@@ -162,7 +162,7 @@ function doSearchLocalStemcells() {
 				var end = directorName.indexOf("_CPI)", start+1);
 				iaas = directorName.substring(start+1, end)
 		}
-	w2ui['us_localStemcellsGrid'].load("<c:url value='/info/stemcell/list/local/"+iaas+"'/>");
+	w2ui['us_localStemcellsGrid'].load("<c:url value='/info/stemcell/list/local'/>");
 }
 
 /********************************************************

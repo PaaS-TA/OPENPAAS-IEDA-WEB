@@ -267,9 +267,7 @@ function doUploadConnect(requestParameter){
 		        	if ( response.messages != null ) {
 				       	for ( var i=0; i < response.messages.length; i++) {
 				       		$("textarea[name='logAppendArea']").append(response.messages[i] + "\n").scrollTop($("textarea[name='logAppendArea']")[0].scrollHeight);
-				       		console.log("started status :" + response.state.toLowerCase());
 				       	}
-				       	console.log("status2 :" + response.state.toLowerCase());
 				       	if ( response.state.toLowerCase() != "started" ) {
 				            if ( response.state.toLowerCase() == "done" )	message = message + " 업로드 되었습니다."; 
 				    		if ( response.state.toLowerCase() == "error" ) message = message + " 업로드 중 오류가 발생하였습니다.";

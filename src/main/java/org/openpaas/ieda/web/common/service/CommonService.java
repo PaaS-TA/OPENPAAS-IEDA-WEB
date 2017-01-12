@@ -32,6 +32,7 @@ import org.openpaas.ieda.web.common.dto.SessionInfoDTO;
 import org.openpaas.ieda.web.deploy.cf.dao.CfDAO;
 import org.openpaas.ieda.web.deploy.cf.dao.CfVO;
 import org.openpaas.ieda.web.deploy.diego.dao.DiegoDAO;
+import org.openpaas.ieda.web.deploy.diego.dao.DiegoVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,7 +143,9 @@ public class CommonService{
 		File settingFile = null;
 		try {
 			settingFile = new File(LocalDirectoryConfiguration.getDeploymentDir() + System.getProperty("file.separator") + deploymentFile);
-			contents = IOUtils.toString(new FileInputStream(settingFile));
+			if( settingFile.exists() ){
+				contents = IOUtils.toString(new FileInputStream(settingFile));
+			}
 		} catch (FileNotFoundException e) {
 			throw new CommonException("notfound.manifest.exception", "배포 파일 정보 조회 중 문제가 발생하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (IOException e) {
@@ -281,6 +284,11 @@ public class CommonService{
 			cfVo.setKeyFile(keyFileName);
 			cfVo.setUpdateUserId(session.getUserId());
 			cfDao.updateCfInfo(cfVo);
+		}else{
+			DiegoVO diegoVo = diegoDao.selectDiegoInfo( Integer.parseInt(dto.getId()) );
+			diegoVo.setKeyFile(keyFileName);
+			diegoVo.setUpdateUserId(session.getUserId());
+			diegoDao.updateDiegoDefaultInfo(diegoVo);
 		}
 	}
 	

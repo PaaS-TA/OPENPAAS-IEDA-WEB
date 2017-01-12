@@ -179,7 +179,6 @@ public class StemcellManagementService {
 		StemcellManagementVO vo = null;
 		BufferedReader bufferedReader = null;
 		Process process = null;
-		String status = "";
 		String[] search = null;
 		String stemcellSize = "";
 		StringBuffer accumulatedBuffer = new StringBuffer();
@@ -267,11 +266,9 @@ public class StemcellManagementService {
 		File stemcllFile = new File(STEMCELLDIR + stemcellFileName);
 		//스템셀 파일이 존재하고 덮어쓰기 체크가 안되어 있을 경우
 		if(stemcllFile.exists() && "false".equals(dto.getOverlayCheck())) {
-			status ="error";
 			throw new CommonException("existReleaseFile.publicStemcell.exception", 
 					stemcellFileName + "의 스템셀 파일은 이미 존재합니다.", HttpStatus.CONFLICT);
 		}else{
-			status ="done";
 			if("".equals(stemcellSize) ||  stemcellSize.isEmpty()){
 				throw new CommonException("notfoundStemcellFile.publicStemcell.exception", 
 						stemcellFileName + "<br> 해당 스템셀을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
@@ -388,15 +385,17 @@ public class StemcellManagementService {
 		Boolean check = false;
 		File file = new File(STEMCELLDIR +  dto.getStemcellFileName());
 		dao.deletePublicStemcell(dto);
+		//key 파일 삭제
+		int index = dto.getStemcellFileName().indexOf(".tgz");
+		String lockFileName = dto.getStemcellFileName().substring(0, index) + "-download.lock";
+		File lcokFile = new File(LocalDirectoryConfiguration.getLockDir() + lockFileName );
+		if(  lcokFile.exists() ) check = lcokFile.delete();
+		//stemcell 파일 삭제
 		if(file.exists()){ 
-			int index = dto.getStemcellFileName().indexOf(".tgz");
-			String lockFileName = dto.getStemcellFileName().substring(0, index) + "-download.lock";
-			File lcokFile = new File(LocalDirectoryConfiguration.getLockDir() + lockFileName );
-			if(  lcokFile.exists() ) check = lcokFile.delete();
 			boolean delete = file.delete(); 
 			if(!delete){
-				throw new CommonException("sqlException Error.publicStemcell.exception",
-						"스템셀 삭제 실패", HttpStatus.INTERNAL_SERVER_ERROR);
+				throw new CommonException("stemcell.delete.exception",
+						"스템셀 파일 삭제에 오류가 발생하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}else{
 			throw new CommonException("notfound.publicStemcell.exception",
@@ -412,9 +411,7 @@ public class StemcellManagementService {
 	 * @return            : List<StemcellManagementVO>
 	***************************************************/
 	public List<StemcellManagementVO> listLocalStemcells(String iaas){
-		
 		List<StemcellManagementVO> list = dao.selectLocalStemcellList(iaas);
-		
 		if( list != null ){
 			for( StemcellManagementVO stemcell : list ){
 				if( stemcell.getDownloadStatus() != null ){

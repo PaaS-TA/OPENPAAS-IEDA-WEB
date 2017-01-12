@@ -432,9 +432,11 @@ public class DiegoControllerTest extends BaseTestController{
 		dto.setGardenReleaseVersion("0.339.0");
 		dto.setEtcdReleaseName("etcd");
 		dto.setEtcdReleaseVersion("63");
+		dto.setPaastaMonitoringUse("true");
+		dto.setCadvisorDriverIp("10.10.10.10");
+		dto.setCadvisorDriverPort("7777");
 		dto.setCfDeploymentFile("openstack-cf-test-1.yml");
 		dto.setCfDeploymentName("cf-openstack-diego");
-		dto.setKeyFile("vsphere-diego-key-1.yml");
 		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
@@ -495,6 +497,7 @@ public class DiegoControllerTest extends BaseTestController{
 		dto.setMediumFlavor("m1.medium");
 		dto.setLargeFlavor("m1.large");
 		dto.setRunnerFlavor("m1.xlarge");
+		dto.setKeyFile("test-diego-key-1.yml");
 		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);

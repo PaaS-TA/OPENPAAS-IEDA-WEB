@@ -206,7 +206,7 @@ public class CfDiegoController {
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화
-	 * @description   : 리소스 정보 저장
+	 * @description   	: 리소스 정보 저장
 	 * @title               : saveResourceInfo
 	 * @return            : ResponseEntity<Map<String,Object>>
 	***************************************************/
@@ -215,7 +215,7 @@ public class CfDiegoController {
 		
 		if(LOGGER.isInfoEnabled()){ LOGGER.info("==================================> CF & Diego 리소스 정보 저장 요청"); }
 		Map<String, Object> result = cfDiegoSaveService.saveResourceInfo(dto, test);
-		if(LOGGER.isInfoEnabled()){ LOGGER.info("==principal.getName(), ================================> CF & Diego 리소스 정보 저장 성공!!"); }
+		if(LOGGER.isInfoEnabled()){ LOGGER.info("================================> CF & Diego 리소스 정보 저장 성공!!"); }
 		
 		return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
 	}

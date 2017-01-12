@@ -16,15 +16,6 @@ base_security_group:
     protocol: all
 
 networks:
-- name: bosh
-  subnets:
-    - range: (( meta.network-external-range ))
-      static: (( meta.network-external-static ))
-      gateway: (( meta.network-external-gateway ))
-      dns: (( meta.network-external-dns ))
-      cloud_properties:
-        security_groups: (( meta.network-external-security-groups ))
-        subnet: (( meta.network-external-subnet-id ))
 - name: cf1
   subnets:
     - range: (( meta.network-0-range ))
@@ -191,7 +182,7 @@ jobs:
     networks:
       - name: elastic
         static_ips: (( meta.elastic_static_ips ))
-      - name: bosh
+      - name: cf1
         default:
         - dns
         - gateway

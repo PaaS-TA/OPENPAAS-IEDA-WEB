@@ -18,7 +18,7 @@ networks:
       reserved: [[subnetReserved]]
       static: [[subnetStatic]]
       cloud_properties:
-        net_id: [cloudNetId]
+        net_id: [subnetId]
         security_groups: [[cloudSecurityGroups]]
 
 resource_pools:

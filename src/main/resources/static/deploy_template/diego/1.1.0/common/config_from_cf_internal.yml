@@ -1,7 +1,7 @@
 config_from_cf:
   cf_deployment_name: (( name ))
   cf_director_uuid: (( director_uuid ))
-  cf_release: (( releases.cf ))
+  cf_release: (( releases.cf || releases.openpaas-controller  || releases.paasta-controller ))
   cc:
     internal_api_user: (( properties.cc.internal_api_user ))
     internal_api_password: (( properties.cc.internal_api_password ))

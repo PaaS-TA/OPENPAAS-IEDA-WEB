@@ -26,6 +26,9 @@
 		<result property="cfName" column="CFNAME" />
 		<result property="cflinuxfs2rootfsreleaseName" column="CFLINUXFS2_ROOTFS_RELEASE_NAME" />
 		<result property="cflinuxfs2rootfsreleaseVersion" column="CFLINUXFS2_ROOTFS_RELEASE_VERSION" />
+		<result property="paastaMonitoringUse" column="PAASTA_MONITORING_USE" />
+		<result property="cadvisorDriverIp" column="CADVISOR_DRIVER_IP" />
+		<result property="cadvisorDriverPort" column="CADVISOR_DRIVER_PORT" />
 		<collection property="resource" ofType="org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO"  javaType="org.openpaas.ieda.web.deploy.common.dao.resource.ResourceVO">
 			<result property="id" column="RESOURCE_ID" />
 			<result property="deployType" column="RESOURCE_DEPLOY_TYPE"/>
@@ -73,12 +76,15 @@
 			,garden_release_version
 			,etcd_release_name
 			,etcd_release_version
+			,paasta_monitoring_use
+			,cadvisor_driver_ip
+			,cadvisor_driver_port
 			,task_id
 			,d.update_date as update_date
 			,d.create_date as create_date
 		From ieda_diego d
 		LEFT JOIN ieda_cf_diego a
-		ON d.id = a.cf_id
+		ON d.id = a.diego_id
 	 	Where LOWER(d.iaas_type) = #{iaasType}
 		And (a.diego_id is null || d.deploy_status = 'error')
 	</select>
@@ -103,6 +109,9 @@
 			,a.etcd_release_name
 			,a.etcd_release_version
 			,a.key_file
+			,a.paasta_monitoring_use
+			,a.cadvisor_driver_ip
+			,a.cadvisor_driver_port
 			,a.task_id
 			,a.update_date
 			,(select c.deployment_name from ieda_diego a, ieda_cf c where c.deployment_file = a.cf_deployment and a.id=#{id}) as cfName
@@ -127,6 +136,9 @@
 			,garden_release_version
 			,etcd_release_name
 			,etcd_release_version
+			,paasta_monitoring_use
+			,cadvisor_driver_ip
+			,cadvisor_driver_port
 			,deployment_file
 			,cf_deployment
 			,key_file
@@ -147,6 +159,9 @@
 			,#{diego.gardenReleaseVersion}
 			,#{diego.etcdReleaseName}
 			,#{diego.etcdReleaseVersion}
+			,#{diego.paastaMonitoringUse}
+			,#{diego.cadvisorDriverIp}
+			,#{diego.cadvisorDriverPort}
 			,#{diego.deploymentFile}
 			,#{diego.cfDeployment}
 			,#{diego.keyFile}
@@ -158,34 +173,6 @@
 			<if test="diego.id == 1"> SELECT 1 AS id from dual; </if>
 		</selectKey>
 	</insert>
-	
-	
-	<select id="selectDiegoKeyInfoById" resultMap="diego">
-		/** DiegoDeploy.selectDiegoKeyInfoById **/
-		Select 
-			 d.id as id
-			,k.id as key_id
-			,k.key_type as key_type
-			,iaas_type
-			,deploy_status
-			,cf_deployment
-			,deployment_name
-			,diego_release_name
-			,diego_release_version
-			,cflinuxfs2_rootfs_release_name
-			,cflinuxfs2_rootfs_release_version
-			,director_uuid
-			,garden_release_name
-			,garden_release_version
-			,etcd_release_name
-			,etcd_release_version
-			,task_id
-		From (select * from ieda_diego where id = #{id} ) d
-		Left Join ieda_key k
-		 	On d.id = k.id
-		   And k.deploy_type=#{deployType}
-		   And k.key_type=#{keyType}
-	</select>
 	
 	<select id="selectResourceInfoById" resultMap="diego">
 		/** DiegoDeploy.selectResourceInfoById **/
@@ -205,6 +192,9 @@
 			,garden_release_version
 			,etcd_release_name
 			,etcd_release_version
+			,paasta_monitoring_use
+			,cadvisor_driver_ip
+			,cadvisor_driver_port
 			,key_file
 			,task_id
 			,resource.id as resource_id
@@ -249,7 +239,10 @@
 			garden_release_name=#{diego.gardenReleaseName}, 
 			garden_release_version=#{diego.gardenReleaseVersion}, 
 			etcd_release_name=#{diego.etcdReleaseName}, 
-			etcd_release_version=#{diego.etcdReleaseVersion}, 
+			etcd_release_version=#{diego.etcdReleaseVersion},
+			paasta_monitoring_use = #{diego.paastaMonitoringUse},
+			cadvisor_driver_ip=#{diego.cadvisorDriverIp},
+			cadvisor_driver_port=#{diego.cadvisorDriverPort},
 			key_file=#{diego.keyFile},
 			deployment_file=#{diego.deploymentFile}, 
 			deploy_status=#{diego.deployStatus}, 

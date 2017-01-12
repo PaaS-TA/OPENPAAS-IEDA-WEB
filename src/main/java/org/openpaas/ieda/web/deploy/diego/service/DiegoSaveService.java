@@ -82,7 +82,9 @@ public class DiegoSaveService {
 		vo.setGardenReleaseVersion(dto.getGardenReleaseVersion());
 		vo.setEtcdReleaseName(dto.getEtcdReleaseName());
 		vo.setEtcdReleaseVersion(dto.getEtcdReleaseVersion());
-		vo.setKeyFile(dto.getKeyFile());
+		vo.setPaastaMonitoringUse(dto.getPaastaMonitoringUse());
+		vo.setCadvisorDriverIp(dto.getCadvisorDriverIp());
+		vo.setCadvisorDriverPort(dto.getCadvisorDriverPort());
 		vo.setUpdateUserId(sessionInfo.getUserId());
 		if( StringUtils.isEmpty(dto.getId()) || "Y".equals(test) ) { 
 			diegoDao.insertDiegoDefaultInfo(vo);//저장
@@ -93,10 +95,10 @@ public class DiegoSaveService {
 	}
 
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : Diego 네트워크 정보 저장   
-	 * @title               : saveNetworkInfo
-	 * @return            : DiegoVO
+	 * @title         : saveNetworkInfo
+	 * @return        : DiegoVO
 	***************************************************/
 	@Transactional
 	public DiegoVO saveNetworkInfo(List<NetworkDTO> dto){
@@ -119,6 +121,7 @@ public class DiegoSaveService {
 				vo.setSubnetStaticTo(network.getSubnetStaticTo());
 				vo.setSubnetId(network.getSubnetId());
 				vo.setCloudSecurityGroups(network.getCloudSecurityGroups());
+				vo.setAvailabilityZone(network.getAvailabilityZone());
 				vo.setCreateUserId(sessionInfo.getUserId());
 				vo.setUpdateUserId(sessionInfo.getUserId());
 				networkList.add(vo);
@@ -136,10 +139,10 @@ public class DiegoSaveService {
 	}
 
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : Diego 리소스 저장
-	 * @title               : saveResourceInfo
-	 * @return            : Map<String,Object>
+	 * @title         : saveResourceInfo
+	 * @return        : Map<String,Object>
 	***************************************************/
 	@Transactional
 	public Map<String, Object> saveResourceInfo(ResourceDTO dto, String test){
@@ -165,13 +168,14 @@ public class DiegoSaveService {
 			resourceVo.setDeployType(codeVo.getCodeName());
 			resourceVo.setCreateUserId(sessionInfo.getUserId());
 		}
+		
 		resourceVo.setUpdateUserId(sessionInfo.getUserId());
 		resourceVo.setStemcellName(dto.getStemcellName());
 		resourceVo.setStemcellVersion(dto.getStemcellVersion());
 		resourceVo.setBoshPassword(dto.getBoshPassword());
+		
 		//Flavor setting
 		//vSphere Flavor setting 
-		
 		if( "vsphere".equals(vo.getIaasType().toLowerCase()) ){
 			resourceVo.setSmallCpu(Integer.parseInt(dto.getSmallCpu()));
 			resourceVo.setSmallDisk(Integer.parseInt(dto.getSmallDisk()));
@@ -199,6 +203,7 @@ public class DiegoSaveService {
 		map.put("id", vo.getId());
 		
 		//update Diego Info
+		vo.setKeyFile(dto.getKeyFile());
 		diegoDao.updateDiegoDefaultInfo(vo);
 		//Insert OR Update Diego Resource Info
 		if( vo.getResource().getId() == null  || "Y".equals(test))

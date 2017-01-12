@@ -136,25 +136,27 @@ $(function(){
 	$("#installBtn").click(function(){
 		if($("#installBtn").attr('disabled') == "disabled") return;
 		var directorName = $("#directorName").text().toUpperCase();
- 		 if ( directorName.indexOf("AWS") > 0 ) { 
+		if( directorName.indexOf("_CPI") > 0  ) {
+			var start = directorName.indexOf("(");
+			var end = directorName.indexOf("_CPI)", start+1);
+			iaas = directorName.substring(start+1, end)
+		}
+ 		 if (iaas == "AWS") { 
 			$("#boshPopupDiv").load("/deploy/bosh/install/boshPopup",function(event){
 				iaas = "AWS";
 				awsPopup();
 			});
- 		} else if (directorName.indexOf("OPENSTACK") > 0 ) {
+ 		} else if (iaas == "OPENSTACK") {
  			$("#boshPopupDiv").load("/deploy/bosh/install/boshPopup",function(event){
 				iaas = "OPENSTACK";
 				openstackPopup();
  			});
-		} else if(directorName.indexOf("VSPHERE") > 0 ){
+		} else if(iaas == "VSPHERE"){
 			$("#boshPopupDiv").load("/deploy/bosh/install/boshPopup",function(event){
 				iaas = "VSPHERE";
 				vSpherePopup();
 			});
 		}
-			else {
-			selectIaas();
-		} 
 	});
 	
 	/********************************************************
@@ -244,7 +246,7 @@ function doSearch() {
 	if( directorName.indexOf("_CPI") > 0  ) {
 			var start = directorName.indexOf("(");
 			var end = directorName.indexOf("_CPI)", start+1);
-			iaas = directorName.substring(start+1, end)
+			iaas = directorName.substring(start+1, end);
 	}
 	if(iaas != ""){
 	w2ui['config_boshGrid'].load("<c:url value='/deploy/bosh/list/"+iaas+"'/>",

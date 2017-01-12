@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.openpaas.ieda.common.CommonException;
 import org.openpaas.ieda.common.LocalDirectoryConfiguration;
 import org.openpaas.ieda.web.common.dao.CommonDAO;
@@ -52,10 +53,10 @@ public class DiegoService {
 	final private static Logger LOGGER = LoggerFactory.getLogger(BootstrapService.class);
 	
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : Diego 목록 정보를 조회
-	 * @title               : getDiegoInfoList
-	 * @return            : List<DiegoListDTO>
+	 * @title         : getDiegoInfoList
+	 * @return        : List<DiegoListDTO>
 	***************************************************/
 	public List<DiegoListDTO> getDiegoInfoList(String iaasType) {
 		List<DiegoListDTO> diegoList = null;
@@ -93,8 +94,8 @@ public class DiegoService {
 				int cnt = 0;
 				String subnetRange , subnetGateway , subnetDns , subnetReservedIp;
 				subnetRange = subnetGateway = subnetDns = subnetReservedIp = "";
-				String subnetStaticIp, publicStaticIp ,subnetId , cloudSecurityGroups;
-				subnetStaticIp = publicStaticIp = subnetId = cloudSecurityGroups=  "";
+				String subnetStaticIp, publicStaticIp ,subnetId , cloudSecurityGroups, availabilityZone;
+				subnetStaticIp = publicStaticIp = subnetId = cloudSecurityGroups= availabilityZone = "";
 				
 				if(netowrks  != null){
 					for(NetworkVO networkVO: netowrks){
@@ -111,6 +112,7 @@ public class DiegoService {
 							subnetStaticIp += networkVO.getSubnetStaticFrom() +" - " + networkVO.getSubnetStaticTo() + br;
 							subnetId += networkVO.getSubnetId() + br;
 							cloudSecurityGroups += networkVO.getCloudSecurityGroups() + br;
+							availabilityZone += networkVO.getAvailabilityZone() + br;
 						}else {
 							publicStaticIp = networkVO.getSubnetStaticFrom();
 						}
@@ -122,6 +124,7 @@ public class DiegoService {
 					diegoInfo.setSubnetStaticIp(subnetStaticIp);
 					diegoInfo.setSubnetId(subnetId);
 					diegoInfo.setCloudSecurityGroups(cloudSecurityGroups);
+					diegoInfo.setAvailabilityZone(availabilityZone);
 					diegoInfo.setPublicStaticIp(publicStaticIp);
 				}
 				vo.setResource(resourceDao.selectResourceInfo(vo.getId(), codeVo.getCodeName()));
@@ -143,10 +146,10 @@ public class DiegoService {
 	}
 	
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : Diego 정보 상세 조회  
-	 * @title               : getDiegoDetailInfo
-	 * @return            : DiegoVO
+	 * @title         : getDiegoDetailInfo
+	 * @return        : DiegoVO
 	***************************************************/
 	public DiegoVO getDiegoDetailInfo(int id) {
 		DiegoVO vo =  diegoDao.selectDiegoInfo(id);
@@ -160,10 +163,10 @@ public class DiegoService {
 	}
 
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : 입력 정보를 바탕으로 manifest 파일 생성 및 배포 파일명 응답  
-	 * @title               : createSettingFile
-	 * @return            : void
+	 * @title         : createSettingFile
+	 * @return        : void
 	***************************************************/
 	public void createSettingFile(DiegoVO vo, String iaas) {
 		String content = "";
@@ -174,13 +177,13 @@ public class DiegoService {
 			result = commonDao.selectManifetTemplate(vo.getIaasType().toLowerCase(), vo.getDiegoReleaseVersion(), "DIEGO",vo.getDiegoReleaseName());
 			ManifestTemplateVO manifestTemplate = null;
 			if(result != null){
-				inputs =  this.getClass().getClassLoader().getResourceAsStream("static/deploy_template/diego/"+result.getTemplateVersion()+ SEPARATOR+vo.getIaasType().toLowerCase() + SEPARATOR +result.getInputTemplate());
+				inputs =  this.getClass().getClassLoader().getResourceAsStream("static/deploy_template/diego/"+result.getTemplateVersion()+ SEPARATOR + vo.getIaasType().toLowerCase() + SEPARATOR +result.getInputTemplate());
 				content = IOUtils.toString(inputs, "UTF-8");
 				manifestTemplate = new ManifestTemplateVO();
 				manifestTemplate = setOptionManifestTemplateInfo(result, manifestTemplate, vo);
 				manifestTemplate.setMinReleaseVersion(result.getTemplateVersion());
 			}else {
-				throw new CommonException("notFound.bootstrap.exception",
+				throw new CommonException("notFound.diego.exception",
 						"해당하는 Manifest 템플릿 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 			}
 
@@ -198,10 +201,7 @@ public class DiegoService {
 				LOGGER.error( e.getMessage() );
 			}
 		} catch(NullPointerException e){
-			if( vo == null){
-				throw new CommonException("notFound.bootstrap.exception",
-						"해당하는 배포 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
-			}
+			throw new CommonException("notFound.diego.exception", "배포 파일을 만드는데 실패하셨습니다.", HttpStatus.NOT_FOUND);
 		}
 	}
 	
@@ -291,6 +291,8 @@ public class DiegoService {
 			items.add(new ReplaceItemDTO("[cflinuxfs2RootfsReleaseName]", "\"" + "" + "\""));
 			items.add(new ReplaceItemDTO("[cflinuxfs2RootfsReleaseVersion]", "\"" + "" + "\""));
 		}
+		items.add(new ReplaceItemDTO("[cadvisorDriverIp]", vo.getCadvisorDriverIp()));
+		items.add(new ReplaceItemDTO("[cadvisorDriverPort]", vo.getCadvisorDriverPort()));
 		// 2. 네트워크 정보
 		for( int i=0; i<vo.getNetworks().size(); i++ ){
 			if( "INTERNAL".equals(vo.getNetworks().get(i).getNet().toUpperCase())){
@@ -303,6 +305,7 @@ public class DiegoService {
 						items.add(new ReplaceItemDTO("[subnetStatic]", vo.getNetworks().get(i).getSubnetStaticFrom() + " - " + vo.getNetworks().get(i).getSubnetStaticTo()));
 						items.add(new ReplaceItemDTO("[subnetId]", vo.getNetworks().get(i).getSubnetId()));			
 						items.add(new ReplaceItemDTO("[cloudSecurityGroups]", vo.getNetworks().get(i).getCloudSecurityGroups()));
+						items.add(new ReplaceItemDTO("[availabilityZone]", vo.getNetworks().get(i).getAvailabilityZone()));
 					}else if(i > 0){
 						items.add(new ReplaceItemDTO("[subnetRange"+i+"]", vo.getNetworks().get(i).getSubnetRange()));
 						items.add(new ReplaceItemDTO("[subnetGateway"+i+"]", vo.getNetworks().get(i).getSubnetGateway()));
@@ -311,6 +314,7 @@ public class DiegoService {
 						items.add(new ReplaceItemDTO("[subnetStatic"+i+"]", vo.getNetworks().get(i).getSubnetStaticFrom() + " - " + vo.getNetworks().get(i).getSubnetStaticTo()));
 						items.add(new ReplaceItemDTO("[subnetId"+i+"]", vo.getNetworks().get(i).getSubnetId()));			
 						items.add(new ReplaceItemDTO("[cloudSecurityGroups"+i+"]", vo.getNetworks().get(i).getCloudSecurityGroups()));
+						items.add(new ReplaceItemDTO("[availabilityZone"+i+"]", vo.getNetworks().get(i).getAvailabilityZone()));
 					}
 				}else if(vo.getIaasType().toUpperCase().equals("VSPHERE")){
 					if(i == 0){
@@ -349,6 +353,9 @@ public class DiegoService {
 			
 			items.add(new ReplaceItemDTO("[cloudSecurityGroups1]", ""));	
 			items.add(new ReplaceItemDTO("[cloudSecurityGroups2]", ""));
+			
+			items.add(new ReplaceItemDTO("[availabilityZone1]", ""));	
+			items.add(new ReplaceItemDTO("[availabilityZone2]", ""));
 		}else if( vo.getNetworks().size() > 1 ){
 			items.add(new ReplaceItemDTO("[subnetRange2]", ""));
 			items.add(new ReplaceItemDTO("[subnetGateway2]", ""));
@@ -357,6 +364,7 @@ public class DiegoService {
 			items.add(new ReplaceItemDTO("[subnetStatic2]", ""));
 			items.add(new ReplaceItemDTO("[subnetId2]", ""));			
 			items.add(new ReplaceItemDTO("[cloudSecurityGroups2]", ""));
+			items.add(new ReplaceItemDTO("[availabilityZone2]", ""));
 		}
 				
 		//3.리소스 정보

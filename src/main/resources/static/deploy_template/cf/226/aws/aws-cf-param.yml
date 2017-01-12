@@ -12,7 +12,7 @@ networks:
       reserved: [[subnetReserved]]
       static: [[subnetStatic]]
       cloud_properties:
-        subnet: [subnetId]
+        subnet: [cloudNetId]
         security_groups: [[cloudSecurityGroups]]
 
 jobs:

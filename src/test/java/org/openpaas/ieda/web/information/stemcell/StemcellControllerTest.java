@@ -51,7 +51,7 @@ public class StemcellControllerTest extends BaseTestController{
 	/************************* URL ************************************/
 	final static String VIEW_URL = "/info/stemcell"; //스템셀 업로드 화면 요청
 	final static String UPLOAD_STEMCELL_LIST_URL = "/info/stemcell/list/upload"; //업로드된 스템셀 목록 정보 조회
-	final static String DOWNLOAD_STEMCELL_LIST_URL = "/info/stemcell/list/local/OPENSTACK"; //로컬에 다운로드 된 스템셀 목록 정보 조회
+	final static String DOWNLOAD_STEMCELL_LIST_URL = "/info/stemcell/list/local"; //로컬에 다운로드 된 스템셀 목록 정보 조회
 	/************************* URL **********************************/
 	
 	/***************************************************

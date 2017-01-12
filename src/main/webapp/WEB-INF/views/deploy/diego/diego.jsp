@@ -21,7 +21,6 @@ var iaas = "";//iaas
 var bDefaultDirector = "";
 var menu = "";
 var cfId = "";
-
 $(function() {
 	/********************************************************
 	 * 설명 :  기본 설치 관리자 정보 조회
@@ -275,7 +274,7 @@ function doSearch() {
 	if( directorName.indexOf("_CPI") > 0  ) {
 			var start = directorName.indexOf("(");
 			var end = directorName.indexOf("_CPI)", start+1);
-			iaas = directorName.substring(start+1, end)
+			iaas = directorName.substring(start+1, end);
 	}
 	if(iaas!=""){
 	w2ui['config_diegoGrid'].load("<c:url value='/deploy/diego/list/"+iaas+"'/>",

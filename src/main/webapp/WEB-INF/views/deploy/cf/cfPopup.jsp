@@ -49,9 +49,9 @@ function getReleaseVersionList(){
 		contentType :"application/json",
 		success :function(data, status) {
 			if (data != null && data != "") {
-				contents = "<table id='popoverTable'><tr><th>IaaS 유형</th><th>릴리즈 버전</th></tr>";
+				contents = "<table id='popoverTable'><tr><th>릴리즈 유형</th><th>릴리즈 버전</th></tr>";
 				data.map(function(obj) {
-					contents += "<tr><td>" + obj.iaasType+ "</td><td>" +  obj.minReleaseVersion +"</td></tr>";
+					contents += "<tr><td>" + obj.releaseType+ "</td><td>" +  obj.minReleaseVersion +"</td></tr>";
 				});
 				contents += "</table>";
 				$('.cf-info').attr('data-content', contents);
@@ -118,7 +118,6 @@ function setCfData(contents) {
 		domain                 : contents.domain,
 		description            : contents.description,
 		domainOrganization     : contents.domainOrganization,		
-		proxyStaticIps		   : contents.proxyStaticIps,
 		loginSecret            : contents.loginSecret
 	}
 	//네트워크 정보 
@@ -137,7 +136,8 @@ function setCfData(contents) {
 			subnetStaticFrom 		: contents.networks[i].subnetStaticFrom,
 			subnetStaticTo 			: contents.networks[i].subnetStaticTo,
 			subnetId 					: contents.networks[i].subnetId,
-			cloudSecurityGroups 	: contents.networks[i].cloudSecurityGroups
+			cloudSecurityGroups 	: contents.networks[i].cloudSecurityGroups,
+			availabilityZone        : contents.networks[i].availabilityZone
 		}
 	 	networkInfo.push(arr);
 	}
@@ -184,8 +184,7 @@ function setCfData(contents) {
  * Function	: defaultInfoPopup
  *********************************************************/
 function defaultInfoPopup() {
-	 settingDiegoUse(diegoUse, $("#defaultInfoDiv ul"));
-	
+	settingDiegoUse(diegoUse, $("#defaultInfoDiv ul"));
 	 	
 	$("#defaultInfoDiv").w2popup({
 		width : 750,
@@ -197,6 +196,10 @@ function defaultInfoPopup() {
 				//릴리즈 정보 popup over
 			 	$('[data-toggle="popover"]').popover();
 			 	getReleaseVersionList();
+			 	//cf & diego 통합 설치일 경우 fingerprint readonly
+			 	if( menu.toLowerCase() =="cfdiego" ){
+			 		$(".w2ui-msg-body input[name='appSshFingerprint']").attr("readonly", true);
+			 	}
 
 			 	if ( defaultInfo != "" && defaultInfo != null) {
 					//설치관리자 UUID
@@ -210,7 +213,6 @@ function defaultInfoPopup() {
 					//CF 정보
 					$(".w2ui-msg-body input[name='domain']").val(defaultInfo.domain);
 					$(".w2ui-msg-body input[name='description']").val(defaultInfo.description);
-					$(".w2ui-msg-body input[name='proxyStaticIps']").val(defaultInfo.proxyStaticIps);
 					$(".w2ui-msg-body input[name='loginSecret']").val(defaultInfo.loginSecret);
 				} else{
 					if( !checkEmpty($("#directorUuid").text()) ){
@@ -294,7 +296,6 @@ function saveDefaultInfo() {
 				domain 					: $(".w2ui-msg-body input[name='domain']").val(),
 				description 			: $(".w2ui-msg-body input[name='description']").val(),
 				domainOrganization 	    : $(".w2ui-msg-body input[name='domainOrganization']").val(),
-				proxyStaticIps			: $(".w2ui-msg-body input[name='proxyStaticIps']").val(),
 				loginSecret			    : $(".w2ui-msg-body input[name='loginSecret']").val()
 	}
 	//유효성
@@ -333,9 +334,16 @@ function saveDefaultInfo() {
  * Function	: networkPopup
  *********************************************************/
 function networkPopup(){
+	settingDiegoUse(diegoUse, $("#networkInfoDiv ul"));
+	if(iaas.toLowerCase() == "aws"){
+		$('#availabilityZone').css('display','block');
+	}else{
+		$('#availabilityZone').css('display','none');
+		$(".w2ui-msg-body input[name='availabilityZone']").val("");
+	}
 	$("#networkInfoDiv").w2popup({
 		width : 750,
-		height : 700,
+		height : 760,
 		modal : true,
 		showMax : false,
 		onOpen : function(event) {
@@ -359,6 +367,7 @@ function networkPopup(){
 							$(".w2ui-msg-body input[name='subnetStaticTo']").eq(cnt).val(networkInfo[i].subnetStaticTo);
 							$(".w2ui-msg-body input[name='subnetId']").eq(cnt).val(networkInfo[i].subnetId);
 							$(".w2ui-msg-body input[name='cloudSecurityGroups']").eq(cnt).val(networkInfo[i].cloudSecurityGroups);
+							$(".w2ui-msg-body input[name='availabilityZone']").eq(cnt).val(networkInfo[i].availabilityZone);
 						}
 					}
 				}		
@@ -377,49 +386,50 @@ function networkPopup(){
  * Function	: vSphereNetworkInfoDiv
  *********************************************************/
 function vSphereNetworkPopup(){
-		$("#VsphereNetworkInfoDiv").w2popup({
-			width : 750,
-			height : 700,
-			modal : true,
-			showMax : false,
-			onOpen : function(event) {
-				event.onComplete = function() {
-					$(".addInternal").show();
-					$(".delInternal").hide();
-					if (networkInfo.length > 0) {
-						networkId = networkInfo[0].id;
-						for(var i=0; i <networkInfo.length; i++){
-							if( networkInfo[i].net == "External" ){
-								$(".w2ui-msg-body input[name='publicSubnetId']").val(networkInfo[i].subnetId);
-								$(".w2ui-msg-body input[name='publicSubnetRange']").val(networkInfo[i].subnetRange); 
-								$(".w2ui-msg-body input[name='publicSubnetGateway']").val(networkInfo[i].subnetGateway);
-								$(".w2ui-msg-body input[name='publicSubnetDns']").val(networkInfo[i].subnetDns);
-								$(".w2ui-msg-body input[name='publicStaticIp']").val(networkInfo[i].subnetStaticFrom);
-								//vsphere
-								$(".w2ui-msg-body input[name='publicStaticFrom']").eq(i).val(networkInfo[i].subnetStaticFrom);
-								$(".w2ui-msg-body input[name='publicStaticTo']").eq(i).val(networkInfo[i].subnetStaticTo);
-							}else{
-								var cnt = i-1;
-								if(cnt > 0)  settingNetwork(cnt);
-								$(".w2ui-msg-body input[name='subnetRange']").eq(cnt).val(networkInfo[i].subnetRange); 
-								$(".w2ui-msg-body input[name='subnetGateway']").eq(cnt).val(networkInfo[i].subnetGateway);
-								$(".w2ui-msg-body input[name='subnetDns']").eq(cnt).val(networkInfo[i].subnetDns);
-								$(".w2ui-msg-body input[name='subnetReservedFrom']").eq(cnt).val(networkInfo[i].subnetReservedFrom);
-								$(".w2ui-msg-body input[name='subnetReservedTo']").eq(cnt).val(networkInfo[i].subnetReservedTo);
-								$(".w2ui-msg-body input[name='subnetStaticFrom']").eq(cnt).val(networkInfo[i].subnetStaticFrom);
-								$(".w2ui-msg-body input[name='subnetStaticTo']").eq(cnt).val(networkInfo[i].subnetStaticTo);
-								$(".w2ui-msg-body input[name='subnetId']").eq(cnt).val(networkInfo[i].subnetId);
-							}
+	settingDiegoUse(diegoUse, $("#VsphereNetworkInfoDiv ul"));
+	$("#VsphereNetworkInfoDiv").w2popup({
+		width : 750,
+		height : 700,
+		modal : true,
+		showMax : false,
+		onOpen : function(event) {
+			event.onComplete = function() {
+				$(".addInternal").show();
+				$(".delInternal").hide();
+				if (networkInfo.length > 0) {
+					networkId = networkInfo[0].id;
+					for(var i=0; i <networkInfo.length; i++){
+						if( networkInfo[i].net == "External" ){
+							$(".w2ui-msg-body input[name='publicSubnetId']").val(networkInfo[i].subnetId);
+							$(".w2ui-msg-body input[name='publicSubnetRange']").val(networkInfo[i].subnetRange); 
+							$(".w2ui-msg-body input[name='publicSubnetGateway']").val(networkInfo[i].subnetGateway);
+							$(".w2ui-msg-body input[name='publicSubnetDns']").val(networkInfo[i].subnetDns);
+							$(".w2ui-msg-body input[name='publicStaticIp']").val(networkInfo[i].subnetStaticFrom);
+							//vsphere
+							$(".w2ui-msg-body input[name='publicStaticFrom']").eq(i).val(networkInfo[i].subnetStaticFrom);
+							$(".w2ui-msg-body input[name='publicStaticTo']").eq(i).val(networkInfo[i].subnetStaticTo);
+						}else{
+							var cnt = i-1;
+							if(cnt > 0)  settingNetwork(cnt);
+							$(".w2ui-msg-body input[name='subnetRange']").eq(cnt).val(networkInfo[i].subnetRange); 
+							$(".w2ui-msg-body input[name='subnetGateway']").eq(cnt).val(networkInfo[i].subnetGateway);
+							$(".w2ui-msg-body input[name='subnetDns']").eq(cnt).val(networkInfo[i].subnetDns);
+							$(".w2ui-msg-body input[name='subnetReservedFrom']").eq(cnt).val(networkInfo[i].subnetReservedFrom);
+							$(".w2ui-msg-body input[name='subnetReservedTo']").eq(cnt).val(networkInfo[i].subnetReservedTo);
+							$(".w2ui-msg-body input[name='subnetStaticFrom']").eq(cnt).val(networkInfo[i].subnetStaticFrom);
+							$(".w2ui-msg-body input[name='subnetStaticTo']").eq(cnt).val(networkInfo[i].subnetStaticTo);
+							$(".w2ui-msg-body input[name='subnetId']").eq(cnt).val(networkInfo[i].subnetId);
 						}
-					}		
-				}
-			},
-			onClose : function(event) {
-				event.onComplete = function() {
-					initSetting();
-				}
+					}
+				}		
 			}
-		});
+		},
+		onClose : function(event) {
+			event.onComplete = function() {
+				initSetting();
+			}
+		}
+	});
 }
 
  /********************************************************
@@ -439,7 +449,7 @@ function vSphereNetworkPopup(){
  	  if( i == 1){
  		  $(".addInternal").hide(); 
  		  $(networkDiv +" .delInternal").show();
- 	  } 
+ 	  }
   }
 
 /********************************************************
@@ -536,7 +546,8 @@ function saveNetworkInfo(type) {
 					subnetStaticFrom			: $(".w2ui-msg-body input[name='subnetStaticFrom']").eq(i).val(),
 					subnetStaticTo				: $(".w2ui-msg-body input[name='subnetStaticTo']").eq(i).val(),
 					subnetId						: $(".w2ui-msg-body input[name='subnetId']").eq(i).val(),
-					cloudSecurityGroups		: $(".w2ui-msg-body input[name='cloudSecurityGroups']").eq(i).val()
+					cloudSecurityGroups		: $(".w2ui-msg-body input[name='cloudSecurityGroups']").eq(i).val(),
+					availabilityZone		: $(".w2ui-msg-body input[name='availabilityZone']").eq(i).val()
 			}
 		 networkInfo.push(InternalArr);
 	 }
@@ -603,6 +614,7 @@ function getCountryCodes() {
  * Function	: uaaInfoPopup
  *********************************************************/
 function keyInfoPopup(){
+	settingDiegoUse(diegoUse, $("#KeyInfoDiv ul"));
 	$("#KeyInfoDiv").w2popup({
 		width : 650,
 		height : 520,
@@ -757,6 +769,7 @@ function saveKeyInfo(type){
  * Function	: resourceInfoPopup
  *********************************************************/
 function resourceInfoPopup() {
+	settingDiegoUse(diegoUse, $("#resourceInfoDiv ul"));
 	$("#resourceInfoDiv").w2popup({
 		width : 750,
 		height : 800,
@@ -788,6 +801,7 @@ function resourceInfoPopup() {
  * Function	: vSphereResourceInfoPopup
  *********************************************************/
 function vSphereResourceInfoPopup() {
+ 	settingDiegoUse(diegoUse, $("#vSphereResourceInfoDiv ul"));
 	$("#vSphereResourceInfoDiv").w2popup({
 		width : 750,
 		height : 800,
@@ -953,6 +967,7 @@ function createSettingFile(id){
  * Function	: deployPopup
  *********************************************************/
 function deployPopup() {
+	settingDiegoUse(diegoUse, $("#deployDiv ul"));
 	$("#deployDiv").w2popup({
 		width : 750,
 		height : 550,
@@ -1061,8 +1076,10 @@ function installPopup(){
 					    		
 					    		installStatus = response.state.toLowerCase();
 					    		$('.w2ui-msg-buttons #deployPopupBtn').prop("disabled", false);
-					    		
-					    		installClient.disconnect();
+					    		if(installClient!=""){
+						    		installClient.disconnect();
+					    			installClient = "";
+					    		}
 								w2alert(message, "CF 설치");
 					       	}
 			        	}
@@ -1085,10 +1102,15 @@ function installPopup(){
  *********************************************************/
 function settingDiegoUse(flag, thisDiv){
 	if(flag=="false"){
-		//ham_9000 display
 		$("#fingerprint").css("display","none");
 	}else{
 		$("#fingerprint").css("display","block");
+		//progress style
+		if( menu == "cfDiego" ){
+			thisDiv.removeClass("progressStep_6");
+	        thisDiv.addClass("progressStep_5");
+            $(".progressStep_5 .install").hide();
+		}
 	}
 	return;
 }
@@ -1150,7 +1172,10 @@ function deletePopup(record){
 						    		if ( response.state.toLowerCase() == "cancelled" ) message = message + " 삭제 중 취소되었습니다.";
 						    			
 						    		installStatus = response.state.toLowerCase();
-						    		deleteClient.disconnect();
+						    		if(deleteClient!=""){
+						    			deleteClient.disconnect();
+						    			deleteClient = "";
+						    		}
 									w2alert(message, "CF 삭제");
 									if( menu == "cfDiego" ){
 										$("#cfDiegoPopupDiv").load("/deploy/diego/install/diegoPopup",function(event){
@@ -1299,7 +1324,7 @@ function gridReload() {
 					</div>
 					<div class="w2ui-field">
 						<label style="text-align: left; width: 40%; font-size: 11px;">CF 릴리즈</label>
-						<img alt="diego-help-info"  src="../images/help-Info-icon.png" class="cf-info" style="width:18px; position:absolute; left:17%; margin-top:3px"  data-toggle="popover"  data-trigger="hover" data-html="true" title="CF 릴리즈 설치 지원 버전 목록"/>
+						<img alt="diego-help-info"  src="../images/help-Info-icon.png" class="cf-info" style="width:18px; position:absolute; left:17%; margin-top:3px"  data-toggle="popover"  data-trigger="hover" data-html="true" title="설치 지원 버전 목록"/>
 						<div>
 							<input name="releases" type="list" style="float: left; width: 60%;" required placeholder="CF 릴리즈를 선택하세요." />
 						</div>
@@ -1321,14 +1346,14 @@ function gridReload() {
 					<div class="w2ui-field">
 						<label style="text-align: left; width: 40%; font-size: 11px;">DEA DISK 사이즈</label>
 						<div>
-							<input name="deaMemoryMB" type="text" style="float: left; width: 60%;"  onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' style='ime-mode:disabled;'  required placeholder="DEA disk 사이즈를 입력하세요." />
+							<input name="deaDiskMB" type="text" style="float: left; width: 60%;"  onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' style='ime-mode:disabled;'  required placeholder="예) 32768" />
 							<div class="isMessage"></div>
 						</div>
 					</div>
 					<div class="w2ui-field">
 						<label style="text-align: left; width: 40%; font-size: 11px;">DEA MEMORY 사이즈</label>
 						<div>
-							<input name="deaDiskMB" type="text" style="float: left; width: 60%;"  onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' style='ime-mode:disabled;'  required placeholder="DEA memory 사이즈를 입력하세요." />
+							<input name="deaMemoryMB" type="text" style="float: left; width: 60%;"  onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' style='ime-mode:disabled;'  required placeholder="예) 8192" />
 							<div class="isMessage"></div>
 						</div>
 					</div>
@@ -1352,13 +1377,6 @@ function gridReload() {
 						</div>
 					</div>
 					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">HAProxy 공인 IP</label>
-						<div>
-							<input name="proxyStaticIps" type="text" style="float: left; width: 60%;" required placeholder="HAProxy 공인 IP를 입력하세요." />
-							<div class="isMessage"></div>
-						</div>
-					</div>
-					<div class="w2ui-field">
 						<label style="text-align: left; width: 40%; font-size: 11px;">로그인 비밀번호</label>
 						<div>
 							<input name="loginSecret" type="text" style="float: left; width: 60%;" required placeholder="로그인 비밀번호룰 입력하세요." />
@@ -1375,7 +1393,7 @@ function gridReload() {
 	</div>
 </div>
 
-<!-- Network 설정 DIV -->
+<!-- aws/openstack Network 설정 DIV -->
 <div id="networkInfoDiv" style="width: 100%; height: 100%;" hidden="true">
 	<div rel="title"><b>CF 설치</b></div>
 	<div rel="body" style="width: 100%; height: 100%; padding: 15px 5px 0 5px; margin: 0 auto;">
@@ -1397,7 +1415,7 @@ function gridReload() {
 						<div  class="panel-heading" style="padding:5px 5% 10px 5%;"><b>External</b></div>
 						<div class="panel-body">
 							<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">디렉터 공인 IP</label> 
+								<label style="text-align: left;width:40%;font-size:11px;">CF API TARGET IP</label> 
 								<div>
 									<input name="publicStaticIp" type="text"  style="float:left;width:60%;"  required placeholder="예) 10.0.0.20"/>
 									<div class="isMessage"></div>
@@ -1421,10 +1439,17 @@ function gridReload() {
 									<div class="isMessage"></div>
 								</div>
 							</div>
-					    	<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">네트워크 ID</label>
+							<div class="w2ui-field" id ="availabilityZone" style="display:none">
+								<label style="text-align: left; width: 40%; font-size: 11px;">Availability Zone</label>
 								<div>
-									<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="네트워크 ID를 입력하세요."/>
+									<input name="availabilityZone" type="text" style="float: left; width: 60%;" required placeholder="예) cf-AvaliailityZone" />
+									<div class="isMessage"></div>
+								</div>
+							</div>
+					    	<div class="w2ui-field">
+								<label style="text-align: left;width:40%;font-size:11px;">서브넷 아이디</label>
+								<div>
+									<input name="subnetId" type="text"  style="float:left;width:60%;" required placeholder="서브넷 아이디를 입력하세요."/>
 									<div class="isMessage"></div>
 								</div>
 							</div>
@@ -1591,7 +1616,7 @@ function gridReload() {
 								</div>
 							</div>
 							<div class="w2ui-field">
-								<label style="text-align: left; width: 40%; font-size: 11px;">IP할당 대역(최소 15개)</label>
+								<label style="text-align: left; width: 40%; font-size: 11px;">IP할당 대역</label>
 								<div>
 									<input name="subnetStaticFrom" type="url" style="float:left;width:27%;" placeholder="예) 10.0.0.100" />
 									<span style="float: left; width: 6%; text-align: center;">&nbsp;&ndash; &nbsp;</span>

@@ -47,3 +47,7 @@ meta:
   garden-runc-release-version: [gardenLinuxReleaseVersion]
   cflinuxfs2-rootfs-release-name: [cflinuxfs2RootfsReleaseName]
   cflinuxfs2-rootfs-release-version: [cflinuxfs2RootfsReleaseVersion]
+
+  ## PaaSTA Properties Block
+  cadvisor-driver-ip: [cadvisorDriverIp]
+  cadvisor-driver-port: [cadvisorDriverPort]

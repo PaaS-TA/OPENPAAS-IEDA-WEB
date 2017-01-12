@@ -503,7 +503,6 @@ public class CfControllerTest extends BaseTestController {
 		dto.setDomain("172.12.34.100.xip.io");
 		dto.setDescription("test-domain");
 		dto.setDomainOrganization("test-org");
-		dto.setProxyStaticIps("172.12.34.100");
 		dto.setLoginSecret("1234");
 		
 		ObjectMapper mapper = new ObjectMapper();

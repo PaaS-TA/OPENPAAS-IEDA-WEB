@@ -32,7 +32,10 @@ public class DiegoVO {
 	private String etcdReleaseVersion; //ETCD 릴리즈 버전
 	private String cflinuxfs2rootfsreleaseName; //cflinuxfs2rootf 릴리즈 명
 	private String cflinuxfs2rootfsreleaseVersion; //cflinuxfs2rootf 릴리즈 버전
-	private String keyFile;
+	private String paastaMonitoringUse;//PaaS-TA 모니터링 사용 유무
+	private String cadvisorDriverIp;//PaaS-TA 모니터링 DB 서버 IP
+	private String cadvisorDriverPort;//PaaS-TA 모니터링 DB 서버 PORT
+	private String keyFile;//key 파일명
 	
 	//2. 네트워크 정보
 	private List<NetworkVO> networks;
@@ -218,6 +221,30 @@ public class DiegoVO {
 	}
 	public void setNetwork(NetworkVO network) {
 		this.network = network;
+	}
+
+	public String getCadvisorDriverIp() {
+		return cadvisorDriverIp;
+	}
+
+	public void setCadvisorDriverIp(String cadvisorDriverIp) {
+		this.cadvisorDriverIp = cadvisorDriverIp;
+	}
+
+	public String getCadvisorDriverPort() {
+		return cadvisorDriverPort;
+	}
+
+	public void setCadvisorDriverPort(String cadvisorDriverPort) {
+		this.cadvisorDriverPort = cadvisorDriverPort;
+	}
+
+	public String getPaastaMonitoringUse() {
+		return paastaMonitoringUse;
+	}
+
+	public void setPaastaMonitoringUse(String paastaMonitoringUse) {
+		this.paastaMonitoringUse = paastaMonitoringUse;
 	}
 	
 }

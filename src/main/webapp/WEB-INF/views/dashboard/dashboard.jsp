@@ -25,7 +25,7 @@ $(function() {
 		method	: 'GET',
 		multiSelect: false,
 		show: {	
-				selectColumn: true,
+				selectColumn: false,
 				footer: false},
 		columns	: [
 		 	 {field: 'recid', 	caption: 'recid', hidden: true}

@@ -33,7 +33,7 @@ public class CfListDTO {
 	private String subnetStaticIp; //VM 할당 IP대역 From ~ to
 	private String subnetId; //서브넷 ID(NET ID)
 	private String cloudSecurityGroups; //시큐리티 그룹명
-
+	private String availabilityZone;
 	// 5. 리소스 정보
 	private String stemcellName; //스템셀명
 	private String stemcellVersion; //스템셀 버전
@@ -177,6 +177,12 @@ public class CfListDTO {
 	}
 	public void setCloudSecurityGroups(String cloudSecurityGroups) {
 		this.cloudSecurityGroups = cloudSecurityGroups;
+	}
+	public String getAvailabilityZone() {
+		return availabilityZone;
+	}
+	public void setAvailabilityZone(String availabilityZone) {
+		this.availabilityZone = availabilityZone;
 	}
 	public String getStemcellName() {
 		return stemcellName;

@@ -31,7 +31,6 @@ public class CfVO {
 	private String domain;//도메인
 	private String description;//도메인 설명
 	private String domainOrganization;//도메인 그룹
-	private String proxyStaticIps;//HAProxy 공인 IP
 	private String loginSecret; //로그인 비밀번호
 	
 	//2. 네트워크 목록 정보
@@ -254,15 +253,6 @@ public class CfVO {
 	public void setKeyFile(String keyFile) {
 		this.keyFile = keyFile;
 	}
-
-	public String getProxyStaticIps() {
-		return proxyStaticIps;
-	}
-
-	public void setProxyStaticIps(String proxyStaticIps) {
-		this.proxyStaticIps = proxyStaticIps;
-	}
-
 	public String getLoginSecret() {
 		return loginSecret;
 	}

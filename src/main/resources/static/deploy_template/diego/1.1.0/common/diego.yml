@@ -208,7 +208,7 @@ base:
           zone: z1
   
     - name: cell_z1      
-      templates: (( base_job_templates.cell volman_overrides.driver_templates netman_overrides.driver_templates ))
+      templates: (( base_job_templates.cell volman_overrides.driver_templates netman_overrides.driver_templates paasta_overrides.templates ))
       instances: (( instance_count_overrides.cell_z1.instances || 1 ))
       resource_pool: cell_z1
       networks:
@@ -282,7 +282,7 @@ base:
           zone: z2
   
     - name: cell_z2
-      templates: (( base_job_templates.cell volman_overrides.driver_templates netman_overrides.driver_templates ))
+      templates: (( base_job_templates.cell volman_overrides.driver_templates netman_overrides.driver_templates paasta_overrides.templates ))
       instances: (( instance_count_overrides.cell_z2.instances || 1 ))
       resource_pool: cell_z2
       networks:
@@ -356,7 +356,7 @@ base:
           zone: z3
   
     - name: cell_z3
-      templates: (( base_job_templates.cell volman_overrides.driver_templates netman_overrides.driver_templates ))
+      templates: (( base_job_templates.cell volman_overrides.driver_templates netman_overrides.driver_templates paasta_overrides.templates ))
       instances: (( instance_count_overrides.cell_z3.instances || 0 ))
       resource_pool: cell_z3
       networks:
@@ -746,7 +746,8 @@ properties:
     network_plugin: (( netman_overrides.garden_properties.network_plugin || nil ))
     network_plugin_extra_args: (( netman_overrides.garden_properties.network_plugin_extra_args || nil ))
 
-
+  cadvisor: (( paasta_overrides.cadvisor_properties || nil ))
+  
 # The keys below should not be included in the final stub
 config_from_cf: (( merge ))
 iaas_settings: (( merge ))
@@ -828,6 +829,10 @@ netman_overrides:
   properties: (( merge || [] ))
   garden_properties: (( merge || [] ))
   jobs: (( merge || [] ))
+
+paasta_overrides:
+  templates: (( merge || [] ))
+  cadvisor_properties: (( merge || [] ))
 
 base_releases:
   - name: (( release_versions.diego.name || "diego" ))

@@ -9,6 +9,7 @@ networks:
       gateway: [subnetGateway]
       dns: [[subnetDns]]
       static: [[subnetStatic]]
+      reserved: [[subnetReserved]]
       cloud_properties:
         net_id: [subnetId]
 jobs:
@@ -22,7 +23,7 @@ resource_pools:
       name: [stemcellName]
       version: [stemcellVersion]
     cloud_properties:
-      instance_type: [cloudInstanceType]
+      instance_type: [smallInstanceType]
   medium:
     stemcell:
       name: [stemcellName]
@@ -31,7 +32,7 @@ resource_pools:
       bosh:
         password: [boshPassword]
     cloud_properties:
-      instance_type: [cloudInstanceType]
+      instance_type: [directorInstanceType]
 properties:
 #  ntp: [[ntp]]
   openstack:
@@ -40,5 +41,5 @@ properties:
     username: [userName]
     api_key: [apiKey]
     default_key_name: [privateKeyName]
-    private_key: [privateKeyPath]
+#   private_key: [privateKeyPath]
     default_security_groups: [[defaultSecurityGroups]]

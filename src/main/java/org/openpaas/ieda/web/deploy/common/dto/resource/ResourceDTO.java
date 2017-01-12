@@ -3,8 +3,8 @@ package org.openpaas.ieda.web.deploy.common.dto.resource;
 import javax.validation.constraints.NotNull;
 
 public class ResourceDTO {
-	@NotNull
-	private String id; //id
+	private String id; //cfId
+	private String cfId;//diegoId
 	@NotNull
 	private String iaas; //IaaS
 	@NotNull
@@ -33,11 +33,19 @@ public class ResourceDTO {
 	private String runnerRam;//runner 인스턴스 유형 Ram
 	private String runnerDisk;//runner 인스턴스 유형 Disk
 	
+	private String keyFile;//key파일명
+	
 	public String getId() {
 		return id;
 	}
 	public void setId(String id) {
 		this.id = id;
+	}
+	public String getCfId() {
+		return cfId;
+	}
+	public void setCfId(String cfId) {
+		this.cfId = cfId;
 	}
 	public String getIaas() {
 		return iaas;
@@ -165,4 +173,11 @@ public class ResourceDTO {
 	public void setRunnerDisk(String runnerDisk) {
 		this.runnerDisk = runnerDisk;
 	}
+	public String getKeyFile() {
+		return keyFile;
+	}
+	public void setKeyFile(String keyFile) {
+		this.keyFile = keyFile;
+	}
+	
 }

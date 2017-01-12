@@ -37,8 +37,6 @@ public class CfParamDTO {
 		@NotNull
 		private String domainOrganization; //도메인 그룹
 		@NotNull
-		private String proxyStaticIps; //HAProxy 공인 IP
-		@NotNull
         private String loginSecret; //로그인 비밀번호
 		
 		
@@ -119,12 +117,6 @@ public class CfParamDTO {
 		}
 		public void setDomainOrganization(String domainOrganization) {
 			this.domainOrganization = domainOrganization;
-		}
-		public String getProxyStaticIps() {
-			return proxyStaticIps;
-		}
-		public void setProxyStaticIps(String proxyStaticIps) {
-			this.proxyStaticIps = proxyStaticIps;
 		}
 		public String getLoginSecret() {
 			return loginSecret;

@@ -2,7 +2,7 @@ name: (( merge ))
 
 director_uuid: (( merge ))
 
-releases: (( merge ))
+release: (( merge ))
 
 networks: (( merge ))
 

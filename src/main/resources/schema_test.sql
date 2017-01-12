@@ -1,12 +1,12 @@
-#사용자 아이디	USER_ID	VARCHAR(255)	NOT NULL	
-#사용자 비밀번호	USER_PASSWORD	VARCHAR(255)	NOT NULL	
-#사용자 명		USER_NAME	VARCHAR(255)	NOT NULL	
-#사용자 메일 주소	EMAIL	VARCHAR(255)	NOT NULL	
-#롤 아이디		ROLE_ID	INT	NOT NULL	
-#생성자			CREATE_USER_ID	VARCHAR(255)	NOT NULL	
-#생성일자		CREATE_DATE	DATE	NOT NULL	
-#수정자			UPDATE_USER_ID	VARCHAR(255)	NOT NULL	
-#수정일자		UPDATE_DATE	DATE	NOT NULL
+#사용자 아이디    USER_ID                 VARCHAR(255) NOT NULL
+#사용자 비밀번호   USER_PASSWORD           VARCHAR(255) NOT NULL
+#사용자 명      USER_NAME               VARCHAR(255) NOT NULL
+#사용자 메일 주소  EMAIL                   VARCHAR(255) NOT NULL
+#롤 아이디      ROLE_ID                 INT NOT NULL
+#생성자        CREATE_USER_ID          VARCHAR(255) NOT NULL
+#생성일자       CREATE_DATE             DATE NOT NULL
+#수정자        UPDATE_USER_ID          VARCHAR(255) NOT NULL
+#수정일자       UPDATE_DATE             DATE NOT NULL
 
 
 create database ieda_test default character set utf8 collate utf8_general_ci;
@@ -308,6 +308,7 @@ CREATE TABLE ieda_network
   subnet_static_to                  VARCHAR(255),
   subnet_id                         VARCHAR(255),
   cloud_security_groups             VARCHAR(255),
+  availability_zone                 VARCHAR(255),
   create_user_id                    VARCHAR(255)  NOT NULL,
   create_date                       DATE          NOT NULL,
   update_user_id                    VARCHAR(255)  NOT NULL,
@@ -363,13 +364,15 @@ CREATE TABLE ieda_cf
   domain                            VARCHAR(100),
   description                       VARCHAR(100),
   domain_organization               VARCHAR(100),
-  country_code						 VARCHAR(255),
-  state_name						 VARCHAR(255),
-  locality_name						 VARCHAR(255),
-  organization_name				 VARCHAR(255),
-  unit_name							 VARCHAR(255),
-  email									 VARCHAR(255),
-  key_file								 VARCHAR(255),
+  proxy_static_ips                  VARCHAR(100),
+  login_secret                      VARCHAR(100),
+  country_code                      VARCHAR(255),
+  state_name                        VARCHAR(255),
+  locality_name                     VARCHAR(255),
+  organization_name                 VARCHAR(255),
+  unit_name                         VARCHAR(255),
+  email                             VARCHAR(255),
+  key_file                          VARCHAR(255),
   deployment_file                   VARCHAR(255),
   deploy_status                     VARCHAR(100),
   task_id                           INT(11),
@@ -395,7 +398,10 @@ CREATE TABLE ieda_diego
   garden_release_version            VARCHAR(100),
   etcd_release_name                 VARCHAR(100),
   etcd_release_version              VARCHAR(100),
-  key_file									VARCHAR(100),
+  paasta_monitoring_use             VARCHAR(100),
+  cadvisor_driver_ip                VARCHAR(100),
+  cadvisor_driver_port              VARCHAR(100),
+  key_file                          VARCHAR(100),
   deployment_file                   VARCHAR(255),
   deploy_status                     VARCHAR(100),
   task_id                           INT(11),

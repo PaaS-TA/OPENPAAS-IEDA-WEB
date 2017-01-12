@@ -465,7 +465,17 @@ function stemcellFileDownload(stemcellInfo){
 		    }else if( status == "done") {
 		    	downloadStatus = '';
 		    	$("#isExisted_" + id).parent().html(completeButton);
-		    	downloadClient.disconnect();
+		    	
+		    	var flag = true;
+		    	w2ui['config_opStemcellsGrid'].records.map(function(obj) {
+		    		if( id != obj.id && obj.downloadStatus.toUpperCase() == "DOWNLOADING" ){
+		    			flag= false;
+		    		}
+				});
+		    	if(downloadClient != "" && flag ){
+		    		downloadClient.disconnect();
+		    		downloadClient = "";
+		    	}
 		    	doSearch();
 		    }
 		});

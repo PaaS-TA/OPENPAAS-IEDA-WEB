@@ -90,10 +90,8 @@ function checkDeploymentNameDuplicate( platform, deploymentName ) {
 		async : false,
 		success : function(data) {
 			data.map(function(obj) {
-				console.log( "배포명 조회 :  " + obj );
 				if( deploymentName == obj){
 					check = false;
-					console.log("check2 : " + check);
 				}
 			});
 		}
@@ -185,6 +183,19 @@ function onlyNumber(event) {
 		return;
 	else
 		return false;
+}
+
+/*******************************************************************************
+ * 설명 : 포트 숫자만 입력
+ *  Function : onlyNumberPort
+ ******************************************************************************/
+function onlyNumberPort(val){
+	regNumber = /^[0-9]*$/;
+	if (regNumber.test(val) == true) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 /*******************************************************************************
@@ -349,14 +360,22 @@ function popupValidation() {
 										label = "시스템 다운 유형";
 										$(this).css({"border-color" : "red"});
 									}
-								} else if( $(this).attr('name') == 'appSshFingerprint' ){
+								} else if( $(this).attr('name') == 'appSshFingerprint'){
 									checkValidation = true;
+								} else if( $(this).attr('name') == 'cadvisorDriverIp' || $(this).attr('name') == 'cadvisorDriverPort'){
+									if( $("input[name=paastaMonitoring]:checkbox:checked").length == 0){
+										checkValidation = true;
+									}else{
+										label = $(this).parent().parent().find("label").text();
+										$(this).css({"border-color" : "red"}).parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color" : "red"});
+									}
 								}else {
 									if ($(this).attr('name') != "deploymentName" ||  $(this).attr('name') != "stemcellPathVersion" || 
 											$(this).attr('name') != "stemcellPathFileName" || $(this).attr('name') != "stemcellPathUrl") {
 										label = $(this).parent().parent().find("label").text();
 										$(this).css({"border-color" : "red"}).parent().find(".isMessage").text(label + "를(을) 입력하세요").css({"color" : "red"});
 									}
+									
 								}
 							}else if (inputType == 'password') {
 								label = $(this).parent().parent().find("label").text();
@@ -463,7 +482,24 @@ function popupValidation() {
 										label = "OS 버전";
 										emptyFieldLabels.push(label);
 									}
+								} else if($(this).attr('name') == "cadvisorDriverPort"){
+									if(!onlyNumberPort($(".w2ui-msg-body input[name='cadvisorDriverPort']").val())){
+										label = "포트 번호";
+										$(this).css({"border-color" : "red"}).parent().find(".isMessage").text(label + "를(을) 확인하세요").css({"color" : "red"});
+										emptyFieldLabels.push(label);
+									}else{
+										$(this).css({"border" : "1px solid #bbb"}).parent().find(".isMessage").text("");
+									}
+								} else if($(this).attr('name') == "cadvisorDriverIp"){
+									if(!validateIP(elementValue)){
+										label = "서버 IP"; 
+										$(this).css({"border-color" : "red"}).parent().find(".isMessage").text(label + "를(을) 확인하세요").css({"color" : "red"});
+										emptyFieldLabels.push(label);
+									}else {
+										$(this).css({"border" : "1px solid #bbb"}).parent().find(".isMessage").text("");
+									}
 								}
+								
 							} else if (inputType.toLowerCase() == "list") {
 								$(this).css({"border" : "1px solid #bbb"});// .parent().find(".isMessage").text("");
 							} else if (inputType.toLowerCase() == "url") {

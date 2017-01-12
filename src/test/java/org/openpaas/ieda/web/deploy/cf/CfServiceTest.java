@@ -300,7 +300,6 @@ public class CfServiceTest {
 		vo.setDomain("172.xx.xx.100.xip.io");
 		vo.setDescription("test-domain");
 		vo.setDomainOrganization("test-org");
-		vo.setProxyStaticIps("172.xx.xx.100");
 		vo.setLoginSecret("1234");
 		vo.setKeyFile("vsphere-cf-key-1.yml");
 		vo.setCountryCode("KR");

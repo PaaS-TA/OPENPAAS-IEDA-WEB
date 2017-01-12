@@ -73,15 +73,12 @@ public class ReleaseManagementDownloadService {
 				Pattern pattern = Pattern.compile("\\d+\\%");
 				Matcher m = pattern.matcher(info);
 				if(m.find()){
-					status = "done";
 					messagingTemplate.convertAndSendToUser(principal.getName() ,MESSAGE_ENDPOINT, dto.getId()+"/"+m.group());
+					if( m.group().equals("100%") ){
+						dto.setDownloadStatus("DOWNLOADED");
+						saveSystemRelese(dto, principal);
+					}
 				}
-			}
-			//다운로드 여부
-			if( "done".equals(status) ){
-				dto.setDownloadStatus("DOWNLOADED");
-				saveSystemRelese(dto, principal);
-				messagingTemplate.convertAndSendToUser(principal.getName() ,MESSAGE_ENDPOINT, dto.getId()+"/done");
 			}
 			
 		} catch(IOException e){
@@ -116,26 +113,21 @@ public class ReleaseManagementDownloadService {
 			if(!deleteFlie){
 				deleteLockFile( result.getReleaseFileName() );
 				throw new CommonException("internal_server_error.releaseDownload.exception",
-						"기존 파일 삭제 실패.", HttpStatus.INTERNAL_SERVER_ERROR);
+						"기존 파일 삭제를 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
-		//덮어쓰기 가능
+		//덮어쓰기 불가능
 		if(releseFile.exists() && "false".equals(dto.getOverlayCheck()) ){
 			deleteLockFile( result.getReleaseFileName() );
-			throw new CommonException("conflict.releaseDownload.exception",
-					"이미 동일한 릴리즈 파일이 존재합니다.", HttpStatus.CONFLICT);
-		}else{//덮어쓰기 불가능.
+			throw new CommonException("conflict.releaseDownload.exception", "이미 동일한 릴리즈 파일이 존재합니다.", HttpStatus.CONFLICT);
+		}else{//덮어쓰기 가능.
 			try {
 				FileUtils.moveFile(tmpFile,releseFile);
 			} catch (IOException e) {
-				if( LOGGER.isErrorEnabled() ){
-					LOGGER.error(e.getMessage());
-				}
-				throw new CommonException("conflict.releaseDownload.exception",
-						"이미 동일한 릴리즈 파일이 존재합니다.", HttpStatus.CONFLICT);
+				throw new CommonException("conflict.releaseDownload.exception", "이미 동일한 릴리즈 파일이 존재합니다.", HttpStatus.CONFLICT);
 			}finally{
 				deleteLockFile( result.getReleaseFileName() );
-				
+				messagingTemplate.convertAndSendToUser(principal.getName() ,MESSAGE_ENDPOINT, dto.getId()+"/done");
 			}
 		}
 		

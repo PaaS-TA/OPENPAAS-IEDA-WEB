@@ -49,7 +49,7 @@
 <script type="text/javascript" src="<c:url value='/webjars/w2ui/1.4.2/w2ui.min.js'/>"></script>
 
 <!-- Common -->
-<script type="text/javascript" src="<c:url value='/js/common.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/js/common.js?ver=3'/>"></script>
 <script type="text/javascript" src="<c:url value='/js/commonPopup.js'/>"></script>
 
 <!-- socket -->

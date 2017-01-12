@@ -69,8 +69,12 @@ public class DashboardController extends BaseController {
 		List<ReleaseInfoDTO> contents = releaseService.listRelease();
 		
 		HashMap<String, Object> result = new HashMap<String, Object>();
-			result.put("total", contents != null ? contents.size() : 0);
+		if ( contents != null ) {
+			result.put("total", contents.size());
 			result.put("records", contents);
+		} else
+			result.put("total", 0);
+			
 		return new ResponseEntity<HashMap<String, Object>>( result, HttpStatus.OK);
 	}
 
