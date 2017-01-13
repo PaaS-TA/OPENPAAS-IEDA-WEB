@@ -82,14 +82,10 @@ API 서비스 애플리케이션을 Java 언어로 작성 한다. API 서비스�
 
 ![meteringAPI](metering/meteringAPI.png)
 
-|||:Header 1|:Header 2|:Header 3|:Header 4
-|| Row 1 .. |  |  |  
-|| Row 2 .. |  Test
-|| Row 3 .. |  |  |  
-|| Row 4 .. |  |  |
 
 
-|**기능**||**설명**|
+
+|**기능**|>| Merge right |**설명**|
 |----------|-------------------------|--------------------------------|
 |Runtime | 미터링/등급/과금 정책|API 서비스 제공자가 제공하는 서비스에 대한 각종 정책 정의 정보. JSON
 형식으로 되었으며, 해당 정책을 CF-ABACUS에 등록하면 정책에 정의한 내용에
@@ -186,8 +182,8 @@ api 서비스 요청에 대한 미터링 정보를 CF-ABACUS에 전송하는 처
 프로젝트 디렉터리를 생성하고, gradle 프로젝트로 초기화 한다
 
 
-	$ **mkdir** sample\_api\_java\_service // 프로젝트 디렉토리
-	$ **cd** sample\_api\_java\_service/
+	$ mkdir sample\_api\_java\_service // 프로젝트 디렉토리
+	$ cd sample\_api\_java\_service/
 	~/sample\_api\_java\_service\$ gradle init --type java-library // gradle 초기화
 	: wrapper
 	: init
