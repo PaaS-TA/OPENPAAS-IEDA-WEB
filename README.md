@@ -1400,86 +1400,85 @@ API 연동 샘플 애플리케이션의 url을 통해 웹 브라우저에서 접
 연동 및 API 사용량에 대한 CF-Abacus 연동 테스트를 진행 할 수 있다.
 
 1.  **CF-Abacus 연동 확인**
->
 
-  	##조직 guid 확인
 
-  	$ cf org *\<**샘플 애플리케이션을 배포한 조직**\>* --guid
+  		##조직 guid 확인
 
-	예)
+  		$ cf org *\<**샘플 애플리케이션을 배포한 조직**\>* --guid
 
-  	$ cf org real --guid
+		예)
 
- 	877d01b2-d177-4209-95b0-00de794d9bba
+  		$ cf org real --guid
 
-  	##샘플 애플리케이션 guid 확인
+ 		877d01b2-d177-4209-95b0-00de794d9bba
 
-  	$ cf env *\<**샘플 애플리케이션 명**\>*
+  		##샘플 애플리케이션 guid 확인
 
-  	예)
+  		$ cf env *\<**샘플 애플리케이션 명**\>*
 
-  	$ cf env sample-api-node-caller
+  		예)
 
-  	Getting env variables for app sample-api-node-caller in org real / space ops as admin...
+  		$ cf env sample-api-node-caller
 
-  	OK
+  		Getting env variables for app sample-api-node-caller in org real / space ops as admin...
 
-  	<<중략>>
+  		OK
 
-  	{
+  		<<중략>>
 
-  	"VCAP\_APPLICATION": {
+  		{
 
-  	"application\_id": "58872d8a-edfc-44df-97f0-df67cf9033a7",
+  		"VCAP\_APPLICATION": {
 
-  	"application\_name": "sample-api-node-caller",
+  		"application\_id": "58872d8a-edfc-44df-97f0-df67cf9033a7",
 
-  	"application\_uris": [
+  		"application\_name": "sample-api-node-caller",
 
-  	"sample-api-node-caller.bosh-lite.com"
+  		"application\_uris": [
 
-  	],
+  		"sample-api-node-caller.bosh-lite.com"
 
-  	"application\_version": "55678102-584c-4fca-8304-82f727506b1d",
+  		],
 
-  	"limits": {
+  		"application\_version": "55678102-584c-4fca-8304-82f727506b1d",
 
-  	"disk": 512,
+  		"limits": {
 
-  	"fds": 16384,
+  		"disk": 512,
 
-  	"mem": 512
+  		"fds": 16384,
 
-  	},
+  		"mem": 512
 
-  	"name": "sample-api-node-caller",
+  		},
 
-  	"space\_id": "2ce08996-f463-406c-a971-adbbaf4e4ca5",
+  		"name": "sample-api-node-caller",
 
-  	"space\_name": "ops",
+  		"space\_id": "2ce08996-f463-406c-a971-adbbaf4e4ca5",
 
-  	"uris": [
+  		"space\_name": "ops",
+	
+  		"uris": [
 
-  	"sample-api-node-caller.bosh-lite.com"
+  		"sample-api-node-caller.bosh-lite.com"
 
-  	],
+  		],
 
-  	"users": null,
+  		"users": null,
 
-  	"version": "55678102-584c-4fca-8304-82f727506b1d"
+  		"version": "55678102-584c-4fca-8304-82f727506b1d"
 
-  	}
+  		}	
 
-  	}
+  		}
 
-  	<<후략>>
+  		<<후략>>
 
-  	## API 사용량 확인
+  		## API 사용량 확인
 
-  	$ curl 'http://abacus-usage-reporting.<파스-타 도메인>/v1/metering/organizations/<샘플 애플리케이션을 배포한 조직>/aggregated/usage''
+  		$ curl 'http://abacus-usage-reporting.<파스-타 도메인>/v1/metering/organizations/<샘플 애플리케이션을 배포한 조직>/aggregated/usage''
 
-  	예)
+  		예)
 
-  	$ curl 'http://abacus-usage-reporting.bosh-lite.com/v1/metering/organizations/877d01b2-d177-4209-95b0-00de794d9bba/aggregated/usage'
-
+  		$ curl 'http://abacus-usage-reporting.bosh-lite.com/v1/metering/organizations/877d01b2-d177-4209-95b0-00de794d9bba/aggregated/usage'
 
