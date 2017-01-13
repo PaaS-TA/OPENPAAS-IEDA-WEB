@@ -98,7 +98,12 @@ This will look like this:
 
 
 
-
+| Fruit | Advantages | 
+| --------- | ---------------- | 
+| Bananas | built-in wrapper | 
+^ | bright color | 
+| Oranges | cures scurvy | 
+^ | tasty | 
 
 
 
