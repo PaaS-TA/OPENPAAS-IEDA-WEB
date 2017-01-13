@@ -1,4 +1,4 @@
-<table border = "1px;">
+<table>
   <tr>
     <th colspan ="2">기능</th>
      <th>설명</th>
