@@ -82,32 +82,14 @@ API 서비스 애플리케이션을 Java 언어로 작성 한다. API 서비스�
 
 ![meteringAPI](metering/meteringAPI.png)
 
-
-|             |          Spanning Header (Two Cells)           ||
-Header 1 | Header  2| Header 2 |
- ------------ | :-----------: | -----------: |
-Content 1      |          *Spanning Cell*        ||
-Content  2     |   **Cell Bold**    |         Cell |
-New section   |     More      |         Data |
-And more      |            And more          |
-[Prototype table]
-into a
-
-[table][Prototype Table].
-This will look like this:
-
-
-
-| Fruit | Advantages | 
-| --------- | ---------------- | 
-| Bananas | built-in wrapper | 
-^ | bright color | 
-| Oranges | cures scurvy | 
-^ | tasty | 
-
-
-
-
+| **Variables**                  |  **Healthy subjects (mean)** |   **Patients (mean)**   | **p-value**  |
+|--------------------------------|------------------------------|-------------------------|--------------|
+| **Age**                        |       11                     |        28.51            |    .01^(U)^  |
+| **Gender**                                                                                          ||||                                                                     
+| Male (%)                       |        12%                   |      99%                |              |
+| Female (%)                     |        13%                   |         88%%            |  .99^(a)^    |                                   
+| **Time from onset (days)**     |  NA                          |        111              |              |
+| **Education (mean, in years)** |  10                          |     5                   |   .11 ^(U)^  |                                                      
 
 
 [Prototype table]
