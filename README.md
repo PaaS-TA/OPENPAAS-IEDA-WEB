@@ -206,12 +206,9 @@ api 서비스 요청에 대한 미터링 정보를 CF-ABACUS에 전송하는 처
 |.gitignore     |Git을 통한 형상 관리 시, 형상 관리를 할 필요가 없는 파일 또는 디렉토리를 설정한다.               |
 |manifest.yml   |애플리케이션을 파스-타 플랫폼에 배포 시 적용하는 애플리케이션에 대한 환경 설정 정보 
 애플리케이션의 이름, 배포 경로, 인스턴스 수 등을 정의할 수 있다.        |
-|gradlew        |Linux 환경에서 사용하는 gradlew 빌드 실행 파일
- gradle 초기화 시 자동 생성 된다.     |
-|gradlew.bat    |Window 환경에서 사용하는 gradle 빌드 실행 파일
-gradle 초기화 시 자동 생성 된다.      |
-|settings.gradle    |gradlew 실행 시 적용하는 환경 설정 파일  
-gradle 초기화 시 자동 생성 된다.    |
+|gradlew        |Linux 환경에서 사용하는 gradlew 빌드 실행 파일 <br> gradle 초기화 시 자동 생성 된다.     |
+|gradlew.bat    |Window 환경에서 사용하는 gradle 빌드 실행 파일 <br> gradle 초기화 시 자동 생성 된다.      |
+|settings.gradle    |gradlew 실행 시 적용하는 환경 설정 파일  <br> gradle 초기화 시 자동 생성 된다.    |
 
 
 Java 파일 형상 설명
