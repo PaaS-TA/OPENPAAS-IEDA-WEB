@@ -96,7 +96,7 @@ https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md
 </td>
   </tr>
    <tr>
-     <td>서비스 브로커 API</td>
+     <td width="160px">서비스 브로커 API</td>
      <td>Cloud Controller와 Service Broker 사이의 규약으로써 서비스 브로커 API 개발에 대해서는 다음을 참조한다.<br>
 https://github.com/OpenPaaSRnD/Documents/blob/master/Development-Guide/ServicePack_develope_guide.md#11
 </td>
