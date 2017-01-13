@@ -82,14 +82,14 @@ API 서비스 애플리케이션을 Java 언어로 작성 한다. API 서비스�
 
 ![meteringAPI](metering/meteringAPI.png)
 
-	|**기능**|**설명**|
-	|----------|-------------------------|--------------------------------|
-	|Runtime| 미터링/등급/과금 정책|API 서비스 제공자가 제공하는 서비스에 대한 각종 정책 정의 정보. JSON
-	형식으로 되었으며, 해당 정책을 CF-ABACUS에 등록하면 정책에 정의한 내용에
-	따라 API 사용량을 집계 한다.
-	정책은 서비스 제공자가 정의해야 하며, JSON 스키마는 다음을 참조한다.
-	[https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md](https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md)
-	|
+|**기능**|**설명**|
+|----------|-------------------------|--------------------------------|
+|Runtime| 미터링/등급/과금 정책|API 서비스 제공자가 제공하는 서비스에 대한 각종 정책 정의 정보. JSON
+형식으로 되었으며, 해당 정책을 CF-ABACUS에 등록하면 정책에 정의한 내용에
+따라 API 사용량을 집계 한다.
+정책은 서비스 제공자가 정의해야 하며, JSON 스키마는 다음을 참조한다.
+[https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md](https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md)
+|
 	
 
 [Prototype table]
