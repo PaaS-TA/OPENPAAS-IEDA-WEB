@@ -204,36 +204,24 @@ api 서비스 요청에 대한 미터링 정보를 CF-ABACUS에 전송하는 처
 |---------------|-----------------------------|
 |build.gradle   |애플리케이션에 필요한 의존성 정보를 기술    |
 |.gitignore     |Git을 통한 형상 관리 시, 형상 관리를 할 필요가 없는 파일 또는 디렉토리를 설정한다.               |
-|manifest.yml   |애플리케이션을 파스-타 플랫폼에 배포 시 적용하는 애플리케이션에 대한 환경 설정 정보 
-애플리케이션의 이름, 배포 경로, 인스턴스 수 등을 정의할 수 있다.        |
+|manifest.yml   |애플리케이션을 파스-타 플랫폼에 배포 시 적용하는 애플리케이션에 대한 환경 설정 정보 <br> 애플리케이션의 이름, 배포 경로, 인스턴스 수 등을 정의할 수 있다.        |
 |gradlew        |Linux 환경에서 사용하는 gradlew 빌드 실행 파일 <br> gradle 초기화 시 자동 생성 된다.     |
 |gradlew.bat    |Window 환경에서 사용하는 gradle 빌드 실행 파일 <br> gradle 초기화 시 자동 생성 된다.      |
 |settings.gradle    |gradlew 실행 시 적용하는 환경 설정 파일  <br> gradle 초기화 시 자동 생성 된다.    |
 
 
 Java 파일 형상 설명
-
-  --------------------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  **파일**                          **목적**
-
-  MeteringConfig                    애플리케이션 구동 시 metering.properties를 로드 한다
-
-  MeteringAuthService               파스-타 플랫폼 상의 UAA 서버에서 abacus-usage-collector 에 대한 접근 권한 토큰을 취득하여 리턴 한다.
-
-  MeteringService                   API 서비스 사용 요청 이 SampleApiJavaServiceController 에서 처리 될 때 API 서비스 처리에 대해 미터링이 적용된 사용량 보고서를 abacus-usage-collector 에 리포팅 한다.
-
-  SampleApiJavaServiceApplication   SpringBoot이 구동할 때, SpringBoot애플리케이션에 필요한 context 객체 들을 로드 한다.
-
-  SampleApiJavaServiceController    API 서비스 사용 요청을 처리하는 REST Controller.
-                                    
-                                    본 샘플 애플리케이션에서는 API 서비스 고유의 비즈니스 로직은 구현 하지 않았으며, API 사용량을 abacus-collector에 전송하는 기능만 수행 한다.
-
-  application.properties            SpringBoot이 구동할 때, spring 에 필요한 property
-
-  metering.properties               API 사용량을 abacus-collector 전송 시에 설정 할 property 들이 정의 되어 있다.
-  --------------------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
+  
+| **파일**       |           **목적**          |
+|---------------|-----------------------------|
+|MeteringConfig   |애플리케이션 구동 시 metering.properties를 로드 한다    |
+|MeteringAuthService     |파스-타 플랫폼 상의 UAA 서버에서 abacus-usage-collector 에 대한 접근 권한 토큰을 취득하여 리턴 한다.              |
+|MeteringService   |API 서비스 사용 요청 이 SampleApiJavaServiceController 에서 처리 될 때 API 서비스 처리에 대해 미터링이 적용된 사용량 보고서를 abacus-usage-collector 에 리포팅 한다.       |
+|SampleApiJavaServiceApplication        |SpringBoot이 구동할 때, SpringBoot애플리케이션에 필요한 context 객체 들을 로드 한다.   |
+|SampleApiJavaServiceController   |API 서비스 사용 요청을 처리하는 REST Controller.<br> 본 샘플 애플리케이션에서는 API 서비스 고유의 비즈니스 로직은 구현 하지 않았으며, API 사용량을 abacus-collector에 전송하는 기능만 수행 한다.
+    |
+|application.properties     |SpringBoot이 구동할 때, spring 에 필요한 property    |
+|metering.properties      |API 사용량을 abacus-collector 전송 시에 설정 할 property 들이 정의 되어 있다.    |
 
 ###의존성 및 프로퍼티의 설정 {.번호대제목-western style="page-break-before: always"}
 
@@ -683,21 +671,20 @@ Abacus-collector에 전송 할 API 서비스 사용량 JSON을 생성 한다.
 	}
 
 -   API 서비스 미터링 전송 항목 (전송 리포트 JSON 상세)
+  
+ | 항목명    |               유형             설명                            |     예시
+ | start     |               UNIX Timestamp|   API처리 시작 시각                    1396421450000|
+ | end       |               UNIX Timestamp|   API처리 응답 시각               |     1396421451000|
+ | organization\_id  |       String        |   API를 호출한 앱의 조직 ID       |     us-south:54257f98-83f0-4eca-ae04-9ea35277a538
+ | space\_id          |      String        |   API를 호출한 앱의 영역 ID       |     d98b5916-3c77-44b9-ac12-04456df23eae|
+ | consumer\_id       |      String        |   API를 호출한 앱 ID              |     App: d98b5916-3c77-44b9-ac12-04d61c7a4eae|
+ | resource\_id       |      String        |   API 자원 ID                    |      sample\_api|
+ | plan\_id           |      String        |   API 미터링 Plan ID             |      basic
+ | resource\_instance\_id |  String        |   API를 호출한 앱 ID                   d98b5916-3c77-44b9-ac12-04d61c7a4eae|
+ | measured\_usage         | Array         |   미터링 항목                     |     - |
+ | measure                 | String       |    미터링 대상 명                  |     api\_calls|
+ | quantity                | Number       |    해당 API 요청에 대한 API 처리 횟수 |  10|
 
-  ------------------------ ---------------- ------------------------------------ -----------------------------------------------
-  항목명                   유형             설명                                 예시
-  start                    UNIX Timestamp   API처리 시작 시각                    1396421450000
-  end                      UNIX Timestamp   API처리 응답 시각                    1396421451000
-  organization\_id         String           API를 호출한 앱의 조직 ID            us-south:54257f98-83f0-4eca-ae04-9ea35277a538
-  space\_id                String           API를 호출한 앱의 영역 ID            d98b5916-3c77-44b9-ac12-04456df23eae
-  consumer\_id             String           API를 호출한 앱 ID                   App: d98b5916-3c77-44b9-ac12-04d61c7a4eae
-  resource\_id             String           API 자원 ID                          sample\_api
-  plan\_id                 String           API 미터링 Plan ID                   basic
-  resource\_instance\_id   String           API를 호출한 앱 ID                   d98b5916-3c77-44b9-ac12-04d61c7a4eae
-  measured\_usage          Array            미터링 항목                          -
-  measure                  String           미터링 대상 명                       api\_calls
-  quantity                 Number           해당 API 요청에 대한 API 처리 횟수   10
-  ------------------------ ---------------- ------------------------------------ -----------------------------------------------
 
 
 
