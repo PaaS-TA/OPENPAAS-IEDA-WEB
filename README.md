@@ -29,16 +29,16 @@
      * [SampleMeteringOAuthService 구현](#26)
      * [SampleMeteringReportService 구현](#27)
     * [미터링/등급/과금 정책](#28)
-     * [미터링 정책](#29)
-     * [등급 정책](#30)
-     * [과금 정책](#31)
-     * [정책 등록](#32)
-    * [배포](#33)
-     * [파스-타 플랫폼 로그인](#34)
-     * [mongo-db 서비스 브로커 생성](#35)
-     * [API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결](#36)
-    * [서비스 바인딩 CF-Abacus 연동 테스트](#37)
-    * [단위 테스트](#38)
+     * [미터링 정책](#)
+     * [등급 정책](#)
+     * [과금 정책](#)
+     * [정책 등록](#)
+    * [배포](#)
+     * [파스-타 플랫폼 로그인](#)
+     * [mongo-db 서비스 브로커 생성](#)
+     * [API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결](#)
+    * [서비스 바인딩 CF-Abacus 연동 테스트](#)
+    * [단위 테스트](#)
 
 
 
@@ -46,9 +46,9 @@
 
 
 
-#<div id='1'/>1.  개요
-##<div id='2'/> 1.1 문서 개요
-###<div id='3'/>1.1.1.  목적
+#1.  개요
+## 1.1 문서 개요
+###1.1.1.  목적
 
 
 본 문서(Java 서비스브로커 미터링 애플리케이션 개발 가이드)는 파스-타
@@ -56,7 +56,7 @@
 Foundry) 서비스를 미터링 하는 방법에 대해 기술 한다.
 
 
-###<div id='4'/>1.1.2.  범위
+###1.1.2.  범위
 
 본 문서의 범위는 파스-타 플랫폼 프로젝트의 Cloud Foundry JAVA 서비스
 브로커 애플리케이션 미터링 개발과 CF-Abacus 연동에 대한 내용으로
@@ -80,7 +80,7 @@ mongo-db 서비스 팩 설치는 별로 로 제공 되는 문서를 참고 하�
 (cf-abacus 설치는 별도 제공하는 Abacus 설치 가이드를 참고하여
 CF-Abacus를 설치한다.)
 
-##<div id='5'/>1.3.  참고 자료
+##1.3.  참고 자료
 
 -   **[https://docs.cloudfoundry.org/devguide/](https://docs.cloudfoundry.org/devguide/)**
 -   **[http://cli.cloudfoundry.org/ko-KR/cf/](http://cli.cloudfoundry.org/ko-KR/cf/)**
@@ -88,10 +88,10 @@ CF-Abacus를 설치한다.)
 -   **[https://github.com/cloudfoundry-incubator/cf-abacus](https://github.com/cloudfoundry-incubator/cf-abacus)**
 
 
-#<div id='6'/>2.  Java서비스 미터링 개발가이드
+#2.  Java서비스 미터링 개발가이드
 
 
-##<div id='7'/>2.1.  개요
+##2.1.  개요
 
 
 CF Services 는 Service Broker API 라고 불리우는 cloud controller
@@ -174,7 +174,7 @@ CF-ABACUS은 CF 설치 후, CF에 마이크로 서비스 형태로 설치한다.
 ※ 다른 컴포넌트의 개발 또는 설치에 대해서 링크한 사이트를 참조한다.
 
 
-##<div id='8'/>2.2.  개발환경 구성
+##2.2.  개발환경 구성
 
 
 서비스 미터링 개발을 위해 다음과 같은 환경을 개발환경을 전제 한다.
@@ -196,11 +196,11 @@ CF-ABACUS은 CF 설치 후, CF에 마이크로 서비스 형태로 설치한다.
 
 
 
-##<div id='9'/>2.3.  서비스 브로커 라이브러리
+##2.3.  서비스 브로커 라이브러리
 
 
 
-###<div id='10'/>2.3.1.  서비스 브로커 라이브러리는 무엇인가?
+###2.3.1.  서비스 브로커 라이브러리는 무엇인가?
 
 
 CF (개방형 플랫폼) 에서는 플랫폼 상에서 서비스 할 수 있는 다양한
@@ -210,9 +210,52 @@ CF (개방형 플랫폼) 에서는 플랫폼 상에서 서비스 할 수 있는 
 (개방형 플랫폼) 에서 애플리케이션이 서비스를 사용 할 수 있도록 하고
 있다.
 
+서비스는 다양하지만, 서비스를 사용하기 위한 개방형 플랫폼의 RESTAPI가
+미리 정해져 있다.
+
+서비스 브로커 라이브러리는 각각 다른 서비스 브로커들이 서비스 브로커
+라이브러리 Jar 파일을 build path 에 추가 하고, 추상화 클래스들을 구현
+하는 것으로 이 개방형 플랫폼의 REST API에 기반 하여, 서비스가 제공 될 수
+있도록 해주는 라이브러리 이다.
 
 
-###<div id='11'/>2.3.3.  서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일들
+
+본 가이드에서는 mongo-db 서비스 브로커에 미터링 서비스를 구현하기
+위해서는 이 서비스 브로커 라이브러리에 미터링을 하기 위한 추상화
+클래스를 추가 한 후, mongo-db 서비스 브로커에서 이 라이브러리를
+dependency로 사용하여 빌드 한다.
+
+
+###2.3.2.  서비스 브로커 라이브러리를 다운로드 한 후, 프로젝트 import 한다.
+
+1.  오픈 소스로 제공되고 있는 서비스 브로커 소스를 git clone 으로 다운받는다.<br>
+    **[https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/tree/master/src/main/java/org/cloudfoundry/community/servicebroker/controller](https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/tree/master/src/main/java/org/cloudfoundry/community/servicebroker/controller)**
+
+
+  
+		$ git clone https://github.com/cloudfoundry-community/spring-boot-cf-service-broker.git
+
+  		Cloning into 'spring-boot-cf-service-broker'...
+
+  		remote: Counting objects: 2394, done.
+
+  		remote: Total 2394 (delta 0), reused 0 (delta 0), pack-reused 2394
+
+  		Receiving objects: 100% (2394/2394), 351.72 KiB | 279.00 KiB/s, done.
+
+  		Resolving deltas: 100% (939/939), done.
+
+  		Checking connectivity... done.
+
+
+다운 받은 소스를 Java 개발 도구 Eclipse 및 Spring Tool Suite 로 import
+한다.
+
+gradle 플러그인을 Eclipse 에 추가한 후, gradle import 하면 개발이 보다
+용이 해진다.
+
+
+###2.3.3.  서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일들
 
 
  |   |Java class | 설명|
@@ -229,7 +272,7 @@ CF (개방형 플랫폼) 에서는 플랫폼 상에서 서비스 할 수 있는 
 
 ![Java_Service_Metering_Image04]
 
-###<div id='12'/>2.3.4.  ServiceInstanceBindingController
+###2.3.4.  ServiceInstanceBindingController
 
 bindServiceInstance 프로세스 에 SampleMeteringOAuthService 에서 uaa
 token 을 취득하여, SampleMeteringReportService 의 파라메터로 호출 하는
@@ -296,7 +339,7 @@ token 을 취득하여, SampleMeteringReportService 의 파라메터로 호출 �
 
   	}
 
-###<div id='13'/>2.3.5.  ServiceInstanceBinding 
+###2.3.5.  ServiceInstanceBinding 
 
 ServiceInstanceBinding 에 미터링 서비스를 구현하기 위해 바인딩 되는
 애플리케이션의 환경 정보 필드를 추가 한다. 추가 된 필드 들은
@@ -375,7 +418,7 @@ parameter 의 필드 값들을 매핑 처리 한 후, mongo-db repository 에 �
   	}
   ----------------------------------------------------------------------------
 
-###<div id='14'/>2.3.6.  SampleMeteringOAuthService 추상화 클래스
+###2.3.6.  SampleMeteringOAuthService 추상화 클래스
 
 UAA OAuthToken은 Abacus가 Secured로 운영될 경우, abucus-collector
 RESTAPI에 접근 하기 위해 필요하다.
@@ -394,7 +437,7 @@ SampleMeteringOAuthService를 상속하는 클래스는 UAA OAuthToken을 취득
   	}
   ---------------------------------------------------------------------
 
-###<div id='15'/>2.3.7.  SampleMeteringReportService 추상화 클래스
+###2.3.7.  SampleMeteringReportService 추상화 클래스
 SampleMeteringReportService를 상속하는 클래스는 create binding request와
 delete binding request를 처리 할 때, 각각 해당 이벤트 정보를
 abacus-collector에 전송하고 해당 처리에 대한 상태코드(HTTP 상태코드)를
@@ -425,67 +468,24 @@ abacus-collector에 전송하고 해당 처리에 대한 상태코드(HTTP 상�
 
 
 
-##<div id='16'/>2.4.  서비스 브로커 라이브러리
+##2.4.  서비스 브로커 라이브러리
 
-###<div id='17'/>2.4.1.  mongo-db 서비스 브로커 API
+###2.4.1.  mongo-db 서비스 브로커 API
 
 지금까지 서비스 브로커 라이브러리를 개수 하여, 미터링을 위한 추상화
 클래스 및 모델 객체들을 준비 했다. 지금 부터는 서비스 브로커
 라이브러리를 구현한 mongo-db 서비스 브로커 API에서 미터링을 구현 하는
 것에 대해 기술 한다.
 
-###<div id='18'/>2.4.2.  mongo-db 서비스 브로커 API 다운로드
+###2.4.2.  mongo-db 서비스 브로커 API 다운로드
 
 mongo-db 서비스 브로커 API는 별도 제공되는 압축 파일 패키지를 사용한다.
 
-###<div id='19'/>2.4.3.  mongo-db 서비스 브로커 API에 추가 및 수정 되는 파일
+###2.4.3.  mongo-db 서비스 브로커 API에 추가 및 수정 되는 파일
 
  |   |유형 | 필수|
  |---------|---|----|
- |   수정      |build.gradle   |  빌드 설정 파일<
-서비스는 다양하지만, 서비스를 사용하기 위한 개방형 플랫폼의 RESTAPI가
-미리 정해져 있다.
-
-서비스 브로커 라이브러리는 각각 다른 서비스 브로커들이 서비스 브로커
-라이브러리 Jar 파일을 build path 에 추가 하고, 추상화 클래스들을 구현
-하는 것으로 이 개방형 플랫폼의 REST API에 기반 하여, 서비스가 제공 될 수
-있도록 해주는 라이브러리 이다.
-
-
-
-본 가이드에서는 mongo-db 서비스 브로커에 미터링 서비스를 구현하기
-위해서는 이 서비스 브로커 라이브러리에 미터링을 하기 위한 추상화
-클래스를 추가 한 후, mongo-db 서비스 브로커에서 이 라이브러리를
-dependency로 사용하여 빌드 한다.
-
-
-###<div id='20'/>2.3.2.  서비스 브로커 라이브러리를 다운로드 한 후, 프로젝트 import 한다.
-
-1.  오픈 소스로 제공되고 있는 서비스 브로커 소스를 git clone 으로 다운받는다.<br>
-    **[https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/tree/master/src/main/java/org/cloudfoundry/community/servicebroker/controller](https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/tree/master/src/main/java/org/cloudfoundry/community/servicebroker/controller)**
-
-
-  
-		$ git clone https://github.com/cloudfoundry-community/spring-boot-cf-service-broker.git
-
-  		Cloning into 'spring-boot-cf-service-broker'...
-
-  		remote: Counting objects: 2394, done.
-
-  		remote: Total 2394 (delta 0), reused 0 (delta 0), pack-reused 2394
-
-  		Receiving objects: 100% (2394/2394), 351.72 KiB | 279.00 KiB/s, done.
-
-  		Resolving deltas: 100% (939/939), done.
-
-  		Checking connectivity... done.
-
-
-다운 받은 소스를 Java 개발 도구 Eclipse 및 Spring Tool Suite 로 import
-한다.
-
-gradle 플러그인을 Eclipse 에 추가한 후, gradle import 하면 개발이 보다
-용이 해진다.br>
+ |   수정      |build.gradle   |  빌드 설정 파일<br>
 미터링 사용량 객체 생성에 필요한 dependency 를 추가 한다.
   |     
  |   수정      | application-mvc.properties  | 서비스 바인딩 request 의 정보들을 매핑한다.
@@ -497,7 +497,7 @@ gradle 플러그인을 Eclipse 에 추가한 후, gradle import 하면 개발이
  |   추가     |SampleMeteringOAuthServiceImpl   | SampleMeteringOAuthService 를 구현 한다.   |     
  |   수정     |Manifest.yml   | 앱을 CF에 배포할 때 필요한 설정 정보 및 앱 실행 환경에 필요한 설정 정보를 기술한다.   |   
 
-###<div id='21'/>2.4.4.  gradle build를 위한 dependency 추가
+###2.4.4.  gradle build를 위한 dependency 추가
 ![Java_Service_Metering_Image03]
 서비스브로커 라이브러리 mongo-db서비스 브로커 jar 파일을 적용
 
@@ -574,7 +574,7 @@ mongo-db 서비스 브로커 build.gradle 파일의 dependencies 부분
   	}
   ------------------------------------------------------------------------------------------------------------
 
-###<div id='23'/>2.4.5.  application-mvc.properties 설정
+###2.4.5.  application-mvc.properties 설정
 
   	# abacus usage collector RESTAPI 의 주소
 
@@ -600,7 +600,7 @@ uaa 계정 설정 방법에 관해서 별도의 **abacus****설치 가이드**�
 Abacus****를 위한****UAA****계정 등록**을 참고한다.
 
 
-###<div id='24'/>2.4.6.  datasource.properties 설정
+###2.4.6.  datasource.properties 설정
 
   	# Mongo-DB 서비스 배포 manifest파일을 참조하여 설정한다.
 
@@ -617,7 +617,7 @@ Abacus****를 위한****UAA****계정 등록**을 참고한다.
   	mongodb.password = openpaas
 
 
-###<div id='25'/>2.4.7.  MongoServiceInstanceBindingService 구현체
+###2.4.7.  MongoServiceInstanceBindingService 구현체
 
 애플리케이션 환경 정보는 service broker binding CLI 요청 시, parameter
 객체를 통해서 입력된다. 이 정보 들을 ServiceInstanceBinding에 미터링
@@ -650,7 +650,7 @@ ServiceInstanceBinding 객체에 매핑한다. mongo-db repository 를 통해 �
   	return binding;
 
 
-###<div id='26'/>2.4.8.  SampleMeteringOAuthService 구현
+###2.4.8.  SampleMeteringOAuthService 구현
 
 application-mvc.properties의 UAA server에서 UAA 토큰을 취득하기 위한
 정보들을 클래스로 호출한다.
@@ -736,7 +736,7 @@ SampleMeteringOAuthServiceImpl는 https 커넥션을 생성하여 UAA 서버에
 
   	}
 
-###<div id='27'/>2.4.9.  SampleMeteringReportService 구현
+###2.4.9.  SampleMeteringReportService 구현
 
 SampleMeteringReportServiceImpl에서는 SampleMeteringOAuthServiceImpl에서
 취득한 uaa token 으로 https 커넥션을 생성하여, abacus-collector에 서비스
@@ -935,7 +935,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 |  resource_id          |String           |서비스 자원 ID                                 |linux-container                                 |
 |  plan_id              |String           | 서비스 미터링 Plan ID                         |standard                                        |
 |  resource_instance_id | String          |바인드 요청을 호출한 앱 ID                      | d98b5916-3c77-44b9-ac12-04d61c7a4eae            |
-|  measured_usage       | Array           | 미터링 항목                                   | -                                         |
+|  measured_usage       | Array           | 미터링 항목                                   | ㅁㄴㅇㅁ                                         |
 |   measure             | String          | 미터링 대상 명                                |sample_service_usage_param1                     |
 |  quantity             |Number           |  서비스 사용량 예제는 메모리 사용량 (byte)      |1000000000                                       |
 
@@ -999,14 +999,14 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
   	}
 
 
-#<div id='28'/>2.5.  미터링/등급/과금 정책
+#2.5.  미터링/등급/과금 정책
 
 서비스, 그리고 서비스 제공자 마다 미터링/등급/과금 정책 다르기 때문에 본
 가이드에서는 정책의 개발 예제를 다루지는 않는다. 다만 CF-ABACUS에 적용할
 수 있는 형식에 대해 설명한다.
 
 
-###<div id='29'/>2.5.1.  미터링 정책
+###2.5.1.  미터링 정책
 
 미터링 정책이란 수집한 미터링 정보에서 미터링 대상의 지정 및 집계 방식을
 정의한 JSON 형식의 오브젝트이다. 서비스 제공자는 미터링 정책 스키마에
@@ -1053,6 +1053,17 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
   			},
 
   			{
+  				name: 'previous\_service\_usage\_param2',
+  				unit: ‘SAMPLE\_UNIT’
+  			} ],
+
+  			metrics: [
+  			{
+  				name: 'sample\_metric',
+  				unit: ‘SAMPLE\_UNIT’,
+  				type: 'time-based',
+
+  			meter: ((m) =\> ({
 
   				previous\_consuming: new BigNumber(m.previous\_instance\_memory || 0)
 
@@ -1158,18 +1169,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 
   		};
 
-###<div id='30'/>2.
-  				name: 'previous\_service\_usage\_param2',
-  				unit: ‘SAMPLE\_UNIT’
-  			} ],
-
-  			metrics: [
-  			{
-  				name: 'sample\_metric',
-  				unit: ‘SAMPLE\_UNIT’,
-  				type: 'time-based',
-
-  			meter: ((m) =\> ({5.2.  등급 정책 
+###2.5.2.  등급 정책 
 
 등급 정책이란 각 서비스의 사용 가중치를 정의한 JSON 형식의 오브젝트이다.
 서비스 제공자는 등급 정책 스키마에 맞춰 서비스에 대한 정책을 개발한다.
@@ -1212,7 +1212,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 
   		}
 
-###<div id='31'/>2.5.3. 과금 정책 
+###2.5.3. 과금 정책 
 
 과금 정책이란 각 서비스에 대한 사용 단가를 정의한 JSON 형식의
 오브젝트이다. 서비스 제공자는 과금 정책 스키마에 맞춰 서비스에 대한
@@ -1313,7 +1313,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
   		}
 
 
-###<div id='32'/>2.5.4.  정책 등록
+###2.5.4.  정책 등록
 
 정책은 2가지 방식 중 하나의 방법으로 CF-ABACUS에 등록할 수 있다.
 
@@ -1353,13 +1353,13 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
   		POST /v1/pricing/plans/:pricing_plan_id
 
 
-##<div id='33'/>2.6  배포
+##2.6  배포
 파스-타 플랫폼에 애플리케이션을 배포하면 배포한 애플리케이션과 파스-타
 플랫폼이 제공하는 서비스를 연결하여 사용할 수 있다. 파스-타 플랫폼상에서
 실행을 해야만 파스-타 플랫폼의 애플리케이션 환경변수에 접근하여 서비스에
 접속할 수 있다.
 
-###<div id='34'/>2.6.1파스-타 플랫폼 로그인
+###2.6.1파스-타 플랫폼 로그인
 
 아래의 과정을 수행하기 위해서 파스-타 플랫폼에 로그인
 
@@ -1368,7 +1368,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
   >$ cf login -u *<****user name****>* -o *<****org name****>* -s *<****space name****>***#**** **로그인 요청**
 
 
-###<div id='35'/>2.6.2.  mongo-db 서비스 브로커 생성
+###2.6.2.  mongo-db 서비스 브로커 생성
 
 애플리케이션에서 사용할 서비스를 파스-타 플랫폼을 통하여 생성한다.
 mongo-db 서비스 팩이 배포하고자 파스-타 플랫폼 환경에 release 되어
@@ -1428,7 +1428,7 @@ mongo-db 서비스 팩이 배포하고자 파스-타 플랫폼 환경에 release
 	
   >$ cf create-service Mongo-DB default-plan mongod_service
 
-##<div id='36'/>2.6.3.  API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결
+##2.6.3.  API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결
 
 애플리케이션과 서비스를 연결하는 과정을 '바인드(bind)라고 하며, 이
 과정을 통해 서비스에 접근할 수 있는 접속정보를 생성한다.
@@ -1491,7 +1491,7 @@ mongo-db 서비스 팩이 배포하고자 파스-타 플랫폼 환경에 release
 
   >openpaas-mongo-broker started 1/1 512M 1G openpaas-mongo-broker**.*****\<****파스**-**타 도메인**\>*
 
-##<div id='37'/>2.7.  서비스 바인딩 CF-Abacus 연동 테스트
+##2.7.  서비스 바인딩 CF-Abacus 연동 테스트
 
 binding-test-app 과 mongo-db 서비스를 바인딩 실행해, CF-Abacus 연동
 테스트를 진행 할 수 있다.
@@ -1514,7 +1514,7 @@ CF-Abacus 연동 확인
   >$ curl 'http://abacus-usage-reporting.bosh-lite.com/v1/metering/organizations/testOrgGuid /aggregated/usage'
 
 
-##<div id='38'/>2.8.  단위 테스트
+##2.8.  단위 테스트
 
 Junit 테스트로 구현 되어 있으며, 테스트 service class 에 대한 부분적
 mock 적용을 위하여, owermock-mockito-release-full:1.6.1 을 사용하였다.
