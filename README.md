@@ -432,7 +432,9 @@ CF 설치한 abacus에서 CF의 앱 사용량 정보를 수집하기 위해서 C
 
 -   manifest.yml 설정의 예
 
-  applications:
+```yaml
+  
+	applications:
 
   	- name: abacus-usage-collector ## 앱 명
 
@@ -503,6 +505,7 @@ CF 설치한 abacus에서 CF의 앱 사용량 정보를 수집하기 위해서 C
   	JWTALGO: RS256 ## JWTKEY 알고리즘
 
   	THROTTLE: 2
+```
  >
   
   	## abacus-authserver를 Auth 서비스로 사용할 경우 설정 예시
@@ -652,7 +655,6 @@ CF 설치한 abacus에서 CF의 앱 사용량 정보를 수집하기 위해서 C
       env: ### 앱 실행 환경 정보
 
       CONF: default
----
       applications:
 
       - name: abacus-cf-bridge
