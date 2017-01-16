@@ -160,9 +160,9 @@ api 서비스 요청에 대한 미터링 정보를 CF-ABACUS에 전송하는 처
 프로젝트 디렉터리를 생성하고, gradle 프로젝트로 초기화 한다
 
 
-	$ mkdir sample_api_java_service // 프로젝트 디렉토리
-	$ cd sample_api_java_service/
-	~/sample_api_java_service $ gradle init --type java-library // gradle 초기화
+	$ mkdir sample\_api\_java\_service // 프로젝트 디렉토리
+	$ cd sample\_api\_java\_service/
+	~/sample\_api\_java\_service\$ gradle init --type java-library // gradle 초기화
 	: wrapper
 	: init
 
@@ -172,7 +172,7 @@ api 서비스 요청에 대한 미터링 정보를 CF-ABACUS에 전송하는 처
 
   
 	This build could be faster, please consider using the Gradle Daemon: 
-	https://docs.gradle.org/2.14/userguide/gradle_daemon.html
+	https://docs.gradle.org/2.14/userguide/gradle\_daemon.html
   
 
 ###<div id='12'/>샘플 API 서비스 형상
@@ -218,9 +218,9 @@ Java 파일 형상 설명
 		// https://mvnrepository.com/artifact/org.springframework/spring-test
 		compile group: 'org.springframework', name: 'spring-test', version: '2.5'
 
-		providedRuntime("org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}")
+		providedRuntime("org.springframework.boot:spring-boot-starter-tomcat:\${springBootVersion}")
 
-		compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+		compile("org.springframework.boot:spring-boot-starter-web:\${springBootVersion}")
 		
 		// 미터링 사용량 객체 생성 dependency
 
@@ -246,19 +246,19 @@ Java 파일 형상 설명
 
 		applications:
 
-		- name: sample-api-node-service # 애플리케이션 이름
+		- name: sample-api-node-service \# 애플리케이션 이름
 
-		memory: 512M # 애플리케이션 메모리 사이즈
+		memory: 512M \# 애플리케이션 메모리 사이즈
 
-		instances: 1 # 애플리케이션 인스턴스 개수
+		instances: 1 \# 애플리케이션 인스턴스 개수
 
 		host: sample-api-java-service
 
-		path: ./build/libs/sample_api_java_service.jar # 배포될 애플리케이션의 위치
+		path: ./build/libs/sample\_api\_java\_service.jar \# 배포될 애플리케이션의 위치
 
 		env:
 
-		SPRING_PROFILES_ACTIVE : cloud
+		SPRING\_PROFILES\_ACTIVE : cloud
 
 
 -   metering.properties
@@ -269,7 +269,7 @@ Java 파일 형상 설명
 
 		# abacus usage collector RESTAPI 의 주소
 
-		abacus.collector = https://abacus-usage-collector.***<CF******도메인******>***/v1/metering/collected/usage
+		abacus.collector = https://abacus-usage-collector.***\<CF******도메인******\>***/v1/metering/collected/usage
 
 		# abacus usage collector 가 secured 모드 true / 아닐 경우 false
 
@@ -277,13 +277,13 @@ Java 파일 형상 설명
 
 		# 파스-타 플랫폼의 uaa server
 
-		uaa.server = https://uaa.***<CF******도메인******>***
+		uaa.server = https://uaa.***\<CF******도메인******\>***
 
 		# abacus usage collector RESTAPI 계정 정보 및 사용권한 (UAA server에 미리 설정)
 
-		uaa.client.id = ***<abacus.usage.read/write scope******권한을 가진******ID>***
+		uaa.client.id = ***\<abacus.usage.read/write scope******권한을 가진******ID\>***
 
-		uaa.client.secret = ***<abacus.usage.read/write scope******권한을 가진******ID******비밀번호******>***
+		uaa.client.secret = ***\<abacus.usage.read/write scope******권한을 가진******ID******비밀번호******\>***
 
 		uaa.client.scope = abacus.usage.object-storage.write,abacus.usage.object-storage.read
   
@@ -296,7 +296,7 @@ UAA 서버 URL 및 계정 정보를 참조 하여, UAA token 을 취득하여 �
 
 	String authToken = "";
 
-	String urlStr = authServer + "/oauth/token?grant_type=client_credentials&scope=" + encodeURIComponent(scope);
+	String urlStr = authServer + "/oauth/token?grant\_type=client\_credentials&scope=" + encodeURIComponent(scope);
 
 	StringBuffer sb = new StringBuffer();
 
@@ -348,7 +348,7 @@ UAA 서버 URL 및 계정 정보를 참조 하여, UAA token 을 취득하여 �
 
 	while ((line = br.readLine()) != null) {
 
-	sb.append(line).append("\n");
+	sb.append(line).append("\\n");
 
 	}
 
@@ -400,7 +400,7 @@ metering.properties 에서 취득한 계정 정보를 BASE64 로 인코딩 한�
 
 	}
 
-UAA SEVER 에서 리턴 받은 JSON 오브젝트 에서 access_token 을 추출한다.
+UAA SEVER 에서 리턴 받은 JSON 오브젝트 에서 access\_token 을 추출한다.
 
   
 	private String parseAuthToken(String jsonStr) throws ParseException{
@@ -411,7 +411,7 @@ UAA SEVER 에서 리턴 받은 JSON 오브젝트 에서 access_token 을 추출�
 
 	JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonStr);
 
-	barerStr = (String) jsonObject.get("access_token");
+	barerStr = (String) jsonObject.get("access\_token");
 
 	return barerStr;
 
@@ -491,7 +491,7 @@ API 사용량을 Abacus-collector에 전송하기 위해, CF 또는 인증 서�
 
 	conn.setRequestProperty("Authorization", bareStr);
 
-	byte[] out = serviceUsage.toString().getBytes(StandardCharsets.UTF_8);
+	byte[] out = serviceUsage.toString().getBytes(StandardCharsets.UTF\_8);
 
 	DataOutputStream dout = new DataOutputStream(conn.getOutputStream());
 
@@ -507,7 +507,7 @@ API 사용량을 Abacus-collector에 전송하기 위해, CF 또는 인증 서�
 
 	while ((line = br.readLine()) != null) {
 
-	sb.append(line).append("\n");
+	sb.append(line).append("\\n");
 
 	}
 
@@ -552,7 +552,7 @@ HTTP Connection을 생성 한다.
 
 	http.setUseCaches(false);
 
-	byte[] out = serviceUsage.toString().getBytes(StandardCharsets.UTF_8);
+	byte[] out = serviceUsage.toString().getBytes(StandardCharsets.UTF\_8);
 
 	int length = out.length;
 
@@ -594,17 +594,17 @@ Abacus-collector에 전송 할 API 서비스 사용량 JSON을 생성 한다.
 
 	jsonObjectUsage.put ("end", timestamp.getTime());
 
-	jsonObjectUsage.put ("organization_id", orgId);
+	jsonObjectUsage.put ("organization\_id", orgId);
 
-	jsonObjectUsage.put ("space_id", spaceId);
+	jsonObjectUsage.put ("space\_id", spaceId);
 
-	jsonObjectUsage.put ("consumer_id", "app:" + appId);
+	jsonObjectUsage.put ("consumer\_id", "app:" + appId);
 
-	jsonObjectUsage.put ("resource_id", RESOURCE_ID);
+	jsonObjectUsage.put ("resource\_id", RESOURCE\_ID);
 
-	jsonObjectUsage.put ("plan_id", planId);
+	jsonObjectUsage.put ("plan\_id", planId);
 
-	jsonObjectUsage.put ("resource_instance_id", appId);
+	jsonObjectUsage.put ("resource\_instance\_id", appId);
 
 	JSONArray measuredUsageArr = new JSONArray ();
 
@@ -616,35 +616,35 @@ Abacus-collector에 전송 할 API 서비스 사용량 JSON을 생성 한다.
 	
 	int quantity = 0;
 
-	if (STANDARD_PLAN_ID.equals(planId)) {
+	if (STANDARD\_PLAN\_ID.equals(planId)) {
 
-	quantity = PLAN_STANDARD_QUANTITY;
+	quantity = PLAN\_STANDARD\_QUANTITY;
 
-	} else if (EXTRA_PLAN_ID.equals(planId)) {
+	} else if (EXTRA\_PLAN\_ID.equals(planId)) {
 
-	quantity = PLAN_EXTRA_QUANTITY;
+	quantity = PLAN\_EXTRA\_QUANTITY;
 
 	}
 
-	measuredUsage1.put ("measure", MEASURE_1);
+	measuredUsage1.put ("measure", MEASURE\_1);
 
 	measuredUsage1.put ("quantity", quantity);
 
 	measuredUsageArr.put(measuredUsage1);
 
-	measuredUsage2.put ("measure", MEASURE_2);
+	measuredUsage2.put ("measure", MEASURE\_2);
 
 	measuredUsage2.put ("quantity", 1);
 
 	measuredUsageArr.put(measuredUsage2);
 
-	measuredUsage3.put ("measure", MEASURE_3);
+	measuredUsage3.put ("measure", MEASURE\_3);
 
 	measuredUsage3.put ("quantity", 0);
 
 	measuredUsageArr.put(measuredUsage3);
 
-	jsonObjectUsage.put ("measured_usage", measuredUsageArr);
+	jsonObjectUsage.put ("measured\_usage", measuredUsageArr);
 
 	return jsonObjectUsage;
 
@@ -672,23 +672,23 @@ Abacus-collector에 전송 할 API 서비스 사용량 JSON을 생성 한다.
 
 	"end": 1396421451000,
 
-	"organization_id": "us-south:54257f98-83f0-4eca-ae04-9ea35277a538",
+	"organization\_id": "us-south:54257f98-83f0-4eca-ae04-9ea35277a538",
 
-	"space_id": "d98b5916-3c77-44b9-ac12-04456df23eae",
+	"space\_id": "d98b5916-3c77-44b9-ac12-04456df23eae",
 
-	"consumer_id": "app:d98b5916-3c77-44b9-ac12-045678edabae",
+	"consumer\_id": "app:d98b5916-3c77-44b9-ac12-045678edabae",
 
-	"resource_id": "sample_api",
+	"resource\_id": "sample\_api",
 
-	"plan_id": "basic",
+	"plan\_id": "basic",
 
-	"resource_instance_id": "d98b5916-3c77-44b9-ac12-04d61c7a4eae",
+	"resource\_instance\_id": "d98b5916-3c77-44b9-ac12-04d61c7a4eae",
 
-	"measured_usage": [
+	"measured\_usage": [
 
 	{
 
-	"measure": "api_calls",
+	"measure": "api\_calls",
 
 	"quantity": 10
 
@@ -705,34 +705,34 @@ Abacus-collector에 전송 할 API 서비스 사용량 JSON을 생성 한다.
 
 	@RequestMapping (value = "/plan1", method = RequestMethod.POST)
 
-	public ResponseEntity<String> serviceAPIPlan01(@RequestBody String input) throws Exception {
+	public ResponseEntity\<String\> serviceAPIPlan01(@RequestBody String input) throws Exception {
 
 	JSONParser jsonParser = new JSONParser ();
 
 	JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
 
-	String orgId = (String) jsonObject.get("organization_id");
+	String orgId = (String) jsonObject.get("organization\_id");
 
-	String spaceId = (String) jsonObject.get("space_id");
+	String spaceId = (String) jsonObject.get("space\_id");
 
-	String appId = (String) jsonObject.get("consumer_id");
+	String appId = (String) jsonObject.get("consumer\_id");
 
-	String planId = (String) jsonObject.get("plan_id");
+	String planId = (String) jsonObject.get("plan\_id");
 
 	JSONObject serviceKeyOBJ = (JSONObject) jsonObject.get("credential");
 
 	String serviceKey = (String) serviceKeyOBJ.get("serviceKey");
 
-	if(!SERVICE_KEY.equals(serviceKey))
+	if(!SERVICE\_KEY.equals(serviceKey))
 
-	return new ResponseEntity<>("credential is wrong", HttpStatus.UNAUTHORIZED);
+	return new ResponseEntity\<\>("credential is wrong", HttpStatus.UNAUTHORIZED);
 
 	meteringService.reportUsageData(orgId, spaceId, appId, planId);
 
 	String successStr = "orgId:" + orgId + "/ spaceId:" + spaceId 
 	+ "/ appId:" + appId + "/ planId:" + planId + " was reported to abacus collector.";
 
-	return new ResponseEntity<>(successStr, HttpStatus.OK);
+	return new ResponseEntity\<\>(successStr, HttpStatus.OK);
 
 	}
 
@@ -749,18 +749,18 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
 1.  **API 서비스 엔드 포인트**
 
-		GET|POST|PUT|DELETE *<api_service_restful_api>*
+		GET|POST|PUT|DELETE *\<api\_service\_restful\_api\>*
 
 
 2.  **API 서비스 미터링 전송 항목**
 
  | 항목명  |유형 | 설명| 예시|
  |---------|---|----|-----|
- |  org_id       | String  | API 서비스를 요청한 앱의 조직 ID    | 54257f98-83f0-4eca-ae04-9ea35277a538    |
- |  space_id       | String  |API 서비스를 요청한 앱의 영역 ID     |d98b5916-3c77-44b9-ac12-04456df23eae     |
- |consumer_id         |String   |API 서비스를 요청한 앱 ID         |d98b5916-3c77-44b9-ac12-045678edabae     |
- |instance_id         |String   |API 서비스를 요청한 앱의 자원 인스턴스 ID     |d98b5916-3c77-44b9-ac12-045678edabad     |
- |plan_id         |String   |앱의 요청한 API 서비스의 plan ID    |basic     |
+ |  org\_id       | String  | API 서비스를 요청한 앱의 조직 ID    | 54257f98-83f0-4eca-ae04-9ea35277a538    |
+ |  space\_id       | String  |API 서비스를 요청한 앱의 영역 ID     |d98b5916-3c77-44b9-ac12-04456df23eae     |
+ |consumer\_id         |String   |API 서비스를 요청한 앱 ID         |d98b5916-3c77-44b9-ac12-045678edabae     |
+ |instance\_id         |String   |API 서비스를 요청한 앱의 자원 인스턴스 ID     |d98b5916-3c77-44b9-ac12-045678edabad     |
+ |plan\_id         |String   |앱의 요청한 API 서비스의 plan ID    |basic     |
  |credentials         |JSON   |서비스 요청에 필요한 credential 항목을 설정한다.    |credentials: {<br>key: value,<br>…<br>}     |
  | inputs        |JSON   |서비스 요청에 필요한 입력 정보를 설정한다.    | inputs: {<br>key:value,<br>...<br>}    |
 
@@ -771,15 +771,15 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
 		{
 
-		organization_id: 'd6ce3670-ab9c-4453-b993-f2821f54846b',
+		organization\_id: 'd6ce3670-ab9c-4453-b993-f2821f54846b',
 
-		space_id: 'ab63eaed-7932-4f24-804d-dccb40a68752',
+		space\_id: 'ab63eaed-7932-4f24-804d-dccb40a68752',
 
-		consumer_id: 'ff7476f9-f5b6-420c-96f0-ac39be43de8c',
+		consumer\_id: 'ff7476f9-f5b6-420c-96f0-ac39be43de8c',
 
-		instance_id: 'ff7476f9-f5b6-420c-96f0-ac39be43de8c',
+		instance\_id: 'ff7476f9-f5b6-420c-96f0-ac39be43de8c',
 
-		plan_id: 'standard',
+		plan\_id: 'standard',
 
 		credential: {
 
@@ -818,7 +818,7 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
  | 항목명  |유형 | 필수| 예시|
  |---------|---|----|-----|
- |plan_id         |String   | O   |API 미터링 Plan ID     |
+ |plan\_id         |String   | O   |API 미터링 Plan ID     |
  |measures         |Array   |최소 하나    |API 미터링 정보 수집 대상 정의     |
  |Name         |String   |O    |미터링 정보 수집 대상 명     |
  |Unit         |String   |O    |미터링 정보 수집 대상 단위     |
@@ -834,7 +834,7 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
 		{
 		
-		"plan_id": "basic-object-storage",
+		"plan\_id": "basic-object-storage",
 
 		"measures": [
 
@@ -848,7 +848,7 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
 		{
 
-		"name": "api_calls",
+		"name": "api\_calls",
 
 		"units": "CALL"
 
@@ -864,25 +864,25 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
 		"unit": "GIGABYTE",
 
-		"meter": "(m) => m.storage / 1073741824",
+		"meter": "(m) =\> m.storage / 1073741824",
 
-		"accumulate": "(a, qty) => Math.max(a, qty)"
+		"accumulate": "(a, qty) =\> Math.max(a, qty)"
 
 		},
 
 		{
 
-		"name": "thousand_api_calls",
+		"name": "thousand\_api\_calls",
 
-		"unit": "THOUSAND_CALLS",
+		"unit": "THOUSAND\_CALLS",
 
-		"meter": "(m) => m.light_api_calls / 1000",
+		"meter": "(m) =\> m.light\_api\_calls / 1000",
 
-		"accumulate": "(a, qty) => a ? a + qty : qty",
+		"accumulate": "(a, qty) =\> a ? a + qty : qty",
 
-		"aggregate": "(a, qty) => a ? a + qty : qty",
+		"aggregate": "(a, qty) =\> a ? a + qty : qty",
 
-		"summarize": "(t, qty) => qty"
+		"summarize": "(t, qty) =\> qty"
 
 		}
 
@@ -899,7 +899,7 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
  | 항목명  |유형 | 필수| 설명|
  |---------|---|----|-----|
- | plan_id|   String |  O        |   API 등급 Plan ID    |
+ | plan\_id|   String |  O        |   API 등급 Plan ID    |
  | metrics |   Array  |  최소 하나 |  등급 정책 목록	|
  | Name    |   String |  O        |   등급 정의 대상 명|
  | rate    |   String |  X        |   가중치 계산식 또는 변환식|
@@ -911,7 +911,7 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
 		{
 
-		"plan_id": "object-rating-plan",
+		"plan\_id": "object-rating-plan",
 
 		"metrics": [
 
@@ -923,11 +923,11 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
 		{
 
-		"name": "thousand_api_calls",
+		"name": "thousand\_api\_calls",
 
-		"rate": "(p, qty) => p ? p * qty : 0",
+		"rate": "(p, qty) =\> p ? p \* qty : 0",
 
-		"charge": "(t, cost) => cost"
+		"charge": "(t, cost) =\> cost"
 
 		}
 
@@ -945,7 +945,7 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
  | 항목명  |유형 | 필수| 설명|
  |---------|---|----|-----|
- | plan_id|   String |  O        |   API 과금 Plan ID|
+ | plan\_id|   String |  O        |   API 과금 Plan ID|
  | Metrics  |  Array   | 최소 하나 |  과금 정책 목록|
  | Name     |  String  | O        |   과금 대상 명|
  | Price    |  Array   | 최소 하나 |  과금 정책 상세|
@@ -958,7 +958,7 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 		
 		{
 
-		"plan_id": "object-pricing-basic",
+		"plan\_id": "object-pricing-basic",
 
 		"metrics": [
 
@@ -998,7 +998,7 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
 		{
 
-		"name": "thousand_api_calls",
+		"name": "thousand\_api\_calls",
 
 		"prices": [
 
@@ -1064,50 +1064,50 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
 -   미터링 정책의 경우
 
-		POST /v1/metering/plans/:metering_plan_id
+		POST /v1/metering/plans/:metering\_plan\_id
 	>
 	
 		## 예제
 
-		$ curl -k -X POST 'http://abacus-provisioning-plugin.bosh-lite.com/v1/metering/plans/sample-linux-container' 
+		$ curl -k -X POST 'http://abacus-provisioning-plugin.bosh-lite.com/v1/metering/plans/sample-linux-container' \\
 
-		-H "Content-Type: application/json" 
+		-H "Content-Type: application/json" \\
 
-		-d '{"plan_id":"sample-linux-container","measures":[{"name":"current_instance_memory","unit":"GIGABYTE"},{"name":"current_running_instances","unit":"NUMBER"},{"name":"previous_instance_memory","unit":"GIGABYTE"},{"name":"previous_running_instances","unit":"NUMBER"}],"metrics":[{"name":"memory","unit":"GIGABYTE","type":"time-based","meter":"((m)=>({previous_consuming:newBigNumber(m.previous_instance_memory||0).div(1073741824).mul(m.previous_running_instances||0).mul(-1).toNumber(),consuming:newBigNumber(m.current_instance_memory||0).div(1073741824).mul(m.current_running_instances||0).toNumber()})).toString()","accumulate":"((a,qty,start,end,from,to,twCell)=>{if(end<from||end>=to)returnnull;constpast=from-start;constfuture=to-start;consttd=past+future;return{consuming:a&&a.since>start?a.consuming:qty.consuming,consumed:newBigNumber(qty.consuming).mul(td).add(newBigNumber(qty.previous_consuming).mul(td)).add(a?a.consumed:0).toNumber(),since:a&&a.since>start?a.since:start};}).toString()","aggregate":"((a,prev,curr,aggTwCell,accTwCell)=>{if(!curr)returna;constconsuming=newBigNumber(curr.consuming).sub(prev?prev.consuming:0);constconsumed=newBigNumber(curr.consumed).sub(prev?prev.consumed:0);return{consuming:consuming.add(a?a.consuming:0).toNumber(),consumed:consumed.add(a?a.consumed:0).toNumber()};}).toString()","summarize":"((t,qty,from,to)=>{if(!qty)return0;constrt=Math.min(t,to?to:t);constpast=from-rt;constfuture=to-rt;consttd=past+future;constconsumed=newBigNumber(qty.consuming).mul(-1).mul(td).toNumber();returnnewBigNumber(qty.consumed).add(consumed).div(2).div(3600000).toNumber();}).toString()"}]}' 
+		-d '{"plan\_id":"sample-linux-container","measures":[{"name":"current\_instance\_memory","unit":"GIGABYTE"},{"name":"current\_running\_instances","unit":"NUMBER"},{"name":"previous\_instance\_memory","unit":"GIGABYTE"},{"name":"previous\_running\_instances","unit":"NUMBER"}],"metrics":[{"name":"memory","unit":"GIGABYTE","type":"time-based","meter":"((m)=\>({previous\_consuming:newBigNumber(m.previous\_instance\_memory||0).div(1073741824).mul(m.previous\_running\_instances||0).mul(-1).toNumber(),consuming:newBigNumber(m.current\_instance\_memory||0).div(1073741824).mul(m.current\_running\_instances||0).toNumber()})).toString()","accumulate":"((a,qty,start,end,from,to,twCell)=\>{if(end\<from||end\>=to)returnnull;constpast=from-start;constfuture=to-start;consttd=past+future;return{consuming:a&&a.since\>start?a.consuming:qty.consuming,consumed:newBigNumber(qty.consuming).mul(td).add(newBigNumber(qty.previous\_consuming).mul(td)).add(a?a.consumed:0).toNumber(),since:a&&a.since\>start?a.since:start};}).toString()","aggregate":"((a,prev,curr,aggTwCell,accTwCell)=\>{if(!curr)returna;constconsuming=newBigNumber(curr.consuming).sub(prev?prev.consuming:0);constconsumed=newBigNumber(curr.consumed).sub(prev?prev.consumed:0);return{consuming:consuming.add(a?a.consuming:0).toNumber(),consumed:consumed.add(a?a.consumed:0).toNumber()};}).toString()","summarize":"((t,qty,from,to)=\>{if(!qty)return0;constrt=Math.min(t,to?to:t);constpast=from-rt;constfuture=to-rt;consttd=past+future;constconsumed=newBigNumber(qty.consuming).mul(-1).mul(td).toNumber();returnnewBigNumber(qty.consumed).add(consumed).div(2).div(3600000).toNumber();}).toString()"}]}' \\
 
-		-H "Authorization: $(cf oauth-token | grep bearer)"
+		-H "Authorization: \$(cf oauth-token | grep bearer)"
 
 
 -   등급 정책의 경우
 
-		  POST /v1/rating/plans/:rating_plan_id
+		  POST /v1/rating/plans/:rating\_plan\_id
 	>
 
   		## 예제
 
- 		$ curl -k -X POST 'http://abacus-provisioning-plugin.bosh-lite.com/v1/rating/plans/linux-rating-sample' 
+ 		$ curl -k -X POST 'http://abacus-provisioning-plugin.bosh-lite.com/v1/rating/plans/linux-rating-sample' \\
 
-  		-H "Content-Type: application/json" 
+  		-H "Content-Type: application/json" \\
 
-  		-d '{"plan_id":"linux-rating-sample","metrics":[{"name":"memory","rate":"((price,qty)=>({price:price,consuming:qty.consuming,consumed:qty.consumed})).toString(),charge:((t,qty,from,to)=>{if(!qty)return0;constrt=Math.min(t,to?to:t);constpast=from-rt;constfuture=to-rt;consttd=past+future;constconsumed=newBigNumber(qty.consuming).mul(-1).mul(td).toNumber();constgbhour=newBigNumber(qty.consumed).add(consumed).div(2).div(3600000).toNumber();returnnewBigNumber(gbhour).mul(qty.price).toNumber();}).toString()"}]}' 
+  		-d '{"plan\_id":"linux-rating-sample","metrics":[{"name":"memory","rate":"((price,qty)=\>({price:price,consuming:qty.consuming,consumed:qty.consumed})).toString(),charge:((t,qty,from,to)=\>{if(!qty)return0;constrt=Math.min(t,to?to:t);constpast=from-rt;constfuture=to-rt;consttd=past+future;constconsumed=newBigNumber(qty.consuming).mul(-1).mul(td).toNumber();constgbhour=newBigNumber(qty.consumed).add(consumed).div(2).div(3600000).toNumber();returnnewBigNumber(gbhour).mul(qty.price).toNumber();}).toString()"}]}' \\
 
-  		-H "Authorization: $(cf oauth-token | grep bearer)"
+  		-H "Authorization: \$(cf oauth-token | grep bearer)"
 
 
 -   과금 정책의 경우
 
-		POST /v1/pricing/plans/:pricing_plan_id
+		POST /v1/pricing/plans/:pricing\_plan\_id
 	>
 
   		## 예제
 
-		$ curl -k -X POST 'http://abacus-provisioning-plugin.bosh-lite.com/v1/pricing/plans/linux-pricing-sample' 
+		$ curl -k -X POST 'http://abacus-provisioning-plugin.bosh-lite.com/v1/pricing/plans/linux-pricing-sample' \\
 
-  		-H "Content-Type: application/json"
+  		-H "Content-Type: application/json" \\
 
-  		-d '{"plan_id":"linux-pricing-sample","metrics":[{"name":"memory","prices":[{"country":"USA","price":0.00014}]}]}' 
+  		-d '{"plan\_id":"linux-pricing-sample","metrics":[{"name":"memory","prices":[{"country":"USA","price":0.00014}]}]}' \\
 
-  		-H "Authorization: $(cf oauth-token | grep bearer)"
+  		-H "Authorization: \$(cf oauth-token | grep bearer)"
 
 
 ##<div id='24'/>배포
@@ -1145,7 +1145,7 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
   		##서비스 브로커 생성
 
-  		$ cf create-service-broker <서비스 브로커 명> <인증ID> <인증Password> <서비스 브로커 주소>
+  		$ cf create-service-broker *\<**서비스 브로커 명**\> \<**인증**ID\> \<**인증**Password\> \<**서비스 브로커 주소**\>*
 
   		예)
 
@@ -1171,17 +1171,17 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
   		service plan access orgs
 
-  		standard_obejct_storage_light_api_calls standard none
+  		standard\_obejct\_storage\_light\_api\_calls standard none
 
-  		standard_obejct_storage_heavy_api_calls basic none
+  		standard\_obejct\_storage\_heavy\_api\_calls basic none
 
   		##등록한 서비스 접근 허용
 
-  		$ cf enable-service-access <서비스명> -p <플랜 명>
+  		$ cf enable-service-access *\<**서비스명**\>* -p *\<**플랜 명**\>*
 
 		  예)
 
-  		$ cf enable-service-access standard_obejct_storage_light_api_calls -p standard
+  		$ cf enable-service-access standard\_obejct\_storage\_light\_api\_calls -p standard
 
 
 ###<div id='27'/>API 서비스 애플리케이션 배포 및 서비스 등록
@@ -1198,7 +1198,7 @@ API 서비스 애플리케이션을 파스-타 플랫폼에 배포한다. 서비
 
 		## API 서비스 배포
 
-		$ cd <샘플 api 서비스 경로>/sample_api_java_service
+		$ cd *\<**샘플**api**서비스 경로**\>*/sample\_api\_java\_service
 
   		## gradle 빌드
 
@@ -1230,11 +1230,11 @@ API 서비스 애플리케이션을 파스-타 플랫폼에 배포한다. 서비
 
 		##서비스 생성
 
-  		$ cf create-service <서비스명> <플랜 명> <서비스 인스턴스 명>
+  		$ cf create-service *\<**서비스명**\> \<**플랜 명**\> \<**서비스 인스턴스 명**\>*
 
   		예)
 
-  		$ cf create-service standard_obejct_storage_light_api_calls standard sampleNodejslightCallApi
+  		$ cf create-service standard\_obejct\_storage\_light\_api\_calls standard sampleNodejslightCallApi
 
   		##서비스 확인
 
@@ -1246,7 +1246,7 @@ API 서비스 애플리케이션을 파스-타 플랫폼에 배포한다. 서비
 
 		name service plan bound apps last operation
 
-  		sampleNodejslightCallApi standard_obejct_storage_light_api_calls standard create succeeded
+  		sampleNodejslightCallApi standard\_obejct\_storage\_light\_api\_calls standard create succeeded
 
 
 ###<div id='28'/>API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결
@@ -1258,13 +1258,13 @@ API 서비스 애플리케이션을 파스-타 플랫폼에 배포한다. 서비
 
  		## API 서비스 연동 샘플 애플리케이션 배포
 
-  		$ cd <샘플 애플리케이션 경로>sample_api_node_caller
+  		$ cd <샘플 애플리케이션 경로>sample\_api\_node\_caller
 
   		$ npm install && npm run babel && npm run cfpack && ./cfpush.sh
 
   		##서비스 바인드
 
-  		$ cf bind-service <APP_NAME> <SERVICE_INSTANCE> -c <PARAMETERS_AS_JSON>
+  		$ cf bind-service *\<APP\_NAME\> \<SERVICE\_INSTANCE\>* -c *\<PARAMETERS\_AS\_JSON\>*
 
 		예)
 
@@ -1317,7 +1317,7 @@ API 연동 샘플 애플리케이션의 url을 통해 웹 브라우저에서 접
 
   		##조직 guid 확인
 
-  		$ cf org <샘플 애플리케이션을 배포한 조직> --guid
+  		$ cf org *\<**샘플 애플리케이션을 배포한 조직**\>* --guid
 
 		예)
 
@@ -1327,7 +1327,7 @@ API 연동 샘플 애플리케이션의 url을 통해 웹 브라우저에서 접
 
   		##샘플 애플리케이션 guid 확인
 
-  		$ cf env <샘플 애플리케이션 명>
+  		$ cf env *\<**샘플 애플리케이션 명**\>*
 
   		예)
 
@@ -1341,19 +1341,19 @@ API 연동 샘플 애플리케이션의 url을 통해 웹 브라우저에서 접
 
   		{
 
-  		"VCAP_APPLICATION": {
+  		"VCAP\_APPLICATION": {
 
-  		"application_id": "58872d8a-edfc-44df-97f0-df67cf9033a7",
+  		"application\_id": "58872d8a-edfc-44df-97f0-df67cf9033a7",
 
-  		"application_name": "sample-api-node-caller",
+  		"application\_name": "sample-api-node-caller",
 
-  		"application_uris": [
+  		"application\_uris": [
 
   		"sample-api-node-caller.bosh-lite.com"
 
   		],
 
-  		"application_version": "55678102-584c-4fca-8304-82f727506b1d",
+  		"application\_version": "55678102-584c-4fca-8304-82f727506b1d",
 
   		"limits": {
 
@@ -1367,9 +1367,9 @@ API 연동 샘플 애플리케이션의 url을 통해 웹 브라우저에서 접
 
   		"name": "sample-api-node-caller",
 
-  		"space_id": "2ce08996-f463-406c-a971-adbbaf4e4ca5",
+  		"space\_id": "2ce08996-f463-406c-a971-adbbaf4e4ca5",
 
-  		"space_name": "ops",
+  		"space\_name": "ops",
 	
   		"uris": [
 
