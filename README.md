@@ -6,7 +6,7 @@
 	 * [범위](#4)
 	 * [참고자료](#5)
 
-1. [JAVA API 서비스 미터링 개발가이드](#6)
+2. [JAVA API 서비스 미터링 개발가이드](#6)
     * [개요](#7)
     * [개발 환경 구성](#8)
     * [서비스 브로커 라이브러리](#10)
@@ -46,9 +46,9 @@
 
 
 
-#1.  문서 개요
-
-##1.1.  목적
+#1.  개요
+## 1.1 문서 개요
+###1.1.1.  목적
 
 
 본 문서(Java 서비스브로커 미터링 애플리케이션 개발 가이드)는 파스-타
@@ -56,7 +56,7 @@
 Foundry) 서비스를 미터링 하는 방법에 대해 기술 한다.
 
 
-##1.2.  범위
+###1.1.2.  범위
 
 본 문서의 범위는 파스-타 플랫폼 프로젝트의 Cloud Foundry JAVA 서비스
 브로커 애플리케이션 미터링 개발과 CF-Abacus 연동에 대한 내용으로
@@ -120,7 +120,11 @@ guid, app guid, metering plan id) 를 이용해 바인딩 정보를 획득 하�
 
 Service Broker API Architecture
 
-<table border = "1px;">
+![Java_Service_Metering_Image01]
+
+![Java_Service_Metering_Image02]
+
+<table>
   <tr>
     <th colspan ="2">기능</th>
      <th>설명</th>
@@ -128,30 +132,31 @@ Service Broker API Architecture
   <tr>
      <td rowspan="4">Runtime</td>
      <td>미터링/등급/과금 정책</td>
-     <td>API 서비스 제공자가 제공하는 서비스에 대한 각종 정책 정의 정보. JSON 형식으로 되었으며, 해당 정책을 CF-ABACUS에 등록하면 정책에 정의한 내용에 따라 API 사용량을 집계 한다.<br>
-정책은 서비스 제공자가 정의해야 하며, JSON 스키마는 다음을 참조한다.<br>
-https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md
+     <td>서비스 제공자가 제공하는 서비스에 대한 각종 정책 정의 정보. JSON 형식으로 되었으며, 해당 정책을 CF-ABACUS에 등록하면 정책에 정의한 내용에 따라 서비스 사용량을 집계 한다.
+정책은 서비스 제공자가 정의해야 하며, JSON 스키마는 다음을 참조한다. <br>
+<a href = "https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md" >https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md
+</a>
 </td>
   </tr>
    <tr>
      <td width="160px">서비스 브로커 API</td>
-     <td>Cloud Controller와 Service Broker 사이의 규약으로써 서비스 브로커 API 개발에 대해서는 다음을 참조한다.<br>
-https://github.com/OpenPaaSRnD/Documents/blob/master/Development-Guide/ServicePack_develope_guide.md#11
+     <td>Cloud Controller와 Service 사이에서 서비스의 create, delete, update, bind, unbind를 처리한다. 본문서에서는 mongo-db 서비스 브로커 API를 대상으로 미터링 서비스를 개발 하여 추가 한다.
 </td>
   </tr> 
   <tr>
-     <td>서비스 API</td>
-     <td>서비스 제공자가 제공하는 API 서비스 기능 및 API 사용량을 CF-ABACUS에 전송하는 기능으로 구성되었다.</td>
+     <td>서비스 브로커 <br>미터링 서비스
+</td>
+     <td>서비스 브로커 API 가 abacus-usage-collector 에 서비스 사용량 정보를 전송하는 서비스 (본 문서에서 가이드 할 개발 영역 이다)</td>
   </tr> 
    <tr>
-     <td>대시보드</td>
-     <td>서비스를 제공하기 위한 인증, 서비스 모니터링 등을 위한 대시보드 기능으로 서비스 제공자가 개발해야 한다.</td>
+     <td>서비스</td>
+     <td>서비스 제공자가 제공하는 서비스 기능</td>
   </tr> 
   <tr>
   	<td colspan ="2">CF-ABACUS</td>
     <td>CF-ABACUS 핵심 기능으로써 수집한 사용량 정보를 집계한다.<br>
 CF-ABACUS은 CF 설치 후, CF에 마이크로 서비스 형태로 설치한다. 자세한 사항은 다음을 참조한다.<br>
-https://github.com/cloudfoundry-incubator/cf-abacus
+<a href = "https://github.com/cloudfoundry-incubator/cf-abacus" >https://github.com/cloudfoundry-incubator/cf-abacus</a>
 </td>
   </tr>
 </table>                
@@ -191,7 +196,7 @@ https://github.com/cloudfoundry-incubator/cf-abacus
 
 
 
-##2.3.  서비스 브로커 라이브러리 {.western}
+##2.3.  서비스 브로커 라이브러리
 
 
 
@@ -265,6 +270,7 @@ gradle 플러그인을 Eclipse 에 추가한 후, gradle import 하면 개발이
 서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일의
 형상
 
+![Java_Service_Metering_Image04]
 
 ###2.3.4.  ServiceInstanceBindingController
 
@@ -492,7 +498,7 @@ mongo-db 서비스 브로커 API는 별도 제공되는 압축 파일 패키지�
  |   수정     |Manifest.yml   | 앱을 CF에 배포할 때 필요한 설정 정보 및 앱 실행 환경에 필요한 설정 정보를 기술한다.   |   
 
 ###2.4.4.  gradle build를 위한 dependency 추가
-
+![Java_Service_Metering_Image03]
 서비스브로커 라이브러리 mongo-db서비스 브로커 jar 파일을 적용
 
 서비스 브로커 라이브러리를 gradle build 한다.
@@ -1549,3 +1555,7 @@ mock 적용을 위하여, owermock-mockito-release-full:1.6.1 을 사용하였�
 			마우스 클릭 \> Run As \> JUNIT 테스트
 
 
+[Java_Service_Metering_Image01]:/images/Java_Service_Metering/service_broker_api_architecture.png
+[Java_Service_Metering_Image02]:/images/Java_Service_Metering/service_metering_deployment_range.png
+[Java_Service_Metering_Image03]:/images/Java_Service_Metering/mongo-db-jar.png
+[Java_Service_Metering_Image04]:/images/Java_Service_Metering/service_broker_library_architecture.png
