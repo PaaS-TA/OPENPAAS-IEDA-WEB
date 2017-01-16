@@ -434,77 +434,77 @@ CF 설치한 abacus에서 CF의 앱 사용량 정보를 수집하기 위해서 C
 
 ```yaml
   
-	applications:
+applications:
 
-  	- name: abacus-usage-collector ## 앱 명
+- name: abacus-usage-collector ## 앱 명
 
-  	host: abacus-usage-collector   ## 호스트 명
+host: abacus-usage-collector   ## 호스트 명
 
-  	path: .cfpack/app.zip          ## Cf에 push할 앱을 빌드한 파일 경로 및 파일
+path: .cfpack/app.zip          ## Cf에 push할 앱을 빌드한 파일 경로 및 파일
 
-  	instances: 1 ## 앱에 할당할 인스턴스 수
+instances: 1 ## 앱에 할당할 인스턴스 수
 
-  	memory: 512M     	           ## 앱에 할당할 메모리 사이즈
+memory: 512M     	           ## 앱에 할당할 메모리 사이즈
 
-  	disk_quota: 512M               ## 앱에 할당할 디스크 사이즈
+disk_quota: 512M               ## 앱에 할당할 디스크 사이즈
 
-  	env:            		       ## 앱 실행 환경 설정
+env:            		       ## 앱 실행 환경 설정
 
-  	CONF: default
+CONF: default
 
-  	DEBUG: e-abacus-* 			   ## 앱의 출력 로그 레벨
+DEBUG: e-abacus-* 			   ## 앱의 출력 로그 레벨
 
-  	METER: abacus-usage-meter
+METER: abacus-usage-meter
 
-  	PROVISIONING: abacus-provisioning-plugin
+PROVISIONING: abacus-provisioning-plugin
 
-  	#DB: abacus-pouchserver 	    ## 로컬 pouchDB를 사용할 경우 설정한 예시
+#DB: abacus-pouchserver 	    ## 로컬 pouchDB를 사용할 경우 설정한 예시
 
-  	DB: http://<user_id>:<password>@<coudb_ip>:<port> ## 외부의 CouchDB를 사용할 경우 설정한 예시
+DB: http://<user_id>:<password>@<coudb_ip>:<port> ## 외부의 CouchDB를 사용할 경우 설정한 예시
 
-  	#DB: mongodb://9a6e635e-41aa-4522-97b3-ade805ce5b89:4fa40ffd-7a78-445d-937c-82999844fb8e@192.168.40.153:27017/728b0614-5357-480e-b238-b618fcc8b957 ## MongoDB 서비스와 바인드하여 MongoDB를 사용할 경우 설정한 예시
+#DB: mongodb://9a6e635e-41aa-4522-97b3-ade805ce5b89:4fa40ffd-7a78-445d-937c-82999844fb8e@192.168.40.153:27017/728b0614-5357-480e-b238-b618fcc8b957 ## MongoDB 서비스와 바인드하여 MongoDB를 사용할 경우 설정한 예시
 
-  	DBCLIENT: abacus-couchclient ## CouchDB, PouchDB를 사용할 경우 설정
+DBCLIENT: abacus-couchclient ## CouchDB, PouchDB를 사용할 경우 설정
 
-  	#DBCLIENT: abacus-mongoclient ## MongoDB를 사용할 경우 설정
+#DBCLIENT: abacus-mongoclient ## MongoDB를 사용할 경우 설정
 
-  	ACCOUNT: abacus-account-plugin
+ACCOUNT: abacus-account-plugin
 
-  	EUREKA: abacus-eureka-plugin
+EUREKA: abacus-eureka-plugin
 
-  	NODE_MODULES_CACHE: false
+NODE_MODULES_CACHE: false
 
-  	SECURED: true ## Abacus를 Secured 모드로 운영할 경우: true
+SECURED: true ## Abacus를 Secured 모드로 운영할 경우: true
 
-  	# AUTH_SERVER:
+# AUTH_SERVER:
 
-  	# CLIENT_ID:
+# CLIENT_ID:
 
-  	# CLIENT_SECRET:
+# CLIENT_SECRET:
 
-  	# JWTKEY:
+# JWTKEY:
 
-  	# JWTALGO:
+# JWTALGO:
 
-  	AUTH_SERVER: [https://api.bosh-lite.com:443](https://api.bosh-lite.com:443) ## Auth 서비스 Endpoint
+AUTH_SERVER: [https://api.bosh-lite.com:443](https://api.bosh-lite.com:443) ## Auth 서비스 Endpoint
 
-  	CLIENT_ID: abacus ## 사용량 정보 접근 권한 ID
+CLIENT_ID: abacus ## 사용량 정보 접근 권한 ID
 
-  	CLIENT_SECRET: secret ## 사용량 정보 접근 권한 Secret
+CLIENT_SECRET: secret ## 사용량 정보 접근 권한 Secret
 
-  	JWTKEY: |+ ### cf 배포 manifest의 properties.uaa.jwt.verification_key를 설정
+JWTKEY: |+ ### cf 배포 manifest의 properties.uaa.jwt.verification_key를 설정
 
-  	-----BEGIN PUBLIC KEY-----
+-----BEGIN PUBLIC KEY-----
 
-  	MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHFr+KICms+tuT1OXJwhCUmR2d
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHFr+KICms+tuT1OXJwhCUmR2d
 
-  	…
+…
 
-  	-----END PUBLIC KEY-----
+-----END PUBLIC KEY-----
 
-  	JWTALGO: RS256 ## JWTKEY 알고리즘
+JWTALGO: RS256 ## JWTKEY 알고리즘
 
-  	THROTTLE: 2
+THROTTLE: 2
 ```
  >
   
