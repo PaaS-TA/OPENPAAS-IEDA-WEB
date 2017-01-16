@@ -1145,7 +1145,7 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
   		##서비스 브로커 생성
 
-  		$ cf create-service-broker *\<**서비스 브로커 명**\> \<**인증**ID\> \<**인증**Password\> \<**서비스 브로커 주소**\>*
+  		$ cf create-service-broker <서비스 브로커 명> <인증ID> <인증Password> <서비스 브로커 주소\>
 
   		예)
 
@@ -1194,59 +1194,58 @@ API 서비스 애플리케이션을 파스-타 플랫폼에 배포한다. 서비
 	-	gradle build -x test 명령으로 빌드 한다.
 
 	-	cf push 명령으로 배포한다. 별도의 값을 넣지않으면 manifest.yml의 설정을 사용한다
-	>
 
-		## API 서비스 배포
+			## API 서비스 배포
 
-		$ cd <샘플api서비스 경로>/sample_api_java_service
+			$ cd <샘플api서비스 경로>/sample_api_java_service
 
-  		## gradle 빌드
+  			## gradle 빌드
 
-  		$ gradle build -x test
+  			$ gradle build -x test
 
-  		:compileJava
+  			:compileJava
 
-  		:processResources
+  			:processResources
 
-  		:classes
+  			:classes
 
-  		:findMainClass
+  			:findMainClass
 
-  		:jar
+  			:jar
 
-  		:bootRepackage
+  			:bootRepackage
 
-  		:assemble
+  			:assemble
 
-  		:check
+  			:check
 
-  		:build
+	  		:build
  
-		BUILD SUCCESSFUL
+			BUILD SUCCESSFUL
 
-		Total time: 13.426 secs
+			Total time: 13.426 secs
 
-  		$ cf push
+	  		$ cf push
+	
+			##서비스 생성
 
-		##서비스 생성
+	  		$ cf create-service <서비스명> <플랜 명> <서비스 인스턴스 명>
 
-  		$ cf create-service <서비스명> <플랜 명> <서비스 인스턴스 명>
+	  		예)
 
-  		예)
+	  		$ cf create-service standard_obejct_storage_light_api_calls standard sampleNodejslightCallApi
+	
+	  		##서비스 확인
+	
+	  		$ cf services
 
-  		$ cf create-service standard_obejct_storage_light_api_calls standard sampleNodejslightCallApi
+	  		Getting services in org real / space ops as admin...
 
-  		##서비스 확인
+	  		OK
 
-  		$ cf services
+			name service plan bound apps last operation
 
-  		Getting services in org real / space ops as admin...
-
-  		OK
-
-		name service plan bound apps last operation
-
-  		sampleNodejslightCallApi standard_obejct_storage_light_api_calls standard create succeeded
+	  		sampleNodejslightCallApi standard_obejct_storage_light_api_calls standard create succeeded
 
 
 ###<div id='28'/>API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결
