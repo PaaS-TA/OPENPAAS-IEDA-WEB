@@ -9,26 +9,26 @@
 2. [JAVA API 서비스 미터링 개발가이드](#6)
     * [개요](#7)
     * [개발 환경 구성](#8)
-    * [서비스 브로커 라이브러리](#9)
-     * [서비스 브로커 라이브러리란 무엇인가?](#10)
-     * [서비스 브로커 라이브러리를 다운로드 한 후, 프로젝트 import 한다](#11)
-     * [서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일들](#12)
-     * [ServiceInstanceBindingController](#13)
-     * [ServiceInstanceBinding](#14)
-     * [SampleMeteringReportService 추상화 클래스](#15)
+    * [서비스 브로커 라이브러리](#10)
+     * [서비스 브로커 라이브러리란 무엇인가?](#11)
+     * [서비스 브로커 라이브러리를 다운로드 한 후, 프로젝트 import 한다](#12)
+     * [서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일들](#13)
+     * [ServiceInstanceBindingController](#14)
+     * [ServiceInstanceBinding](#15)
+     * [SampleMeteringReportService 추상화 클래스](#)
      * [SampleMeteringOAuthService 추상화 클래스](#16)
     * [서비스 브로커 라이브러리](#17)
     * [API 서비스 연동 샘플 애플리케이션 인터페이스 항목](#18)
-     * [mongo-db 서비스 브로커 API](#19)
-     * [mongo-db 서비스 브로커 API 다운로드](#20)
-     * [mongo-db 서비스 브로커 API에 추가 및 수정 되는 파일](#21)
-     * [gradle build를 위한 dependency 추가](#22)
-     * [application-mvc.properties 설정](#23)
-     * [datasource.properties 설정](#24)
-     * [MongoServiceInstanceBindingService 구현체](#25)
-     * [SampleMeteringOAuthService 구현](#26)
-     * [SampleMeteringReportService 구현](#27)
-    * [미터링/등급/과금 정책](#28)
+     * [mongo-db 서비스 브로커 API](#)
+     * [mongo-db 서비스 브로커 API 다운로드](#)
+     * [mongo-db 서비스 브로커 API에 추가 및 수정 되는 파일](#)
+     * [gradle build를 위한 dependency 추가](#)
+     * [application-mvc.properties 설정](#)
+     * [datasource.properties 설정](#)
+     * [MongoServiceInstanceBindingService 구현체](#)
+     * [SampleMeteringOAuthService 구현](#)
+     * [SampleMeteringReportService 구현](#)
+    * [미터링/등급/과금 정책](#)
      * [미터링 정책](#)
      * [등급 정책](#)
      * [과금 정책](#)
@@ -1549,7 +1549,7 @@ mock 적용을 위하여, owermock-mockito-release-full:1.6.1 을 사용하였�
 
   		}
 
-	1.  테스트 실행
+ 1.  테스트 실행
 	
 		-   Spring Tool Suite 의 네비게이터 트리의 /meteringTest 경로에서 오른쪽
 			마우스 클릭 \> Run As \> JUNIT 테스트
