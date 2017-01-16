@@ -336,7 +336,7 @@ CF 설치한 abacus에서 CF의 앱 사용량 정보를 수집하기 위해서 C
 
   	Kernel IP routing table
 
-  	Destination    Gateway       Genmask       Flags Metric Ref Use Iface
+  	Destination   Gateway      Genmask         Flags Metric Ref Use Iface
 
   	default       10.8.0.5     128.0.0.0       UG    0      0   0   tun0
 
@@ -648,6 +648,11 @@ CF 설치한 abacus에서 CF의 앱 사용량 정보를 수집하기 위해서 C
 -   Abacus-cf-bridge의 manifest.yml
 
 ```yaml
+
+      env: ### 앱 실행 환경 정보
+
+      CONF: default
+---
       applications:
 
       - name: abacus-cf-bridge
@@ -661,10 +666,6 @@ CF 설치한 abacus에서 CF의 앱 사용량 정보를 수집하기 위해서 C
       memory: 512M ### 앱 할당 메모리
 
       disk_quota: 512M ### 앱 할당 디스크
-
-      env: ### 앱 실행 환경 정보
-
-      CONF: default
 
       DEBUG: e-abacus-*
 
