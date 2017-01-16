@@ -1,4 +1,3 @@
-
 ## Table of Contents
 
 1. [개요](#1)
@@ -10,804 +9,1007 @@
 1. [JAVA API 서비스 미터링 개발가이드](#6)
     * [개요](#7)
     * [개발 환경 구성](#8)
-     * [CF-Abacus 설치](#9)
-    * [샘플 API 서비스 개발](#10)
-     * [gradle 프로젝트를 생성](#11)
-     * [샘플 API 서비스 형상](#12)
-     * [의존성 및 프로퍼티의 설정](#13)
-     * [MeteringAuthService 클래스](#14)
-     * [MeteringService 클래스](#15)
-     * [SampleApiJavaServiceController 클래스](#16)
-    * [API 서비스 연동 샘플 애플리케이션](#17)
+    * [서비스 브로커 라이브러리](#10)
+     * [서비스 브로커 라이브러리란 무엇인가?](#11)
+     * [서비스 브로커 라이브러리를 다운로드 한 후, 프로젝트 import 한다](#12)
+     * [서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일들](#13)
+     * [ServiceInstanceBindingController](#14)
+     * [ServiceInstanceBinding](#15)
+     * [SampleMeteringReportService 추상화 클래스](#)
+     * [SampleMeteringOAuthService 추상화 클래스](#16)
+    * [서비스 브로커 라이브러리](#17)
     * [API 서비스 연동 샘플 애플리케이션 인터페이스 항목](#18)
-    * [미터링/등급/과금 정책](#19)
-     * [미터링 정책](#20)
-     * [등급 정책](#21)
-     * [과금 정책](#22)
-     * [정책 등록](#23)
-    * [배포](#24)
-     * [파스-타 플랫폼 로그인](#25)
-     * [API 서비스 브로커 생성](#26)
-     * [API 서비스 애플리케이션 배포 및 서비스 등록](#27)
-     * [API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결](#28)
-    * [API 및 CF-Abacus 연동 테스트](#29)
-     
-     
-
-	
-#<div id='1'/>개요
-
-##<div id='2'/>문서 개요
-
-###<div id='3'/>목적
-
-본 문서(Java API 서비스 미터링 적용개발 가이드)는 파스-타 플랫폼
-프로젝트의 미터링 플러그인과 Java API 미터링 서비스 애플리케이션을
-연동시켜 API 서비스를 미터링 하는 방법에 대해 기술 하였다.
-
-
-
-###<div id='4'/>범위
-본 문서의 범위는 파스-타 플랫폼 프로젝트의 JAVA API 서비스
-애플리케이션에 대한 미터링 방법에 대한 개발과 CF-Abacus 연동에 대한
-내용으로 한정되어 있다.
-
-본 문서는 API 미터링 서비스 애플리케이션을 Java 언어로 작성 하는 것에
-대해 기술 한다.
-
-본 문서는 API 서비스 고유의 비즈니스 로직은 구현 하지 않으며, API 서비스
-호출 시의 미터링을 하는 기능만 구현 한다
-
-본 문서에서 언급 하는 “API 서비스를 사용하는 애플리케이션”은 별도로 제공
-하는 **Node.js API****미터링 개발 가이드**를 참고 하여 개발 한다.
-
-
-
-###<div id='5'/>참고 자료
--   [https://docs.cloudfoundry.org/devguide/](https://docs.cloudfoundry.org/devguide/)
-
--   [https://github.com/cloudfoundry-incubator/cf-abacus](https://github.com/cloudfoundry-incubator/cf-abacus)
+     * [mongo-db 서비스 브로커 API](#)
+     * [mongo-db 서비스 브로커 API 다운로드](#)
+     * [mongo-db 서비스 브로커 API에 추가 및 수정 되는 파일](#)
+     * [gradle build를 위한 dependency 추가](#)
+     * [application-mvc.properties 설정](#)
+     * [datasource.properties 설정](#)
+     * [MongoServiceInstanceBindingService 구현체](#)
+     * [SampleMeteringOAuthService 구현](#)
+     * [SampleMeteringReportService 구현](#)
+    * [미터링/등급/과금 정책](#)
+     * [미터링 정책](#)
+     * [등급 정책](#)
+     * [과금 정책](#)
+     * [정책 등록](#)
+    * [배포](#)
+     * [파스-타 플랫폼 로그인](#)
+     * [mongo-db 서비스 브로커 생성](#)
+     * [API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결](#)
+    * [서비스 바인딩 CF-Abacus 연동 테스트](#)
+    * [단위 테스트](#)
 
 
 
 
 
-##<div id='6'/>JAVA API 서비스 미터링 개발가이드
-###<div id='7'/>개요
 
 
-API 서비스 애플리케이션을 Java 언어로 작성 한다. API 서비스는 서비스
-요청을 처리함과 동시에 API 사용 내역을 CF-ABACUS에 전송하는
-애플리케이션을 작성 한다.
+#1.  문서 개요
 
-![meteringAPI](metering/meteringAPI.png)
+##1.1.  목적
 
-<table border = "1px;">
-  <tr>
-    <th colspan ="2">기능</th>
-     <th>설명</th>
-  </tr>
-  <tr>
-     <td rowspan="4">Runtime</td>
-     <td>미터링/등급/과금 정책</td>
-     <td>API 서비스 제공자가 제공하는 서비스에 대한 각종 정책 정의 정보. JSON 형식으로 되었으며, 해당 정책을 CF-ABACUS에 등록하면 정책에 정의한 내용에 따라 API 사용량을 집계 한다.<br>
-정책은 서비스 제공자가 정의해야 하며, JSON 스키마는 다음을 참조한다.<br>
-https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md
-</td>
-  </tr>
-   <tr>
-     <td width="160px">서비스 브로커 API</td>
-     <td>Cloud Controller와 Service Broker 사이의 규약으로써 서비스 브로커 API 개발에 대해서는 다음을 참조한다.<br>
-https://github.com/OpenPaaSRnD/Documents/blob/master/Development-Guide/ServicePack_develope_guide.md#11
-</td>
-  </tr> 
-  <tr>
-     <td>서비스 API</td>
-     <td>서비스 제공자가 제공하는 API 서비스 기능 및 API 사용량을 CF-ABACUS에 전송하는 기능으로 구성되었다.</td>
-  </tr> 
-   <tr>
-     <td>대시보드</td>
-     <td>서비스를 제공하기 위한 인증, 서비스 모니터링 등을 위한 대시보드 기능으로 서비스 제공자가 개발해야 한다.</td>
-  </tr> 
-  <tr>
-  	<td colspan ="2">CF-ABACUS</td>
-    <td>CF-ABACUS 핵심 기능으로써 수집한 사용량 정보를 집계한다.<br>
-CF-ABACUS은 CF 설치 후, CF에 마이크로 서비스 형태로 설치한다. 자세한 사항은 다음을 참조한다.<br>
-https://github.com/cloudfoundry-incubator/cf-abacus
-</td>
-  </tr>
-</table>                                              
 
-※ 본 개발 가이드는 **API****서비스** 개발에 대해서만 기술하며, 다른
-컴포넌트의 개발 또는 설치에 대해서 링크한 사이트를 참조한다.
+본 문서(Java 서비스브로커 미터링 애플리케이션 개발 가이드)는 파스-타
+플랫폼 프로젝트의 서비스 브로커에 미터링 서비스를 추가하여, CF(Cloud
+Foundry) 서비스를 미터링 하는 방법에 대해 기술 한다.
+
+
+##1.2.  범위
+
+본 문서의 범위는 파스-타 플랫폼 프로젝트의 Cloud Foundry JAVA 서비스
+브로커 애플리케이션 미터링 개발과 CF-Abacus 연동에 대한 내용으로
+한정되어 있다. 서비스브로커 API 개발에 대해서는 별도 제공 하는
+서비스브로커 API 개발 가이드를 참고 한다.
 
 
 
-##<div id='8'/>개발환경 구성
+본 문서는 Ubuntu 14.04 ver의 개발 환경을 전제로 기술 한다.
 
 
-Java 애플리케이션 개발을 위해 다음과 같은 환경으로 개발환경을 구성 한다.
+본 문서는 mongo-db 서비스 팩이 설치 되어 있는 개발 환경을 전제로 기술
+한다.
+
+mongo-db 서비스 팩 설치는 별로 로 제공 되는 문서를 참고 하여 설치 한다.
+
+**[https://github.com/OpenPaaSRnD/Documents/blob/master/Service-Guide/NOSQL/OpenPaaS_PaaSTA_ServicePack_MongoDB_BOSH-Lite_install_guide.md](https://github.com/OpenPaaSRnD/Documents/blob/master/Service-Guide/NOSQL/OpenPaaS_PaaSTA_ServicePack_MongoDB_BOSH-Lite_install_guide.md)**
 
 
+본 문서는 cf-abacus 가 설치 되어 있는 개발 환경을 전제로 기술 한다.
+(cf-abacus 설치는 별도 제공하는 Abacus 설치 가이드를 참고하여
+CF-Abacus를 설치한다.)
 
--   CF release: v226 이상
+##1.3.  참고 자료
+
+-   **[https://docs.cloudfoundry.org/devguide/](https://docs.cloudfoundry.org/devguide/)**
+-   **[http://cli.cloudfoundry.org/ko-KR/cf/](http://cli.cloudfoundry.org/ko-KR/cf/)**
+-   **[https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/](https://github.com/cloudfoundry-community/spring-boot-cf-service-broker)**
+-   **[https://github.com/cloudfoundry-incubator/cf-abacus](https://github.com/cloudfoundry-incubator/cf-abacus)**
+
+
+#2.  Java서비스 미터링 개발가이드
+
+
+##2.1.  개요
+
+
+CF Services 는 Service Broker API 라고 불리우는 cloud controller
+클라이언트 API를 구현하여 개방형 클라우드 플랫폼에서 사용된다. Services
+API는 독립적인 cloud controller API의 버전이다. 이는 플랫폼에서 외부
+application을 이용 가능하게 한다. (database, message queue, rest
+endpoint, etc.)
+
+개방형 클라우드 플랫폼 Service API는 Cloud Controller 와 Service Broker
+사이의 규약 (catalog, provision, de provision, update provision plan,
+bind, unbind)이고 Service Broker 는 RESTful API 로 구현하고 Cloud
+Controller 에 등록한다.
+
+서비스에 미터링 구현하고자 할 때, 이 규약들 중 서비스 정책 및 취지에
+맞는 프로세스를 선택하여, 그 프로세스에 미터링을 연동할 수 있다.
+
+본 개발가이드에서는 mongo-db 서비스를 예시로, bind 와 unbind 시 미터링을
+하는 방법에 대해 가이드 한다.
+
+서비스를 사용하고자 하는 애플리케이션과 API 서비스를 바인딩 할 때, CF
+CLI 바인딩 요청 request에 적용 된 애플리케이션 환경정보(org guid, space
+guid, app guid, metering plan id) 를 이용해 바인딩 정보를 획득 하여,
+서비스 요청을 처리함과 동시에 서비스의 사용 내역을 CF-ABACUS에 전송하는
+미터링 서비스 기능을 mongo-db 서비스 브로커에 추가하여 개발 한다.
+
+
+Service Broker API Architecture
+
+
+기능
+
+설명
+
+Runtime
+
+미터링/등급/과금 정책
+
+서비스 제공자가 제공하는 서비스에 대한 각종 정책 정의 정보. JSON
+형식으로 되었으며, 해당 정책을 CF-ABACUS에 등록하면 정책에 정의한 내용에
+따라 서비스 사용량을 집계 한다.
+
+정책은 서비스 제공자가 정의해야 하며, JSON 스키마는 다음을 참조한다.
+
+[https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md](https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md)
+
+서비스 브로커 API
+
+Cloud Controller와 Service 사이에서 서비스의 create, delete, update,
+bind, unbind를 처리한다. 본문서에서는 mongo-db 서비스 브로커 API를
+대상으로 미터링 서비스를 개발 하여 추가 한다.
+
+서비스 브로커
+
+미터링 서비스
+
+서비스 브로커 API 가 abacus-usage-collector 에 서비스 사용량 정보를
+전송하는 서비스 (본 문서에서 가이드 할 개발 영역 이다)
+
+서비스
+
+서비스 제공자가 제공하는 서비스 기능
+
+CF-ABACUS
+
+CF-ABACUS 핵심 기능으로써 수집한 사용량 정보를 집계한다.
+
+CF-ABACUS은 CF 설치 후, CF에 마이크로 서비스 형태로 설치한다. 자세한
+사항은 다음을 참조한다.
+
+[https://github.com/cloudfoundry-incubator/cf-abacus](https://github.com/cloudfoundry-incubator/cf-abacus)
+
+
+※ 본 개발 가이드는 <U>**애플리케이션과 서비스가 바인드 되는 시점을 서비스의
+이용 시작으로 판단할 수 있는 서비스에 대해 미터링 하는 기능 개발</U>**에
+대해서만 기술한다.
+
+※ <U>**서비스의 특정****API****호출****,****서비스의 특정 자원 이용 등에
+대한 미터링 기능 개발에 대해서는 기술하지 않는다****.**</U>
+
+※ API 호출에 대한 미터링은 API 서비스 미터링 개발 가이드를 참조한다.
+
+※ 다른 컴포넌트의 개발 또는 설치에 대해서 링크한 사이트를 참조한다.
+
+
+##2.2.  개발환경 구성
+
+
+서비스 미터링 개발을 위해 다음과 같은 환경을 개발환경을 전제 한다.
+
+-   CF release: v226 이상 (bosh-lite 설치 환경에서 테스트)
+
+-   gradle 2.14
 
 -   java version "1.8.0\_101"
 
--   springBootVersion : 1.3.0.BUILD-SNAPSHOT
+-   springBootVersion: 1.3.0. BUILD-SNAPSHOT
 
--   gradle 2.14
+-   mongo-db service broker 2.5 (미터링 서비스를 추가 하기 위한 대상
+    서비스 브로커 프로젝트)
+
+-   springBootCfServiceBrokerVersion "2.5.0" (서비스 브로커 라이브러리)
 
 -   Spring Tool Suite 혹은 Eclipse
 
 
 
-###<div id='9'/>CF-Abacus 설치
-    
-
-별도 제공하는 Abacus 설치 가이드를 참고하여 CF-Abacus를 설치한다.
+##2.3.  서비스 브로커 라이브러리 {.western}
 
 
 
-##<div id='10'/>샘플 API 서비스 개발 
-    
-샘플 api 서비스는 서비스 요청이 있는 경우, 해당 요청에 대한 응답 처리와
-api 서비스 요청에 대한 미터링 정보를 CF-ABACUS에 전송하는 처리를 한다.
+###2.3.1.  서비스 브로커 라이브러리는 무엇인가?
 
 
-###<div id='11'/>gradle 프로젝트를 생성
+CF (개방형 플랫폼) 에서는 플랫폼 상에서 서비스 할 수 있는 다양한
+서비스들이 존재한다.
 
-프로젝트 디렉터리를 생성하고, gradle 프로젝트로 초기화 한다
+이 서비스들은 각각 그 서비스 고유의 서비스 브로커를 개발 함으로써, CF
+(개방형 플랫폼) 에서 애플리케이션이 서비스를 사용 할 수 있도록 하고
+있다.
+
+서비스는 다양하지만, 서비스를 사용하기 위한 개방형 플랫폼의 RESTAPI가
+미리 정해져 있다.
+
+서비스 브로커 라이브러리는 각각 다른 서비스 브로커들이 서비스 브로커
+라이브러리 Jar 파일을 build path 에 추가 하고, 추상화 클래스들을 구현
+하는 것으로 이 개방형 플랫폼의 REST API에 기반 하여, 서비스가 제공 될 수
+있도록 해주는 라이브러리 이다.
 
 
-	$ mkdir sample\_api\_java\_service // 프로젝트 디렉토리
-	$ cd sample\_api\_java\_service/
-	~/sample\_api\_java\_service\$ gradle init --type java-library // gradle 초기화
-	: wrapper
-	: init
 
-	BUILD SUCCESSFU
+본 가이드에서는 mongo-db 서비스 브로커에 미터링 서비스를 구현하기
+위해서는 이 서비스 브로커 라이브러리에 미터링을 하기 위한 추상화
+클래스를 추가 한 후, mongo-db 서비스 브로커에서 이 라이브러리를
+dependency로 사용하여 빌드 한다.
 
-	Total time: 2.435 secs
+
+###2.3.2.  서비스 브로커 라이브러리를 다운로드 한 후, 프로젝트 import 한다.
+
+1.  오픈 소스로 제공되고 있는 서비스 브로커 소스를 git clone 으로 다운받는다.<br>
+    **[https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/tree/master/src/main/java/org/cloudfoundry/community/servicebroker/controller](https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/tree/master/src/main/java/org/cloudfoundry/community/servicebroker/controller)**
+
 
   
-	This build could be faster, please consider using the Gradle Daemon: 
-	https://docs.gradle.org/2.14/userguide/gradle\_daemon.html
-  
+		$ git clone https://github.com/cloudfoundry-community/spring-boot-cf-service-broker.git
 
-###<div id='12'/>샘플 API 서비스 형상
+  		Cloning into 'spring-boot-cf-service-broker'...
 
-![sampleAPI](metering/sampleAPI.png)
+  		remote: Counting objects: 2394, done.
 
-의존성 및 프로퍼티 형상 설명
+  		remote: Total 2394 (delta 0), reused 0 (delta 0), pack-reused 2394
 
-| **파일**       |           **목적**          |
-|---------------|-----------------------------|
-|build.gradle   |애플리케이션에 필요한 의존성 정보를 기술    |
-|.gitignore     |Git을 통한 형상 관리 시, 형상 관리를 할 필요가 없는 파일 또는 디렉토리를 설정한다.               |
-|manifest.yml   |애플리케이션을 파스-타 플랫폼에 배포 시 적용하는 애플리케이션에 대한 환경 설정 정보 <br> 애플리케이션의 이름, 배포 경로, 인스턴스 수 등을 정의할 수 있다.        |
-|gradlew        |Linux 환경에서 사용하는 gradlew 빌드 실행 파일 <br> gradle 초기화 시 자동 생성 된다.     |
-|gradlew.bat    |Window 환경에서 사용하는 gradle 빌드 실행 파일 <br> gradle 초기화 시 자동 생성 된다.      |
-|settings.gradle    |gradlew 실행 시 적용하는 환경 설정 파일  <br> gradle 초기화 시 자동 생성 된다.    |
+  		Receiving objects: 100% (2394/2394), 351.72 KiB | 279.00 KiB/s, done.
 
+  		Resolving deltas: 100% (939/939), done.
 
-Java 파일 형상 설명
-  
-| **파일**       |           **목적**          |
-|---------------|-----------------------------|
-|MeteringConfig   |애플리케이션 구동 시 metering.properties를 로드 한다    |
-|MeteringAuthService     |파스-타 플랫폼 상의 UAA 서버에서 abacus-usage-collector 에 대한 접근 권한 토큰을 취득하여 리턴 한다.              |
-|MeteringService   |API 서비스 사용 요청 이 SampleApiJavaServiceController 에서 처리 될 때 API 서비스 처리에 대해 미터링이 적용된 사용량 보고서를 abacus-usage-collector 에 리포팅 한다.       |
-|SampleApiJavaServiceApplication        |SpringBoot이 구동할 때, SpringBoot애플리케이션에 필요한 context 객체 들을 로드 한다.   |
-|SampleApiJavaServiceController   |API 서비스 사용 요청을 처리하는 REST Controller.<br> 본 샘플 애플리케이션에서는 API 서비스 고유의 비즈니스 로직은 구현 하지 않았으며, API 사용량을 abacus-collector에 전송하는 기능만 수행 한다.|
-|application.properties     |SpringBoot이 구동할 때, spring 에 필요한 property    |
-|metering.properties      |API 사용량을 abacus-collector 전송 시에 설정 할 property 들이 정의 되어 있다.    |
+  		Checking connectivity... done.
 
-###<div id='13'/>의존성 및 프로퍼티의 설정 {.번호대제목-western style="page-break-before: always"}
 
-
--  build.gradle
-
-	샘플 Api 서비스 애플리케이션이 사용하는 의존성에 대해 기술한다.
-
-  
-		중략..
-
-		dependencies {
-	
-		// https://mvnrepository.com/artifact/org.springframework/spring-test
-		compile group: 'org.springframework', name: 'spring-test', version: '2.5'
-
-		providedRuntime("org.springframework.boot:spring-boot-starter-tomcat:\${springBootVersion}")
-
-		compile("org.springframework.boot:spring-boot-starter-web:\${springBootVersion}")
-		
-		// 미터링 사용량 객체 생성 dependency
-
-		compile("org.json:json:20160212") // Json object 생성시
-
-		compile("com.sun.jersey:jersey-bundle:1.18.1") ") // https connection 생성시
-
-		compile("com.googlecode.json-simple:json-simple:1.1") // json parse
-
-		compile("commons-codec:commons-codec:1.5") // https connection 생성시
-
-		}
-
-		후략..
-  
-
-
-
--   manifest.yml
-
-	앱을 CF에 배포할 때 필요한 설정 정보 및 앱 실행 환경에 필요한 설정
-	정보를 기술 한다.
-
-		applications:
-
-		- name: sample-api-node-service \# 애플리케이션 이름
-
-		memory: 512M \# 애플리케이션 메모리 사이즈
-
-		instances: 1 \# 애플리케이션 인스턴스 개수
-
-		host: sample-api-java-service
-
-		path: ./build/libs/sample\_api\_java\_service.jar \# 배포될 애플리케이션의 위치
-
-		env:
-
-		SPRING\_PROFILES\_ACTIVE : cloud
-
-
--   metering.properties
-
-	API 서비스의 사용량 정보를 abacus-collector에 전송 할 때, 필요한 설정
-	정보 및 계정 정보를 기술 한다.
-
-
-		# abacus usage collector RESTAPI 의 주소
-
-		abacus.collector = https://abacus-usage-collector.***\<CF******도메인******\>***/v1/metering/collected/usage
-
-		# abacus usage collector 가 secured 모드 true / 아닐 경우 false
-
-		abacus.secured = true
-
-		# 파스-타 플랫폼의 uaa server
-
-		uaa.server = https://uaa.***\<CF******도메인******\>***
-
-		# abacus usage collector RESTAPI 계정 정보 및 사용권한 (UAA server에 미리 설정)
-
-		uaa.client.id = ***\<abacus.usage.read/write scope******권한을 가진******ID\>***
-
-		uaa.client.secret = ***\<abacus.usage.read/write scope******권한을 가진******ID******비밀번호******\>***
-
-		uaa.client.scope = abacus.usage.object-storage.write,abacus.usage.object-storage.read
-  
-
-###<div id='14'/>MeteringAuthService 클래스
-    
-UAA 서버 URL 및 계정 정보를 참조 하여, UAA token 을 취득하여 리턴 한다.
- 
-	public String getUaacTokenHTTPS () throws MalformedURLException {
-
-	String authToken = "";
-
-	String urlStr = authServer + "/oauth/token?grant\_type=client\_credentials&scope=" + encodeURIComponent(scope);
-
-	StringBuffer sb = new StringBuffer();
-
-  
-
-	try {
-
-	TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-
-	public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-
-	return null;
-
-	}
-
-	public void checkClientTrusted(X509Certificate[] certs, String authType) {
-
-	}
-
-	public void checkServerTrusted(X509Certificate[] certs, String authType) {
-
-	}
-
-	} };
-
-	SSLContext sc = SSLContext.getInstance("SSL");
-
-	sc.init(null, trustAllCerts, new java.security.SecureRandom());
-
-	HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-	URL url = new URL(urlStr);
-
-	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-	conn.setRequestMethod("GET");
-
-	conn.setDoInput(true);
-
-	String authHeader = getAuthKey(clientId, clientSecret);
-
-	conn.setRequestProperty("authorization", authHeader);
-
-	InputStreamReader in = new InputStreamReader((InputStream) conn.getContent());
-
-	BufferedReader br = new BufferedReader(in);
-
-	String line;
-
-	while ((line = br.readLine()) != null) {
-
-	sb.append(line).append("\\n");
-
-	}
-
-	authToken= parseAuthToken(sb.toString());
-
-	br.close();
-
-	in.close();
-
-	conn.disconnect();
-
-	} catch (Exception e) {
-
-	System.out.println(e.toString());
-
-	}
-
-	return authToken;
-
-	}
-
-metering.properties 에서 취득한 계정 정보를 BASE64 로 인코딩 한다.
-
-	public String getAuthKey(String id, String secret) throws Exception {
-
-	String authKey = "";
-
-	try {
-
-	String encodedConsumerKey = URLEncoder.encode(id, "UTF-8");
-
-	String encodedConsumerSecret = URLEncoder.encode(secret, "UTF-8");
-
-	String fullKey = encodedConsumerKey + ":" + encodedConsumerSecret;
-
-	byte[] encodedBytes = Base64.encodeBase64(fullKey.getBytes());
-
-	authKey = "Basic " + new String(encodedBytes);
-
-	} catch (Exception e) {
-
-	e.printStackTrace();
-
-	throw e;
-
-	}
-
-	return authKey;
-
-	}
-
-UAA SEVER 에서 리턴 받은 JSON 오브젝트 에서 access\_token 을 추출한다.
-
-  
-	private String parseAuthToken(String jsonStr) throws ParseException{
-
-	String barerStr;
-
-	JSONParser jsonParser = new JSONParser();
-
-	JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonStr);
-
-	barerStr = (String) jsonObject.get("access\_token");
-
-	return barerStr;
-
-	}
-
-
-
-
-###<div id='15'/>MeteringService 클래스
-abacus-collector의 Auth 설정 정보에 따라, 전송 방식에 대한 분기 처리를
+다운 받은 소스를 Java 개발 도구 Eclipse 및 Spring Tool Suite 로 import
 한다.
 
-	public void reportUsageData(String orgId, String spaceId, String appId, String planId) throws Exception {
+gradle 플러그인을 Eclipse 에 추가한 후, gradle import 하면 개발이 보다
+용이 해진다.
 
-	JSONObject serviceUsage = buildServiceUsage(orgId, spaceId, appId, planId);
 
-	if (SECURED.equals(abacusSecured)) {
+###2.3.3.  서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일들
 
-	reportUsageDataHTTPS(serviceUsage);
 
-	} else {
+ |   |Java class | 설명|
+ |---------|---|----|
+ |    수정     | ServiceIncetanceBindingController  | 클라우드 컨트롤러의 서비스 바인딩 요청을 처리하는 컨트롤러,<br> SampleMeteringOAuthService 에서 uaa token 을 취득하여, SampleMeteringReportService 의 파라메터로 호출 하는 프로세스를 추가 한다.   |
+ |    수정     | ServiceInstanceBinding  | service-binding-request 가 ServiceIncetanceBindingController 에서 처리 될 때 바인딩 연결에 대해 미터링이 적용된 사용량 보고서를 abacus-usage-collector 에 리포팅 한다.   |     
+ |    추가     | SampleMeteringReportService  | SampleMeteringReportService 추상화 된 인터페이스로서, 미터링/등급/과금 정책과 관련된 그 어떠한 정보도 가지고 있지 않다. 이는 이 인터페이스를 구현할 서비스 제공자가 서비스 구현체에 적용할 수 있도록 제공되고 있는 추상화 클래스 이다.<br>SampleMeteringReportService 추상화 된 인터페이스로서, 미터링/등급/과금 정책과 관련된 그 어떠한 정보도 가지고 있지 않다. 이는 이 인터페이스를 구현할 서비스 제공자가 서비스 구현체에 적용할 수 있도록 제공되고 있는 추상화 클래스 이다.
+    |     
+ |    추가     | SampleMeteringOAuthService  | 개방형 플랫폼 상의 UAA 서버에서 abacus-usage-collector 에 대한 접근 권한 토큰을 취득하여, SampleMeteringReportService 에 토큰을 전달 하기 위한 추상화 클래스 이다.   | 
 
-	reportUsageDataHTTP(serviceUsage);
 
-	  }
+서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일의
+형상
 
-	}
 
-API 사용량을 Abacus-collector에 전송하기 위해, CF 또는 인증 서버로부터
-토큰을 취득하여 HTTP header에 설정하고 HTTPS Connection을 생성 한다.
+###2.3.4.  ServiceInstanceBindingController
 
-	public void reportUsageDataHTTPS(JSONObject serviceUsage) throws Exception {
+bindServiceInstance 프로세스 에 SampleMeteringOAuthService 에서 uaa
+token 을 취득하여, SampleMeteringReportService 의 파라메터로 호출 하는
+프로세스를 추가 한다.
 
-	StringBuffer sb = new StringBuffer();
+  	@RequestMapping (value = BASE\_PATH + "/{bindingId}", method = RequestMethod.PUT)
 
-	try {
+  	public ResponseEntity\<ServiceInstanceBindingResponse\> bindServiceInstance (
 
-	TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+  	@PathVariable("instanceId") String instanceId,
 
-	public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+  	@PathVariable("bindingId") String bindingId,
 
-	return null;
+  	@Valid @RequestBody CreateServiceInstanceBindingRequest request) throws
 
-	}
+  	ServiceInstanceDoesNotExistException, ServiceInstanceBindingExistsException,
 
-	public void checkClientTrusted(X509Certificate[] certs, String authType) {
+  	ServiceBrokerException {
 
-	} // 인증서를 생성 한다.
+  	ServiceInstance instance = serviceInstanceService.getServiceInstance(instanceId);
 
-	public void checkServerTrusted(X509Certificate[] certs, String authType) {
+  	if (instance == null) {
 
-	}
+  	throw new ServiceInstanceDoesNotExistException(instanceId);
 
-	} };
+  	}
 
-	SSLContext sc = SSLContext.getInstance("SSL");
+  	ServiceInstanceBinding binding = 
+	serviceInstanceBindingService.createServiceInstanceBinding( 
+	request. withServiceInstanceId(instanceId).and (). withBindingId(bindingId));
 
-	sc.init(null, trustAllCerts, new java.security.SecureRandom());
 
-	HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+  	if (binding == null) {
 
-	URL url = new URL(collectorUrl);
+  	throw new ServiceBrokerException(bindingId);
 
-	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+  	}
 
-	conn.setRequestMethod("POST");
+  	String uaaToken = sampleMeteringOAuthService.getUAAToken();
 
-	conn.setDoInput(true);
+  	try {
 
-	conn.setDoOutput(true);
+  	int httpStatus = sampleMeteringReportService.reportServiceInstanceBinding(binding, uaaToken);
 
-	conn.setUseCaches(false);
+  	if (httpStatus == 400) {
 
-	conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+  	throw new ServiceBrokerException(bindingId);
 
-	String bareStr = "bearer " + meteringAuthService.getUaacTokenHTTPS();
+  	}
 
-	conn.setRequestProperty("Authorization", bareStr);
+  	} catch (ServiceBrokerException e) {
 
-	byte[] out = serviceUsage.toString().getBytes(StandardCharsets.UTF\_8);
+  	throw e;
 
-	DataOutputStream dout = new DataOutputStream(conn.getOutputStream());
+  	}
 
-	dout.write(out);
+  	logger. debug ("ServiceInstanceBinding Created: " + binding. getId());
 
-	dout.close();
+  	return new ResponseEntity\<ServiceInstanceBindingResponse\>(
 
-	InputStreamReader in = new InputStreamReader((InputStream) conn.getInputStream());
+  	new ServiceInstanceBindingResponse(binding),
 
-	BufferedReader br = new BufferedReader(in);
+  	binding.getHttpStatus());
 
-	String line;
+  	}
 
-	while ((line = br.readLine()) != null) {
+###2.3.5.  ServiceInstanceBinding 
 
-	sb.append(line).append("\\n");
+ServiceInstanceBinding 에 미터링 서비스를 구현하기 위해 바인딩 되는
+애플리케이션의 환경 정보 필드를 추가 한다. 추가 된 필드 들은
+ServiceInstanceBindingService 의 구현체 에서 서비스 바인딩 request
+parameter 의 필드 값들을 매핑 처리 한 후, mongo-db repository 에 전달될
+것이다. 라이브러리를 gradle build 한다.
 
-	}
+  	package org.openpaas.servicebroker.model;
 
-	System.out.println(sb.toString());
+  	import java.util.HashMap;
 
-	System.out.println(serviceUsage + " was repoerted.");
+  	import java.util.Map;
 
-	br.close();
+  	import org.springframework.http.HttpStatus;
 
-	in.close();
+  	import com.fasterxml.jackson.annotation.JsonIgnore;
 
-	conn.disconnect();
+	public class ServiceInstanceBinding {
 
-	} catch (Exception e) {
+ 	private String id;
 
-	Exception se = new Exception(e);
+  	private String serviceInstanceId;
 
-	throw se;
+  	private Map\<String,Object\> credentials = new HashMap\<String,Object\>();
 
-	}
+  	private String syslogDrainUrl;
 
-	}
+  	// 미터링에 사용되는 필드
 
-API 사용량을 Abacus-collector에 전송하기 위한 HTTP header를 설정하고
-HTTP Connection을 생성 한다.
+  	private String appGuid;
 
-	public void reportUsageDataHTTP(JSONObject serviceUsage) throws Exception {
+ 	// 미터링을 위해 추가 된 필드
 
-	try {
+  	private String appOrganizationId;
 
-	URL url = new URL(collectorUrl);
+  	private String appSpaceId;
 
-	URLConnection con = url.openConnection();
+  	private String meteringPlanId;
 
-	HttpURLConnection http = (HttpURLConnection) con;
+  	@JsonIgnore
 
-	http.setRequestMethod("POST"); // PUT is another valid option
+  	private HttpStatus httpStatus = HttpStatus.CREATED;
 
-	http.setDoOutput(true);
+  	public ServiceInstanceBinding (String id,
 
-	http.setDoInput(true);
+  			String serviceInstanceId,
 
-	http.setUseCaches(false);
+  			Map\<String,Object\> credentials,
 
-	byte[] out = serviceUsage.toString().getBytes(StandardCharsets.UTF\_8);
+  			String syslogDrainUrl, String appGuid,
 
-	int length = out.length;
+  			String appOrganizationId,
 
-	http.setFixedLengthStreamingMode(length);
+  			String appSpaceId,
 
-	http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+  			String meteringPlanId
 
-	http.connect();
+  	) {
 
-	try (OutputStream os = http.getOutputStream()) {
+  		this.id = id;
 
-	os.write(out);
+  		this.serviceInstanceId = serviceInstanceId;
 
-	}
+  		setCredentials(credentials);
 
-	} catch (IOException e) {
+  		this.syslogDrainUrl = syslogDrainUrl;
 
-	e.printStackTrace();
+  		this.appGuid = appGuid;
 
-	throw new Exception(e);
+  		this.appOrganizationId = appOrganizationId;
 
-	}
+  		this.appSpaceId = appSpaceId;
 
-	}
+  		this.meteringPlanId = meteringPlanId;
 
-Abacus-collector에 전송 할 API 서비스 사용량 JSON을 생성 한다.
+  	}
+  ----------------------------------------------------------------------------
 
-	private JSONObject buildServiceUsage (String orgId, String spaceId, String appId, String planId)
+###2.3.6.  SampleMeteringOAuthService 추상화 클래스
 
-	throws JSONException {
+UAA OAuthToken은 Abacus가 Secured로 운영될 경우, abucus-collector
+RESTAPI에 접근 하기 위해 필요하다.
 
-	LocalDateTime now = LocalDateTime.now();
+SampleMeteringOAuthService를 상속하는 클래스는 UAA OAuthToken을 취득하여
+리턴하는 처리를 구현해야 한다.
 
-	Timestamp timestamp = Timestamp.valueOf(now);
+  	package org.openpaas.servicebroker.service;
 
-	JSONObject jsonObjectUsage = new JSONObject ();
+  	import org.openpaas.servicebroker.exception.ServiceBrokerException;
 
-	jsonObjectUsage.put ("start", timestamp.getTime());
+  	public interface SampleMeteringOAuthService {
 
-	jsonObjectUsage.put ("end", timestamp.getTime());
+  	String getUAAToken() throws ServiceBrokerException;
 
-	jsonObjectUsage.put ("organization\_id", orgId);
+  	}
+  ---------------------------------------------------------------------
 
-	jsonObjectUsage.put ("space\_id", spaceId);
+###2.3.7.  SampleMeteringReportService 추상화 클래스
+SampleMeteringReportService를 상속하는 클래스는 create binding request와
+delete binding request를 처리 할 때, 각각 해당 이벤트 정보를
+abacus-collector에 전송하고 해당 처리에 대한 상태코드(HTTP 상태코드)를
+리턴하는 처리를 구현해야 한다.
 
-	jsonObjectUsage.put ("consumer\_id", "app:" + appId);
+  	package org.openpaas.servicebroker.service;
 
-	jsonObjectUsage.put ("resource\_id", RESOURCE\_ID);
+  	import org.openpaas.servicebroker.exception.ServiceBrokerException;
 
-	jsonObjectUsage.put ("plan\_id", planId);
+  	import org.openpaas.servicebroker.model.ServiceInstanceBinding;
 
-	jsonObjectUsage.put ("resource\_instance\_id", appId);
+  	public interface SampleMeteringReportService {
 
-	JSONArray measuredUsageArr = new JSONArray ();
+  	int reportServiceInstanceBinding(ServiceInstanceBinding serviceInstanceBinding,
 
-	JSONObject measuredUsage1 = new JSONObject ();
-	
-	JSONObject measuredUsage2 = new JSONObject ();
+  	String uaaToken)
 
-	JSONObject measuredUsage3 = new JSONObject ();
-	
-	int quantity = 0;
+  	throws ServiceBrokerException;
 
-	if (STANDARD\_PLAN\_ID.equals(planId)) {
+  	int reportServiceInstanceBindingDelete(ServiceInstanceBinding serviceInstanceBinding,
 
-	quantity = PLAN\_STANDARD\_QUANTITY;
+  	String uaaToken)
 
-	} else if (EXTRA\_PLAN\_ID.equals(planId)) {
+  	throws ServiceBrokerException;
 
-	quantity = PLAN\_EXTRA\_QUANTITY;
+  	}
+  ---------------------------------------------------------------------------------------
 
-	}
 
-	measuredUsage1.put ("measure", MEASURE\_1);
 
-	measuredUsage1.put ("quantity", quantity);
+##2.4.  서비스 브로커 라이브러리
 
-	measuredUsageArr.put(measuredUsage1);
+###2.4.1.  mongo-db 서비스 브로커 API
 
-	measuredUsage2.put ("measure", MEASURE\_2);
+지금까지 서비스 브로커 라이브러리를 개수 하여, 미터링을 위한 추상화
+클래스 및 모델 객체들을 준비 했다. 지금 부터는 서비스 브로커
+라이브러리를 구현한 mongo-db 서비스 브로커 API에서 미터링을 구현 하는
+것에 대해 기술 한다.
 
-	measuredUsage2.put ("quantity", 1);
+###2.4.2.  mongo-db 서비스 브로커 API 다운로드
 
-	measuredUsageArr.put(measuredUsage2);
+mongo-db 서비스 브로커 API는 별도 제공되는 압축 파일 패키지를 사용한다.
 
-	measuredUsage3.put ("measure", MEASURE\_3);
+###2.4.3.  mongo-db 서비스 브로커 API에 추가 및 수정 되는 파일
 
-	measuredUsage3.put ("quantity", 0);
+ |   |유형 | 필수|
+ |---------|---|----|
+ |   수정      |build.gradle   |  빌드 설정 파일<br>
+미터링 사용량 객체 생성에 필요한 dependency 를 추가 한다.
+  |     
+ |   수정      | application-mvc.properties  | 서비스 바인딩 request 의 정보들을 매핑한다.
+미터링 서비스를 구현하기 위해 바인딩 되는 애플리케이션의 환경정보 필드를 추가 한다.
+   |     
+ |   수정      | datasource.properties   | Mongo-db 서비스 정보   |     
+ |   수정     | MongoServiceInstanceBindingService  |service broker binding request parameter 로 입력 받은 미터링 정보를 ServiceInstanceBinding 에 매핑하는 프로세스를 추가 한다.    |     
+ |   추가      | SampleMeteringReportServiceImpl  | SampleMeteringReportService 를 구현 한다.   |     
+ |   추가     |SampleMeteringOAuthServiceImpl   | SampleMeteringOAuthService 를 구현 한다.   |     
+ |   수정     |Manifest.yml   | 앱을 CF에 배포할 때 필요한 설정 정보 및 앱 실행 환경에 필요한 설정 정보를 기술한다.   |   
 
-	measuredUsageArr.put(measuredUsage3);
+###2.4.4.  gradle build를 위한 dependency 추가
 
-	jsonObjectUsage.put ("measured\_usage", measuredUsageArr);
+서비스브로커 라이브러리 mongo-db서비스 브로커 jar 파일을 적용
 
-	return jsonObjectUsage;
+서비스 브로커 라이브러리를 gradle build 한다.
 
-	}
+  	@openpaas-service-broker/openpaas-service-java-broker\$ gradle build -x test
 
--   API 서비스 미터링 전송 항목 (전송 리포트 JSON 상세)
+  	:compileJava
+
+  	:processResources UP-TO-DATE
+
+  	:classes
+
+  	:findMainClass
+
+  	:jar
+
+  	:bootRepackage
+
+  	:assemble
+
+  	:check
+
+  	:build
+
+  	BUILD SUCCESSFUL
+
+  	Total time: 58.845 secs
+
+
+빌드가 성공하면
+/openpaas-service-java-broker/build/libs/openpaas-service-java-broker.jar가
+생성 된다.
+
+이 jar 파일을 mongo-db 서비스 브로커의
+/openpaas-service-java-broker-mongo/libs 경로로 복사 하고, mongo-db
+서비스브로커 gradle build 파일에 dependency를 추가 한다.
+
+
+mongo-db 서비스 브로커 build.gradle 파일의 dependencies 부분
+
+  	dependencies {
+
+  	// 서비스브로커 라이브러리
+
+  	compile files('libs/openpaas-service-java-broker.jar')
+
+  	// 미터링 사용량 객체 생성 dependency
+
+  	compile("org.json:json:20160212")
+
+  	compile("com.googlecode.json-simple:json-simple:1.1")
+
+  	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat:\${springBootVersion}")
+
+  	compile("org.springframework.boot:spring-boot-starter-web:\${springBootVersion}")
+
+  	compile("org.springframework.boot:spring-boot-starter-security:\${springBootVersion}")
+
+  	//testCompile("org.cloudfoundry:spring-boot-cf-service-broker-tests:\${springBootCfServiceBrokerVersion}")
+
+  	testCompile("org.springframework.boot:spring-boot-starter-test:\${springBootVersion}")
+
+  	testCompile("com.jayway.jsonpath:json-path:\${jsonPathVersion}")
+
+  	testCompile("org.apache.httpcomponents:httpclient:4.4.1")
+
+  	testCompile("org.powermock:powermock-mockito-release-full:1.6.1")
+
+  	compile("org.apache.commons:commons-dbcp2")
+
+  	compile("org.springframework.boot:spring-boot-starter-data-mongodb:\${springBootVersion}")
+
+  	}
+  ------------------------------------------------------------------------------------------------------------
+
+###2.4.5.  application-mvc.properties 설정
+
+  	# abacus usage collector RESTAPI 의 주소
+
+  	abacus.collector: https://abacus-usage-collector.<파스-타 도메인> /v1/metering/collected/usage
+
+  	# abacus usage collector 가 secured 모드 true / 아닐 경우 false
+
+  	abacus.secured: true
+
+  	# 개발형 플랫폼의 uaa server
+
+  	uaa.server: https://uaa.***\<****파스**-**타 도메인**\>*
+
+  	# abacus usage collector RESTAPI 사용권한 (UAA server 에 미리 등록한다.)
+
+  	uaa.client.id: abacus-linux-container
+
+  	uaa.client.secret: secret
+
+  	uaa.client.scope: abacus.usage.linux-container.write,abacus.usage.linux-container.read
+
+uaa 계정 설정 방법에 관해서 별도의 **abacus****설치 가이드**의 **Secured
+Abacus****를 위한****UAA****계정 등록**을 참고한다.
+
+
+###2.4.6.  datasource.properties 설정
+
+  	# Mongo-DB 서비스 배포 manifest파일을 참조하여 설정한다.
+
+  	mongodb.hosts = 10.244.14.2, 10.244.14.14, 10.244.14.26
+
+  	mongodb.port = 27017
+
+  	mongodb.dbName = mongo-broker
+
+  	mongodb.userName = root
+
+  	mongodb.authSource = admin
+
+  	mongodb.password = openpaas
+
+
+###2.4.7.  MongoServiceInstanceBindingService 구현체
+
+애플리케이션 환경 정보는 service broker binding CLI 요청 시, parameter
+객체를 통해서 입력된다. 이 정보 들을 ServiceInstanceBinding에 미터링
+필드를 매핑한다.
+
+-   service broker binding CLI 요청 예제<br>
+
+  		$ cf bind-service sample-api-node-caller mongod\_service -c 
+		'{"app\_organization\_id":"test05","app\_space\_id":"testspaceId","metering\_plan\_id":"standard"}'
+
+
+parameter 넘어온 정보들을 mongo-db 에 저장하기 위해
+ServiceInstanceBinding 객체에 매핑한다. mongo-db repository 를 통해 저장
+후, 바인딩 정보를 리턴 한다.
+
+  	// parameter 로 입력 받은 미터링 관련 정보를 취득하여 ServiceInstanceBinding 에 매핑한다.
+
+  	Map\<String, Object\> paraMap = request.getParameters();
+
+  	String appOrganizationId = (String) paraMap.get("app\_organization\_id");
+
+  	String appSpaceId = (String) paraMap.get("app\_space\_id");
+
+  	String meteringPlanId = (String) paraMap.get("metering\_plan\_id");
+
+  	binding = new ServiceInstanceBinding(request.getBindingId(), request.getServiceInstanceId(), credentials, null,request.getAppGuid(), appOrganizationId, appSpaceId, meteringPlanId);
+
+  	repository.save(binding);
+
+  	return binding;
+
+
+###2.4.8.  SampleMeteringOAuthService 구현
+
+application-mvc.properties의 UAA server에서 UAA 토큰을 취득하기 위한
+정보들을 클래스로 호출한다.
+
+  	@Component
+
+  	@Service
+
+  	public class SampleMeteringOAuthServiceImpl implements SampleMeteringOAuthService {
+
+  		@Value("${uaa.server}")
+
+  		String authServer;
+
+  		@Value("${uaa.client.id}")
+
+  		String clientId;
+
+  		@Value("${uaa.client.secret}")
+
+  		String clientSecret;
+
+  		@Value("${uaa.client.scope}")
+
+  		String scope;
+
+  		@Value("${abacus.secured}")
+
+  		String abacusSecured;
+
+
+SampleMeteringOAuthServiceImpl은 SampleMeteringOAuthService를 구현한다.
+
+SampleMeteringOAuthServiceImpl는 https 커넥션을 생성하여 UAA 서버에
+토큰을 요청한다. 이때 abacusSecured (abacus-collector 의 secured 설정
+여부) 에 따라 공백({}) 또는 토큰을 리턴 한다.
+
+  	@Override
+
+  	public String getUAAToken() throws ServiceBrokerException {
+
+  	if(!SECURED.equals(abacusSecured)){
+
+  	  return "";
+
+  	} else {
+
+  		String authToken = "";
+
+  		StringBuffer sb = new StringBuffer();
+
+  		HttpsURLConnection conn = (HttpsURLConnection) getConnetionUAA();
+
+  		conn.setRequestMethod("GET");
+
+  		conn.setDoInput(true);
+
+  		String authHeader = getAuthKey(clientId, clientSecret);
+
+  		conn.setRequestProperty("authorization", authHeader);
+
+  		InputStreamReader in = new InputStreamReader((InputStream) conn.getContent());
+
+  		BufferedReader br = new BufferedReader(in);
+
+  		String line;
+
+  		while ((line = br.readLine()) != null) {
+
+  		sb.append(line).append("\\n");
+
+  		}
+
+  	authToken= parseAuthToken(sb.toString());
+
+  	br.close();
+
+  	in.close();
+
+  	conn.disconnect();
+
+  	return authToken;
+
+  	}
+
+###2.4.9.  SampleMeteringReportService 구현
+
+SampleMeteringReportServiceImpl에서는 SampleMeteringOAuthServiceImpl에서
+취득한 uaa token 으로 https 커넥션을 생성하여, abacus-collector에 서비스
+사용량 정보를 POST 한다.
+
+abacus-collector 에서는 미터링 정책에 따라 POST 받을 양식에 대한
+프로세스를 준비 하고 있기 때문에 abacus-collector가 알 수 있는 양식으로
+JSON을 생성 후 POST 한다.
+
+SampleMeteringReportServiceImpl 은 크게 나누어 2가지 처리를 하고 있다.
+
+
+1.  **ServiceInstanceBinding****정보를 참조 하여****,****사용량
+    정보****JSON****을 생성 한다****.**
+
+2.  **생성한 사용량 정보****JSON****을****abacus-collector****로 전송
+    한다****. (HTTPS, HTTP)**
+
+
+사용량 정보 JSON 을 생성 한다.
+
+RESOURCE_ID linux-container 와 STANDARD_PLAN_ID standard 는
+abacus에서 sample 로 제공 되는 미터링 스키마이다.
+
+본 가이드에서는 이 미터링 스키마를 mongo-db 서비스 바인딩과 언바인딩에
+대한 미터링 스키마로 이용하여 기술 했다.
+
+서비스 제공자는 제공 하려는 서비스에 맞는 정책을 정하여, 미터링 스키마를
+abacus-프로비저닝에 등록 해야, abacus-collector 에 미터링을 전송할 수
+있게 된다. (정책 등록에 대한 자세한 내용은 본문 하기의
+**미터링****/****과금 정책 참조**)
+
+
+다음 예제의 미터링 리포팅 용 상수들은 abacus의 linux-container 미터링
+스키마에 맞게 기술 되었고, PLAN_STANDARD_QUANTITY,
+PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 해당
+항목을 DB 또는 프로퍼티 등을 통해 설정한다.
+
+  	// 미터링 리포트용 상수
+
+  	private static final String RESOURCE\_ID = "linux-container";
+
+  	private static final int BIND = 1;
+
+  	private static final int UNBIND = 0;
+
+  	private static final String MEASURE\_1 = "sample\_service\_usage\_param1";
+
+  	private static final String MEASURE\_2 = "sample\_service\_usage\_param2";
+
+  	private static final String MEASURE\_3 = "previous\_sample\_service\_usage\_param1";
+
+  	private static final String MEASURE\_4 = "previous\_sample\_service\_usage\_param2";
+
+  	private static final String STANDARD\_PLAN\_ID = "standard";
+
+  	private static final int PLAN\_STANDARD\_QUANTITY = 50000000;
+
+  	private static final int PLAN\_EXTRA\_QUANTITY = 1000000000;
+
+  	private static final String SECURED = "true";
+
+  	/***************************************************
+
+  	* @description : 리포트 용 JSON 생성
+
+  	* @title : buildServiceUsage
+
+  	* @return : JSONObject
+
+  	 ***************************************************/
+
+  	public JSONObject buildServiceUsage(ServiceInstanceBinding binding, int mode) {
+
+  		String orgId = (String) binding.getAppOrganizationId();
+
+  		String spaceId = (String) binding.getAppSpaceId();
+
+  		String planId = (String) binding.getMeteringPlanId();
+
+  		String appId = (String) binding.getAppGuid();
+
+  		LocalDateTime now = LocalDateTime.now();
+
+  		Timestamp timestamp = Timestamp.valueOf(now);
+
+  		JSONObject jsonObjectUsage = new JSONObject();
+
+  		jsonObjectUsage.put("start", timestamp.getTime());
+
+  		jsonObjectUsage.put("end", timestamp.getTime());
+
+  		jsonObjectUsage.put("organization\_id", orgId);
+
+  		jsonObjectUsage.put("space\_id", spaceId);
+
+  		jsonObjectUsage.put("consumer\_id", "app:" + appId);
+
+  		jsonObjectUsage.put("resource\_id", RESOURCE\_ID);
+
+  		jsonObjectUsage.put("plan\_id", planId);
+
+  		jsonObjectUsage.put("resource\_instance\_id", appId);
+
+  		JSONArray measuredUsageArr = new JSONArray();
+
+  		JSONObject measuredUsage1 = new JSONObject();
+
+  		JSONObject measuredUsage2 = new JSONObject();
+
+ 		JSONObject measuredUsage3 = new JSONObject();
+
+  		JSONObject measuredUsage4 = new JSONObject();
+
+  		int quantity = 0;
+
+  		if (STANDARD\_PLAN\_ID.equals(planId)) {
+
+  			quantity = PLAN\_STANDARD\_QUANTITY;
+
+  			} else {
+
+  			quantity = PLAN\_EXTRA\_QUANTITY;
+
+  			}
+
+  		if (mode == BIND) {
+
+  			measuredUsage1.put("measure", MEASURE\_1);
+
+  			measuredUsage1.put("quantity", quantity);
+
+  			measuredUsageArr.put(measuredUsage1);
+
+  			measuredUsage2.put("measure", MEASURE\_2);
+
+  			measuredUsage2.put("quantity", 1);
+
+  			measuredUsageArr.put(measuredUsage2);
+
+  			measuredUsage3.put("measure", MEASURE\_3);
+
+  			measuredUsage3.put("quantity", 0);
+
+  			measuredUsageArr.put(measuredUsage3);
+
+  			measuredUsage4.put("measure", MEASURE\_4);
+
+  			measuredUsage4.put("quantity", 0);
+
+  			measuredUsageArr.put(measuredUsage4);
+
+  			} else { // UNBIND
+
+  			measuredUsage1.put("measure", MEASURE\_1);
+
+  			measuredUsage1.put("quantity", 0);
+
+  			measuredUsageArr.put(measuredUsage1);
+
+  			measuredUsage2.put("measure", MEASURE\_2);
+
+  			measuredUsage2.put("quantity", 0);
+
+  			measuredUsageArr.put(measuredUsage2);
+
+  			measuredUsage3.put("measure", MEASURE\_3);
+
+  			measuredUsage3.put("quantity", quantity);
+
+  			measuredUsageArr.put(measuredUsage3);
+
+  			measuredUsage4.put("measure", MEASURE\_4);
+
+  			measuredUsage4.put("quantity", 1);
+
+  			measuredUsageArr.put(measuredUsage4);
+
+  			}
+
+  		jsonObjectUsage.put("measured\_usage", measuredUsageArr);
+
+  		return jsonObjectUsage;
+
+  	}
+
+**abacus-collector****인터페이스 항목**
 
  | 항목명  |유형 | 설명| 예시|
  |---------|---|----|-----|
- |  start  |  UNIX |  Timestamp  |   API처리 시작 시각  | 1396421450000 |
- |  end       |  UNIX | Timestamp   | API처리 응답 시각    | 1396421451000
- |  space_id  |   String| API를 호출한 앱의 영역 ID   | d98b5916-3c77-44b9-ac12-04456df23eae    |
- |  resource_id       | String  | API 자원 ID   | sample_api    |
- | plan_id        | String  | API 미터링 Plan ID   | basic    |
- |  resource_instance_id       | String  | API를 호출한 앱 ID   | d98b5916-3c77-44b9-ac12-04d61c7a4eae    |
- | measured_usage      | Array  |  미터링 항목  |   -  |
- | measure        |  String | 미터링 대상 명   |  api_calls   |
- | quantity        |Number   | 해당 API 요청에 대한 API 처리 횟수    | 10    |
- 					
+ |   start      | UNIX Timestamp  |바인드/언바인드 처리 시작 시각    |1396421450000     |
+ |   end      | UNIX Timestamp  |  바인드/언바인드 처리 응답 시각  |1396421451000     |
+ |  organization_id       | String  | 바인드 요청을 호출한 앱의 조직 ID   | us-south:54257f98-83f0-4eca-ae04-9ea35277a538    |
+ |   space_id      |String   | 서비스 바인드 요청을 호출한 앱의 영역 ID   |d98b5916-3c77-44b9-ac12-04456df23eae     |
+ |  consumer_id       | String  |서비스 바인드 요청을 호출한 앱 ID    | App: d98b5916-3c77-44b9-ac12-04d61c7a4eae    |
+ |  resource_id       |String   |서비스 자원 ID    |linux-container     |
+ |  plan_id       |String   | 서비스 미터링 Plan ID   |standard     |
+ |  resource_instance_id       | String  |바인드 요청을 호출한 앱 ID    | d98b5916-3c77-44b9-ac12-04d61c7a4eae    |
+ |  measured_usage       | Array  | 미터링 항목   | -    |
+ |   measure      | String  | 미터링 대상 명   |sample_service_usage_param1     |
+ |  quantity       |Number   |  서비스 사용량
+예제는 메모리 사용량 (byte)
+  |1000000000     |
+
+
 ※ JSON 변환 예제
 
-	{
+  	{
 
-	"start": 1396421450000,
+  		"consumer\_id":"app:d98b5916-3c77-44b9-ac12-04d61c7a4eae ",
 
-	"end": 1396421451000,
+  		"resource\_instance\_id":"d98b5916-3c77-44b9-ac12-04d61c7a4eae ",
 
-	"organization\_id": "us-south:54257f98-83f0-4eca-ae04-9ea35277a538",
+  		"organization\_id":" us-south:54257f98-83f0-4eca-ae04-9ea35277a538",
 
-	"space\_id": "d98b5916-3c77-44b9-ac12-04456df23eae",
+  		"measured\_usage":[
 
-	"consumer\_id": "app:d98b5916-3c77-44b9-ac12-045678edabae",
+  		{
 
-	"resource\_id": "sample\_api",
+  			"measure":"sample\_service\_usage\_param1",
 
-	"plan\_id": "basic",
+  			"quantity":50000000
 
-	"resource\_instance\_id": "d98b5916-3c77-44b9-ac12-04d61c7a4eae",
+  		},
 
-	"measured\_usage": [
+  		{
 
-	{
+  			"measure":"sample\_service\_usage\_param2",
 
-	"measure": "api\_calls",
+  			"quantity":0
 
-	"quantity": 10
+  		},
 
-	}
+  		{
 
-	]
+  			"measure":"previous\_sample\_service\_usage\_param1",
 
-###<div id='16'/>SampleApiJavaServiceController 클래스
+  			"quantity":50000000
 
-서비스 사용 요청을 처리하는 REST Controller. 본 샘플 애플리케이션에서는
-미터링을 하는 기능만 수행 한다.
+  		},
 
-	중략..
+  		{
 
-	@RequestMapping (value = "/plan1", method = RequestMethod.POST)
+  			"measure":"previous\_sample\_service\_usage\_param2",
 
-	public ResponseEntity\<String\> serviceAPIPlan01(@RequestBody String input) throws Exception {
+  			"quantity":1
 
-	JSONParser jsonParser = new JSONParser ();
+  		}
 
-	JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
+  	],
 
-	String orgId = (String) jsonObject.get("organization\_id");
+  	"start":1396421450000,
 
-	String spaceId = (String) jsonObject.get("space\_id");
+  	"resource\_id":"linux-container",
 
-	String appId = (String) jsonObject.get("consumer\_id");
+  	"end":1396421450000,
 
-	String planId = (String) jsonObject.get("plan\_id");
+  	"space\_id":" d98b5916-3c77-44b9-ac12-04456df23eae ",
 
-	JSONObject serviceKeyOBJ = (JSONObject) jsonObject.get("credential");
+  	"plan\_id":"standard"
 
-	String serviceKey = (String) serviceKeyOBJ.get("serviceKey");
-
-	if(!SERVICE\_KEY.equals(serviceKey))
-
-	return new ResponseEntity\<\>("credential is wrong", HttpStatus.UNAUTHORIZED);
-
-	meteringService.reportUsageData(orgId, spaceId, appId, planId);
-
-	String successStr = "orgId:" + orgId + "/ spaceId:" + spaceId 
-	+ "/ appId:" + appId + "/ planId:" + planId + " was reported to abacus collector.";
-
-	return new ResponseEntity\<\>(successStr, HttpStatus.OK);
-
-	}
-
-	후략..
-
-##<div id='17'/>API 서비스 연동 샘플 애플리케이션
-
-본 가이드에서는 API 서비스를 호출하는 애플리케이션의 개발에 대해서는
-기술하지 않는다. 샘플 애플리케이션의 개발에 대해서는 **Node.js
-API****미터링 개발 가이드의****Api****서비스 연동 애플리케이션 개발**을
-참고 한다.
-
-###<div id='18'/>API 서비스 연동 샘플 애플리케이션 인터페이스 항목
-
-1.  **API 서비스 엔드 포인트**
-
-		GET|POST|PUT|DELETE *\<api\_service\_restful\_api\>*
+  	}
 
 
-2.  **API 서비스 미터링 전송 항목**
-
- | 항목명  |유형 | 설명| 예시|
- |---------|---|----|-----|
- |  org\_id       | String  | API 서비스를 요청한 앱의 조직 ID    | 54257f98-83f0-4eca-ae04-9ea35277a538    |
- |  space\_id       | String  |API 서비스를 요청한 앱의 영역 ID     |d98b5916-3c77-44b9-ac12-04456df23eae     |
- |consumer\_id         |String   |API 서비스를 요청한 앱 ID         |d98b5916-3c77-44b9-ac12-045678edabae     |
- |instance\_id         |String   |API 서비스를 요청한 앱의 자원 인스턴스 ID     |d98b5916-3c77-44b9-ac12-045678edabad     |
- |plan\_id         |String   |앱의 요청한 API 서비스의 plan ID    |basic     |
- |credentials         |JSON   |서비스 요청에 필요한 credential 항목을 설정한다.    |credentials: {<br>key: value,<br>…<br>}     |
- | inputs        |JSON   |서비스 요청에 필요한 입력 정보를 설정한다.    | inputs: {<br>key:value,<br>...<br>}    |
-
-
-
-
-3.  **API 서비스 미터링 전송 항목 예제**
-
-		{
-
-		organization\_id: 'd6ce3670-ab9c-4453-b993-f2821f54846b',
-
-		space\_id: 'ab63eaed-7932-4f24-804d-dccb40a68752',
-
-		consumer\_id: 'ff7476f9-f5b6-420c-96f0-ac39be43de8c',
-
-		instance\_id: 'ff7476f9-f5b6-420c-96f0-ac39be43de8c',
-
-		plan\_id: 'standard',
-
-		credential: {
-
-		'serviceKey': '[cloudfoundry]',
-
-		'url': 'http://localhost:9602/plan1'
-
-		},
-
-		inputs: {
-
-		key1: 'val1',
-
-		key2: 'val2'
-
-		}
-
-		}
-
-
-##<div id='19'/>미터링/등급/과금 정책
+#2.5.  미터링/등급/과금 정책
 
 서비스, 그리고 서비스 제공자 마다 미터링/등급/과금 정책 다르기 때문에 본
 가이드에서는 정책의 개발 예제를 다루지는 않는다. 다만 CF-ABACUS에 적용할
 수 있는 형식에 대해 설명한다.
 
 
-###<div id='20'/>미터링 정책
+###2.5.1.  미터링 정책
 
 미터링 정책이란 수집한 미터링 정보에서 미터링 대상의 지정 및 집계 방식을
 정의한 JSON 형식의 오브젝트이다. 서비스 제공자는 미터링 정책 스키마에
@@ -816,583 +1018,543 @@ API****미터링 개발 가이드의****Api****서비스 연동 애플리케이�
 
 1.  **미터링 정책 스키마**
 
- | 항목명  |유형 | 필수| 예시|
+ | 항목명  |유형 | 필수| 설명|
  |---------|---|----|-----|
- |plan\_id         |String   | O   |API 미터링 Plan ID     |
- |measures         |Array   |최소 하나    |API 미터링 정보 수집 대상 정의     |
- |Name         |String   |O    |미터링 정보 수집 대상 명     |
- |Unit         |String   |O    |미터링 정보 수집 대상 단위     |
- |metrics        |Array   |최소 하나    |API 미터링 집계 방식 정의     |
- |meter         |String   |X    |미터링 정보에 대해서 수집 단계에 적용하는 계산식 또는 변환식     |
- |accumulate         |String   |X    |미터링 정보에 대해서 누적 단계에 적용하는 계산식 또는 변환식     |
- |aggregate         |String   |X   |미터링 정보에 대해서 집계 단계에 적용하는 계산식 또는 변환식     |
- |summarize         |String   |X   |미터링 정보를 보고할 때 적용하는 계산식 또는 변환식     |
- |title         |String   |X   |API 미터링 제목     |
-
+ |   plan\_id      |  String | O   |  API 서비스 미터링 Plan ID   |
+ |    measures     | Array  |  최소 하나  |  API 서비스 미터링 정보 수집 대상 정의   |
+ |    Name     | String  | O   |  미터링 정보 수집 대상 명   |
+ |    Unit     | String  |  O  |  미터링 정보 수집 대상 단위   |
+ |    metrics     | Array  | 최소 하나   | API 서비스 미터링 집계 방식 정의    |
+ |    Name     |  String | O   | 미터링 정보 수집 대상 명    |
+ |   unit      |  String |  O  | 미터링 정보 수집 대상 단위    |
+ |    meter     |  String | X   | 미터링 정보에 대해서 수집 단계에 적용하는 계산식 또는 변환 식    |
+ |   accumulate      |String   |    | 미터링 정보에 대해서 누적 단계에 적용하는 계산식 또는 변환식    |
+ |   aggregate      |  String |  X  | 미터링 정보에 대해서 집계 단계에 적용하는 계산식 또는 변환식    |
+ |   summarize      | String  |  X  | 미터링 정보를 보고할 때 적용하는 계산식 또는 변환식    |
+|   title      |  String |   X | API 서비스 미터링 제목    |
 
 2.  **미터링 정책 예제**
 
-		{
-		
-		"plan\_id": "basic-object-storage",
+  		{
 
-		"measures": [
+  		"plan\_id": "basic-linux-container",
+  		"measures": [
 
-		{
+  			{
+  				name: 'sample\_service\_usage\_param1',
+  				unit: ‘SAMPLE\_UNIT’
+  			},
 
-		"name": "storage",
+  			{
+  				name: 'sample\_service\_usage\_param2',
+  				unit: ‘SAMPLE\_UNIT’
+  			},
 
-		"unit": "BYTE"
+  			{
+  				name: 'previous\_service\_usage\_param1',
+  				unit: ‘SAMPLE\_UNIT’
+  			},
 
-		},
+  			{
+  				name: 'previous\_service\_usage\_param2',
+  				unit: ‘SAMPLE\_UNIT’
+  			} ],
 
-		{
+  			metrics: [
+  			{
+  				name: 'sample\_metric',
+  				unit: ‘SAMPLE\_UNIT’,
+  				type: 'time-based',
 
-		"name": "api\_calls",
+  			meter: ((m) =\> ({
 
-		"units": "CALL"
+  				previous\_consuming: new BigNumber(m.previous\_instance\_memory || 0)
 
-		}
+  				.div(1073741824).mul(m.previous\_running\_instances || 0)
 
-		],
+  				.mul(-1).toNumber(),
 
-		"metrics": [
+  				consuming: new BigNumber(m.current\_instance\_memory || 0)
 
-		{
+  				.div(1073741824).mul(m.current\_running\_instances || 0).toNumber()
 
-		"name": "storage",
+  			})).toString(),
 
-		"unit": "GIGABYTE",
+  			accumulate: ((a, qty, start, end, from, to, twCell) =\> {
 
-		"meter": "(m) =\> m.storage / 1073741824",
+  			// Do not accumulate usage out of boundary
 
-		"accumulate": "(a, qty) =\> Math.max(a, qty)"
+  			if (end \< from || end \>= to)
 
-		},
+  			return null;
 
-		{
+  		const past = from - start;
 
-		"name": "thousand\_api\_calls",
+  		const future = to - start;
 
-		"unit": "THOUSAND\_CALLS",
+  		const td = past + future;
 
-		"meter": "(m) =\> m.light\_api\_calls / 1000",
+  		return {
 
-		"accumulate": "(a, qty) =\> a ? a + qty : qty",
+  			// Keep the consuming & since to the latest value
 
-		"aggregate": "(a, qty) =\> a ? a + qty : qty",
+  			consuming: a && a.since \> start ? a.consuming : qty.consuming,
 
-		"summarize": "(t, qty) =\> qty"
+  			consumed: new BigNumber(qty.consuming).mul(td)
 
-		}
+  			.add(new BigNumber(qty.previous\_consuming).mul(td))
 
-		]
+  			.add(a ? a.consumed : 0).toNumber(),
 
-		}
+  			since: a && a.since \> start ? a.since : start
 
-###<div id='21'/>등급 정책
+  		};
+
+  		}).toString(),
+
+  		aggregate: ((a, prev, curr, aggTwCell, accTwCell) =\> {
+
+  		// Usage was rejected by accumulate
+
+  		if (!curr)
+
+  		return a;
+
+ 		 const consuming = new BigNumber(curr.consuming)
+
+  		.sub(prev ? prev.consuming : 0);
+
+  		const consumed = new BigNumber(curr.consumed)
+
+  		.sub(prev ? prev.consumed : 0);
+
+  		return {
+
+ 			consuming: consuming.add(a ? a.consuming : 0).toNumber(),
+
+  			consumed: consumed.add(a ? a.consumed : 0).toNumber()
+
+  		};
+
+  		}).toString(),
+
+  		summarize: ((t, qty, from, to) =\> {
+
+ 		// no usage
+
+  		if (!qty)
+
+  		return 0;
+
+  		// Apply stop on running instance
+
+  		const rt = Math.min(t, to ? to : t);
+
+  		const past = from - rt;
+
+  		const future = to - rt;
+
+  		const td = past + future;
+
+  		const consumed = new BigNumber(qty.consuming)
+
+  		.mul(-1).mul(td).toNumber();
+
+ 		 return new BigNumber(qty.consumed).add(consumed)
+
+  		.div(2).div(3600000).toNumber();
+
+  		}).toString()
+
+  		}
+
+  		]
+
+  		};
+
+###2.5.2.  등급 정책 {.번호대제목-western}
 
 등급 정책이란 각 서비스의 사용 가중치를 정의한 JSON 형식의 오브젝트이다.
 서비스 제공자는 등급 정책 스키마에 맞춰 서비스에 대한 정책을 개발한다.
+
 
 1.  **등급 정책 스키마**
 
  | 항목명  |유형 | 필수| 설명|
  |---------|---|----|-----|
- | plan\_id|   String |  O        |   API 등급 Plan ID    |
- | metrics |   Array  |  최소 하나 |  등급 정책 목록	|
- | Name    |   String |  O        |   등급 정의 대상 명|
- | rate    |   String |  X        |   가중치 계산식 또는 변환식|
- | charge  |   String |  X        |   사용량에 대한 과금 계산식 또는 변환식|
- | title   |   String |  X        |   등급 정책 명|
+ |   plan\_id      |  String | O   |  API 서비스 미터링 Plan ID   |
+ |    metrics     | Array  |  최소 하나  |  등급 정책 목록   |
+ |    Name     | String  | O   |  등급 정의 대상 명   |
+ |    rate     | String  |  X  |  가중치 계산식 또는 변환식   |
+ |    charge     | String  | X   | 사용량에 대한 과금 계산식 또는 변환식    |
+ |    title     |  String | X   | 등급 정책 명    |
 
 
 2.  **등급 정책 예제**
 
-		{
+  		{
 
-		"plan\_id": "object-rating-plan",
+  		"plan\_id": "standard",
 
-		"metrics": [
+  		"metrics": [
 
-		{
+  		  {
+  			"name": "sample\_metrics"
+  		  },
 
-		"name": "storage"
+  		  {
+  			"name": "sample\_service\_usage\_param1",
 
-		},
+  			"rate": "(p, qty) =\> p ? p \* qty : 0",
 
-		{
+  			"charge": "(t, cost) =\> cost"
 
-		"name": "thousand\_api\_calls",
+  		  }
 
-		"rate": "(p, qty) =\> p ? p \* qty : 0",
+  		 ]
 
-		"charge": "(t, cost) =\> cost"
+  		}
 
-		}
-
-		]
-
-		}
-
-###<div id='22'/>과금 정책
+###2.5.3. 과금 정책 
 
 과금 정책이란 각 서비스에 대한 사용 단가를 정의한 JSON 형식의
 오브젝트이다. 서비스 제공자는 과금 정책 스키마에 맞춰 서비스에 대한
 정책을 개발한다.
 
+
 1.  **과금 정책 스키마**
 
  | 항목명  |유형 | 필수| 설명|
  |---------|---|----|-----|
- | plan\_id|   String |  O        |   API 과금 Plan ID|
- | Metrics  |  Array   | 최소 하나 |  과금 정책 목록|
- | Name     |  String  | O        |   과금 대상 명|
- | Price    |  Array   | 최소 하나 |  과금 정책 상세|
- | Country  |  String  | O        |   서비스 사용 단가에 적용할 통화|
- | Price    |  Number  | O        |   서비스 사용 단가|
- | title    |  String  | X        |   과금 정책 제목|
+ |   plan\_id      |  String | O   |  API 서비스 미터링 Plan ID   |
+ |    metrics     | Array  |  최소 하나  |  과금 정책 목록   |
+ |    Name     | String  | O   |  과금 대상 명  |
+ |    Price     | String  |  최소 하나  |  과금 정책 상세   |
+ |    Country     | String  | O   | 서비스 사용 단가에 적용할 통화    |
+ |    Price     |  String | O   | 서비스 사용 단가    |
+ |    title     |  String | X   | 과금 정책 제목    |
 
 
 2.  **과금 정책 예제**
-		
-		{
 
-		"plan\_id": "object-pricing-basic",
+  		{
 
-		"metrics": [
+  			"plan\_id": "standard",
 
-		{
+  			"metrics": [
 
-		"name": "storage",
+  			 {
 
-		"prices": [
+  				"name": "sample\_service\_usage\_param1",
 
- 		{
+  				"prices": [
 
-		"country": "USA",
+  					{
 
-		"price": 1
+  						"country": "USA",
 
-		},
+  						"price": 1
 
-		{
+  					},
 
-		"country": "EUR",
+  					{
 
-		"price": 0.7523
+  						"country": "EUR",
 
-		},
-	
-		{
+  						"price": 0.7523
 
-		"country": "CAN",
+  					},
 
-		"price": 1.06
+  					{
 
-		}
+  						"country": "CAN",
 
-		]
+  						"price": 1.06
 
-		},
+  					}
 
-		{
+  				]
 
-		"name": "thousand\_api\_calls",
+  			},
 
-		"prices": [
+  			{
 
-		{
+  				"name": " sample\_service\_usage\_param2",
 
-		"country": "USA",
+  				"prices": [
 
-		"price": 0.03
+		  			{
 
-		},
+  						"country": "USA",
 
-		{
+  						"price": 0.03
 
-		"country": "EUR",
-		
-		"price": 0.0226
+  					},
 
-		},
+  					{
 
-		{
+  						"country": "EUR",
 
-		"country": "CAN",
+  						"price": 0.0226
 
-		"price": 0.0317
+  					},
 
-		}
+  					{
 
-		]
+  						"country": "CAN",
 
-		}
+  						"price": 0.0317
 
-		]
+  					}
 
-		}
+  				]
+
+  			}
+
+  		 ]
+
+  		}
 
 
-###<div id='23'/>정책 등록
+###2.5.4.  정책 등록
+
 정책은 2가지 방식 중 하나의 방법으로 CF-ABACUS에 등록할 수 있다.
 
-1.  **js 파일을 등록하는 방식**
+**1.  js 파일을 등록하는 방식**
 
-작성한 정책을 다음의 디렉토리에 저장한 후, CF에 CF-ABACUS를 배포 또는 재
-배포 한다.
+작성한 정책을 다음의 디렉토리에 저장한 후, CF에 CF-ABACUS를 배포 또는
+재배포 한다.
 
 -   미터링 정책의 경우
-		
-		cf-abacus/lib/plugins/provisioning/src/plans/metering
+
+  		cf-abacus/lib/plugins/provisioning/src/plans/metering
 
 -   등급 정책의 경우
 
-		cf-abacus/lib/plugins/provisioning/src/plans/pricing
+  		cf-abacus/lib/plugins/provisioning/src/plans/pricing
 
 -   과금 정책의 경우
 
-		cf-abacus/lib/plugins/provisioning/src/plans/rating
+  		cf-abacus/lib/plugins/provisioning/src/plans/rating
 
-
-2.  **DB에 등록하는 방식**
+**2.  DB에 등록하는 방식**
 
 작성한 정책을 curl 등을 이용해 DB에 저장하는 방식으로 CF-ABACUS를
 재배포할 필요는 없다. 정책 등록 시, 정책 ID는 고유해야 한다.
 
-
 -   미터링 정책의 경우
 
-		POST /v1/metering/plans/:metering\_plan\_id
-	>
-	
-		## 예제
-
-		$ curl -k -X POST 'http://abacus-provisioning-plugin.bosh-lite.com/v1/metering/plans/sample-linux-container' \\
-
-		-H "Content-Type: application/json" \\
-
-		-d '{"plan\_id":"sample-linux-container","measures":[{"name":"current\_instance\_memory","unit":"GIGABYTE"},{"name":"current\_running\_instances","unit":"NUMBER"},{"name":"previous\_instance\_memory","unit":"GIGABYTE"},{"name":"previous\_running\_instances","unit":"NUMBER"}],"metrics":[{"name":"memory","unit":"GIGABYTE","type":"time-based","meter":"((m)=\>({previous\_consuming:newBigNumber(m.previous\_instance\_memory||0).div(1073741824).mul(m.previous\_running\_instances||0).mul(-1).toNumber(),consuming:newBigNumber(m.current\_instance\_memory||0).div(1073741824).mul(m.current\_running\_instances||0).toNumber()})).toString()","accumulate":"((a,qty,start,end,from,to,twCell)=\>{if(end\<from||end\>=to)returnnull;constpast=from-start;constfuture=to-start;consttd=past+future;return{consuming:a&&a.since\>start?a.consuming:qty.consuming,consumed:newBigNumber(qty.consuming).mul(td).add(newBigNumber(qty.previous\_consuming).mul(td)).add(a?a.consumed:0).toNumber(),since:a&&a.since\>start?a.since:start};}).toString()","aggregate":"((a,prev,curr,aggTwCell,accTwCell)=\>{if(!curr)returna;constconsuming=newBigNumber(curr.consuming).sub(prev?prev.consuming:0);constconsumed=newBigNumber(curr.consumed).sub(prev?prev.consumed:0);return{consuming:consuming.add(a?a.consuming:0).toNumber(),consumed:consumed.add(a?a.consumed:0).toNumber()};}).toString()","summarize":"((t,qty,from,to)=\>{if(!qty)return0;constrt=Math.min(t,to?to:t);constpast=from-rt;constfuture=to-rt;consttd=past+future;constconsumed=newBigNumber(qty.consuming).mul(-1).mul(td).toNumber();returnnewBigNumber(qty.consumed).add(consumed).div(2).div(3600000).toNumber();}).toString()"}]}' \\
-
-		-H "Authorization: \$(cf oauth-token | grep bearer)"
+  		POST /v1/metering/plans/:metering_plan_id
 
 
 -   등급 정책의 경우
 
-		  POST /v1/rating/plans/:rating\_plan\_id
-	>
-
-  		## 예제
-
- 		$ curl -k -X POST 'http://abacus-provisioning-plugin.bosh-lite.com/v1/rating/plans/linux-rating-sample' \\
-
-  		-H "Content-Type: application/json" \\
-
-  		-d '{"plan\_id":"linux-rating-sample","metrics":[{"name":"memory","rate":"((price,qty)=\>({price:price,consuming:qty.consuming,consumed:qty.consumed})).toString(),charge:((t,qty,from,to)=\>{if(!qty)return0;constrt=Math.min(t,to?to:t);constpast=from-rt;constfuture=to-rt;consttd=past+future;constconsumed=newBigNumber(qty.consuming).mul(-1).mul(td).toNumber();constgbhour=newBigNumber(qty.consumed).add(consumed).div(2).div(3600000).toNumber();returnnewBigNumber(gbhour).mul(qty.price).toNumber();}).toString()"}]}' \\
-
-  		-H "Authorization: \$(cf oauth-token | grep bearer)"
-
+  		POST /v1/rating/plans/:rating_plan_id
 
 -   과금 정책의 경우
 
-		POST /v1/pricing/plans/:pricing\_plan\_id
-	>
-
-  		## 예제
-
-		$ curl -k -X POST 'http://abacus-provisioning-plugin.bosh-lite.com/v1/pricing/plans/linux-pricing-sample' \\
-
-  		-H "Content-Type: application/json" \\
-
-  		-d '{"plan\_id":"linux-pricing-sample","metrics":[{"name":"memory","prices":[{"country":"USA","price":0.00014}]}]}' \\
-
-  		-H "Authorization: \$(cf oauth-token | grep bearer)"
+  		POST /v1/pricing/plans/:pricing_plan_id
 
 
-##<div id='24'/>배포
-
+##2.6  배포
 파스-타 플랫폼에 애플리케이션을 배포하면 배포한 애플리케이션과 파스-타
 플랫폼이 제공하는 서비스를 연결하여 사용할 수 있다. 파스-타 플랫폼상에서
 실행을 해야만 파스-타 플랫폼의 애플리케이션 환경변수에 접근하여 서비스에
 접속할 수 있다.
 
-
-###<div id='25'/>파스-타 플랫폼 로그인
+###2.6.1파스-타 플랫폼 로그인
 
 아래의 과정을 수행하기 위해서 파스-타 플랫폼에 로그인
-	
-`$ cf api --skip-ssl-validation`**`https://api.`**`<파스-타 도메인> `**`#파스-타 플랫폼TARGET지정`**
 
-`$ cf login -u <user name> -o <org name> -s <space name>#로그인 요청`
+  >$ cf api --skip-ssl-validation **https://api**.<*파스-타 도메인*> # **파스-타 플랫폼 TARGET 지정**
+
+  >$ cf login -u *<****user name****>* -o *<****org name****>* -s *<****space name****>***#**** **로그인 요청**
 
 
-###<div id='26'/>API 서비스 브로커 생성 {.번호대제목-western}
+###2.6.2.  mongo-db 서비스 브로커 생성 {.번호대제목-western}
 
 애플리케이션에서 사용할 서비스를 파스-타 플랫폼을 통하여 생성한다.
-별도의 서비스 설치과정 없이 생성할 수 있으며, 애플리케이션과
-바인딩과정을 통해 접속정보를 얻을 수 있다.
+mongo-db 서비스 팩이 배포하고자 파스-타 플랫폼 환경에 release 되어
+있어야 한다. 애플리케이션과 바인딩 과정을 통해 접속정보를 얻을 수 있다.
 
--   서비스 생성 (cf marketplace 명령을 통해 서비스 목록과 각 서비스의
-    플랜을 조회할 수 있다.)
+-   **서비스 생성 (cf marketplace 명령을 통해 서비스 목록과 각 서비스의
+    플랜을 조회할 수 있다.)**
 
-		##서비스 브로커 CF 배포
+  >**##****서비스 브로커****CF****배포**
+	
+  >$ cd openpaas-service-java-broker-mongo
 
-		$ cd <샘플 서비스 브로커 경로>/sample_api_java_broker
+  >$ cf push
 
-		$ cf push
+  
 
+  >**##****서비스 브로커 생성**
 
-  		##서비스 브로커 생성
+  >$ cf create-service-broker <***서비스 브로커 명***> <***인증ID***> <***인증Password***> <***서비스 브로커 주소***>
 
-  		$ cf create-service-broker *\<**서비스 브로커 명**\> \<**인증**ID\> \<**인증**Password\> \<**서비스 브로커 주소**\>*
+  예)
 
-  		예)
+  >$ cf create-service-broker openpaas-mongo-broker admin cloudfoundry http://openpaas-mongo-broker.bosh-lite.com
 
-  		$ cf create-service-broker sample-api-broker admin cloudfoundry http://sample-api-java-broker.bosh-lite.com
+  >**##****서비스 브로커 확인**
 
-  		##서비스 브로커 확인
+  >$ cf service-brokers
 
-  		$ cf service-brokers
+  >Getting service brokers as admin...
 
-  		Getting service brokers as admin...
+  >name url
 
- 		name url
-
-  		sample-api-broker http://sample-api-java-broker.bosh-lite.com
-
-  		##서비스 카탈로그 확인
-
-  		$ cf service-access
-
-  		Getting service access as admin...
-
-  		broker: sample-api-broker
-
-  		service plan access orgs
-
-  		standard\_obejct\_storage\_light\_api\_calls standard none
-
-  		standard\_obejct\_storage\_heavy\_api\_calls basic none
-
-  		##등록한 서비스 접근 허용
-
-  		$ cf enable-service-access *\<**서비스명**\>* -p *\<**플랜 명**\>*
-
-		  예)
-
-  		$ cf enable-service-access standard\_obejct\_storage\_light\_api\_calls -p standard
+  >openpaas-mongo-broker http://openpaas-mongo-broker.<***파스-타 도메인***>
 
 
-###<div id='27'/>API 서비스 애플리케이션 배포 및 서비스 등록
+  >**##****서비스 카탈로그 확인**
 
-API 서비스 애플리케이션을 파스-타 플랫폼에 배포한다. 서비스 등록한 API는
-다른 애플리케이션과 바인다 하여 API 서비스를 할 수 있다.
+  >$ cf service-access
 
-1.  **애플리케이션 배포**
+  >Getting service access as admin...
 
-	-	gradle build -x test 명령으로 빌드 한다.
+  >broker: sample-mongodb-broker
 
-	-	cf push 명령으로 배포한다. 별도의 값을 넣지않으면 manifest.yml의 설정을 사용한다
-	>
+  >service plan access orgs
 
-		## API 서비스 배포
+  >Mongo-DB default-plan none
 
-		$ cd *\<**샘플**api**서비스 경로**\>*/sample\_api\_java\_service
+  >**##****등록한 서비스 접근 허용**
 
-  		## gradle 빌드
+  >$ cf enable-service-access <***서비스명***> -p <***플랜 명***>
 
-  		$ gradle build -x test
+  >예)
 
-  		:compileJava
+  >$ cf enable-service-access Mongo-DB
 
-  		:processResources
+  >**##****서비스 생성**
+	
+  >$ cf create-service Mongo-DB default-plan mongod\_service
 
-  		:classes
-
-  		:findMainClass
-
-  		:jar
-
-  		:bootRepackage
-
-  		:assemble
-
-  		:check
-
-  		:build
- 
-		BUILD SUCCESSFUL
-
-		Total time: 13.426 secs
-
-  		$ cf push
-
-		##서비스 생성
-
-  		$ cf create-service *\<**서비스명**\> \<**플랜 명**\> \<**서비스 인스턴스 명**\>*
-
-  		예)
-
-  		$ cf create-service standard\_obejct\_storage\_light\_api\_calls standard sampleNodejslightCallApi
-
-  		##서비스 확인
-
-  		$ cf services
-
-  		Getting services in org real / space ops as admin...
-
-  		OK
-
-		name service plan bound apps last operation
-
-  		sampleNodejslightCallApi standard\_obejct\_storage\_light\_api\_calls standard create succeeded
-
-
-###<div id='28'/>API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결 {.번호대제목-western}
-    =====================================================
+##2.6.3.  API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결
 
 애플리케이션과 서비스를 연결하는 과정을 '바인드(bind)라고 하며, 이
 과정을 통해 서비스에 접근할 수 있는 접속정보를 생성한다.
 
 -   애플리케이션과 서비스 연결
 
- 		## API 서비스 연동 샘플 애플리케이션 배포
+-   이때 -c 옵션으로 미터링에 필요한 애플리케이션 환경정보를 세팅한다.
 
-  		$ cd <샘플 애플리케이션 경로>sample\_api\_node\_caller
+  >**\#\# API****서비스 연동 샘플 애플리케이션 배포**
 
-  		$ npm install && npm run babel && npm run cfpack && ./cfpush.sh
+  >$ cd /binding-test-app
 
-  		##서비스 바인드
-
-  		$ cf bind-service *\<APP\_NAME\> \<SERVICE\_INSTANCE\>* -c *\<PARAMETERS\_AS\_JSON\>*
-
-		예)
-
-  		$ cf bind-service sample-api-node-caller sampleNodejslightCallApi -c '{"serviceKey": "cloudfoundry"}'
-
-  		##서비스 연결 확인
-
-  		$ cf services
-
- 		Getting services in org real / space ops as admin...
-
-  		OK
-
-  		name service plan bound apps last operation
-
-  		sampleNodejslightCallApi standard_obejct_storage_light_api_calls standard sample-api-node-caller create succeeded
-
-  		##애플리케이션 실행
-
-  		$ cf start <APP_NAME>
-
-  		예
-
-  		$ cf start sample-api-node-caller
-
-  		##형상 확인
-
-  		$ cf a
-
-  		Getting apps in org real / space ops as admin...
-
-  		OK
-
-		name requested state instances memory disk urls
-
-  		sample-api-node-service started 1/1 512M 512M sample-api-node-service.bosh-lite.com
-
-  		sample-api-java-broker started 1/1 512M 1G sample-api-java-broker.bosh-lite.com
-
-  		sample-api-node-caller started 1/1 512M 512M sample-api-node-caller.bosh-lite.com
+  >$ cf push
 
 
-##<div id='29'/>API 및 CF-Abacus 연동 테스트
+  >**\#\#****서비스 바인드**
 
-API 연동 샘플 애플리케이션의 url을 통해 웹 브라우저에서 접속하면 API
-연동 및 API 사용량에 대한 CF-Abacus 연동 테스트를 진행 할 수 있다.
-
-1.  **CF-Abacus 연동 확인**
+  >$ cf bind-service <***APP_NAME***> <***SERVICE_INSTANCE***> -c <***PARAMETERS_AS_JSON***>
 
 
-  		##조직 guid 확인
+  >예)
 
-  		$ cf org *\<**샘플 애플리케이션을 배포한 조직**\>* --guid
+  >$ cf bind-service binding-test-app mongod_service -c '{"app_organization_id":"test05","app_space_id":"testspaceId","metering_plan_id":"standard"}'
 
-		예)
 
-  		$ cf org real --guid
+  >**\#\#****서비스 연결 확인**
 
- 		877d01b2-d177-4209-95b0-00de794d9bba
+  >$ cf services
 
-  		##샘플 애플리케이션 guid 확인
+  >Getting services in org real / space ops as admin...
 
-  		$ cf env *\<**샘플 애플리케이션 명**\>*
+  >OK
 
-  		예)
 
-  		$ cf env sample-api-node-caller
+  >name service plan bound apps last operation
 
-  		Getting env variables for app sample-api-node-caller in org real / space ops as admin...
+  >binding-test-app mongod_service standard binding-test-app create succeeded
 
-  		OK
 
-  		<<중략>>
+  >**\#\#****애플리케이션 실행**
 
-  		{
+  >$ cf start <***APP_NAME***>
 
-  		"VCAP\_APPLICATION": {
+  >*예**)*
 
-  		"application\_id": "58872d8a-edfc-44df-97f0-df67cf9033a7",
+  >$ cf start binding-test-app
 
-  		"application\_name": "sample-api-node-caller",
 
-  		"application\_uris": [
+  >**\#\#****형상 확인**
 
-  		"sample-api-node-caller.bosh-lite.com"
+  >$ cf a
 
-  		],
+  >Getting apps in org real / space ops as admin...
 
-  		"application\_version": "55678102-584c-4fca-8304-82f727506b1d",
+  >OK
 
-  		"limits": {
+  >name requested state instances memory disk urls
 
-  		"disk": 512,
+  >binding-test-app started 1/1 512M 512M binding-test-app**.*****\<****파스**-**타 도메인**\>*
 
-  		"fds": 16384,
+  >openpaas-mongo-broker started 1/1 512M 1G openpaas-mongo-broker**.*****\<****파스**-**타 도메인**\>*
 
-  		"mem": 512
+##2.7.  서비스 바인딩 CF-Abacus 연동 테스트
 
-  		},
+binding-test-app 과 mongo-db 서비스를 바인딩 실행해, CF-Abacus 연동
+테스트를 진행 할 수 있다.
 
-  		"name": "sample-api-node-caller",
+CF-Abacus 연동 확인
 
-  		"space\_id": "2ce08996-f463-406c-a971-adbbaf4e4ca5",
+  >**\#\#****테스트 바인딩**
 
-  		"space\_name": "ops",
-	
-  		"uris": [
+  >$ cf bind-service binding-test-app mongod_service -c '{"app_organization_id":"testorgguid","app_space_id":"testSpaceGuId","metering_plan_id":"standard"}'
 
-  		"sample-api-node-caller.bosh-lite.com"
 
-  		],
+  ><<후략>>
 
-  		"users": null,
+  >**\#\# API****사용량 확인**
 
-  		"version": "55678102-584c-4fca-8304-82f727506b1d"
+  >$ curl 'http://abacus-usage-reporting.<***파스-타 도메인***>/v1/metering/organizations/<***샘플 애플리케이션을 배포한 조직***>/aggregated/usage'
 
-  		}	
+  >예)
+
+  >$ curl 'http://abacus-usage-reporting.bosh-lite.com/v1/metering/organizations/testOrgGuid /aggregated/usage'
+
+
+##2.8.  단위 테스트
+
+Junit 테스트로 구현 되어 있으며, 테스트 service class 에 대한 부분적
+mock 적용을 위하여, owermock-mockito-release-full:1.6.1 을 사용하였다.
+
+
+-   테스트를 위한 gradle.build dependency 작성
+
+  		dependencies {
+
+  		// 서비스브로커 라이브러리
+
+  		compile files('libs/openpaas-service-java-broker-ex.jar')
+
+  		// 미터링 사용량 객체 생성 의존 라이브러리
+
+  		compile("org.json:json:20160212")
+
+  		…중략
+
+  		:\${springBootCfServiceBrokerVersion}")
+
+
+  		testCompile("org.springframework.boot:spring-boot-starter-test:\${springBootVersion}")
+
+  		testCompile("com.jayway.jsonpath:json-path:\${jsonPathVersion}")
+
+  		testCompile("org.apache.httpcomponents:httpclient:4.4.1")
+
+  		testCompile("org.powermock:powermock-mockito-release-full:1.6.1")
+
+ 		 …후략
 
   		}
 
-  		<<후략>>
+	1.  테스트 실행
+	
+		-   Spring Tool Suite 의 네비게이터 트리의 /meteringTest 경로에서 오른쪽
+			마우스 클릭 \> Run As \> JUNIT 테스트
 
-  		## API 사용량 확인
-
-  		$ curl 'http://abacus-usage-reporting.<파스-타 도메인>/v1/metering/organizations/<샘플 애플리케이션을 배포한 조직>/aggregated/usage''
-
-  		예)
-
-  		$ curl 'http://abacus-usage-reporting.bosh-lite.com/v1/metering/organizations/877d01b2-d177-4209-95b0-00de794d9bba/aggregated/usage'
 
