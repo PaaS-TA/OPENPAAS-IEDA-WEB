@@ -258,13 +258,12 @@ gradle 플러그인을 Eclipse 에 추가한 후, gradle import 하면 개발이
 ###2.3.3.  서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일들
 
 
- |   |Java class | 설명|
- |---------|---|----|
- |    수정     | ServiceIncetanceBindingController  | 클라우드 컨트롤러의 서비스 바인딩 요청을 처리하는 컨트롤러,<br> SampleMeteringOAuthService 에서 uaa token 을 취득하여, SampleMeteringReportService 의 파라메터로 호출 하는 프로세스를 추가 한다.   |
- |    수정     | ServiceInstanceBinding  | service-binding-request 가 ServiceIncetanceBindingController 에서 처리 될 때 바인딩 연결에 대해 미터링이 적용된 사용량 보고서를 abacus-usage-collector 에 리포팅 한다.   |     
- |    추가     | SampleMeteringReportService  | SampleMeteringReportService 추상화 된 인터페이스로서, 미터링/등급/과금 정책과 관련된 그 어떠한 정보도 가지고 있지 않다. 이는 이 인터페이스를 구현할 서비스 제공자가 서비스 구현체에 적용할 수 있도록 제공되고 있는 추상화 클래스 이다.<br>SampleMeteringReportService 추상화 된 인터페이스로서, 미터링/등급/과금 정책과 관련된 그 어떠한 정보도 가지고 있지 않다. 이는 이 인터페이스를 구현할 서비스 제공자가 서비스 구현체에 적용할 수 있도록 제공되고 있는 추상화 클래스 이다.
-    |     
- |    추가     | SampleMeteringOAuthService  | 개방형 플랫폼 상의 UAA 서버에서 abacus-usage-collector 에 대한 접근 권한 토큰을 취득하여, SampleMeteringReportService 에 토큰을 전달 하기 위한 추상화 클래스 이다.   | 
+|   |Java class | 설명|
+|---------|---|----|
+|    수정     | ServiceIncetanceBindingController  | 클라우드 컨트롤러의 서비스 바인딩 요청을 처리하는 컨트롤러,<br> SampleMeteringOAuthService 에서 uaa token 을 취득하여, SampleMeteringReportService 의 파라메터로 호출 하는 프로세스를 추가 한다.   |
+|    수정     | ServiceInstanceBinding  | service-binding-request 가 ServiceIncetanceBindingController 에서 처리 될 때 바인딩 연결에 대해 미터링이 적용된 사용량 보고서를 abacus-usage-collector 에 리포팅 한다.   |     
+|    추가     | SampleMeteringReportService  | SampleMeteringReportService 추상화 된 인터페이스로서, 미터링/등급/과금 정책과 관련된 그 어떠한 정보도 가지고 있지 않다. 이는 이 인터페이스를 구현할 서비스 제공자가 서비스 구현체에 적용할 수 있도록 제공되고 있는 추상화 클래스 이다.<br>SampleMeteringReportService 추상화 된 인터페이스로서, 미터링/등급/과금 정책과 관련된 그 어떠한 정보도 가지고 있지 않다. 이는 이 인터페이스를 구현할 서비스 제공자가 서비스 구현체에 적용할 수 있도록 제공되고 있는 추상화 클래스 이다.|     
+|    추가     | SampleMeteringOAuthService  | 개방형 플랫폼 상의 UAA 서버에서 abacus-usage-collector 에 대한 접근 권한 토큰을 취득하여, SampleMeteringReportService 에 토큰을 전달 하기 위한 추상화 클래스 이다.   |
 
 
 서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일의
@@ -483,19 +482,17 @@ mongo-db 서비스 브로커 API는 별도 제공되는 압축 파일 패키지�
 
 ###2.4.3.  mongo-db 서비스 브로커 API에 추가 및 수정 되는 파일
 
- |   |유형 | 필수|
- |---------|---|----|
- |   수정      |build.gradle   |  빌드 설정 파일<br>
-미터링 사용량 객체 생성에 필요한 dependency 를 추가 한다.
-  |     
- |   수정      | application-mvc.properties  | 서비스 바인딩 request 의 정보들을 매핑한다.
-미터링 서비스를 구현하기 위해 바인딩 되는 애플리케이션의 환경정보 필드를 추가 한다.
-   |     
- |   수정      | datasource.properties   | Mongo-db 서비스 정보   |     
- |   수정     | MongoServiceInstanceBindingService  |service broker binding request parameter 로 입력 받은 미터링 정보를 ServiceInstanceBinding 에 매핑하는 프로세스를 추가 한다.    |     
- |   추가      | SampleMeteringReportServiceImpl  | SampleMeteringReportService 를 구현 한다.   |     
- |   추가     |SampleMeteringOAuthServiceImpl   | SampleMeteringOAuthService 를 구현 한다.   |     
- |   수정     |Manifest.yml   | 앱을 CF에 배포할 때 필요한 설정 정보 및 앱 실행 환경에 필요한 설정 정보를 기술한다.   |   
+|   |유형 | 필수|
+|---------|---|----|
+|   수정      |build.gradle   |  빌드 설정 파일<br>미터링 사용량 객체 생성에 필요한 dependency 를 추가 한다.
+|     
+|   수정      | application-mvc.properties  | 서비스 바인딩 request 의 정보들을 매핑한다.
+미터링 서비스를 구현하기 위해 바인딩 되는 애플리케이션의 환경정보 필드를 추가 한다.|     
+|   수정      | datasource.properties   | Mongo-db 서비스 정보   |     
+|   수정     | MongoServiceInstanceBindingService  |service broker binding request parameter 로 입력 받은 미터링 정보를 ServiceInstanceBinding 에 매핑하는 프로세스를 추가 한다.    |     
+|   추가      | SampleMeteringReportServiceImpl  | SampleMeteringReportService 를 구현 한다.   |     
+|   추가     |SampleMeteringOAuthServiceImpl   | SampleMeteringOAuthService 를 구현 한다.   |     
+|   수정     |Manifest.yml   | 앱을 CF에 배포할 때 필요한 설정 정보 및 앱 실행 환경에 필요한 설정 정보를 기술한다.   |
 
 ###2.4.4.  gradle build를 위한 dependency 추가
 ![Java_Service_Metering_Image03]
