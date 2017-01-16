@@ -506,7 +506,6 @@ JWTALGO: RS256 ## JWTKEY 알고리즘
 
 THROTTLE: 2
 ```
- >
   
   	## abacus-authserver를 Auth 서비스로 사용할 경우 설정 예시
 
@@ -652,152 +651,128 @@ THROTTLE: 2
 
 ```yaml
 
-      env: ### 앱 실행 환경 정보
+env: ### 앱 실행 환경 정보
 
-      CONF: default
-      applications:
+CONF: default
+applications:
 
-      - name: abacus-cf-bridge
+- name: abacus-cf-bridge
 
-      host: abacus-cf-bridge
+host: abacus-cf-bridge
 
-      path: .cfpack/app.zip
+path: .cfpack/app.zip
 
-      instances: 1 ### 앱 인스턴스 수
+instances: 1 ### 앱 인스턴스 수
 
-      memory: 512M ### 앱 할당 메모리
+memory: 512M ### 앱 할당 메모리
 
-      disk_quota: 512M ### 앱 할당 디스크
+disk_quota: 512M ### 앱 할당 디스크
 
-      DEBUG: e-abacus-*
+DEBUG: e-abacus-*
 
-      COLLECTOR: abacus-usage-collector
+COLLECTOR: abacus-usage-collector
 
-      EUREKA: abacus-eureka-plugin
+EUREKA: abacus-eureka-plugin
 
-      API: https://api.<CF 도메인> ### CF api 도메인
+API: https://api.<CF 도메인> ### CF api 도메인
 
-      #DB: abacus-pouchserver ### Abacus의 Pouch서버를 DB로 사용할 경우
+#DB: abacus-pouchserver ### Abacus의 Pouch서버를 DB로 사용할 경우
 
-      DB: *http://<**user_id**>:<password>@<coudb_ip>:<port>* ### 외부의 CouchDB를 DB로 사용할 경우 설정 예시
+DB: *http://<**user_id**>:<password>@<coudb_ip>:<port>* ### 외부의 CouchDB를 DB로 사용할 경우 설정 예시
 
-      #DB: mongodb://9a6e635e-41aa-4522-97b3-ade805ce5b89:4fa40ffd-7a78-445d-937c-82999844fb8e@192.168.40.153:27017/728b0614-5357-480e-b238-b618fcc8b957 ## Abacus를 CF MongoDB 서비스팩과 바인드하여 DB로 사용할 경우 설정 예시
+#DB: mongodb://9a6e635e-41aa-4522-97b3-ade805ce5b89:4fa40ffd-7a78-445d-937c-82999844fb8e@192.168.40.153:27017/728b0614-5357-480e-b238-b618fcc8b957 ## Abacus를 CF MongoDB 서비스팩과 바인드하여 DB로 사용할 경우 설정 예시
 
-      DBCLIENT: abacus-couchclient ## CouchDB 또는 PouchDB를 사용할 경우
+DBCLIENT: abacus-couchclient ## CouchDB 또는 PouchDB를 사용할 경우
 
-      #DBCLIENT: abacus-mongoclient ## MongoDB를 사용할 경우
+#DBCLIENT: abacus-mongoclient ## MongoDB를 사용할 경우
 
-      CF_CLIENT_ID: abacus-cf-bridge ## CF cloud_controller.admin Client ID
+CF_CLIENT_ID: abacus-cf-bridge ## CF cloud_controller.admin Client ID
 
-      CF_CLIENT_SECRET: secret ## CF cloud_controller.admin Client Secret
+CF_CLIENT_SECRET: secret ## CF cloud_controller.admin Client Secret
 
-      NODE_MODULES_CACHE: false
+NODE_MODULES_CACHE: false
 
-      SECURED: true ## Abacus를 Secured 모드로 운영할 경우: true
+SECURED: true ## Abacus를 Secured 모드로 운영할 경우: true
 
-      AUTH_SERVER: [https://api.bosh-lite.com](https://api.bosh-lite.com) ## Auth 서비스 Endpoint
+AUTH_SERVER: [https://api.bosh-lite.com](https://api.bosh-lite.com) ## Auth 서비스 Endpoint
 
-      CLIENT_ID: abacus-linux-container ## 미터링 자원 접근 권한 ID
+CLIENT_ID: abacus-linux-container ## 미터링 자원 접근 권한 ID
 
-      CLIENT_SECRET: secret ## 미터링 자원 접근 권한 secret
+CLIENT_SECRET: secret ## 미터링 자원 접근 권한 secret
 
-      JWTKEY: |+ ### cf 배포 manifest의 properties.uaa.jwt.verification_key를 설정
+JWTKEY: |+ ### cf 배포 manifest의 properties.uaa.jwt.verification_key를 설정
 
-      -----BEGIN PUBLIC KEY-----
+-----BEGIN PUBLIC KEY-----
 
-      MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHFr+KICms+tuT1OXJwhCUmR2d
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHFr+KICms+tuT1OXJwhCUmR2d
 
-      …
+…
 
-      -----END PUBLIC KEY-----
+-----END PUBLIC KEY-----
 
-      JWTALGO: RS256 ## JWTKEY 알고리즘
+JWTALGO: RS256 ## JWTKEY 알고리즘
 
-      THROTTLE: 2
+THROTTLE: 2
 ```
--   참고: cf-abacus 는 cf-abacus 가 설치 완료 된 이후 시점부터, cf 상의
-    app이 새로 push 되거나 cf stop 및 cf start 된 cf event 를 기반으로
-    데이터를 수집, 집계한다. 
 
-\
-\
+<b>※	참고: cf-abacus 는 cf-abacus 가 설치 완료 된 이후 시점부터, cf 상의 app이 새로 push 되거나 cf stop 및 cf start 된 cf event 를 기반으로 데이터를 수집, 집계한다. </b>
 
-3.  PAASTA-USAGE-REPORTING 배포  {.번호대제목-western style="page-break-before: always"}
-    ============================
+
+#3.  PAASTA-USAGE-REPORTING 배포
 
 PAASTA-USAGE-REPORTING은 abacus 시스템과 연동하여 PAASTA에 앱의 사용량을
 보고하는 서비스이다.
 
-1.  배포 전제 조건 {.western style="line-height: 100%"}
-    ==============
+##3.1.  배포 전제 조건 
 
 [[Abacus](#_1._배포_전제)[배포 전제 조건](#_1._배포_전제)]  참조.
 
-2.  CF에 UAA 계정 등록 {.western style="line-height: 100%"}
-    ==================
+##3.2.  CF에 UAA 계정 등록 
 
 [[Abacus](#_4._CF에_abacus)[UAA 계정 등록](#_4._CF에_abacus)]  참조.
 
-3.  paasta-usage-repoting 배포 {.western style="line-height: 100%"}
-    ==========================
+##3.3.  paasta-usage-repoting 배포 
 
-    1.  #### 다운로드 {.western}
+###3.3.1.다운로드 
 
-  -----------------------------------------------------------
-  **\#\#****다운로드 대상 파일**
+  	##다운로드 대상 파일
 
-  PAASTA-USAGE-METERING.tar
+  	PAASTA-USAGE-METERING.tar
 
-  \
+  	##대상 파일을<설치 경로>에 다운로드
 
-  **\#\#****대상 파일을***\<**설치 경로**\>***에 다운로드**
+  	$ cd <설치 경로>
 
-  \
+  	##파일압축 해제
 
-  \$ cd *\<**설치 경로**\>*
+  	$ tar xvf PAASTA-USAGE-METERING.zip
 
-  \
 
-  **\#\#****파일압축 해제**
+###3.3.2. paasta-usage-reporting 배포
 
-  \$ tar xvf PAASTA-USAGE-METERING.zip
-  -----------------------------------------------------------
+  	$ cd <설치 경로>/PAASTA-USAGE-METERING/usageReporting
 
-\
-\
+  	## Abacus 연동을 위한 DB 및 Secure 정보 설정
 
-2.  #### paasta-usage-reporting 배포 {.western}
+  	$ vi manifest.yml
 
-  -------------------------------------------------------------------
-  \$ cd *\<**설치 경로**\>*/PAASTA-USAGE-METERING/usageReporting
+  	※ manifest.yml 내용 및 수정 사항에 대해서는 별도 기술
 
-  **\#\# Abacus****연동을 위한****DB****및****Secure****정보 설정**
+  	##paasta-usage-reporting 배포
 
-  \$ vi manifest.yml
-
-  ※ *manifest.yml**내용 및 수정 사항에 대해서는 별도 기술*
-
-  \
-
-  **\#\#****paasta-usage-reporting****배포**
-
-  \$ cd *\<**설치 경로**\>*/PAASTA-USAGE-METERING
-
-  \$ cf push
-  -------------------------------------------------------------------
+  	$ cd <설치 경로>/PAASTA-USAGE-METERING
+	
+  	$ cf push
 
 ※ paasta-usage-reporting과 연동하기 위한 인터페이스는 다음 파일을
 참조한다.
 
 paasta\_usage\_reporting app\_인터페이스
 
-\
-\
 
 ※ paasta-usage-reporting manifest.yml
 
-  ---------------------------------------------------------------------------------------
-  ---
+```yml
 
   applications:
 
@@ -844,17 +819,13 @@ paasta\_usage\_reporting app\_인터페이스
   -----END PUBLIC KEY-----
 
   JWTALGO: RS256
-  ---------------------------------------------------------------------------------------
 
-\
-\
+```
 
-3.  #### 배포 형상 {.western}
 
-  -----------------------------------------------------------------------------------
-  \$ cf a
+###3.3.3. 배포 형상
 
-  \
+  $ cf a
 
   Getting apps in org test / space test as admin...
 
@@ -863,29 +834,8 @@ paasta\_usage\_reporting app\_인터페이스
   name requested state instances memory disk urls
 
   paasta-usage-reporting started 1/1 512M 512M paasta-usage-reporting.bosh-lite.com
-  -----------------------------------------------------------------------------------
 
-\
-\
+###3.3.4.  api 호출 예제
 
-4.  #### api 호출 예제 {.western}
-
-  -----------------------------------------------------------------------------------------------------
-  \$ curl -k -X GET https://paasta-usage-reporting.bosh-lite.com/v1/org/:org\_id**/space/:space\_id**
-  -----------------------------------------------------------------------------------------------------
-
-\
-\
-
-\
-\
-
-\
-\
-
-\
-\
-
-\
-\
+  	$ curl -k -X GET https://paasta-usage-reporting.bosh-lite.com/v1/org/:org_id/space/:space_id
 
