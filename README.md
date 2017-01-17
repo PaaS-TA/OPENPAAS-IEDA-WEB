@@ -131,14 +131,13 @@ CF & Diego Document:
 
 #####1.  로그인
 
--   플랫폼 설치 관리자는 로그인 첫 아이디와 비밀번호를(admin/admin) 입력
-    후 로그인 버튼을 클릭한다.
-	![PaaSTa_Platform_Use_Guide_Image01]
+-   플랫폼 설치 관리자는 로그인 첫 아이디와 비밀번호를(admin/admin) 입력 후 로그인 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image01]
 
 #####2.  비밀번호 변경
 
 -   비밀번호 변경 화면을 통해 비밀번호를 수정할 수 있다.
-	![PaaSTa_Platform_Use_Guide_Image02]
+![PaaSTa_Platform_Use_Guide_Image02]
 
 #####3.  플랫폼 설치 자동화 접속
 ![PaaSTa_Platform_Use_Guide_Image03]
