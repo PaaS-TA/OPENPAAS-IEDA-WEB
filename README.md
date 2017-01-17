@@ -745,6 +745,7 @@ BOSH는 클라우드 환경에 서비스를 배포하고 소프트웨어 릴리�
 
 플랫폼 설치 자동화를 이용해서 클라우드 환경에 PaaS-TA를 설치하기 위해서는 **스템셀**과 **소프트웨어 릴리즈**, **배포 Manifest파일** 3가지 요소가 필요하다. 스템셀은 클라우드 환경에 VM을 생성하기 위해 사용할 기본 이미지이고, 소프트웨어 릴리즈는 VM에 설치할 소프트웨어 패키지들을 묶어 놓은 파일이고, 배포 Manifest파일은 스템셀과 소프트웨어 릴리즈를 이용해서 서비스를 어떤 식으로 구성할지를 정의해 놓은 명세서이다. 다음 그림은 BOOTSTRAP과 BOSH를 이용하여 PaaS-TA를 설치하는 절차이다.
 
+![PaaSTa_Platform_Use_Guide_Image25]
 
 ##3.1.  ***플랫폼 설치 자동화 파일 관리***
 
@@ -762,8 +763,7 @@ Home 디렉토리에 .bosh\_plugin 디렉토리를 생성하고 배포에 필요
 | {HOME}/.bosh\_plugin/deployment/manifest       |서비스팩 Manifest 관리 디렉토리   | 
 | {HOME}/.bosh\_plugin/key        |CF 및 Diego 키 관리 디렉토리   |
 | {HOME}/.bosh\_plugin/lock        |스템셀, 릴리즈, 배포 등을 수행 시 lock 관리 디렉토리   |  
-|  {HOME}/.bosh\_plugin/temp       |   |
-|   임시 디렉토리      |   |
+|  {HOME}/.bosh\_plugin/temp       |  임시 디렉토리 |
 
 플랫폼 설치 자동화를 이용해서 다운로드 된 스템셀과 생성된 배포 파일은
 해당 디렉토리에 각각 다운로드 또는 생성되어 관리된다.
@@ -771,7 +771,7 @@ Home 디렉토리에 .bosh\_plugin 디렉토리를 생성하고 배포에 필요
 
 ###3.1.2.  ***코드 관리***
 
-플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치 자동화 관리”  “코드 관리”
+플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치 자동화 관리” -> “코드 관리”
 메뉴로 이동한다. 플랫폼 설치 자동화는 “코드 관리” 메뉴에서 기본적으로
 배포 유형 및 배포 상태 / 릴리즈 유형 / 권한 / IaaS 유형 / 국가 코드 / OS
 유형 등의 코드 정보를 제공한다. (코드 관리 화면 설명은 2.1.5 참고)
@@ -781,11 +781,13 @@ Home 디렉토리에 .bosh\_plugin 디렉토리를 생성하고 배포에 필요
 -   코드 그룹 “등록” 버튼을 클릭 후 코드 그룹 정보를 입력하고 “확인” 버튼을 클릭한다.
 -   중복된 코드 그룹 값은 등록할 수 없다.
 
+![PaaSTa_Platform_Use_Guide_Image26]
 
 #####2.  코드 그룹 수정
 
 -   코드 그룹 “수정” 버튼을 클릭 후 코드 그룹 정보를 수정하고 “확인” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image27]
 
 #####3.  코드 등록
 
@@ -793,18 +795,20 @@ Home 디렉토리에 .bosh\_plugin 디렉토리를 생성하고 배포에 필요
 -   하위 그룹을 선택하지 않을 경우 해당 코드 그룹의 상위 코드가 등록된다.
 -   하위 그룹을 선택했을 경우 해당 코드 그룹의 선택한 하위 그룹의 하위 코드가 등록된다.
 
+![PaaSTa_Platform_Use_Guide_Image28]
+
 #####4.  코드 수정
 
 -   코드 “수정” 버튼을 클릭 후 코드 정보를 수정하고 “확인” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image29]
+
 ###3.1.3.  ***권한 관리*** 
 
-플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치 자동화 관리”  “권한 관리”
+플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치 자동화 관리” -> “권한 관리”
 메뉴로 이동한다. 플랫폼 설치 자동화는 “권한 관리” 메뉴에서 기본적으로
 플랫폼 설치 사용자 / 플랫폼 설치 자동화 관리자 등의 권한 그룹 정보 및
-해당 권한 그룹의 상세 권한 정보를 제공한다. (권한 관리 화면 설명은
-Error: Reference source not found Error: Reference source not found참고)
-
+해당 권한 그룹의 상세 권한 정보를 제공한다. (권한 관리 화면 설명은 2.1.6 참고)<br>
 상세 권한 정보는 “코드 관리” 화면에서 코드 그룹 명 “ROLE”의 하위 코드를
 통해 관리할 수 있다.
 
@@ -812,40 +816,47 @@ Error: Reference source not found Error: Reference source not found참고)
 
 -   코드 그룹 목록에서 “ROLE”을 선택 후 코드 “등록” 버튼을 클릭하고 코드 등록 화면에서 권한 코드 정보를 입력 후 “확인” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image30]
+
 #####2.  권한 그룹 등록
 
 -   권한 그룹 “등록” 버튼을 클릭 후 권한 그룹 정보를 입력하고 “확인” 버튼을 클릭한다.
 -   권한 그룹명은 중복해서 등록할 수 없다.
 
+![PaaSTa_Platform_Use_Guide_Image31]
+
 #####3.  권한 그룹 수정
 
 -   권한 그룹 “수정” 버튼을 클릭 후 권한 그룹 정보를 수정하고 “확인” 버튼을 클릭한다.
+
+![PaaSTa_Platform_Use_Guide_Image32]
 
 #####4.  권한 상세 등록/수정
 
 -   권한 상세 “등록” 버튼을 클릭 후 권한 상세 정보를 등록/수정하고 “확인” 버튼을 클릭한다.
 -   권한 설정 항목에서 대시보드 / 기본 시스템 사용자 / 기본 시스템 조회 등의 권한은 기본적으로 허용으로 설정되어 있고, 그 외의 권한은 거부로 설정되어 있다.
 
+![PaaSTa_Platform_Use_Guide_Image33]
+
 ###3.1.4.  ***사용자 관리***
 
-플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치 자동화 관리”  “사용자 관리”
+플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치 자동화 관리” -> “사용자 관리”
 메뉴로 이동한다. 플랫폼 설치 자동화는 “사용자 관리” 메뉴에서 기본적으로
-플랫폼 설치 자동화 관리자 정보(admin/admin)를 제공한다. (사용자 관리
-화면 설명은 Error: Reference source not found Error: Reference source
-not found참고)
+플랫폼 설치 자동화 관리자 정보(admin/admin)를 제공한다. (사용자 관리 화면 설명은 2.1.7 참고)
 
 #####1.  사용자 등록
 
 -   사용자 “등록” 버튼을 클릭 후 사용자 정보 입력 및 해당 사용자의 권한을 선택하여 “확인” 버튼을 클릭한다.
--   사용자 등록 후 초기 비밀번호는 “1234” 이며, 최초 로그인 후
-    비밀번호를 변경할 수 있다.
+-   사용자 등록 후 초기 비밀번호는 “1234” 이며, 최초 로그인 후 비밀번호를 변경할 수 있다.
 
+![PaaSTa_Platform_Use_Guide_Image34]
 
 #####2.  사용자 수정
 
 -   사용자 “수정” 버튼을 클릭 후 사용자 정보 및 해당 권한을 수정하여 “확인” 버튼을 클릭한다.
 -   관리자는 선택한 사용자의 아이디는 수정할 수 없지만 비밀번호를 변경할 수 있다.
 
+![PaaSTa_Platform_Use_Guide_Image35]
 
 ###3.1.5.  ***스템셀과 릴리즈***
 
@@ -952,10 +963,11 @@ not found참고)
 플랫폼 설치 자동화를 이용하여 BOOTSTRAP 설치하고, 설치 관리자로 등록하는
 절차는 다음과 같다.
 
+![PaaSTa_Platform_Use_Guide_Image36]
 
 ###3.2.1.  ***스템셀 다운로드*** 
 
-플랫폼 설치 자동화 웹 화면에서 “환경설정 및 관리”  “스템셀 관리” 메뉴로
+플랫폼 설치 자동화 웹 화면에서 “환경설정 및 관리” -> “스템셀 관리” 메뉴로
 이동한다. “스템셀 관리” 메뉴에서는 Cloud Foundry에서 제공하는 공개
 스템셀을 다운로드할 수 있는 기능을 제공한다.
 
@@ -967,6 +979,7 @@ not found참고)
 	
 -   본 가이드에서는 버전 3312.12을 다운로드 하였다.
 
+![PaaSTa_Platform_Use_Guide_Image37]
 
 ###3.2.2.  ***릴리즈 다운로드***
 
@@ -986,26 +999,29 @@ BOOTSTRAP을 설치하기 위해서는 BOSH 릴리즈와 BOSH CPI릴리즈 2개�
 
 -   본 가이드에서는 v256을 다운로드 하였다.
 
+![PaaSTa_Platform_Use_Guide_Image38]
+
 #####2.  BOSH CPI 릴리즈
 
 -   릴리즈 등록 팝업화면에서 BOSH CPI릴리즈 정보를 입력하고, “등록” 버튼 클릭한다.
 -   BOSH-CPI 릴리즈 참조 사이트
 
   		※ aws의 경우
-  		[http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?all=1](http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?all=1)
+  		http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?all=1
 
   		※ openstack의 경우
-  		[http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-openstack-cpi-release?all=1](http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-openstack-cpi-release?all=1)
+  		http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-openstack-cpi-release?all=1
 
   		※ vsphere의 경우
-  		[http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-vsphere-cpi-release?all=1](http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-vsphere-cpi-release?all=1)
+  		http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-vsphere-cpi-release?all=1
 
 -   본 가이드에서는 v30을 다운로드 하였다.
 
+![PaaSTa_Platform_Use_Guide_Image39]
 
 ###3.2.3.  ***BOOTSTRAP******설치***
 
-BOOTSTRAP 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” 
+BOOTSTRAP 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” ->
 “BOOTSTRAP 설치” 메뉴로 이동 후 상단에 위치한 “설치”버튼을 클릭한다.
 (BOOTSTRAP설치 화면 설명은 2.1.8참고)
 
@@ -1013,35 +1029,53 @@ BOOTSTRAP 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플
 
 -   설치할 클라우드 환경을 선택하는 팝업화면에서 설치할 클라우드를 선택하고, “확인” 버튼 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image40]
 
 #####4.  BOOTSTRAP 설치 – 선택한 클라우드 환경 정보
 
 -   오픈스택 클라우드 환경을 선택한 경우 오픈스택의 인증정보/시큐리티 그룹/키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image41]
+
 -   AWS 클라우드 환경을 선택한 경우 AWS의 정보 및 키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image42]
+
 -   VSPHERE 클라우드 환경을 선택한 경우 VSPHERE의 정보 및 키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
+
+![PaaSTa_Platform_Use_Guide_Image43]
 
 #####5.  BOOTSTRAP 설치 – 기본 정보
 
 -   BOOTSTRAP의 배포명 / 디렉터명 / NTP / BOSH 릴리즈 / BOSH CPI 릴리즈 / 스냅샷기능 사용여부 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image44]
+
 #####6.  BOOTSTRAP 설치 – 클라우드 환경 별 네트워크 정보
 
 -   AWS/오픈스택 클라우드 환경을 선택한 경우 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image45]
+
 -   VSPHERE 클라우드 환경을 선택한 경우 네트워크 정보 입력 후 “다음”	버튼을 클릭한다.
+
+![PaaSTa_Platform_Use_Guide_Image46]
 
 #####7.  BOOTSTRAP 설치 – 리소스 정보
 
 -   AWS/오픈스택 클라우드 환경을 선택한 경우 스템셀 / 인스턴스 유형 / VM 비밀번호 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image47]
+
 -   VSPHERE 클라우드 환경을 선택한 경우 스템셀 / 리소스 풀 CPU / 리소스 풀 RAM / 리소스 풀 DISK / VM 비밀번호 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image48]
 
 #####8.  BOOTSTRAP 설치 - 배포 파일 정보
 
 -   입력한 정보를 기준으로 생성한 배포 Manifest파일 정보를 확인한다.
+
+![PaaSTa_Platform_Use_Guide_Image49]
 
 #####9.  BOOTSTRAP 설치 - 설치
 
@@ -1059,14 +1093,14 @@ BOOTSTRAP(Microbosh)을 설치 관리자로 설정 완료 후 BOSH를 설치하�
 
 ###3.3.1.  ***스템셀 업로드***
 
-플랫폼 설치 자동화 웹 화면에서 “배포 정보 조회 및 관리”  “스템셀
+플랫폼 설치 자동화 웹 화면에서 “배포 정보 조회 및 관리” -> “스템셀
 업로드”를 선택한다. “스템셀 업로드” 화면의 하단에 1.2.1 “스템셀
 다운로드” 메뉴에서 다운로드 받은3312.12버전의 스템셀을 선택하고, “스템셀
 업로드” 버튼을 클릭하여 설치 관리자에 스템셀을 업로드 한다.
 
 ###3.3.2.  ***릴리즈 업로드*** 
 
-플랫폼 설치 자동화 웹 화면에서 “정보 조회”  “릴리즈 업로드”를 선택한다.
+플랫폼 설치 자동화 웹 화면에서 “정보 조회” -> “릴리즈 업로드”를 선택한다.
 “릴리즈 업로드” 화면의 하단에 1.2.2 “릴리즈 다운로드”에서 다운로드 한
 256버전의 BOSH 릴리즈(bosh-256.tgz)를 선택하고, “릴리즈 업로드” 버튼을
 클릭하여 설치 관리자에 릴리즈를 업로드한다.
@@ -1074,7 +1108,7 @@ BOOTSTRAP(Microbosh)을 설치 관리자로 설정 완료 후 BOSH를 설치하�
 
 ###3.3.3.  ***BOSH******설치*** 
 
-BOSH설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” 
+BOSH설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” ->
 “BOSH설치” 메뉴로 이동 후 상단의 “설치” 버튼을 클릭한다. (BOSH 설치 화면 설명은 2.1.9참고)
 
 
@@ -1149,7 +1183,7 @@ cf-release(cf-release-247.tgz)를 1.2.2 “릴리즈 다운로드”와 동일�
 
 ##3.4.3.  ***CF******설치*** 
 
-CF설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치”  “CF설치”
+CF설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” -> “CF설치”
 메뉴로 이동 후 상단의 “설치” 버튼을 클릭한다. (CF 설치 화면 설명은 2.1.10참고))
 
 
@@ -1201,13 +1235,13 @@ CF설치가 완료되면 DIEGO를 설치할 준비가 된 상태로 DIEGO를 설
 절차는 다음과 같다.
 
 
-###3.5.1.  ***스템셀 업로드*** {.western}
+###3.5.1.  ***스템셀 업로드***
 
 1.3.1 “스템셀 업로드”에서 수행했던 것과 동일하게 BOSH 설치 관리자에
 3312.12버전의 스템셀을 업로드 합니다.
 
 
-###3.5.2.  ***릴리즈 업로드*** {.western}
+###3.5.2.  ***릴리즈 업로드***
 
 DIEGO설치를 위해서는 Container 역할을 하는 릴리즈와 의존 관계에 있는
 릴리즈를 다운로드, 업로드 하여야 한다. 2.0.0버전의PaaS-TA Container
@@ -1255,7 +1289,7 @@ garden-runc릴리즈와 86버전의 etcd 릴리즈를 1.2.2 “릴리즈 다운�
 
 ###3.5.3.  ***DIEGO******설치***
 
-DIEGO를 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” 
+DIEGO를 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” ->
 “DIEGO설치” 메뉴로 이동 후 상단의 “설치” 버튼을 클릭한다. (DIEGO 설치 화면 설명은 2.1.11참고
 
 #####1.  DIEGO 설치 – 기본 정보
@@ -1302,7 +1336,7 @@ DIEGO 통합 설치가 준비 된 상태로 실행 절차는 CF와 DIEDO 설치�
 1.3.1 “스템셀 업로드”에서 수행했던 것과 동일하게 BOSH 설치 관리자에
 3312.12버전의 스템셀을 업로드 합니다.
 
-###3.6.2.  ***릴리즈 업로드*** {.western}
+###3.6.2.  ***릴리즈 업로드***
 
 CF & DIEGO 설치를 위해서는 Controller역할을 담당하는 PaaS-TA
 Controller(CF) 릴리즈와 PaaS-TA Container(DIEGO) 릴리즈, 의존 관계
@@ -1359,7 +1393,7 @@ Controller(CF) 릴리즈와 PaaS-TA Container(DIEGO) 릴리즈, 의존 관계
 ###3.6.3.  ***CF & DIEGO******통합 설치***
 
 CF & DIEGO를 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치”
- “CF & DIEGO설치” 메뉴로 이동 후 상단의 “설치” 버튼을 클릭한다. (CF &
+-> “CF & DIEGO설치” 메뉴로 이동 후 상단의 “설치” 버튼을 클릭한다. (CF &
 DIEGO 설치 화면 설명은 Error: Reference source not found참고)
 
 #####1.  CF & DIEGO 설치 – CF 기본 정보 입력
@@ -1428,7 +1462,7 @@ PaaS-TA개발팀에서 제공하는 PaaS-TA 서비스 릴리즈(passta-mysql-2.0
 ###3.7.3.  ***Manifest******업로드***
 
 Manifest를 업로드 하기 위해 플랫폼 설치 자동화 웹 화면에서 “배포 정보
-조회 및 관리”  “Manifest 관리” 메뉴로 이동 후 상단의 “업로드” 버튼을
+조회 및 관리” -> “Manifest 관리” 메뉴로 이동 후 상단의 “업로드” 버튼을
 클릭한다. (Manifest설치 화면 설명은 2.1.21 참고)
 
 #####1.  Manifest 업로드 – 업로드
@@ -1437,9 +1471,9 @@ Manifest를 업로드 하기 위해 플랫폼 설치 자동화 웹 화면에서 
 
 -   본 가이드에서는 PaaS-TA 서비스 MySQL Manifest를 업로드 하였다.
 
-###3.7.4.  ***서비스팩 설치*** {.western}
+###3.7.4.  ***서비스팩 설치***
 
-서비스팩을 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” 
+서비스팩을 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” ->
 “서비스팩 설치” 메뉴로 이동 후 상단의 “설치” 버튼을 클릭한다. (서비스팩
 설치 화면 설명은 Error: Reference source not found참고)
 
@@ -1454,7 +1488,7 @@ Manifest를 업로드 하기 위해 플랫폼 설치 자동화 웹 화면에서 
 ##3.8.  ***Property******관리***
 
 Property를 생성하기 위해 플랫폼 설치 자동화 웹 화면에서 “배포 정보 조회
-및 관리”  “Property 관리” 메뉴로 이동 후 배포명을 선택하고 “조회”
+및 관리” -> “Property 관리” 메뉴로 이동 후 배포명을 선택하고 “조회”
 버튼을 클릭한다. (Property 관리 화면 설명은 Error: Reference source not
 found참고)
 
@@ -1492,3 +1526,47 @@ found참고)
 [PaaSTa_Platform_Use_Guide_Image22]:/images/PaaSTa_Platform_Use_Guide/manual/PropertyInfo.png
 [PaaSTa_Platform_Use_Guide_Image23]:/images/PaaSTa_Platform_Use_Guide/manual/SnapshotInfo.png
 [PaaSTa_Platform_Use_Guide_Image24]:/images/PaaSTa_Platform_Use_Guide/manual/ManifestInfo.png
+
+[PaaSTa_Platform_Use_Guide_Image25]:/images/PaaSTa_Platform_Use_Guide/platformProcess/PlatformProcess.png
+[PaaSTa_Platform_Use_Guide_Image26]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/codeGroupAdd.png
+[PaaSTa_Platform_Use_Guide_Image27]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/codeGroupModify.png
+[PaaSTa_Platform_Use_Guide_Image28]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/codeAdd.png
+[PaaSTa_Platform_Use_Guide_Image29]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/codeModify.png
+[PaaSTa_Platform_Use_Guide_Image30]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/authCodeADD.png
+[PaaSTa_Platform_Use_Guide_Image31]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/authGroupadd.png
+[PaaSTa_Platform_Use_Guide_Image32]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/authGroupModify.png
+[PaaSTa_Platform_Use_Guide_Image33]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/authDetailAdd.png
+[PaaSTa_Platform_Use_Guide_Image34]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/userAdd.png
+[PaaSTa_Platform_Use_Guide_Image35]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/userModify.png
+
+
+[PaaSTa_Platform_Use_Guide_Image36]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapProcess.png
+[PaaSTa_Platform_Use_Guide_Image37]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/StemcellAdd.png
+[PaaSTa_Platform_Use_Guide_Image38]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/releaseAdd.png
+[PaaSTa_Platform_Use_Guide_Image39]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/releaseAdd2.png
+[PaaSTa_Platform_Use_Guide_Image40]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapIaasSelect.png
+[PaaSTa_Platform_Use_Guide_Image41]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapOpenstackInfo.png
+[PaaSTa_Platform_Use_Guide_Image42]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapAWSInfo.png
+[PaaSTa_Platform_Use_Guide_Image43]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapVsphereInfo.png
+[PaaSTa_Platform_Use_Guide_Image44]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapDefaultInfo.png
+[PaaSTa_Platform_Use_Guide_Image45]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapOpenstackNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image46]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapVsphereNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image47]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapAwsOpenstackResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image48]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapVsphereResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image49]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapDeployInfo.png
+
+
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshInstallProcess.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/StemcellUpload.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/ReleaseUpload.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshOpenstackInfo.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsInfo.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereInfo.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshDefaultInfo.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshOpenstackNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsOpenstackResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshDeployInfo.png
+[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshInstallInfo.png
