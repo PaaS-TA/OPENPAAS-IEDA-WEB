@@ -68,6 +68,9 @@ meta:
 
   dea-next-memory-mb: [deaMemoryMB]
 
+  ingestor-ip: [ingestorIp]  
+  ingestor-port: [ingestorPort]
+
   ## Don't change
   default_env:
     bosh:

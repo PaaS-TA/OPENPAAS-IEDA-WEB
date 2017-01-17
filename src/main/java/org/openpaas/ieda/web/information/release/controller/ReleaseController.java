@@ -85,7 +85,7 @@ public class ReleaseController extends BaseController {
 	public ResponseEntity<HashMap<String, Object>> listLocalRelease(){
 		
 		if(LOGGER.isInfoEnabled()){ LOGGER.info("====================> 다운로드 된 릴리즈 정보 목록 조회 요청!!"); }
-		List<ReleaseManagementVO> contents = systemReleaseService.getSystemReleaseList();
+		List<ReleaseManagementVO> contents = systemReleaseService.getSystemReleaseList("info");
 		
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		if ( contents != null ) {

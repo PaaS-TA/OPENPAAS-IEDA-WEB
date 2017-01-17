@@ -21,7 +21,7 @@ public interface CommonDAO {
 	 * @title               : getDeploymentNameByPlatform
 	 * @return            : List<String>
 	***************************************************/
-	List<String> selectDeploymentNameByPlatform(@Param("platform") String platform);
+	List<String> selectDeploymentNameByPlatform(@Param("platform") String platform, @Param("iaas") String iaas);
 	
 	/***************************************************
 	 * @project          : Paas 플랫폼 설치 자동화

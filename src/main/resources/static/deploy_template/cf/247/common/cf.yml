@@ -1084,9 +1084,9 @@ properties:
         autoapprove: true
       cf:
         override: true
-        authorized-grant-types: password,refresh_token
+        authorized-grant-types: (( paasta_overrides.clients_properties.cf.authorized-grant-types || "password,refresh_token" ))
         scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,cloud_controller.admin_read_only,scim.read,scim.write,doppler.firehose,uaa.user,routing.router_groups.read,routing.router_groups.write
-        authorities: uaa.none
+        authorities: (( paasta_overrides.clients_properties.cf.authorities || "uaa.none" ))
         access-token-validity: 600
         refresh-token-validity: 604800
       notifications:
@@ -1168,7 +1168,7 @@ properties:
   routing_api:
     enabled: (( merge || nil ))
 
-  syslog_daemon_config: ~
+  syslog_daemon_config: (( paasta_overrides.syslog_daemon_config_properties ))
 
   nfs_server: (( meta.nfs_server ))
 
@@ -1588,3 +1588,7 @@ meta:
     rules: (( security_group_overrides.service_networks.rules ))
 
 empty_hash: {}
+
+paasta_overrides:
+  clients_properties: (( merge || nil ))
+  syslog_daemon_config_properties: (( merge || nil ))

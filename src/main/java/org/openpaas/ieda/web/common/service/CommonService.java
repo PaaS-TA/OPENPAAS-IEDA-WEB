@@ -354,8 +354,8 @@ public class CommonService{
 	 * @title               : listDeployment
 	 * @return            : List<String>
 	***************************************************/
-	public List<String> listDeployment(String platform){
-		return commonDao.selectDeploymentNameByPlatform(platform);
+	public List<String> listDeployment(String platform, String iaas){
+		return commonDao.selectDeploymentNameByPlatform(platform, iaas);
 	}
 	
 	/***************************************************

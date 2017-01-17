@@ -38,6 +38,10 @@ public class CfParamDTO {
 		private String domainOrganization; //도메인 그룹
 		@NotNull
         private String loginSecret; //로그인 비밀번호
+		@NotNull
+		private String paastaMonitoringUse;//PaaS-TA 모니터링 사용 유무
+		private String ingestorIp;//PaaS-TA 모니터링 DB 서버 IP
+		private String ingestorPort;//PaaS-TA 모니터링 DB 서버 Port
 		
 		
 		public String getId() {
@@ -124,6 +128,25 @@ public class CfParamDTO {
 		public void setLoginSecret(String loginSecret) {
 			this.loginSecret = loginSecret;
 		}
+		public String getPaastaMonitoringUse() {
+			return paastaMonitoringUse;
+		}
+		public void setPaastaMonitoringUse(String paastaMonitoringUse) {
+			this.paastaMonitoringUse = paastaMonitoringUse;
+		}
+		public String getIngestorIp() {
+			return ingestorIp;
+		}
+		public void setIngestorIp(String ingestorIp) {
+			this.ingestorIp = ingestorIp;
+		}
+		public String getIngestorPort() {
+			return ingestorPort;
+		}
+		public void setIngestorPort(String ingestorPort) {
+			this.ingestorPort = ingestorPort;
+		}
+		
 		
 	}
 	

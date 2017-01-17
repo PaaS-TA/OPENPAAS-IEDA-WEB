@@ -14,7 +14,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<style>
+	.popover{
+		max-width:280px
+	}
+	.popover-content {
+		width:275px;
+ 		max-height: 300px;
+ 		overflow-y: auto;
+	}
+</style>
 <script type="text/javascript">
 
 //setting variable
@@ -34,6 +43,17 @@ var countryCodes = null;
 var keyFile ="";
 
 $(function() {
+	
+	$(document).delegate(".w2ui-popup","click",function(e){
+	 $('[data-toggle="popover"]').each(function () {
+	        //the 'is' for buttons that trigger popups
+	        //the 'has' for icons within a button that triggers a popup
+	        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+	            $(this).popover('hide');
+	        }
+	    });
+    });
+	
 });
 
 
@@ -118,26 +138,30 @@ function setCfData(contents) {
 		domain                 : contents.domain,
 		description            : contents.description,
 		domainOrganization     : contents.domainOrganization,		
-		loginSecret            : contents.loginSecret
+		loginSecret            : contents.loginSecret,
+		paastaMonitoringUse    : contents.paastaMonitoringUse,
+		ingestorIp             : contents.ingestorIp,
+		ingestorPort           : contents.ingestorPort
+		
 	}
 	//네트워크 정보 
 	for(var i=0; i<contents.networks.length; i++){
 	 	var arr = {
-	 		id								: contents.id,
-			deployType					: contents.networks[i].deployType,
-			seq							: i,
-			net							: contents.networks[i].net,
-			publicStaticIp				: contents.networks[i].publicStaticIp,
-			subnetRange 				: contents.networks[i].subnetRange,
-			subnetGateway 			: contents.networks[i].subnetGateway,
-			subnetDns 				: contents.networks[i].subnetDns,
-			subnetReservedFrom 	: contents.networks[i].subnetReservedFrom,
-			subnetReservedTo 		: contents.networks[i].subnetReservedTo,
-			subnetStaticFrom 		: contents.networks[i].subnetStaticFrom,
-			subnetStaticTo 			: contents.networks[i].subnetStaticTo,
-			subnetId 					: contents.networks[i].subnetId,
-			cloudSecurityGroups 	: contents.networks[i].cloudSecurityGroups,
-			availabilityZone        : contents.networks[i].availabilityZone
+	 		id                       : contents.id,
+			deployType               : contents.networks[i].deployType,
+			seq                      : i,
+			net                      : contents.networks[i].net,
+			publicStaticIp           : contents.networks[i].publicStaticIp,
+			subnetRange              : contents.networks[i].subnetRange,
+			subnetGateway            : contents.networks[i].subnetGateway,
+			subnetDns                : contents.networks[i].subnetDns,
+			subnetReservedFrom       : contents.networks[i].subnetReservedFrom,
+			subnetReservedTo 		 : contents.networks[i].subnetReservedTo,
+			subnetStaticFrom         : contents.networks[i].subnetStaticFrom,
+			subnetStaticTo           : contents.networks[i].subnetStaticTo,
+			subnetId                 : contents.networks[i].subnetId,
+			cloudSecurityGroups      : contents.networks[i].cloudSecurityGroups,
+			availabilityZone         : contents.networks[i].availabilityZone
 		}
 	 	networkInfo.push(arr);
 	}
@@ -188,13 +212,15 @@ function defaultInfoPopup() {
 	 	
 	$("#defaultInfoDiv").w2popup({
 		width : 750,
-		height : 670,
+		height :820,
 		modal : true,
 		showMax : false,
 		onOpen : function(event) {
 			event.onComplete = function() {
 				//릴리즈 정보 popup over
 			 	$('[data-toggle="popover"]').popover();
+			 	$(".paastaMonitoring-info").attr('data-content', "paasta-controller v2.0 이상에서 지원")
+				
 			 	getReleaseVersionList();
 			 	//cf & diego 통합 설치일 경우 fingerprint readonly
 			 	if( menu.toLowerCase() =="cfdiego" ){
@@ -214,6 +240,13 @@ function defaultInfoPopup() {
 					$(".w2ui-msg-body input[name='domain']").val(defaultInfo.domain);
 					$(".w2ui-msg-body input[name='description']").val(defaultInfo.description);
 					$(".w2ui-msg-body input[name='loginSecret']").val(defaultInfo.loginSecret);
+					
+					if( !checkEmpty(defaultInfo.ingestorIp) ){//PaaS-TA 모니터링 체크 
+						$(".w2ui-msg-body input:checkbox[name='paastaMonitoring']").attr("checked", true);
+						checkPaasTAMonitoringUseYn();
+						$(".w2ui-msg-body input[name='ingestorIp']").val(defaultInfo.ingestorIp);
+						$(".w2ui-msg-body input[name='ingestorPort']").val(defaultInfo.ingestorPort);
+					}
 				} else{
 					if( !checkEmpty($("#directorUuid").text()) ){
 						$(".w2ui-msg-body input[name='directorUuid']").val($("#directorUuid").text());
@@ -265,9 +298,58 @@ function setReleaseData(){
 	if( !checkEmpty(defaultInfo.releaseName) && !checkEmpty(defaultInfo.releaseVersion) ){
 		$(".w2ui-msg-body input[name='releases']").data('selected',{text : defaultInfo.releaseName + "/"+ defaultInfo.releaseVersion});
 	}
+	setDisabledMonitoring(defaultInfo.releaseName + "/"+ defaultInfo.releaseVersion);
 	w2popup.unlock();
 }
 
+
+/********************************************************
+ * 설명		: paasta-controller v2.0 이상에서 지원
+ * Function	: setDisabledMonitoring
+ *********************************************************/
+function setDisabledMonitoring(val){
+	 
+	if( !checkEmpty(val) && val != "undefined/undefined"){
+		var cfReleaseName = val.split("/")[0];
+		var cfReleaseVersion = val.split("/")[1];
+		
+		//paasta-controller v2.0.0 이상 PaaS-TA 모니터링 지원 checkbox
+		if( cfReleaseName.indexOf("paasta-controller") > -1 && compare(cfReleaseVersion, "2.0.0") > -1 ){
+			$('.w2ui-msg-body #paastaMonitoring').attr('disabled',false);
+		}else{
+			if( $(".w2ui-msg-body input:checkbox[name='paastaMonitoring']").is(":checked")){
+				$(".w2ui-msg-body input:checkbox[name='paastaMonitoring']").prop('checked',false);
+				checkPaasTAMonitoringUseYn();
+			}
+			$('.w2ui-msg-body #paastaMonitoring').attr('disabled',true);
+		}
+	}
+	
+}
+
+/********************************************************
+ * 설명		: PaaS-TA 모니터링 사용 체크 검사
+ * Function	: checkPaasTAMonitoringUseYn
+ *********************************************************/
+function checkPaasTAMonitoringUseYn(value){
+	var cnt = $("input[name=paastaMonitoring]:checkbox:checked").length;
+	
+	if(cnt > 0 ){
+		$(".w2ui-msg-body input[name='ingestorIp']").attr("disabled", false);
+		$(".w2ui-msg-body input[name='ingestorPort']").attr("disabled", false);
+		
+	}else{
+		$(".w2ui-msg-body input[name='ingestorIp']").css({"border-color" : "rgb(187, 187, 187)"}).parent().find(".isMessage").text("");
+		$(".w2ui-msg-body input[name='ingestorPort']").css({"border-color" : "rgb(187, 187, 187)"}).parent().find(".isMessage").text("");
+		//값 초기화
+		$(".w2ui-msg-body input[name='ingestorIp']").val("");
+		$(".w2ui-msg-body input[name='ingestorPort']").val("");
+		//Read-only
+		$(".w2ui-msg-body input[name='ingestorIp']").attr("disabled", true);
+		$(".w2ui-msg-body input[name='ingestorPort']").attr("disabled", true);
+	}
+	 
+}
 
 /********************************************************
  * 설명		: 기본정보 등록
@@ -276,11 +358,12 @@ function setReleaseData(){
 function saveDefaultInfo() {
 	var release = $(".w2ui-msg-body input[name='releases']").val();
 	// 배포명 중복 검사
-	if( !checkDeploymentNameDuplicate("cf", $(".w2ui-msg-body input[name='deploymentName']").val() ) 
+	if( !checkDeploymentNameDuplicate("cf", $(".w2ui-msg-body input[name='deploymentName']").val(), iaas ) 
 			&& defaultInfo.deploymentName !=  $(".w2ui-msg-body input[name='deploymentName']").val() ){
 		w2alert(  "입력한 배포명 (" + $(".w2ui-msg-body input[name='deploymentName']").val()  + ") 은 이미 존재합니다.","CF 설치");
 		return;
 	}
+	
 	defaultInfo = {
 				id 						: (cfId) ? cfId : "",
 				iaas 					: iaas.toUpperCase(),
@@ -296,7 +379,10 @@ function saveDefaultInfo() {
 				domain 					: $(".w2ui-msg-body input[name='domain']").val(),
 				description 			: $(".w2ui-msg-body input[name='description']").val(),
 				domainOrganization 	    : $(".w2ui-msg-body input[name='domainOrganization']").val(),
-				loginSecret			    : $(".w2ui-msg-body input[name='loginSecret']").val()
+				loginSecret			    : $(".w2ui-msg-body input[name='loginSecret']").val(),
+				paastaMonitoringUse     : $(".w2ui-msg-body input:checkbox[name='paastaMonitoring']").is(":checked") == true ? "true" : "false",
+				ingestorIp        : $(".w2ui-msg-body input[name='ingestorIp']").val(),
+				ingestorPort      : $(".w2ui-msg-body input[name='ingestorPort']").val()
 	}
 	//유효성
 	if (popupValidation()) {
@@ -843,7 +929,7 @@ function vSphereResourceInfoPopup() {
 function getStamcellList() {
 	$.ajax({
 		type : "GET",
-		url : "/common/deploy/stemcell/list/cf/openstack",
+		url : "/common/deploy/stemcell/list/cf/" + iaas,
 		contentType : "application/json",
 		success : function(data, status) {
 			stemcells = new Array();
@@ -1121,7 +1207,7 @@ function settingDiegoUse(flag, thisDiv){
  *********************************************************/
 function deletePopup(record){
 	var requestParameter = {
-			iaas		: (record.iaas) ? record.iaas : record.iaasType, 
+			iaas		: (record.iaas) ? record.iaas : record.cType, 
 			id			: record.id,
 			platform	: "cf"
 	};
@@ -1287,7 +1373,6 @@ function gridReload() {
 		 doSearch();
 	 }
 }
-
 </script>
 
 <!-- Default 정보 DIV -->
@@ -1324,9 +1409,9 @@ function gridReload() {
 					</div>
 					<div class="w2ui-field">
 						<label style="text-align: left; width: 40%; font-size: 11px;">CF 릴리즈</label>
-						<img alt="diego-help-info"  src="../images/help-Info-icon.png" class="cf-info" style="width:18px; position:absolute; left:17%; margin-top:3px"  data-toggle="popover"  data-trigger="hover" data-html="true" title="설치 지원 버전 목록"/>
+						<img alt="diego-help-info"  src="../images/help-Info-icon.png" class="cf-info" style="width:18px; position:absolute; left:17%; margin-top:3px;"  data-toggle="popover"  data-trigger="click" data-html="true" title="설치 지원 버전 목록"/>
 						<div>
-							<input name="releases" type="list" style="float: left; width: 60%;" required placeholder="CF 릴리즈를 선택하세요." />
+							<input name="releases" type="list"  onchange='setDisabledMonitoring(this.value);' style="float: left; width: 60%;" required placeholder="CF 릴리즈를 선택하세요." />
 						</div>
 					</div>
 					<div class="w2ui-field" id="fingerprint">
@@ -1357,6 +1442,13 @@ function gridReload() {
 							<div class="isMessage"></div>
 						</div>
 					</div>
+					<div class="w2ui-field">
+						<label style="text-align:left; width:40%; font-size:11px;">PaaS-TA 모니터링</label>
+						<img alt="paasta-monitoring-help-info" class="paastaMonitoring-info" style="width:18px; position:absolute; left:24%; margin-top:3px" data-toggle="popover" data-html="true" src="../images/help-Info-icon.png" />
+						<div>
+							<input name="paastaMonitoring" type="checkbox" id="paastaMonitoring" onchange="checkPaasTAMonitoringUseYn(this);" disabled />사용
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="panel panel-info">	
@@ -1385,6 +1477,25 @@ function gridReload() {
 					</div>
 				</div>
 			</div>	
+			<div class="panel panel-info">	
+				<div class="panel-heading"><b>PaaS-TA 모니터링 정보</b></div>
+				<div class="panel-body" style="padding:5px 5% 10px 5%;">
+					<div class="w2ui-field">
+						<label style="text-align: left; width: 40%; font-size: 11px;">PaaS-TA 모니터링 DB 서버 IP</label>
+						<div>
+							<input name="ingestorIp" type="text" style="float: left; width: 60%;" disabled placeholder="예)10.0.0.0" />
+							<div class="isMessage ingestorIp"></div>
+						</div>
+					</div>
+					<div class="w2ui-field">
+						<label style="text-align: left; width: 40%; font-size: 11px;">PaaS-TA 모니터링 DB 서버 PORT</label>
+						<div>
+							<input name="ingestorPort" type="text" style="float: left; width: 60%;" disabled required placeholder="예)8063" />
+							<div class="isMessage "ingestorPort""></div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<br/>
 		<div class="w2ui-buttons" rel="buttons" hidden="true">

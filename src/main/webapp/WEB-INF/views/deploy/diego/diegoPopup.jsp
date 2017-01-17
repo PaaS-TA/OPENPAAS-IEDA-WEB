@@ -13,6 +13,12 @@
 %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<style>
+	.popover-content {
+ 		max-height: 300px;
+ 		overflow-y: auto;
+	}
+</style>
 <script type="text/javascript">
 var diegoId = "";
 var networkId = "";
@@ -40,24 +46,16 @@ var cfInfoYn = false;
 var diegoKeyFile = "";
 
 $(function() {
- 	//Diego 릴리즈 popover가 나타난 후
- 	$('.diego-info').on('show.bs.popover', function () {
- 		$(".gardenRelease-info").popover('hide')
- 		$(".cflinux-info").popover('hide')
- 	 	$(".etcd-info").popover('hide')
-//  	 	$(".paastaMonitoring-info").popover('hide');
- 	 })
- 	 
- 	 //다른 곳 클릭 시 popover hide 이벤트
- 	$('.w2ui-popup').on('click', function (e) {
- 	    $('[data-toggle="popover"]').each(function () {
- 	        //the 'is' for buttons that trigger popups
- 	        //the 'has' for icons within a button that triggers a popup
- 	        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
- 	            $(this).popover('hide');
- 	        }
- 	    });
- 	});
+	
+ 	$(document).delegate(".w2ui-popup","click",function(e){
+	 $('[data-toggle="popover"]').each(function () {
+	        //the 'is' for buttons that trigger popups
+	        //the 'has' for icons within a button that triggers a popup
+	        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+	            $(this).popover('hide');
+	        }
+	    });
+    });
  	 
 });
 
@@ -207,7 +205,7 @@ function defaultPopup() {
 	 
 	$("#defaultInfoDiv").w2popup({
 		width : 750,
-		height :500,
+		height :625,
 		modal :true,
 		showMax :false,
 		onOpen :function(event) {
@@ -221,7 +219,7 @@ function defaultPopup() {
 			 	$(".gardenRelease-info").attr('data-content', "https://github.com/cloudfoundry/diego-cf-compatibility");
 			 	$(".cflinux-info").attr('data-content', "https://github.com/cloudfoundry/diego-cf-compatibility");
 			 	$(".etcd-info").attr('data-content', "https://github.com/cloudfoundry/diego-cf-compatibility");
-// 			 	$(".paastaMonitoring-info").attr('data-content', "paasta-container v2.0 이상에서 지원")
+			 	$(".paastaMonitoring-info").attr('data-content', "paasta-container v2.0 이상에서 지원")
 				 	
 				if( menu == "cfDiego") {
 					$('.w2ui-msg-buttons #defaultPopupBtn').show();
@@ -360,6 +358,7 @@ function getCfRelease() {
 						$(".w2ui-msg-body input[name='cfInfo']").w2field('list', {items :cfInfo,maxDropHeight :200,width :250});
 						arrayCFInfoJSON=data;
 					}
+					$(".w2ui-msg-body input[name='cfPaastaMonitoring']").val(obj.paastaMonitoringUse);
 				});
 			}
 			getDiegoRelease();
@@ -511,7 +510,8 @@ function setDisabledMonitoring(val){
 		var diegoReleaseVersion = val.split("/")[1];
 		
 		//paasta-container v2.0 이상 PaaS-TA 모니터링 지원 checkbox
-		if( diegoReleaseName.indexOf("-container") > -1 && compare(diegoReleaseVersion, "2.0") > -1 ){
+		if( diegoReleaseName.indexOf("paasta-container") > -1 && compare(diegoReleaseVersion, "2.0.0") > -1 && 
+				$(".w2ui-msg-body input[name='cfPaastaMonitoring']").val()=="true"){
 			$('.w2ui-msg-body #paastaMonitoring').attr('disabled',false);
 		}else{
 			if( $(".w2ui-msg-body input:checkbox[name='paastaMonitoring']").is(":checked")){
@@ -1524,7 +1524,7 @@ function gridReload() {
 					</div>
 					<div class="w2ui-field" >
 						<label style="text-align:left; width:40%; font-size:11px;">DIEGO 릴리즈</label>
-						<img alt="diego-help-info"  src="../images/help-Info-icon.png" class="diego-info" style="width:18px; position:absolute; left:20%; margin-top:3px"  data-toggle="popover"  data-trigger="hover" data-html="true" title="설치 지원 버전 목록"/>
+						<img alt="diego-help-info"  src="../images/help-Info-icon.png" class="diego-info" style="width:18px; position:absolute; left:20%; margin-top:3px"  data-toggle="popover"  data-trigger="click" data-html="true" title="설치 지원 버전 목록"/>
 						<div>
 							<input name="diegoReleases" onchange='setcflinuxDisplay(this.value);' type="list" style="float:left; width:60%;" required placeholder="DIEGO 릴리즈를 선택하세요." />
 						</div>
@@ -1556,35 +1556,36 @@ function gridReload() {
 						<input name="cfId" type="hidden"/>
 						<input name="cfDeploymentFile" type="hidden"/>
 					</div>
-<!-- 					<div class="w2ui-field"> -->
-<!-- 						<label style="text-align:left; width:40%; font-size:11px;">PaaS-TA 모니터링</label> -->
-<!-- 						<img alt="paasta-monitoring-help-info" class="paastaMonitoring-info" style="width:18px; position:absolute; left:22%; margin-top:3px" data-toggle="popover" data-html="true" src="../images/help-Info-icon.png" /> -->
-<!-- 						<div> -->
-<!-- 							<input name="paastaMonitoring" type="checkbox" id="paastaMonitoring" onchange="checkPaasTAMonitoringUseYn(this);" disabled />사용 -->
-<!-- 						</div> -->
-<!-- 					</div> -->
+					<div class="w2ui-field">
+						<label style="text-align:left; width:40%; font-size:11px;">PaaS-TA 모니터링</label>
+						<img alt="paasta-monitoring-help-info" class="paastaMonitoring-info" style="width:18px; position:absolute; left:22%; margin-top:3px" data-toggle="popover" data-html="true" src="../images/help-Info-icon.png" />
+						<div>
+							<input name="paastaMonitoring" type="checkbox" id="paastaMonitoring" onchange="checkPaasTAMonitoringUseYn(this);" disabled />사용
+							<input name="cfPaastaMonitoring" type="hidden" id="cfPaastaMonitoring" />
+						</div>
+					</div>
 				</div>
 			</div>
 			
-<!-- 			<div class="panel panel-info">	 -->
-<!-- 				<div class="panel-heading"><b>PaaS-TA 모니터링 정보</b></div> -->
-<!-- 				<div class="panel-body" style="padding:5px 5% 10px 5%;"> -->
-<!-- 					<div class="w2ui-field"> -->
-<!-- 						<label style="text-align: left; width: 40%; font-size: 11px;">PaaS-TA 모니터링 DB 서버 IP</label> -->
-<!-- 						<div> -->
-<!-- 							<input name="cadvisorDriverIp" type="text" style="float: left; width: 60%;" disabled placeholder="예)10.0.0.0" /> -->
-<!-- 							<div class="isMessage cadvisorDriverIp"></div> -->
-<!-- 						</div> -->
-<!-- 					</div> -->
-<!-- 					<div class="w2ui-field"> -->
-<!-- 						<label style="text-align: left; width: 40%; font-size: 11px;">PaaS-TA 모니터링 DB 서버 PORT</label> -->
-<!-- 						<div> -->
-<!-- 							<input name="cadvisorDriverPort" type="text" style="float: left; width: 60%;" disabled required placeholder="예)8063" /> -->
-<!-- 							<div class="isMessage cadvisorDriverPort"></div> -->
-<!-- 						</div> -->
-<!-- 					</div> -->
-<!-- 				</div> -->
-<!-- 			</div> -->
+			<div class="panel panel-info">	
+				<div class="panel-heading"><b>PaaS-TA 모니터링 정보</b></div>
+				<div class="panel-body" style="padding:5px 5% 10px 5%;">
+					<div class="w2ui-field">
+						<label style="text-align: left; width: 40%; font-size: 11px;">PaaS-TA 모니터링 DB 서버 IP</label>
+						<div>
+							<input name="cadvisorDriverIp" type="text" style="float: left; width: 60%;" disabled placeholder="예)10.0.0.0" />
+							<div class="isMessage cadvisorDriverIp"></div>
+						</div>
+					</div>
+					<div class="w2ui-field">
+						<label style="text-align: left; width: 40%; font-size: 11px;">PaaS-TA 모니터링 DB 서버 PORT</label>
+						<div>
+							<input name="cadvisorDriverPort" type="text" style="float: left; width: 60%;" disabled required placeholder="예)8063" />
+							<div class="isMessage cadvisorDriverPort"></div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<br />
 		<div class="w2ui-buttons" rel="buttons" hidden="true">

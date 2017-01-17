@@ -69,6 +69,7 @@ AND
 			From ieda_diego
 		</when>
 	</choose>
+	    where iaas_type=#{iaas}
 </select>
 
 <select id="selectReleaseInfoByPlatform" resultType="org.openpaas.ieda.web.common.dao.ManifestTemplateVO">

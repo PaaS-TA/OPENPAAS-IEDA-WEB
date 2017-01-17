@@ -301,6 +301,9 @@ public class CfServiceTest {
 		vo.setDescription("test-domain");
 		vo.setDomainOrganization("test-org");
 		vo.setLoginSecret("1234");
+		vo.setPaastaMonitoringUse("true");
+		vo.setIngestorIp("10.10.10.10");
+		vo.setIngestorPort("7777");
 		vo.setKeyFile("vsphere-cf-key-1.yml");
 		vo.setCountryCode("KR");
 		vo.setStateName("Seoul");

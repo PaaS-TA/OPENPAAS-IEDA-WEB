@@ -388,7 +388,7 @@ public class StemcellManagementService {
 		//key 파일 삭제
 		int index = dto.getStemcellFileName().indexOf(".tgz");
 		String lockFileName = dto.getStemcellFileName().substring(0, index) + "-download.lock";
-		File lcokFile = new File(LocalDirectoryConfiguration.getLockDir() + lockFileName );
+		File lcokFile = new File(LocalDirectoryConfiguration.getLockDir() + System.getProperty("file.separator") +lockFileName );
 		if(  lcokFile.exists() ) check = lcokFile.delete();
 		//stemcell 파일 삭제
 		if(file.exists()){ 
@@ -405,10 +405,10 @@ public class StemcellManagementService {
 	}
 	
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : 공통 로컬 스템셀 콤보
-	 * @title               : listLocalStemcells
-	 * @return            : List<StemcellManagementVO>
+	 * @title         : listLocalStemcells
+	 * @return        : List<StemcellManagementVO>
 	***************************************************/
 	public List<StemcellManagementVO> listLocalStemcells(String iaas){
 		List<StemcellManagementVO> list = dao.selectLocalStemcellList(iaas);

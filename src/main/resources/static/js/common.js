@@ -82,11 +82,11 @@ function commonLockFile(url, message) {
  * 설명 : 배포명 중복 체크
  * Function : checkDeploymentNameDuplicate
  ******************************************************************************/
-function checkDeploymentNameDuplicate( platform, deploymentName ) {
+function checkDeploymentNameDuplicate( platform, deploymentName, iaas ) {
 	var check = true;
 	$.ajax({
 		type : "get",
-		url : "/common/deploy/deployments/"+platform,
+		url : "/common/deploy/deployments/"+platform + "/" +iaas,
 		async : false,
 		success : function(data) {
 			data.map(function(obj) {
@@ -362,7 +362,8 @@ function popupValidation() {
 									}
 								} else if( $(this).attr('name') == 'appSshFingerprint'){
 									checkValidation = true;
-								} else if( $(this).attr('name') == 'cadvisorDriverIp' || $(this).attr('name') == 'cadvisorDriverPort'){
+								} else if( $(this).attr('name') == 'cadvisorDriverIp' || $(this).attr('name') == 'cadvisorDriverPort' 
+									|| $(this).attr('name') == 'ingestorIp' || $(this).attr('name') == 'ingestorPort') {
 									if( $("input[name=paastaMonitoring]:checkbox:checked").length == 0){
 										checkValidation = true;
 									}else{
@@ -482,15 +483,15 @@ function popupValidation() {
 										label = "OS 버전";
 										emptyFieldLabels.push(label);
 									}
-								} else if($(this).attr('name') == "cadvisorDriverPort"){
-									if(!onlyNumberPort($(".w2ui-msg-body input[name='cadvisorDriverPort']").val())){
+								} else if($(this).attr('name') == "cadvisorDriverPort" || $(this).attr('name') == 'ingestorPort'){
+									if(!onlyNumberPort(elementValue)){
 										label = "포트 번호";
 										$(this).css({"border-color" : "red"}).parent().find(".isMessage").text(label + "를(을) 확인하세요").css({"color" : "red"});
 										emptyFieldLabels.push(label);
 									}else{
 										$(this).css({"border" : "1px solid #bbb"}).parent().find(".isMessage").text("");
 									}
-								} else if($(this).attr('name') == "cadvisorDriverIp"){
+								} else if($(this).attr('name') == "cadvisorDriverIp" || $(this).attr('name') == 'ingestorIp'){
 									if(!validateIP(elementValue)){
 										label = "서버 IP"; 
 										$(this).css({"border-color" : "red"}).parent().find(".isMessage").text(label + "를(을) 확인하세요").css({"color" : "red"});

@@ -546,6 +546,9 @@ public class CfDiegoControllerTest extends BaseTestController {
 		dto.setDomain("172.12.34.100.xip.io");
 		dto.setDescription("test-domain");
 		dto.setDomainOrganization("test-org");
+		dto.setPaastaMonitoringUse("true");
+		dto.setIngestorIp("10.1.10.10");
+		dto.setIngestorPort("7777");
 		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);

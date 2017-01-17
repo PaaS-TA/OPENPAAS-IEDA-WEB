@@ -116,14 +116,11 @@ final public class CommonUtils {
 				if (!StringUtils.isEmpty(manifestTemplate.getOptionResourceTemplate())) {
 					cmd.add(manifestTemplate.getOptionResourceTemplate());
 				}
+				if (!StringUtils.isEmpty(manifestTemplate.getOptionEtc())) {
+					cmd.add(manifestTemplate.getOptionEtc());
+				}
 				if (!StringUtils.isEmpty(manifestTemplate.getCommonOptionTemplate())) {
 					cmd.add(manifestTemplate.getCommonOptionTemplate());
-				}
-				if (!StringUtils.isEmpty(manifestTemplate.getOptionEtc())) {
-					cmd.add(manifestTemplate.getOptionEtc());
-				}
-				if (!StringUtils.isEmpty(manifestTemplate.getOptionEtc())) {
-					cmd.add(manifestTemplate.getOptionEtc());
 				}
 				if( !(keyFile.equals("microbosh") || keyFile.equals("bosh")) && !StringUtils.isEmpty(keyPath) ){
 					cmd.add(keyPath);//생성한 key.yml파일 추가

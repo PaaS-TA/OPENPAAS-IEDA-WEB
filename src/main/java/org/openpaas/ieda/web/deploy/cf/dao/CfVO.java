@@ -27,11 +27,17 @@ public class CfVO {
 	private Integer deaMemoryMB; //deaDiskMB
 	private Integer deaDiskMB; //deaDiskMB
 	
+	
 	// 1.2 기본정보
 	private String domain;//도메인
 	private String description;//도메인 설명
 	private String domainOrganization;//도메인 그룹
 	private String loginSecret; //로그인 비밀번호
+	
+	//1.3 PaaS-TA 모니터링
+	private String paastaMonitoringUse;//PaaS-TA 모니터링 사용 유무
+	private String ingestorIp;//PaaS-TA 모니터링 DB 서버 IP
+	private String ingestorPort;//PaaS-TA 모니터링 DB 서버 Port
 	
 	//2. 네트워크 목록 정보
 	private List<NetworkVO> networks;
@@ -178,51 +184,39 @@ public class CfVO {
 	public String getCountryCode() {
 		return countryCode;
 	}
-
 	public void setCountryCode(String countryCode) {
 		this.countryCode = countryCode;
 	}
-
 	public String getStateName() {
 		return stateName;
 	}
-
 	public void setStateName(String stateName) {
 		this.stateName = stateName;
 	}
-
 	public String getLocalityName() {
 		return localityName;
 	}
-
 	public void setLocalityName(String localityName) {
 		this.localityName = localityName;
 	}
-
 	public String getOrganizationName() {
 		return organizationName;
 	}
-
 	public void setOrganizationName(String organizationName) {
 		this.organizationName = organizationName;
 	}
-
 	public String getUnitName() {
 		return unitName;
 	}
-
 	public void setUnitName(String unitName) {
 		this.unitName = unitName;
 	}
-
 	public String getEmail() {
 		return email;
 	}
-
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
 	public ResourceVO getResource() {
 		return resource;
 	}
@@ -256,9 +250,26 @@ public class CfVO {
 	public String getLoginSecret() {
 		return loginSecret;
 	}
-
 	public void setLoginSecret(String loginSecret) {
 		this.loginSecret = loginSecret;
+	}
+	public String getPaastaMonitoringUse() {
+		return paastaMonitoringUse;
+	}
+	public void setPaastaMonitoringUse(String paastaMonitoringUse) {
+		this.paastaMonitoringUse = paastaMonitoringUse;
+	}
+	public String getIngestorIp() {
+		return ingestorIp;
+	}
+	public void setIngestorIp(String ingestorIp) {
+		this.ingestorIp = ingestorIp;
+	}
+	public String getIngestorPort() {
+		return ingestorPort;
+	}
+	public void setIngestorPort(String ingestorPort) {
+		this.ingestorPort = ingestorPort;
 	}
 	
 	

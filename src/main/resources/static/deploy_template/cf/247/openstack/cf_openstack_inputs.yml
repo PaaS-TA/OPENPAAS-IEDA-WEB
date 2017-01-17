@@ -55,6 +55,9 @@ meta:
   dea-next-disk-mb: [deaDiskMB]
 
   dea-next-memory-mb: [deaMemoryMB]
+  
+  ingestor-ip: [ingestorIp]  
+  ingestor-port: [ingestorPort]
 
   ## Don't change
   default_env:

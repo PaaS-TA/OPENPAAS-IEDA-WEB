@@ -103,11 +103,11 @@ public class CommonController {
 	 * @title               : getDeploymentListByPlatform
 	 * @return            : ResponseEntity<HashMap<String,Object>>
 	***************************************************/
-	@RequestMapping(value="/common/deploy/deployments/{platform}", method=RequestMethod.GET)
-	public ResponseEntity<List<String>> getDeploymentListByPlatform(@PathVariable String platform){
+	@RequestMapping(value="/common/deploy/deployments/{platform}/{iaas}", method=RequestMethod.GET)
+	public ResponseEntity<List<String>> getDeploymentListByPlatform(@PathVariable String platform, @PathVariable String iaas){
 		if(LOGGER.isInfoEnabled()){ LOGGER.info("================================> 플랫폼 별 배포명 조회 요청");  }
 		
-		List<String> contents = commonService.listDeployment(platform);
+		List<String> contents = commonService.listDeployment(platform, iaas);
 		
 		if(LOGGER.isInfoEnabled()){ LOGGER.info("================================> 플랫폼 별 배포명 조회 요청 성공");  }
 		return new ResponseEntity<List<String>>( contents, HttpStatus.OK);

@@ -40,10 +40,10 @@ public class CfSaveService {
 	
 	
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : 기본 정보 저장
-	 * @title               : saveDefaultInfo
-	 * @return            : CfVO
+	 * @title         : saveDefaultInfo
+	 * @return        : CfVO
 	***************************************************/
 	@Transactional
 	public CfVO saveDefaultInfo(CfParamDTO.Default dto, String test) {
@@ -74,6 +74,12 @@ public class CfSaveService {
 		vo.setDescription(dto.getDescription());
 		vo.setDomainOrganization(dto.getDomainOrganization());
 		vo.setLoginSecret(dto.getLoginSecret());
+		
+		//1.3 PaaS-TA 모니터링 
+		vo.setPaastaMonitoringUse(dto.getPaastaMonitoringUse());
+		vo.setIngestorIp(dto.getIngestorIp());
+		vo.setIngestorPort(dto.getIngestorPort());
+		
 		vo.setUpdateUserId(sessionInfo.getUserId());
 		
 		if( StringUtils.isEmpty(dto.getId()) ||  "Y".equals(test) )
@@ -86,10 +92,10 @@ public class CfSaveService {
 	
 	
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : Key 생성 정보 저장
-	 * @title               : saveKeyInfo
-	 * @return            : void
+	 * @title         : saveKeyInfo
+	 * @return        : void
 	***************************************************/
 	public void saveKeyInfo(KeyInfoDTO dto){
 		SessionInfoDTO sessionInfo = new SessionInfoDTO();
@@ -110,10 +116,10 @@ public class CfSaveService {
 	}
 	
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : 네트워크 정보 저장 
-	 * @title               : saveNetworkInfo
-	 * @return            : void
+	 * @title         : saveNetworkInfo
+	 * @return        : void
 	***************************************************/
 	@Transactional
 	public void saveNetworkInfo(List<NetworkDTO> dto ){
@@ -153,10 +159,10 @@ public class CfSaveService {
 	
 
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : CF 리소스 정보 저장 및 배포 파일명 설정 
-	 * @title               : saveResourceInfo
-	 * @return            : Map<String,Object>
+	 * @title         : saveResourceInfo
+	 * @return        : Map<String,Object>
 	***************************************************/
 	@Transactional
 	public Map<String, Object> saveResourceInfo(ResourceDTO dto, String test){
@@ -227,10 +233,10 @@ public class CfSaveService {
 	}
 	
 	/***************************************************
-	 * @project          : Paas 플랫폼 설치 자동화
+	 * @project       : Paas 플랫폼 설치 자동화
 	 * @description   : 배포 파일명 설정
-	 * @title               : makeDeploymentName
-	 * @return            : String
+	 * @title         : makeDeploymentName
+	 * @return        : String
 	***************************************************/
 	public String makeDeploymentName(CfVO vo ){
 		String settingFileName = "";

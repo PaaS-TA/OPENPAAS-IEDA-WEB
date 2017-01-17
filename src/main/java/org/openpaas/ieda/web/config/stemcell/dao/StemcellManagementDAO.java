@@ -66,7 +66,7 @@ public interface StemcellManagementDAO {
 	
 	/***************************************************
 	 * @project       : Paas 플랫폼 설치 자동화
-	 * @description   : IaaS 기준 스템셀 정보 조회
+	 * @description   : IaaS 기준 다운로드된 스템셀 정보 조회
 	 * @title         : selectLocalStemcellList
 	 * @return        : List<StemcellManagementVO>
 	***************************************************/

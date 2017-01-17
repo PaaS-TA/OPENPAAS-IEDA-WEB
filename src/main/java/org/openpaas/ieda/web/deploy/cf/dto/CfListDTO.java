@@ -43,6 +43,10 @@ public class CfListDTO {
 	private String deploymentFile; //배포파일명
 	private String deployStatus; //배포상태
 	private String cfDiegoInstall;//CF & Diego 통합 설치 사용 여부
+	private String paastaMonitoringUse;//PaaS-TA 모니터링 사용 유무
+	private String ingestorIp;//PaaS-TA 모니터링 DB 서버 IP
+	private String ingestorPort;//PaaS-TA 모니터링 DB 서버 Port
+	
 	private int taskId; //TASK ID
 	
 	public int getRecid() {
@@ -226,4 +230,23 @@ public class CfListDTO {
 	public void setTaskId(int taskId) {
 		this.taskId = taskId;
 	}
+	public String getPaastaMonitoringUse() {
+		return paastaMonitoringUse;
+	}
+	public void setPaastaMonitoringUse(String paastaMonitoringUse) {
+		this.paastaMonitoringUse = paastaMonitoringUse;
+	}
+	public String getIngestorIp() {
+		return ingestorIp;
+	}
+	public void setIngestorIp(String ingestorIp) {
+		this.ingestorIp = ingestorIp;
+	}
+	public String getIngestorPort() {
+		return ingestorPort;
+	}
+	public void setIngestorPort(String ingestorPort) {
+		this.ingestorPort = ingestorPort;
+	}
+	
 }

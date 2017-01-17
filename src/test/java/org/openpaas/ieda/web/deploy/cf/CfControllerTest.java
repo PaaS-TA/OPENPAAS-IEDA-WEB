@@ -504,6 +504,9 @@ public class CfControllerTest extends BaseTestController {
 		dto.setDescription("test-domain");
 		dto.setDomainOrganization("test-org");
 		dto.setLoginSecret("1234");
+		dto.setPaastaMonitoringUse("true");
+		dto.setIngestorIp("10.10.10.10");
+		dto.setIngestorPort("7777");
 		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);

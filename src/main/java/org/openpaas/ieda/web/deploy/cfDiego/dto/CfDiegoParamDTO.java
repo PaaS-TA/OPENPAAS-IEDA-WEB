@@ -46,6 +46,9 @@ public class CfDiegoParamDTO {
 		private String paastaMonitoringUse;//PaaS-TA 모니터링 사용 유무
 		private String cadvisorDriverIp;//PaaS-TA 모니터링 DB 서버 IP
 		private String cadvisorDriverPort;//PaaS-TA 모니터링 DB 서버 PORT
+		
+		private String ingestorIp;//PaaS-TA 모니터링 DB 서버 IP
+		private String ingestorPort;//PaaS-TA 모니터링 DB 서버 Port
 
 		private String keyFile;
 		
@@ -230,6 +233,19 @@ public class CfDiegoParamDTO {
 		public void setCadvisorDriverPort(String cadvisorDriverPort) {
 			this.cadvisorDriverPort = cadvisorDriverPort;
 		}
+		public String getIngestorIp() {
+			return ingestorIp;
+		}
+		public void setIngestorIp(String ingestorIp) {
+			this.ingestorIp = ingestorIp;
+		}
+		public String getIngestorPort() {
+			return ingestorPort;
+		}
+		public void setIngestorPort(String ingestorPort) {
+			this.ingestorPort = ingestorPort;
+		}
+		
 		
 	}
 	

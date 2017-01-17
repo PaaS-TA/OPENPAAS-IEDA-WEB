@@ -31,6 +31,9 @@
 			update_user_id,
 			update_date 
 		From ieda_system_releases 
+		<if test="option == 'info'">
+	         where upper(download_status) = 'DOWNLOADED'
+		</if>
 		order by release_Type desc
 	</select>
 	
@@ -149,5 +152,6 @@
 		WHERE release_type = #{type}
 		AND release_filename LIKE CONCAT('%',#{iaas},'%')
 	</select>
+	
 	
 </mapper>

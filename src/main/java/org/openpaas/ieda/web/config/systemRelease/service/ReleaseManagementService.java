@@ -43,13 +43,13 @@ public class ReleaseManagementService {
 	 * @title               : getSystemReleaseList
 	 * @return            : List<ReleaseManagementVO>
 	***************************************************/
-	public List<ReleaseManagementVO> getSystemReleaseList(){
+	public List<ReleaseManagementVO> getSystemReleaseList(String option){
 		//db release datas
-		List<ReleaseManagementVO> releaseList = dao.selectSystemReleaseList();
+		List<ReleaseManagementVO> releaseList = dao.selectSystemReleaseList(option);
 		if( releaseList != null ){
 			for( ReleaseManagementVO release : releaseList ){
 				if( release.getDownloadStatus() != null ){
-					if( release.getDownloadStatus().equals("DOWNLOADED") ){
+					if( release.getDownloadStatus().toUpperCase().equals("DOWNLOADED") ){
 						File releaseFile = new File(LocalDirectoryConfiguration.getReleaseDir()+System.getProperty("file.separator")+release.getReleaseFileName());
 						if(!releaseFile.exists() || releaseFile.length() == 0){
 							ReleaseManagementDTO.Delete dto = new ReleaseManagementDTO.Delete();
@@ -61,7 +61,7 @@ public class ReleaseManagementService {
 				}
 			}
 		}
-		return dao.selectSystemReleaseList();
+		return dao.selectSystemReleaseList(option);
 	}
 	
 	/***************************************************
@@ -333,7 +333,7 @@ public class ReleaseManagementService {
 		//delete lock file
 		int index = dto.getReleaseFileName().indexOf(".tgz");
 		String lockFileName = dto.getReleaseFileName().substring(0, index) + "-download.lock";
-		File lcokFile = new File(LocalDirectoryConfiguration.getLockDir() + lockFileName );
+		File lcokFile = new File(LocalDirectoryConfiguration.getLockDir() + System.getProperty("file.separator") + lockFileName );
 		if(  lcokFile.exists() ) check = lcokFile.delete();
 		//delete release File
 		if(file.exists()){ 

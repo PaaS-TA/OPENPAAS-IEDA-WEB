@@ -370,7 +370,6 @@ function stemcellFileUpload(stemcellInfo){
 	formData.append("fileSize", files[0].size);
 	
 	if(stemcellInfo.id == 'undefined' || stemcellInfo.id==null || stemcellInfo.id=="" ){
-		alert(stemcellInfo.id);
 		return;
 	}
 	

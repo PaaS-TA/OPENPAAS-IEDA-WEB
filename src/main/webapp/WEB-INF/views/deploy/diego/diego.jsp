@@ -392,5 +392,5 @@ $(window).resize(function() {
 	</div>
 </div>
 
-<!--  cf div -->
+<!--  diego div -->
 <div id="diegoPopupDiv"></div>

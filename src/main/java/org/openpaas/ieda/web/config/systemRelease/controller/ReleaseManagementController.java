@@ -61,7 +61,7 @@ public class ReleaseManagementController extends BaseController{
 	@RequestMapping(value="/config/systemRelease/list",  method=RequestMethod.GET)
 	public ResponseEntity<HashMap<String, Object>> getSystemReleaseList(){
 		if(LOGGER.isInfoEnabled()){ LOGGER.info("================================> 시스템 릴리즈 목록 조회 요청"); }
-		List<ReleaseManagementVO> systemReleases = service.getSystemReleaseList();
+		List<ReleaseManagementVO> systemReleases = service.getSystemReleaseList("config");
 		
 		HashMap<String, Object> list = new HashMap<String, Object>();
 		

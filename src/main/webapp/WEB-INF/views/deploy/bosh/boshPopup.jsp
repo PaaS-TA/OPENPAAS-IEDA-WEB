@@ -549,17 +549,18 @@ function saveDefaultInfo(type){
  * Function	: networkInfoPopup
  *********************************************************/
 function networkInfoPopup(){
-	if(iaas.toUpperCase() == "AWS"){
-		$('#ExternalLabel').text('Elastic IP');
-	}
 	settingPopupTab("networkInfoDiv", iaas);
 	
 	$("#networkInfoDiv").w2popup({
 		width 	: 700,
-		height	: 580,
+		height	: 695,
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function() {
+				if(iaas.toUpperCase() == "AWS"){
+					$(".w2ui-msg-body input[name='publicStaticIp']").attr("placeholder", "Elastic IP를 입력하세요."); 
+				}
+				
 				if (networkInfo.length > 0) {
 					networkId = networkInfo[0].id;
 					for(var i=0; i <networkInfo.length; i++){
@@ -722,7 +723,7 @@ function vSphereresourceInfoPopup(){
 	
 	$("#vSphereResourceInfoDiv").w2popup({
 		width 	: 700,
-		height	: 537,
+		height	: 645,
 		modal	: true,
 		onOpen:function(event){
 			event.onComplete = function(){				

@@ -167,7 +167,7 @@
             download_status
         from ieda_public_stemcells 
         where download_status is not null
-        and download_status = 'downloaded'
+        and lower(download_status) = 'downloaded'
         <if test="iaas != '' and iaas != null">
             and iaas = #{iaas}
         </if>

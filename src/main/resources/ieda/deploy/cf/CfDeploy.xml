@@ -22,6 +22,9 @@
 		<result property="deaMemoryMB" column="DEA_MEMORY_MB" />
 		<result property="deaDiskMB" column="DEA_DISK_MB" />
 		<result property="loginSecret" column="LOGIN_SECRET" />
+		<result property="paastaMonitoringUse" column="PAASTA_MONITORING_USE" />
+		<result property="ingestorIp" column="INGESTOR_IP" />
+		<result property="ingestorPort" column="INGESTOR_PORT" />
 		<result property="countryCode" column="COUNTRY_CODE" />
 		<result property="stateName" column="STATE_NAME" />
 		<result property="localityName" column="LOCALITY_NAME" />
@@ -76,6 +79,9 @@
 			,domain
 			,domain_organization
 			,login_secret
+			,paasta_monitoring_use
+			,ingestor_ip
+			,ingestor_port
 			,release_name
 			,release_version
 			,task_id
@@ -109,6 +115,9 @@
 			,login_secret
 			,release_name
 			,release_version
+			,paasta_monitoring_use
+			,ingestor_ip
+			,ingestor_port
 			,country_code
 			,state_name
 			,locality_name
@@ -140,6 +149,9 @@
 			,domain
 			,domain_organization
 			,login_secret
+			,paasta_monitoring_use
+			,ingestor_ip
+			,ingestor_port
 			,release_name
 			,release_version
 			,country_code
@@ -194,6 +206,9 @@
 			,login_secret
 			,dea_memory_mb
 			,dea_disk_mb
+			,paasta_monitoring_use
+			,ingestor_ip
+			,ingestor_port
 			,country_code
 			,state_name
 			,locality_name
@@ -222,6 +237,9 @@
 			,#{cf.loginSecret}
 			,#{cf.deaMemoryMB}
 			,#{cf.deaDiskMB}
+			,#{cf.paastaMonitoringUse}
+			,#{cf.ingestorIp}
+			,#{cf.ingestorPort}
 			,#{cf.countryCode}
 			,#{cf.stateName}
 			,#{cf.localityName}
@@ -255,6 +273,9 @@
 			,description=#{cf.description}
 			,domain_organization=#{cf.domainOrganization}
 			,login_secret=#{cf.loginSecret}
+			,paasta_monitoring_use=#{cf.paastaMonitoringUse}
+			,ingestor_ip=#{cf.ingestorIp}
+			,ingestor_port=#{cf.ingestorPort}
 			,country_code = #{cf.countryCode}
 			,state_name=#{cf.stateName}
 			,locality_name=#{cf.localityName}

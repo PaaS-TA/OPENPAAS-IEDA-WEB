@@ -88,6 +88,9 @@ public class CfService {
 				cfInfo.setDomain(vo.getDomain());
 				cfInfo.setDescription(vo.getDescription());
 				cfInfo.setDomainOrganization(vo.getDomainOrganization());
+				cfInfo.setPaastaMonitoringUse(vo.getPaastaMonitoringUse());
+				cfInfo.setIngestorIp(vo.getIngestorIp());
+				cfInfo.setIngestorPort(vo.getIngestorPort());
 				
 				//NETWORK
 				List<NetworkVO> netowrks = networkDao.selectNetworkList(vo.getId(),  codeVo.getCodeName());
@@ -262,14 +265,14 @@ public class CfService {
 			manifestTemplate.setOptionResourceTemplate("");
 		}
 		//diego use Template File
-		if( "true".equals(vo.getDiegoYn().toLowerCase()) && result.getCommonOptionTemplate() != null  && !(StringUtils.isEmpty( result.getCommonOptionTemplate()) )){
+		if( "true".equals(vo.getPaastaMonitoringUse().toLowerCase()) && result.getCommonOptionTemplate() != null  && !(StringUtils.isEmpty( result.getCommonOptionTemplate()) )){
 			manifestTemplate.setCommonOptionTemplate(MANIFEST_TEMPLATE_LOCATION + result.getTemplateVersion() + SEPARATOR + "common" + SEPARATOR + result.getCommonOptionTemplate() );
 		}else{
 			manifestTemplate.setCommonOptionTemplate("");
 		}
 		//option etc Template File
-		if(result.getOptionEtc() != null  && !(StringUtils.isEmpty( result.getOptionEtc()) )){
-			manifestTemplate.setOptionEtc(MANIFEST_TEMPLATE_LOCATION + result.getTemplateVersion() + SEPARATOR + vo.getIaasType().toLowerCase() + SEPARATOR + result.getOptionEtc() );
+		if( "true".equals(vo.getDiegoYn().toLowerCase()) && result.getOptionEtc() != null  && !(StringUtils.isEmpty( result.getOptionEtc()) )){
+			manifestTemplate.setOptionEtc(MANIFEST_TEMPLATE_LOCATION + result.getTemplateVersion() + SEPARATOR + "common" + SEPARATOR + result.getOptionEtc() );
 		}else{
 			manifestTemplate.setOptionEtc("");
 		}
@@ -306,6 +309,8 @@ public class CfService {
 		}else{
 			items.add(new ReplaceItemDTO("[appSshFingerprint]", ""));
 		}
+		items.add(new ReplaceItemDTO("[ingestorIp]", vo.getIngestorIp()));
+		items.add(new ReplaceItemDTO("[ingestorPort]", vo.getIngestorPort()));
 		
 		// 2. 네트워크 정보
 		int InternalCnt = 0;

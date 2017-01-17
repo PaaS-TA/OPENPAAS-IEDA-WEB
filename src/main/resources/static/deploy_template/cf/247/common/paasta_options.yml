@@ -1,0 +1,12 @@
+meta: (( merge ))
+
+paasta_overrides:
+  clients_properties:
+    cf:
+      authorities: uaa.none,doppler.firehose
+      authorized-grant-types: password,refresh_token,client_credentials
+
+  syslog_daemon_config_properties:
+    address: (( meta.ingestor-ip ))
+    port: (( meta.ingestor-port || "2514" ))
+    transport: "relp"
