@@ -553,7 +553,7 @@ API: https://api.<CF 도메인>                  ### CF api 도메인
 
 ```
 
-<b>※	참고: cf-abacus 는 cf-abacus 가 설치 완료 된 이후 시점부터, cf 상의 app이 새로 push 되거나 cf stop 및 cf start 된 cf event 를 기반으로 데이터를 수집, 집계한다. </b>
+※	참고: cf-abacus 는 cf-abacus 가 설치 완료 된 이후 시점부터, cf 상의 app이 새로 push 되거나 cf stop 및 cf start 된 cf event 를 기반으로 데이터를 수집, 집계한다.
 
 
 #<div id='25'/>3.  PAASTA-USAGE-REPORTING 배포
@@ -563,11 +563,11 @@ PAASTA-USAGE-REPORTING은 abacus 시스템과 연동하여 PAASTA에 앱의 사�
 
 ##<div id='26'/>3.1.  배포 전제 조건 
 
-[[Abacus](#_1._배포_전제)[배포 전제 조건](#_1._배포_전제)]  참조.
+[[Abacus 배포 전제 조건](#7)]  참조.
 
 ##<div id='27'/>3.2.  CF에 UAA 계정 등록 
 
-[[Abacus](#_4._CF에_abacus)[UAA 계정 등록](#_4._CF에_abacus)]  참조.
+[[Abacus UAA 계정 등록](#15)]  참조
 
 ##<div id='28'/>3.3.  paasta-usage-repoting 배포 
 
