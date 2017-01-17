@@ -97,19 +97,15 @@ CF Services 는 Service Broker API 라고 불리우는 cloud controller
 클라이언트 API를 구현하여 개방형 클라우드 플랫폼에서 사용된다. Services
 API는 독립적인 cloud controller API의 버전이다. 이는 플랫폼에서 외부
 application을 이용 가능하게 한다. (database, message queue, rest
-endpoint, etc.)
-
+endpoint, etc.)<br>
 개방형 클라우드 플랫폼 Service API는 Cloud Controller 와 Service Broker
 사이의 규약 (catalog, provision, de provision, update provision plan,
 bind, unbind)이고 Service Broker 는 RESTful API 로 구현하고 Cloud
-Controller 에 등록한다.
-
+Controller 에 등록한다.<br>
 서비스에 미터링 구현하고자 할 때, 이 규약들 중 서비스 정책 및 취지에
-맞는 프로세스를 선택하여, 그 프로세스에 미터링을 연동할 수 있다.
-
+맞는 프로세스를 선택하여, 그 프로세스에 미터링을 연동할 수 있다.<br>
 본 개발가이드에서는 mongo-db 서비스를 예시로, bind 와 unbind 시 미터링을
-하는 방법에 대해 가이드 한다.
-
+하는 방법에 대해 가이드 한다.<br>
 서비스를 사용하고자 하는 애플리케이션과 API 서비스를 바인딩 할 때, CF
 CLI 바인딩 요청 request에 적용 된 애플리케이션 환경정보(org guid, space
 guid, app guid, metering plan id) 를 이용해 바인딩 정보를 획득 하여,
@@ -165,8 +161,8 @@ CF-ABACUS은 CF 설치 후, CF에 마이크로 서비스 형태로 설치한다.
 이용 시작으로 판단할 수 있는 서비스에 대해 미터링 하는 기능 개발</U>**에
 대해서만 기술한다.
 
-※ <U>**서비스의 특정****API****호출****,****서비스의 특정 자원 이용 등에
-대한 미터링 기능 개발에 대해서는 기술하지 않는다****.**</U>
+※ <U>**서비스의 특정 API 호출 , 서비스의 특정 자원 이용 등에
+대한 미터링 기능 개발에 대해서는 기술하지 않는다.**</U>
 
 ※ API 호출에 대한 미터링은 API 서비스 미터링 개발 가이드를 참조한다.
 
@@ -196,21 +192,16 @@ CF-ABACUS은 CF 설치 후, CF에 마이크로 서비스 형태로 설치한다.
 
 
 CF (개방형 플랫폼) 에서는 플랫폼 상에서 서비스 할 수 있는 다양한
-서비스들이 존재한다.
-
+서비스들이 존재한다.<br>
 이 서비스들은 각각 그 서비스 고유의 서비스 브로커를 개발 함으로써, CF
 (개방형 플랫폼) 에서 애플리케이션이 서비스를 사용 할 수 있도록 하고
-있다.
-
+있다.<br>
 서비스는 다양하지만, 서비스를 사용하기 위한 개방형 플랫폼의 RESTAPI가
-미리 정해져 있다.
-
+미리 정해져 있다.<br>
 서비스 브로커 라이브러리는 각각 다른 서비스 브로커들이 서비스 브로커
 라이브러리 Jar 파일을 build path 에 추가 하고, 추상화 클래스들을 구현
 하는 것으로 이 개방형 플랫폼의 REST API에 기반 하여, 서비스가 제공 될 수
 있도록 해주는 라이브러리 이다.
-
-
 
 본 가이드에서는 mongo-db 서비스 브로커에 미터링 서비스를 구현하기
 위해서는 이 서비스 브로커 라이브러리에 미터링을 하기 위한 추상화
@@ -306,12 +297,12 @@ ServiceInstanceBindingService 의 구현체 에서 서비스 바인딩 request
 parameter 의 필드 값들을 매핑 처리 한 후, mongo-db repository 에 전달될
 것이다. 라이브러리를 gradle build 한다.
 
-package org.openpaas.servicebroker.model;
-
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.http.HttpStatus;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+	package org.openpaas.servicebroker.model;
+	
+	import java.util.HashMap;
+	import java.util.Map;
+	import org.springframework.http.HttpStatus;
+	import com.fasterxml.jackson.annotation.JsonIgnore;
 
 	public class ServiceInstanceBinding {
 	
@@ -415,9 +406,8 @@ mongo-db 서비스 브로커 API는 별도 제공되는 압축 파일 패키지�
 
 
 ###<div id='21'/>2.4.4.  gradle build를 위한 dependency 추가
-![Java_Service_Metering_Image03]
 서비스브로커 라이브러리 mongo-db서비스 브로커 jar 파일을 적용
-
+![Java_Service_Metering_Image03]
 서비스 브로커 라이브러리를 gradle build 한다.
 
 	@openpaas-service-broker/openpaas-service-java-broker$ gradle build -x test
@@ -503,31 +493,26 @@ Abacus****를 위한****UAA****계정 등록**을 참고한다.
 객체를 통해서 입력된다. 이 정보 들을 ServiceInstanceBinding에 미터링
 필드를 매핑한다.
 
--   service broker binding CLI 요청 예제<br>
+-   service broker binding CLI 요청 예제
 
-  		$ cf bind-service sample-api-node-caller mongod_service -c 
+  	    $ cf bind-service sample-api-node-caller mongod_service -c 
 		'{"app_organization_id":"test05","app_space_id":"testspaceId","metering_plan_id":"standard"}'
 
 
 parameter 넘어온 정보들을 mongo-db 에 저장하기 위해
 ServiceInstanceBinding 객체에 매핑한다. mongo-db repository 를 통해 저장
 후, 바인딩 정보를 리턴 한다.
-
-  	// parameter 로 입력 받은 미터링 관련 정보를 취득하여 ServiceInstanceBinding 에 매핑한다.
-
-  	Map<String, Object> paraMap = request.getParameters();
-
-  	String appOrganizationId = (String) paraMap.get("app_organization_id");
-
-  	String appSpaceId = (String) paraMap.get("app_space_id");
-
-  	String meteringPlanId = (String) paraMap.get("metering_plan_id");
-
-  	binding = new ServiceInstanceBinding(request.getBindingId(), request.getServiceInstanceId(), credentials, null,request.getAppGuid(), appOrganizationId, appSpaceId, meteringPlanId);
-
-  	repository.save(binding);
-
-  	return binding;
+	
+	// parameter 로 입력 받은 미터링 관련 정보를 취득하여 ServiceInstanceBinding 에 매핑한다.
+	Map<String, Object> paraMap = request.getParameters();
+	String appOrganizationId = (String) paraMap.get("app_organization_id");
+	String appSpaceId = (String) paraMap.get("app_space_id");
+	String meteringPlanId = (String) paraMap.get("metering_plan_id");
+	binding = new ServiceInstanceBinding(request.getBindingId(), request.getServiceInstanceId(), credentials, null,request.getAppGuid(), appOrganizationId, appSpaceId, meteringPlanId);
+	
+	repository.save(binding);
+	
+	return binding;
 
 
 ###<div id='25'/>2.4.8.  SampleMeteringOAuthService 구현
@@ -605,25 +590,19 @@ JSON을 생성 후 POST 한다.
 SampleMeteringReportServiceImpl 은 크게 나누어 2가지 처리를 하고 있다.
 
 
-1.  **ServiceInstanceBinding****정보를 참조 하여****,****사용량
-    정보****JSON****을 생성 한다****.**
+1.  **ServiceInstanceBinding 정보를 참조 하여 ,사용량 정보 JSON을 생성 한다.**
 
-2.  **생성한 사용량 정보****JSON****을****abacus-collector****로 전송
-    한다****. (HTTPS, HTTP)**
+2.  **생성한 사용량 정보 JSON을 abacus-collector로 전송한다. (HTTPS, HTTP)**
 
 
-사용량 정보 JSON 을 생성 한다.
-
+사용량 정보 JSON 을 생성 한다.<br>
 RESOURCE_ID linux-container 와 STANDARD_PLAN_ID standard 는
-abacus에서 sample 로 제공 되는 미터링 스키마이다.
-
+abacus에서 sample 로 제공 되는 미터링 스키마이다.<br>
 본 가이드에서는 이 미터링 스키마를 mongo-db 서비스 바인딩과 언바인딩에
-대한 미터링 스키마로 이용하여 기술 했다.
-
+대한 미터링 스키마로 이용하여 기술 했다.<br>
 서비스 제공자는 제공 하려는 서비스에 맞는 정책을 정하여, 미터링 스키마를
 abacus-프로비저닝에 등록 해야, abacus-collector 에 미터링을 전송할 수
-있게 된다. (정책 등록에 대한 자세한 내용은 본문 하기의
-**미터링****/****과금 정책 참조**)
+있게 된다. (정책 등록에 대한 자세한 내용은 본문 하기의 **미터링/과금 정책 참조**)
 
 
 다음 예제의 미터링 리포팅 용 상수들은 abacus의 linux-container 미터링
@@ -724,7 +703,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 |  resource_id          |String           |서비스 자원 ID                                 |linux-container                                 |
 |  plan_id              |String           | 서비스 미터링 Plan ID                         |standard                                        |
 |  resource_instance_id | String          |바인드 요청을 호출한 앱 ID                      | d98b5916-3c77-44b9-ac12-04d61c7a4eae            |
-|  measured_usage       | Array           | 미터링 항목                                   | ㅁㄴㅇㅁ                                         |
+|  measured_usage       | Array           | 미터링 항목                                   | -                                         |
 |   measure             | String          | 미터링 대상 명                                |sample_service_usage_param1                     |
 |  quantity             |Number           |  서비스 사용량 예제는 메모리 사용량 (byte)      |1000000000                                       |
 
@@ -778,19 +757,19 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 
 ####1.  **미터링 정책 스키마**
 
- | 항목명  |유형 | 필수| 설명|
- |---------|---|----|-----|
- |   plan_id      |  String | O   |  API 서비스 미터링 Plan ID   |
- |    measures     | Array  |  최소 하나  |  API 서비스 미터링 정보 수집 대상 정의   |
- |    Name     | String  | O   |  미터링 정보 수집 대상 명   |
- |    Unit     | String  |  O  |  미터링 정보 수집 대상 단위   |
- |    metrics     | Array  | 최소 하나   | API 서비스 미터링 집계 방식 정의    |
- |    Name     |  String | O   | 미터링 정보 수집 대상 명    |
- |   unit      |  String |  O  | 미터링 정보 수집 대상 단위    |
- |    meter     |  String | X   | 미터링 정보에 대해서 수집 단계에 적용하는 계산식 또는 변환 식    |
- |   accumulate      |String   |  X  | 미터링 정보에 대해서 누적 단계에 적용하는 계산식 또는 변환식    |
- |   aggregate      |  String |  X  | 미터링 정보에 대해서 집계 단계에 적용하는 계산식 또는 변환식    |
- |   summarize      | String  |  X  | 미터링 정보를 보고할 때 적용하는 계산식 또는 변환식    |
+| 항목명  |유형 | 필수| 설명|
+|---------|---|----|-----|
+|   plan_id      |  String | O   |  API 서비스 미터링 Plan ID   |
+|    measures     | Array  |  최소 하나  |  API 서비스 미터링 정보 수집 대상 정의   |
+|    Name     | String  | O   |  미터링 정보 수집 대상 명   |
+|    Unit     | String  |  O  |  미터링 정보 수집 대상 단위   |
+|    metrics     | Array  | 최소 하나   | API 서비스 미터링 집계 방식 정의    |
+|    Name     |  String | O   | 미터링 정보 수집 대상 명    |
+|   unit      |  String |  O  | 미터링 정보 수집 대상 단위    |
+|    meter     |  String | X   | 미터링 정보에 대해서 수집 단계에 적용하는 계산식 또는 변환 식    |
+|   accumulate      |String   |  X  | 미터링 정보에 대해서 누적 단계에 적용하는 계산식 또는 변환식    |
+|   aggregate      |  String |  X  | 미터링 정보에 대해서 집계 단계에 적용하는 계산식 또는 변환식    |
+|   summarize      | String  |  X  | 미터링 정보를 보고할 때 적용하는 계산식 또는 변환식    |
 |   title      |  String |   X | API 서비스 미터링 제목    |
 
 ####2.  **미터링 정책 예제**
@@ -888,14 +867,14 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 
 ####1.  **등급 정책 스키마**
 
- | 항목명  |유형 | 필수| 설명|
- |---------|---|----|-----|
- |   plan_id      |  String | O   |  API 서비스 미터링 Plan ID   |
- |    metrics     | Array  |  최소 하나  |  등급 정책 목록   |
- |    Name     | String  | O   |  등급 정의 대상 명   |
- |    rate     | String  |  X  |  가중치 계산식 또는 변환식   |
- |    charge     | String  | X   | 사용량에 대한 과금 계산식 또는 변환식    |
- |    title     |  String | X   | 등급 정책 명    |
+| 항목명  |유형 | 필수| 설명|
+|---------|---|----|-----|
+|   plan_id      |  String | O   |  API 서비스 미터링 Plan ID   |
+|    metrics     | Array  |  최소 하나  |  등급 정책 목록   |
+|    Name     | String  | O   |  등급 정의 대상 명   |
+|    rate     | String  |  X  |  가중치 계산식 또는 변환식   |
+|    charge     | String  | X   | 사용량에 대한 과금 계산식 또는 변환식    |
+|    title     |  String | X   | 등급 정책 명    |
 
 
 ####2.  **등급 정책 예제**
@@ -924,15 +903,15 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 
 ####1.  **과금 정책 스키마**
 
- | 항목명  |유형 | 필수| 설명|
- |---------|---|----|-----|
- |   plan_id      |  String | O   |  API 서비스 미터링 Plan ID   |
- |    metrics     | Array  |  최소 하나  |  과금 정책 목록   |
- |    Name     | String  | O   |  과금 대상 명  |
- |    Price     | String  |  최소 하나  |  과금 정책 상세   |
- |    Country     | String  | O   | 서비스 사용 단가에 적용할 통화    |
- |    Price     |  String | O   | 서비스 사용 단가    |
- |    title     |  String | X   | 과금 정책 제목    |
+| 항목명  |유형 | 필수| 설명|
+|---------|---|----|-----|
+|   plan_id      |  String | O   |  API 서비스 미터링 Plan ID   |
+|    metrics     | Array  |  최소 하나  |  과금 정책 목록   |
+|    Name     | String  | O   |  과금 대상 명  |
+|    Price     | String  |  최소 하나  |  과금 정책 상세   |
+|    Country     | String  | O   | 서비스 사용 단가에 적용할 통화    |
+|    Price     |  String | O   | 서비스 사용 단가    |
+|    title     |  String | X   | 과금 정책 제목    |
 
 
 ####2.  **과금 정책 예제**
@@ -988,7 +967,18 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 작성한 정책을 다음의 디렉토리에 저장한 후, CF에 CF-ABACUS를 배포 또는
 재배포 한다.
 
-	cf-abacus/lib/plugins/provisioning/src/plans/rating
+-	미터링 정책의 경우
+
+		cf-abacus/lib/plugins/provisioning/src/plans/metering
+
+-	등급 정책의 경우
+
+		cf-abacus/lib/plugins/provisioning/src/plans/pricing
+
+-	과금 정책의 경우
+
+		cf-abacus/lib/plugins/provisioning/src/plans/rating
+
 
 ####**2.  DB에 등록하는 방식**
 
@@ -1021,16 +1011,6 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 
   >$ cf api --skip-ssl-validation **https://api**.<***파스-타 도메인***> # **파스-타 플랫폼 TARGET 지정**
 
--   미터링 정책의 경우
-
-  		cf-abacus/lib/plugins/provisioning/src/plans/metering
-
--   등급 정책의 경우
-
-  		cf-abacus/lib/plugins/provisioning/src/plans/pricing
-
--   과금 정책의 경우
-
   >$ cf login -u *<****user name****>* -o *<****org name****>* -s *<****space name****>***#**** **로그인 요청**
 
 
@@ -1043,56 +1023,39 @@ mongo-db 서비스 팩이 배포하고자 파스-타 플랫폼 환경에 release
 -   **서비스 생성 (cf marketplace 명령을 통해 서비스 목록과 각 서비스의
     플랜을 조회할 수 있다.)**
 
-  >**##****서비스 브로커****CF****배포**
-	
-  >$ cd openpaas-service-java-broker-mongo
+		## 서비스 브로커 CF 배포
+		$ cd openpaas-service-java-broker-mongo
+		$ cf push
+		
+		## 서비스 브로커 생성
+		$ cf create-service-broker <서비스 브로커 명> <인증ID> <인증Password> <서비스 브로커 주소>
+		
+		예)
+		$ cf create-service-broker openpaas-mongo-broker admin cloudfoundry http://openpaas-mongo-broker.bosh-lite.com
+		
+		## 서비스 브로커 확인
+		$ cf service-brokers
+		Getting service brokers as admin...
+		
+		name                url   
+		openpaas-mongo-broker http://openpaas-mongo-broker.<파스-타 도메인>
+		
+		## 서비스 카탈로그 확인
+		$ cf service-access
+		Getting service access as admin...
+		broker: sample-mongodb-broker
+		   service                                   plan       access   orgs   
+		   Mongo-DB                               default-plan none        
+		   
+		## 등록한 서비스 접근 허용
+		$ cf enable-service-access <서비스명> -p <플랜 명>
+		
+		예)
+		$ cf enable-service-access Mongo-DB
+		
+		# 서비스 생성
+		$ cf create-service Mongo-DB default-plan  mongod_service
 
-  >$ cf push
-
-  
-
-  >**##****서비스 브로커 생성**
-
-  >$ cf create-service-broker <***서비스 브로커 명***> <***인증ID***> <***인증Password***> <***서비스 브로커 주소***>
-
-  예)
-
-  >$ cf create-service-broker openpaas-mongo-broker admin cloudfoundry http://openpaas-mongo-broker.bosh-lite.com
-
-  >**##****서비스 브로커 확인**
-
-  >$ cf service-brokers
-
-  >Getting service brokers as admin...
-
-  >name url
-
-  >openpaas-mongo-broker http://openpaas-mongo-broker.<***파스-타 도메인***>
-
-
-  >**##****서비스 카탈로그 확인**
-
-  >$ cf service-access
-
-  >Getting service access as admin...
-
-  >broker: sample-mongodb-broker
-
-  >service plan access orgs
-
-  >Mongo-DB default-plan none
-
-  >**##****등록한 서비스 접근 허용**
-
-  >$ cf enable-service-access <***서비스명***> -p <***플랜 명***>
-
-  >예)
-
-  >$ cf enable-service-access Mongo-DB
-
-  >**##****서비스 생성**
-	
-  >$ cf create-service Mongo-DB default-plan mongod_service
 
 ##<div id='35'/>2.6.3.  API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결
 
@@ -1103,50 +1066,39 @@ mongo-db 서비스 팩이 배포하고자 파스-타 플랫폼 환경에 release
 
 -   이때 -c 옵션으로 미터링에 필요한 애플리케이션 환경정보를 세팅한다.
 
-  >**## API****서비스 연동 샘플 애플리케이션 배포**
+		## API 서비스 연동 샘플 애플리케이션 배포
+		$ cd /binding-test-app
+		$ cf push
+		
+		## 서비스 바인드
+		$ cf bind-service <APP_NAME> <SERVICE_INSTANCE> -c <PARAMETERS_AS_JSON>
+		
+		예) 
+		$ cf bind-service binding-test-app mongod_service -c '{"app_organization_id":"test05","app_space_id":"testspaceId","metering_plan_id":"standard"}'
+		
+		## 서비스 연결 확인
+		$ cf services
+		Getting services in org real / space ops as admin...
+		OK
+		
+		name                       service                                   plan       bound apps               last operation   
+		binding-test-app mongod_service standard   binding-test-app create succeeded
+		
+		## 애플리케이션 실행
+		$ cf start <APP_NAME>
+		
+		예)
+		$ cf start binding-test-app
+		
+		## 형상 확인
+		$ cf a
+		Getting apps in org real / space ops as admin...
+		OK
+		
+		name                      requested state   instances   memory   disk   urls   
+		binding-test-app          started           1/1         512M     512M   binding-test-app.<파스-타 도메인>
+		openpaas-mongo-broker     started           1/1         512M     1G     openpaas-mongo-broker.<파스-타 도메인>
 
-  >$ cd /binding-test-app
-
-  >$ cf push
-
-
-  >**\#\#****서비스 바인드**
-
-  >$ cf bind-service <***APP_NAME***> <***SERVICE_INSTANCE***> -c <***PARAMETERS_AS_JSON***>
-
-
-  >예)
-
-  >$ cf bind-service binding-test-app mongod_service -c '{"app_organization_id":"test05","app_space_id":"testspaceId","metering_plan_id":"standard"}'
-
-
-  >**\#\#****서비스 연결 확인**
-
-  >$ cf services
-  >Getting services in org real / space ops as admin...
-  >OK
-
-  >name service plan bound apps last operation
-  >binding-test-app mongod_service standard binding-test-app create succeeded
-
-
-  >**\#\#****애플리케이션 실행**
-
-  >$ cf start <***APP_NAME***>
-
-  >*예**)*
-
-  >$ cf start binding-test-app
-
-
-  >**\#\#****형상 확인**
-
-  >$ cf a
-  >Getting apps in org real / space ops as admin...
-  >OK
-  >name requested state instances memory disk urls
-  >binding-test-app started 1/1 512M 512M binding-test-app**.*****<****파스**-**타 도메인**>*
-  >openpaas-mongo-broker started 1/1 512M 1G openpaas-mongo-broker**.*****<****파스**-**타 도메인**>*
 
 ##<div id='36'/>2.7.  서비스 바인딩 CF-Abacus 연동 테스트
 
@@ -1155,20 +1107,16 @@ binding-test-app 과 mongo-db 서비스를 바인딩 실행해, CF-Abacus 연동
 
 CF-Abacus 연동 확인
 
-  >**\#\#****테스트 바인딩**
-
-  >$ cf bind-service binding-test-app mongod_service -c '{"app_organization_id":"testorgguid","app_space_id":"testSpaceGuId","metering_plan_id":"standard"}'
-
-
-  ><<후략>>
-
-  >**\#\# API****사용량 확인**
-
-  >$ curl 'http://abacus-usage-reporting.<***파스-타 도메인***>/v1/metering/organizations/<***샘플 애플리케이션을 배포한 조직***>/aggregated/usage'
-
-  >예)
-
-  >$ curl 'http://abacus-usage-reporting.bosh-lite.com/v1/metering/organizations/testOrgGuid /aggregated/usage'
+	## 테스트 바인딩
+	$ cf bind-service binding-test-app mongod_service -c '{"app_organization_id":"testOrgGuid","app_space_id":"testSpaceGuId","metering_plan_id":"standard"}'
+	
+	<<후략>> 
+	
+	## API 사용량 확인
+	$ curl 'http://abacus-usage-reporting.<파스-타 도메인>/v1/metering/organizations/<샘플 애플리케이션을 배포한 조직>/aggregated/usage'
+	
+	예)
+	$ curl 'http://abacus-usage-reporting.bosh-lite.com/v1/metering/organizations/testOrgGuid /aggregated/usage'
 
 
 ##<div id='37'/>2.8.  단위 테스트
