@@ -137,9 +137,11 @@ CF & Diego Document:
 #####2.  비밀번호 변경
 
 -   비밀번호 변경 화면을 통해 비밀번호를 수정할 수 있다.
+
 ![PaaSTa_Platform_Use_Guide_Image02]
 
 #####3.  플랫폼 설치 자동화 접속
+
 ![PaaSTa_Platform_Use_Guide_Image03]
 
 2.  ***환경설정 및 관리************설치관리자 설정*** {.western}
