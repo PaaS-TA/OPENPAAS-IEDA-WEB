@@ -23,7 +23,7 @@ INSERT INTO ieda_common_code VALUES ( 315, 'DEPLOY_TYPE_BOSH', '1102' , 'BOSH', 
 INSERT INTO ieda_common_code VALUES ( 316, 'DEPLOY_TYPE_CF', '1103' , 'CF', 'CF 배포', 3, 1100, 1000, 'SYSTEM', now(), 'SYSTEM', now() );
 INSERT INTO ieda_common_code VALUES ( 317, 'DEPLOY_TYPE_DIEGO', '1104' , 'DIEGO', 'Diego 배포', 4, 1100, 1000, 'SYSTEM', now(), 'SYSTEM', now() );
 
-INSERT INTO ieda_common_code VALUES ( 318, 'DEPLOY_STATUS', '1200' , '배포 유형', '배포 상태(진행 중/완료/취소/실패)', 0, null, 1000, 'SYSTEM', now(), 'SYSTEM', now() );
+INSERT INTO ieda_common_code VALUES ( 318, 'DEPLOY_STATUS', '1200' , '배포 상태', '배포 상태(진행 중/완료/취소/실패)', 0, null, 1000, 'SYSTEM', now(), 'SYSTEM', now() );
 INSERT INTO ieda_common_code VALUES ( 319, 'DEPLOY_STATUS_PROCESSING', '1201' , '진행중', '배포 진행중', 1, 1200, 1000, 'SYSTEM', now(), 'SYSTEM', now() );
 INSERT INTO ieda_common_code VALUES ( 320, 'DEPLOY_STATUS_DONE', '1202' , '완료', '배포 완료', 2, 1200, 1000, 'SYSTEM', now(), 'SYSTEM', now() );
 INSERT INTO ieda_common_code VALUES ( 321, 'DEPLOY_STATUS_UPDATING', '1203' , '수정중', '배포 정보 수정중', 3, 1200, 1000, 'SYSTEM', now(), 'SYSTEM', now() );
