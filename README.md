@@ -969,8 +969,7 @@ Home 디렉토리에 .bosh\_plugin 디렉토리를 생성하고 배포에 필요
 
 플랫폼 설치 자동화 웹 화면에서 “환경설정 및 관리” -> “스템셀 관리” 메뉴로
 이동한다. “스템셀 관리” 메뉴에서는 Cloud Foundry에서 제공하는 공개
-스템셀을 다운로드할 수 있는 기능을 제공한다.
-
+스템셀을 다운로드할 수 있는 기능을 제공한다.<br>
 상단에 위치한 “등록” 버튼을 클릭 후 스템셀 정보를 입력하고 “등록” 버튼을
 클릭한다. (스템셀 관리 화면 설명은 2.1.3 참고)
 
@@ -991,21 +990,17 @@ BOOTSTRAP을 설치하기 위해서는 BOSH 릴리즈와 BOSH CPI릴리즈 2개�
 클릭한다. (릴리즈 관리 화면 설명은 2.1.4참고)
 
 #####1.  BOSH 릴리즈
-
 -   릴리즈 등록 팝업화면에서BOSH 릴리즈 정보를 입력하고, “등록” 버튼 클릭한다.
 -   BOSH 릴리즈 참조 사이트
-
   		http://bosh.io/releases/github.com/cloudfoundry/bosh?all=1
-
--   본 가이드에서는 v256을 다운로드 하였다.
 
 ![PaaSTa_Platform_Use_Guide_Image38]
 
-#####2.  BOSH CPI 릴리즈
+-   본 가이드에서는 v256을 다운로드 하였다.
 
+#####2.  BOSH CPI 릴리즈
 -   릴리즈 등록 팝업화면에서 BOSH CPI릴리즈 정보를 입력하고, “등록” 버튼 클릭한다.
 -   BOSH-CPI 릴리즈 참조 사이트
-
   		※ aws의 경우
   		http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?all=1
 
@@ -1015,9 +1010,10 @@ BOOTSTRAP을 설치하기 위해서는 BOSH 릴리즈와 BOSH CPI릴리즈 2개�
   		※ vsphere의 경우
   		http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-vsphere-cpi-release?all=1
 
+![PaaSTa_Platform_Use_Guide_Image39]
+
 -   본 가이드에서는 v30을 다운로드 하였다.
 
-![PaaSTa_Platform_Use_Guide_Image39]
 
 ###3.2.3.  ***BOOTSTRAP******설치***
 
@@ -1026,13 +1022,11 @@ BOOTSTRAP 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플
 (BOOTSTRAP설치 화면 설명은 2.1.8참고)
 
 #####3.  클라우드 환경 선택
-
 -   설치할 클라우드 환경을 선택하는 팝업화면에서 설치할 클라우드를 선택하고, “확인” 버튼 클릭한다.
 
 ![PaaSTa_Platform_Use_Guide_Image40]
 
 #####4.  BOOTSTRAP 설치 – 선택한 클라우드 환경 정보
-
 -   오픈스택 클라우드 환경을 선택한 경우 오픈스택의 인증정보/시큐리티 그룹/키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
 
 ![PaaSTa_Platform_Use_Guide_Image41]
@@ -1086,10 +1080,14 @@ BOOTSTRAP 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플
 BOOTSTRAP설치가 완료되면 BOOTSTRAP 디렉터 정보(디렉터IP, 포트번호, 계정,
 비밀번호)를 이용해서 플랫폼 설치 자동화의 설치 관리자로 설정한다. (설치 관리자 설정 화면 설명은 2.1.2참고)
 
+![PaaSTa_Platform_Use_Guide_Image50]
+
 ##3.3.  ***BOSH******설치하기***
 
 BOOTSTRAP(Microbosh)을 설치 관리자로 설정 완료 후 BOSH를 설치하는 절차는
 다음과 같다.
+
+![PaaSTa_Platform_Use_Guide_Image52]
 
 ###3.3.1.  ***스템셀 업로드***
 
@@ -1098,6 +1096,8 @@ BOOTSTRAP(Microbosh)을 설치 관리자로 설정 완료 후 BOSH를 설치하�
 다운로드” 메뉴에서 다운로드 받은3312.12버전의 스템셀을 선택하고, “스템셀
 업로드” 버튼을 클릭하여 설치 관리자에 스템셀을 업로드 한다.
 
+![PaaSTa_Platform_Use_Guide_Image53]
+
 ###3.3.2.  ***릴리즈 업로드*** 
 
 플랫폼 설치 자동화 웹 화면에서 “정보 조회” -> “릴리즈 업로드”를 선택한다.
@@ -1105,6 +1105,7 @@ BOOTSTRAP(Microbosh)을 설치 관리자로 설정 완료 후 BOSH를 설치하�
 256버전의 BOSH 릴리즈(bosh-256.tgz)를 선택하고, “릴리즈 업로드” 버튼을
 클릭하여 설치 관리자에 릴리즈를 업로드한다.
 
+![PaaSTa_Platform_Use_Guide_Image54]
 
 ###3.3.3.  ***BOSH******설치*** 
 
@@ -1116,43 +1117,62 @@ BOSH설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼
 
 -   오픈스택 클라우드 환경일 경우 오픈스택의 인증정보 / 시큐리티 그룹 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image55]
+
 -   AWS 클라우드 환경일 경우 AWS의 인증정보 / 시큐리티 그룹 / 키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image56]
 
 -   VSPHERE 클라우드 환경일 경우 VSPHERE의 인증정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image57]
 
 #####2.  BOSH 설치 – 기본 정보
 
 -   BOSH의 배포명 / 디렉터명 / NTP / BOSH 릴리즈 / 스냅샷 사용 여부 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image58]
+
 #####3.  BOSH 설치 – 클라우드 환경 별 네트워크 정보
 
 -   오픈스택 환경일 경우 오픈스택의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image59]
+
 -   AWS 환경일 경우 AWS의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image60]
+
 -   VSPHERE 환경일 경우 VSPHERE 의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+
+![PaaSTa_Platform_Use_Guide_Image61]
 
 #####4.  BOSH 설치 – 클라우드 환경 별 리소스 정보
 
 -   오픈스택/AWS 환경일 경우 오픈스택 또는 AWS의 스템셀 / 인스턴스 유형 / VM 비밀번호 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image62]
+
 -   VSPHERE 환경일 경우 VSPHERR의 스템셀 / 리소스 유형 / VM 비밀번호 정보 입력 후 “다음” 버튼을 클릭한다.
+
+![PaaSTa_Platform_Use_Guide_Image63]
 
 #####5.  BOSH 설치 – 배포파일 정보
 
 -   입력한 정보를 기준으로 생성한 배포 Manifest파일 정보를 확인한다.
 
+![PaaSTa_Platform_Use_Guide_Image64]
+
 #####6.  BOSH 설치 – 설치 정보
 
 -   생성된 배포 Manifest파일 정보를 이용하여 BOSH설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
+
+![PaaSTa_Platform_Use_Guide_Image65]
 
 ####3.2.4.  ***설치 관리자 설정***
 
 BOSH설치가 완료되면 BOSH 디렉터 정보(디렉터IP, 포트번호, 계정,
 비밀번호)를 이용해서 플랫폼 설치 자동화의 설치 관리자로 설정한다. (설치 관리자 설정 화면 설명은 2.1.2참고)
-
 
 ##3.4.  ***CF******설치하기***
 
@@ -1554,19 +1574,20 @@ found참고)
 [PaaSTa_Platform_Use_Guide_Image47]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapAwsOpenstackResourceInfo.png
 [PaaSTa_Platform_Use_Guide_Image48]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapVsphereResourceInfo.png
 [PaaSTa_Platform_Use_Guide_Image49]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapDeployInfo.png
+[PaaSTa_Platform_Use_Guide_Image50]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapDirectorAdd.png
 
 
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshInstallProcess.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/StemcellUpload.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/ReleaseUpload.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshOpenstackInfo.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsInfo.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereInfo.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshDefaultInfo.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshOpenstackNetworkInfo.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsNetworkInfo.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereNetworkInfo.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsOpenstackResourceInfo.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereResourceInfo.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshDeployInfo.png
-[PaaSTa_Platform_Use_Guide_Image]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshInstallInfo.png
+[PaaSTa_Platform_Use_Guide_Image52]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshInstallProcess.png
+[PaaSTa_Platform_Use_Guide_Image53]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/StemcellUpload.png
+[PaaSTa_Platform_Use_Guide_Image54]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/ReleaseUpload.png
+[PaaSTa_Platform_Use_Guide_Image55]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshOpenstackInfo.png
+[PaaSTa_Platform_Use_Guide_Image56]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsInfo.png
+[PaaSTa_Platform_Use_Guide_Image57]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereInfo.png
+[PaaSTa_Platform_Use_Guide_Image58]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshDefaultInfo.png
+[PaaSTa_Platform_Use_Guide_Image59]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshOpenstackNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image60]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image61]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image62]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsOpenstackResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image63]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image64]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshDeployInfo.png
+[PaaSTa_Platform_Use_Guide_Image65]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshInstallInfo.png
