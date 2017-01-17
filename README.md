@@ -61,9 +61,8 @@ API 서비스를 미터링하는 방법에 대해 기술 하였다.
 -   이 가이드는 ubuntu14.04 및 로컬 설치를 기준으로 작성되어 있다. 
 -   bosh-lite가 로컬에 설치 되어 있어야 한다.
 -   CF가 로컬에 설치 되어 있어야 한다.
--   운영 환경의 CF에 abacus를 배포할 경우, abacus를 서비스 하기 위한
-    security-group을 설정해야 한다.
-    -   **Abacus****를 위한****security****설정 정보**
+-   운영 환경의 CF에 abacus를 배포할 경우, abacus를 서비스 하기 위한 security-group을 설정해야 한다.
+    -   **Abacus를 위한 security 설정 정보**
 <table style ="width : 700;">
       <tr>
     	<th>Component</th>
@@ -137,9 +136,11 @@ API 서비스를 미터링하는 방법에 대해 기술 하였다.
 ###<div id='9'/>2.2.1. Node.js 설치 순서
 
   	$ sudo apt-get install curl
+
   	## Node.js version 6.x를 설치할 경우
   	## Source Repository 등록
   	$ curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+
   	## Node.js & Npm 설치
   	$ sudo apt-get install -y nodejs
 
@@ -215,10 +216,12 @@ CF 설치한 abacus에서 CF의 앱 사용량 정보를 수집하기 위해서 C
 
   	## CF target 설정
   	$ uaac target uaa.<CF 도메인> --skip-ssl-validation
+
   	예) $ uaac target uaa.bosh-lite.com --skip-ssl-validation
 
   	## uaa client 토큰 취득
   	$ uaac token client get <uaac user id> -s <uaac user password>
+
   	예) $ uaac token client get admin -s admin-secret
 
   	## cloud_controller.admi 계정 생성
@@ -269,30 +272,25 @@ CF 설치한 abacus에서 CF의 앱 사용량 정보를 수집하기 위해서 C
   		$ uaac client add abacus-linux-container --name abacus-linux-container --authorized_grant_types client_credentials --authorities abacus.usage.linux-container.write,abacus.usage.linux-container.read --scope abacus.usage.linux-container.write,abacus.usage.linux-container.read --secret secret
 
   		##사용량 정보에 대한 abacus 접근 권한을 UAA에 등록
-
   		$ uaac client add <CLIENT_ID> --name <CLIENT_ID> --authorized_grant_types client_credentials --authorities abacus.usage.write,abacus.usage.read --scope abacus.usage.write,abacus.usage.read --secret <CLIENT_SECRET>
 
   		예)
   		$ uaac client add abacus --name abacus --authorized_grant_types client_credentials --authorities abacus.usage.write,abacus.usage.read --scope abacus.usage.write,abacus.usage.read --secret secret
 
   		##Abacus 모니터링 권한을 UAA에 등록
-
   		$ uaac client add <CLIENT_ID> --name <CLIENT_ID> --authorized_grant_types client_credentials –authorities abacus.system.read --scope abacus.system.read --secret <CLIENT_SECRET>
 
   		예)
   		$ uaac client add abacus-system --name abacus-system --authorized_grant_types client_credentials --authorities abacus.system.read --scope abacus.system.read --secret secret
 
-※ 하나의 <CLIENT_ID>에 모든 권한을 부여할 수 있다.
-
-※ Secured Abacus에 대해서는 다음 웹 사이트를 참조한다.
-
+※ 하나의 <CLIENT_ID>에 모든 권한을 부여할 수 있다.<br>
+※ Secured Abacus에 대해서는 다음 웹 사이트를 참조한다.<br>
 [https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/security.md](https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/security.md)
 
 
 ##<div id='18'/>2.5.  Abacus 배포를 위한 조직 및 영역 설정
 
   	<< Bosh Lite의 경우>>
-
 
   	##라우트 확인
 
@@ -643,5 +641,5 @@ applications:
 
 ###<div id='32'/>3.3.4.  api 호출 예제
 
-  	$ curl -k -X GET https://paasta-usage-reporting.bosh-lite.com/v1/org/:org_id/space/:space_id
+  	$ curl -k -X GET https://paasta-usage-reporting.bosh-lite.com/v1/org/:org_id/space/:space_id
 
