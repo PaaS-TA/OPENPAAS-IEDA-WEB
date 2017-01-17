@@ -881,23 +881,23 @@ applications:
 
 ####2.  Manifest.yml  
 앱을 CF에 배포할 때 필요한 설정 정보 및 앱 실행 환경에 필요한 설정 정보를 기술한다.
-
-	---
-	applications:
-	- name: sample-api-node-caller  # 애플리케이션 이름
-	  memory: 512M                  # 애플리케이션 메모리 사이즈
-	  disk_quota: 512M
-	  instances: 1                  # 애플리케이션 인스턴스 개수
-	  path: ./.cfpack/app.zip       # 배포될 애플리케이션의 위치
-	  command: npm start            # CF에서의 애플리케이션 시작 명령어
-	  env:
-	    DEBUG: a*
-	    ORG_ID: d6ce3670-ab9c-4453-b993-f2821f54846b
-	    SECURED: false
-	    #AUTH_SERVER: https://api.bosh-lite.com:443 
-	    #CLIENT_ID: abacus
-	    #CLIENT_SECRET: secret
-
+```yml
+---
+applications:
+- name: sample-api-node-caller  # 애플리케이션 이름
+  memory: 512M                  # 애플리케이션 메모리 사이즈
+  disk_quota: 512M
+  instances: 1                  # 애플리케이션 인스턴스 개수
+  path: ./.cfpack/app.zip       # 배포될 애플리케이션의 위치
+  command: npm start            # CF에서의 애플리케이션 시작 명령어
+  env:
+    DEBUG: a*
+    ORG_ID: d6ce3670-ab9c-4453-b993-f2821f54846b
+    SECURED: false
+    #AUTH_SERVER: https://api.bosh-lite.com:443 
+    #CLIENT_ID: abacus
+    #CLIENT_SECRET: secret
+```
 
 -   ENV 항목
 	- 아래에 기술한 항목 이외에 서비스에 필요한 항목을 추가할 수 있다.
@@ -1812,26 +1812,26 @@ Api 서비스를 요청하는 웹 화면
 
 API 서비스 애플리케이션을 파스-타 플랫폼에 배포한다. 서비스 등록한 API는 다른 애플리케이션과 바인드하여 API 서비스를 할 수 있다.
 
-1.  애플리케이션 배포
+####1.  애플리케이션 배포
 
-	-   cf push 명령으로 배포한다. 별도의 값을 넣지않으면 manifest.yml의 설정을 사용한다.
+-   cf push 명령으로 배포한다. 별도의 값을 넣지않으면 manifest.yml의 설정을 사용한다.
 
-			## API 서비스 배포
-			$ cd <샘플 api 서비스 경로>/sample_api_node_service
-			$ npm install && npm run babel && npm run cfpack && cf push
-			
-			## 서비스 생성
-			$ cf create-service <서비스명> <플랜명> <서비스 인스턴스명>
-			예)
-			$ cf create-service standard_obejct_storage_light_api_calls standard sampleNodejslightCallApi
-			
-			## 서비스 확인
-			$ cf services
-			Getting services in org real / space ops as admin...
-			OK
-			
-			name                       service                                   plan       bound apps   last operation   
-			sampleNodejslightCallApi   standard_obejct_storage_light_api_calls   standard                create succeeded
+		## API 서비스 배포
+		$ cd <샘플 api 서비스 경로>/sample_api_node_service
+		$ npm install && npm run babel && npm run cfpack && cf push
+		
+		## 서비스 생성
+		$ cf create-service <서비스명> <플랜명> <서비스 인스턴스명>
+		예)
+		$ cf create-service standard_obejct_storage_light_api_calls standard sampleNodejslightCallApi
+		
+		## 서비스 확인
+		$ cf services
+		Getting services in org real / space ops as admin...
+		OK
+		
+		name                       service                                   plan       bound apps   last operation   
+		sampleNodejslightCallApi   standard_obejct_storage_light_api_calls   standard                create succeeded
 
 
 
