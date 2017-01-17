@@ -1,647 +1,763 @@
-## Table of Contents
-1. [개요](#1)
-	* [문서 개요](#2)
-	 * [목적](#3)
-	 * [범위](#4)
-	 * [참고자료](#5)
-
-2. [Abacus 배포](#6)
-    * [배포 전제 조건](#7)
-    * [Node.js 설치](#8)
-    * [서비스 브로커 라이브러리](#9)
-     * [Node.js 설치 순서](#10)
-    * [pouchdb, couchdb 설치](#11)
-     * [couchdb 설치](#12)
-     * [pouchdb 설치(옵션)](#13)
-     * [설치 확인](#14)
-    * [CF에 abacus UAA 계정 등록](#15)
-     * [UAA 클라이언트 설치](#16)
-     * [CF 앱 사용량 수집을 위한 UAA 계정 드록](#17)
-     * [2.4.3.	Secured Abacus를 위한 UAA 계정 등록](#18)
-    * [cf-abacus 배포](#19)
-     * [Git을 통해 cf-abacus를 다운받는다.](#20)
-     * [gradle build를 위한 dependency 추가](#21)
-     * [Abacus와 연동할 DB 및 Secure 정보 설정](#22)
-     * [Abacus 빌드](#23)
-     * [Abacus 배포](#24)
-     * [Abaus-cf-bridge 배포](#25)
-* [PAASTA-USAGE-REPORTION 배포](#26)
-    * [배포 전제 조건](#27)
-    * [CF에 UAA 계정 등록](#28)
-    * [paasta-usage-repoting 배포](#39)
-    * [다운로드](#30)
-    * [paasta-usage-reportion 배포](#31)
-    * [배포 형상](#32)
-    * [api 호출 예제](#33)
-
-#<div id='1'/>1.  개요
-##<div id='2'/>1.1.  문서 개요
-###<div id='3'/>1.1.1.  목적
-
-본 문서(node.js API 서비스 미터링 애플리케이션 개발 가이드)는 파스-타
-플랫폼 프로젝트의 미터링 플러그인과 Node.js API 애플리케이션과 연동하여
-API 서비스를 미터링하는 방법에 대해 기술 하였다.
-
-
-###<div id='4'/>1.1.2.  범위
-
-본 문서의 범위는 파스-타 플랫폼 프로젝트의 Node.js API 서비스
-애플리케이션 개발과 CF-Abacus 연동에 대한 내용으로 한정되어 있다.
-
-
-###<div id='5'/>1.1.3.  참고 자료 
-
--   [https://github.com/cloudfoundry-incubator/cf-abacus](https://github.com/cloudfoundry-incubator/cf-abacus)
-
-
-#<div id='6'/>2.  Abacus 배포 
-
-##<div id='7'/>2.1.  배포 전제 조건
-
--   이 가이드는 ubuntu14.04 및 로컬 설치를 기준으로 작성되어 있다. 
--   bosh-lite가 로컬에 설치 되어 있어야 한다.
--   CF가 로컬에 설치 되어 있어야 한다.
--   운영 환경의 CF에 abacus를 배포할 경우, abacus를 서비스 하기 위한
-    security-group을 설정해야 한다.
-    -   **Abacus****를 위한****security****설정 정보**
-<table style ="width : 700;">
-      <tr>
-    	<th>Component</th>
-        <th>Protocol</th>
-        <th>Port</th>
-      </tr>
-      <tr>
-      	<td>abacus-pouchserver</td>
-        <td rowspan="12">TCP</td>
-        <td>5984</td>
-      </tr>
-      <tr>
-      	<td>abacus-usage-collector</td>
-        <td>9080</td>
-      </tr>
-      <tr>
-      	<td>abacus-usage-reporting</td>
-        <td>9088</td>
-      </tr>
-       <tr>
-      	<td>abacus-usage-meter</td>
-        <td>9100</td>
-      </tr>
-       <tr>
-      	<td>abacus-usage-accumulator</td>
-        <td>9200</td>
-      </tr>
-       <tr>
-      	<td>abacus-usage-aggregator</td>
-        <td>9300</td>
-      </tr>
-       <tr>
-      	<td>abacus-cf-bridge</td>
-        <td>9500</td>
-      </tr>
-       <tr>
-      	<td>abacus-cf-renewer</td>
-        <td>9501</td>
-      </tr>
-      <tr>
-      	<td>abacus-provisioning-plugin</td>
-        <td>9880</td>
-      </tr>
-       <tr>
-      	<td>abacus-account-plugin</td>
-        <td>9881</td>
-      </tr>
-      <tr>
-      	<td>abacus-authserver-plugin</td>
-        <td>9882</td>
-      </tr>
-       <tr>
-      	<td>abacus-eureka-plugin</td>
-        <td>9990</td>
-      </tr>
-
-    </table>
-
--   cf-CLI 가 로컬에 설치 되어 있어야 한다.
--   zip 패키지가 로컬에 설치 되어 있어야 한다.
-
-
-##<div id='8'/>2.2.  Node.js 설치
-
-※ 설치할 abacus가 요구하는 Node.js 및 Npm 버전을 설치한다. Cf-abacus
-사이트에서 해당 버전을 확인한다.
-[https://github.com/cloudfoundry-incubator/cf-abacus](https://github.com/cloudfoundry-incubator/cf-abacus)
-
-※ Node.js와 npm은 같이 설치된다
-
-###<div id='9'/>2.2.1. Node.js 설치 순서
-
-  	$ sudo apt-get install curl
-  	## Node.js version 6.x를 설치할 경우
-  	## Source Repository 등록
-  	$ curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-  	## Node.js & Npm 설치
-  	$ sudo apt-get install -y nodejs
-
-##<div id='10'/>2.3.  pouchdb, couchdb 설치
-
-※ abacus 데모를 실행하기 위해서는 pouchdb를 설치 해야 한다.
-
-※ abacus 데이터를 영구 보존하기 위해 서는 couchdb를 설치해야 한다.
-
-###<div id='11'/>2.3.1.couchdb 설치
-
-  	## CouchDB 설치
-  	$ sudo apt-get install couchdb
-
-  	## CouchDB 설정
-  	※ abacus와 couchdb가 모두 같은 로컬 환경인 경우 아래 설정은 생략한다.
-  	$ vi /etc/couchdb/default.ini
-
-  	; etc/couchdb/default.ini.tpl. Generated from default.ini.tpl.in by configure.
-
-  	; Upgrading CouchDB will overwrite this file.
-  	[vendor]
-  	name = Ubuntu
-  	version = 14.04
-
-  	<<중략>>
-
-  	[httpd]
-  	port = 5984
-  	bind_address = 127.0.0.1 ## Remote 서비스를 할 경우, 0.0.0.0 또는 cf 도메인 ip로 수정한다.
-	authentication_handlers = {couch_httpd_oauth, oauth_authentication_handler}, {couch_httpd_auth, cookie_authentication_handler}, {couch_httpd_auth, default_authentication_handler}
-  	default_handler = {couch_httpd_db, handle_request}
-  	secure_rewrites = true
-  	vhost_global_handlers = _utils, _uuids, _session, _oauth, _users
-  	allow_jsonp = false
-
-  	<<후략>>
-
-  	$ sudo service couchdb restart
-
-※ couchDB 설정에 관해서 다음 웹 사이트를 참조한다.
-
-[http://docs.couchdb.org/en/master/config/index.html](http://docs.couchdb.org/en/master/config/index.html)
-
-
-###<div id='12'/>2.3.2. pouchdb 설치(옵션)
-
-  	## pouchdb 설치
-  	$ sudo npm install -g pouchdb-server
-
-  	## pouchdb에 서비스 포트 할당
-  	$ pouchdb-server --port 5984
-
-###<div id='13'/>2.3.3.  #### 설치 확인 
-
-  	$ curl localhost:5984 
-  	> {"couchdb":"Welcome","version":"1.5.1",...}
-
-
-##<div id='14'/>2.4.  CF에 abacus UAA 계정 등록
-
-CF 설치한 abacus에서 CF의 앱 사용량 정보를 수집하기 위해서 CF 접근을
-위한 계정 및 토큰을발급 받아야 한다.
-
-또한 보안 모드로 abacus를 배포한 경우, abacus 컴포넌트간의 데이터 전송을
-위한 계정을 등록해야 한다.
-
-###<div id='15'/>2.4.1. UAA 클라이언트 설치
-
-  	$ gem install cf-uaac
-
-###<div id='16'/>2.4.2. CF 앱 사용량 수집을 위한 UAA 계정 등록
-
-  	## CF target 설정
-  	$ uaac target uaa.<CF 도메인> --skip-ssl-validation
-  	예) $ uaac target uaa.bosh-lite.com --skip-ssl-validation
-
-  	## uaa client 토큰 취득
-  	$ uaac token client get <uaac user id> -s <uaac user password>
-  	예) $ uaac token client get admin -s admin-secret
-
-  	## cloud_controller.admi 계정 생성
-  	$ uaac client add <CF_CLIENT_ID> --name <CF_CLIENT_ID> --authorized_grant_types client_credentials --authorities cloud_controller.admin --secret <CF_CLIENT_SECRET>
-
- 	예) $ uaac client add abacus-cf-bridge --name abacus-cf-bridge --authorized_grant_types client_credentials --authorities cloud_controller.admin --secret secret
-
-##<div id='17'/>2.4.3.  Secured Abacus를 위한 UAA 계정 등록 
-
--   Secured Abacus를 위한 권한 목록
-
-	<table>
-      <tr>
-    	<th>내용</th>
-        <th>권한 SCOPE</th>
-        <th>예시</th>
-      </tr>
-      <tr>
-      	<td rowspan="2">미터링 자원 사용량 정보에 대한 abacus 접근 권한</td>
-        <td>abacus.usage.<Resource_id>.write</td>
-        <td>abacus.usage.linux-container.write</td>
-      </tr>
-      <tr>
-        <td>abacus.usage.<Resource_id>.read</td>
-        <td>abacus.usage.linux-container.read</td>
-      </tr>
-      <tr>
-      	<td  rowspan="2">사용량 정보에 대한 abacus접근 권한</td>
-        <td>abacus.usage.write<Resource_id>.write</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <td>abacus.usage.read</td>
-        <td>-</td>
-      </tr>
-     <tr>
-      	<td>Abacus 모니터링 권한</td>
-        <td>abacus.system.read</td>
-        <td>-</td>
-      </tr>
-    </table>
-
-  		##미터링 자원 사용량 정보에 대한 abacus 접근 권한을 UAA 에 등록
-
-  		$ uaac client add <CLIENT_ID> --name <CLIENT_ID> --authorized_grant_types client_credentials --authorities abacus.usage.<Resource_id>.write,abacus.usage.<Resource_id>.read --scope abacus.usage.<Resource_d>*.write,abacus.usage.<Resource_id>.read --secret *<CLIENT_SECRET>
-
-  		예)
-  		$ uaac client add abacus-linux-container --name abacus-linux-container --authorized_grant_types client_credentials --authorities abacus.usage.linux-container.write,abacus.usage.linux-container.read --scope abacus.usage.linux-container.write,abacus.usage.linux-container.read --secret secret
-
-  		##사용량 정보에 대한 abacus 접근 권한을 UAA에 등록
-
-  		$ uaac client add <CLIENT_ID> --name <CLIENT_ID> --authorized_grant_types client_credentials --authorities abacus.usage.write,abacus.usage.read --scope abacus.usage.write,abacus.usage.read --secret <CLIENT_SECRET>
-
-  		예)
-  		$ uaac client add abacus --name abacus --authorized_grant_types client_credentials --authorities abacus.usage.write,abacus.usage.read --scope abacus.usage.write,abacus.usage.read --secret secret
-
-  		##Abacus 모니터링 권한을 UAA에 등록
-
-  		$ uaac client add <CLIENT_ID> --name <CLIENT_ID> --authorized_grant_types client_credentials –authorities abacus.system.read --scope abacus.system.read --secret <CLIENT_SECRET>
-
-  		예)
-  		$ uaac client add abacus-system --name abacus-system --authorized_grant_types client_credentials --authorities abacus.system.read --scope abacus.system.read --secret secret
-
-※ 하나의 <CLIENT_ID>에 모든 권한을 부여할 수 있다.
-
-※ Secured Abacus에 대해서는 다음 웹 사이트를 참조한다.
-
-[https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/security.md](https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/security.md)
-
-
-##<div id='18'/>2.5.  Abacus 배포를 위한 조직 및 영역 설정
-
-  	<< Bosh Lite의 경우>>
-
-
-  	##라우트 확인
-
-  	$ route
-
-  	$ route
-  	Kernel IP routing table
-  	Destination   Gateway      Genmask         Flags Metric Ref Use Iface
-  	default       10.8.0.5     128.0.0.0       UG    0      0   0   tun0
-  	default       192.168.4.1  0.0.0.0         UG    0      0   0   eth1
-  	10.8.0.1      10.8.0.5     255.255.255.255 UGH   0      0   0   tun0
-  	1	0.8.0.5   *            255.255.255.255 UH    0      0   0   tun0
-  	10.244.0.0    192.168.50.4 255.255.0.0     UG    0      0   0   vboxnet0
-  	61.74.60.194  192.168.4.1  255.255.255.255 UGH   0      0   0   eth1
-  	128.0.0.0     10.8.0.5     128.0.0.0       UG    0      0   0   tun0
-  	192.168.4.0   *            255.255.255.0   U     1      0   0   eth1
-  	192.168.50.0  *            255.255.255.0   U     0      0   0   vboxnet0
-
-  	## route 설정에 10.244.0.0가 없는 경우
-  	$ <bosh-lite 설치 경로>/bin/add-route
-
-  	## CF target 설정
-  	$ cf api https://api.<CF 도메인> --skip-ssl-validation
-  	예) $ cf api https://api.bosh-lite.com --skip-ssl-validation
-
-
-  	## CF 로그인
-  	$ cf login
-
-  	##조직 생성 및 설정
-  	$ cf create-org <조직>
-  	$ cf target -o <조직>
-
-  	##영역 생성 및 설정
-  	$ cf create-space <영역>
-  	$ cf target -o <조직> -s <영역>
-
-##<div id='19'/>2.6.  cf-abacus 배포
-
--   **Abacus****기능 개요**
-
-| 형상  |설명|
-|---------|---|
-|  abacus-pouchserver       |Abacus가 사용하는 in-browser database. 앱을 재시작하면 데이터가 사라지므로 운영 환경에서는 별도의 CouchDB 또는 MongoDB를 구성해야 한다.   |
-|  abacus-usage-collector      | CF 앱 사용량 수집기  |
-|  abacus-usage-reporting       |Abacus가 수집/집계한 미터링 정보에 사용자의 요청에 맞게 보고한다.   |
-|   abacus-usage-meter      |  수집한 CF 앱 사용량의 집계를 위해 미터링 정보를 가공한다.  | 
-|  abacus-usage-accumulator       | 수집한 CF 앱 사용량 정보를 계정/조직/영역/앱 별로 누적한다.   | 
-|  abacus-usage-aggregator       | 누적한 CF 앱 사용량 정보를 계정/조직/영역/앱 별로 집계한다.  |
-|  abacus-cf-bridge       |CF와 연동하여 앱의 Container 사용량 정보를 수집한다.   |  
-| abacus-provisioning-plugin        | Abacus의 각 기능에서 수집/누적/집계에 필요한 메타 정보를 제공한다.  |
-|  abacus-account-plugin       | 앱의 계정 정보 조회 및 유효성 체크를 수행한다.  |
-|  abacus-authserver-plugin       | Secured Abacus 운영을 위한 인증 서비스를 제공한다.<br>운영 환경에서는 CF UAA로 대체 한다.|
-|   abacus-eureka-plugin      | Netflix의 Eureka 시스템과 연동하여 Abacus 앱의 분산 처리 서비스를 제공한다.  |
-
-
-###<div id='20'/>2.6.1. Git을 통해 cf-abacus를 다운 받는다.
-
-  	$ cd <abacus를 설치할 경로>
-  	$ git clone [https://github.com/cloudfoundry-incubator/cf-abacus](https://github.com/cloudfoundry-incubator/cf-abacus)
-
--   Abacus를 빌드하기 위해서는 Node.js 및 Npm을 사전에 설치해야 한다.
-
-
-###<div id='21'/>2.6.2. Abacus와 연동할 DB 및 Secure 정보 설정
-
--	DB연동 및 Secure 정보를 설정하기 위해서는 다음 경로에 있는 manifest.yml 파일을 수정한다.
-
-| 앱  |경로|
-|---------|---|
-|  abacus-pouchserver       | <abacus 경로>/cf-abacus/lib/utils/pouchserver  |
-|  abacus-usage-collector       | <abacus 경로>/cf-abacus/lib/metering/collector  |
-|  abacus-usage-reporting      | <abacus 경로>/cf-abacus/lib/aggregation/reporting  |
-|  abacus-usage-meter       | <abacus 경로>/cf-abacus/lib/metering/meter  | 
-|  abacus-usage-accumulator       | <abacus 경로>/cf-abacus/lib/aggregation/accumulator  | 
-|  abacus-usage-aggregator       | <abacus 경로>/cf-abacus/lib/aggregation/aggregator  |
-|  abacus-provisioning-plugin       | <abacus 경로>/cf-abacus/lib/plugins/provisioning  |  
-|  abacus-account-plugin       | <abacus 경로>/cf-abacus/lib/plugins/account  |
-|  abacus-authserver-plugin       |<abacus 경로>/cf-abacus/lib/plugins/authserver   |
-|  abacus-eureka-plugin       | <abacus 경로>/cf-abacus/lib/plugins/eureka  |
-
--   manifest.yml 설정의 예
-
-```yaml
+# Table of Contents
+1. [문서 개요](#1)
+	* [목적](#2)
+	* [범위](#3)
+	* [참고자료](#4)
+2. [플랫폼 설치 자동화 메뉴얼](#5)
+	* [플랫폼 설치 자동화 화면 설명](#6)
+		* [로그인](#7)
+		* [환경설정 및 관리 -> 설치관리자 설정](#8)
+		* [환경설정 및 관리 -> 스템셀 관리](#9)
+		* [환경설정 및 관리 -> 릴리즈 관리](#10)
+		* [플랫폼 설치 자동화 관리 -> 코드 관리](#11)
+		* [플랫폼 설치 자동화 관리 -> 권한 관리](#12)
+		* [플랫폼 설치 자동화 관리 -> 사용자 관리](#13)
+		* [플랫폼 설치 -> BOOTSTRAP 설치](#14)
+		* [플랫폼 설치 -> BOSH 설치](#15)
+		* [플랫폼 설치 -> CF 설치](#16)
+		* [플랫폼 설치 -> DEIGO 설치](#17)
+		* [플랫폼 설치 -> CF & DEIGO 통합 설차](#18)
+		* [플랫폼 설치 -> 서비스팩 설치](#19)
+		* [정보조회 -> 스템셀 업로드](#20)
+		* [정보조회 -> 릴리즈 업로드](#21)
+		* [정보조회 -> 배포 정보](#22)
+		* [정보조회 -> Task 정보](#23)
+		* [정보조회 -> VM 관리](#24)
+		* [정보조회 -> Property 관리](#25)
+		* [정보조회 -> 스냅샷 관리](#26)
+		* [정보조회 -> Manifest 관리](#27)
+		
+ 		
+#<div id='1'/>1.  문서 개요 
+
+##<div id='2'/>1.1.  목적
+
+본 문서는 플랫폼 설치 자동화 시스템의 사용 절차에 대해 기술하였다.
+
+##<div id='3'/>1.2.  범위
+
+본 문서에서는 Linux 환경(Ubuntu 14.04)을 기준으로 플랫폼 설치 자동화를
+사용하는 방법에 대해 작성되었다.
+
+##<div id='4'/>1.3.  참고자료
+
+본 문서는 Cloud Foundry의 Document를 참고로 작성하였다.<br>
+BOSH Document: **[http://bosh.io](http://bosh.io)**<br>
+CF & Diego Document:
+[http://docs.cloudfoundry.org/](http://docs.cloudfoundry.org/)
+
+
+#<div id='5'/>2.  플랫폼 설치 자동화 매뉴얼
+
+플랫폼 설치 관리자는 설치관리자 등록정보 관리 및 기본 설치관리자를
+지정하는 환경 설정하는 부분과 기본 설치관리자로부터 필요한 정보를
+조회/업로드를 수행하는 부분 그리고 설치관리자를 이용해서 PaaS-TA를
+설치하는 부분으로 구성되어 있다.
+
+<table>
+  <tr>
+    <th>분류</th>
+    <th>메뉴</th>
+    <th>설명</th>
+  </tr>
+  <tr>
+    <td rowspan="3">환경설정 및 관리</td>
+    <td>설치관리자 설정</td>
+    <td>BOSH 디렉터(설치관리자) 정보를 관리하는 화면</td>
+  </tr>
+  <tr>
+    <td>스템셀 관리</td>
+    <td>BOSH Public 스템셀 등록/삭제하는 화면</td>
+  </tr>
+  <tr>
+    <td>릴리즈 관리</td>
+    <td>릴리즈 등록/삭제하는 화면</td>
+  </tr>
+  <tr>
+    <td rowspan="3">플랫폼 설치 자동화 관리</td>
+    <td>코드 관리</td>
+    <td>공통 코드를 등록/수정/삭제 등 관리하는 화면</td>
+  </tr>
+  <tr>
+    <td>권한 관리</td>
+    <td>권한 정보를 등록/수정/삭제 등 관리하는 화면</td>
+  </tr>
+  <tr>
+    <td>사용자 관리</td>
+    <td>사용자 정보를 등록/수정/삭제 등 관리하는 화면</td>
+  </tr>
+  <tr>
+    <td rowspan="6">플랫폼 설치</td>
+    <td>BOOTSTRAP 설치</td>
+    <td>BOOTSTRAP를 설치하는 화면</td>
+  </tr>
+  <tr>
+    <td>BOSH 설치</td>
+    <td>BOSH를 설치하는 화면</td>
+  </tr>
+  <tr>
+    <td>CF 설치</td>
+    <td>CF를 설치하는 화면</td>
+  </tr>
+  <tr>
+    <td>Diego 설치</td>
+    <td>Diego를 설치하는 화면</td>
+  </tr>
+  <tr>
+    <td>CF 및 Diego 설치</td>
+    <td>CF 및 Diego를 설치하는 화면</td>
+  </tr>
+  <tr>
+    <td>서비스팩 설치</td>
+    <td>서비스팩을 설치하는 화면</td>
+  </tr>
+  <tr>
+    <td rowspan="8">배포 정보 조회 및 관리</td>
+    <td>스템셀 업로드</td>
+    <td>기본 설치관리자에 스템셀 업로드 및 삭제하는 화면</td>
+  </tr>
+  <tr>
+    <td>릴리즈 업로드</td>
+    <td>기본 설치관리자에 릴리즈 업로드 및 삭제하는 화면</td>
+  </tr>
+  <tr>
+    <td>배포 정보</td>
+    <td>기본 설치관리자에 배포된 배포목록을 확인하는 화면</td>
+  </tr>
+  <tr>
+    <td>Task 정보</td>
+    <td>기본 설치관리자가 수행한 Task 정보를 확인하는 화면</td>
+  </tr>
+  <tr>
+    <td>VM 관리</td>
+    <td>기본 설치관리자에 배포된 배포의 VM을 관리하는 화면</td>
+  </tr>
+  <tr>
+    <td>Property 관리</td>
+    <td>기본 설치관리자에 배포된 배포의 Property를 관리하는 화면</td>
+  </tr>
+  <tr>
+    <td>스냅샷 관리</td>
+    <td>기본 설치관리자에 배포된 배포의 스냅샷을 관리하는 화면</td>
+  </tr>
+  <tr>
+    <td>Manifest 관리</td>
+    <td>서비스팩 설치에 필요한 Manifest를 관리하는 화면</td>
+  </tr>
   
-applications:
-- name: abacus-usage-collector ## 앱 명
-  host: abacus-usage-collector   ## 호스트 명
-  path: .cfpack/app.zip          ## Cf에 push할 앱을 빌드한 파일 경로 및 파일
-  instances: 1 ## 앱에 할당할 인스턴스 수
-  memory: 512M     	           ## 앱에 할당할 메모리 사이즈
-  disk_quota: 512M               ## 앱에 할당할 디스크 사이즈
-  env:            		       ## 앱 실행 환경 설정
-    CONF: default
-    DEBUG: e-abacus-* 			   ## 앱의 출력 로그 레벨
-    METER: abacus-usage-meter
-    PROVISIONING: abacus-provisioning-plugin
-    #DB: abacus-pouchserver 	    ## 로컬 pouchDB를 사용할 경우 설정한 예시
-    DB: http://<user_id>:<password>@<coudb_ip>:<port> ## 외부의 CouchDB를 사용할 경우 설정한 예시
-    #DB: mongodb://9a6e635e-41aa-4522-97b3-ade805ce5b89:4fa40ffd-7a78-445d-937c-82999844fb8e@192.168.40.153:27017/728b0614-5357-480e-b238-b618fcc8b957 ## MongoDB 서비스와 바인드하여 MongoDB를 사용할 경우 설정한 예시
-    DBCLIENT: abacus-couchclient ## CouchDB, PouchDB를 사용할 경우 설정
-    #DBCLIENT: abacus-mongoclient ## MongoDB를 사용할 경우 설정
-    ACCOUNT: abacus-account-plugin
-    EUREKA: abacus-eureka-plugin
-    NODE_MODULES_CACHE: false
-    SECURED: true ## Abacus를 Secured 모드로 운영할 경우: true
-    # AUTH_SERVER:
-    # CLIENT_ID:
-    # CLIENT_SECRET:
-    # JWTKEY:
-    # JWTALGO:
-    AUTH_SERVER: [https://api.bosh-lite.com:443](https://api.bosh-lite.com:443) ## Auth 서비스 Endpoint
-    CLIENT_ID: abacus ## 사용량 정보 접근 권한 ID
-    CLIENT_SECRET: secret ## 사용량 정보 접근 권한 Secret
-    JWTKEY: |+ ### cf 배포 manifest의 properties.uaa.jwt.verification_key를 설정
-      -----BEGIN PUBLIC KEY-----
-      MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHFr+KICms+tuT1OXJwhCUmR2d
-      …
-      -----END PUBLIC KEY-----
-    JWTALGO: RS256 ## JWTKEY 알고리즘
-    THROTTLE: 2
-```
-  >
-	
-	### abacus-authserver를 Auth 서비스로 사용할 경우 설정 예시
+</table>
 
-  	AUTH_SERVER: abacus-authserver-plugin ## Auth 서비스 Endpoint
-  	CLIENT_ID: abacus ## 사용량 정보 접근 권한 ID
-  	CLIENT_SECRET: secret ## 사용량 정보 접근 권한 Secret
-  	JWTKEY: encode
-  	JWTALGO: HS256 ## JWTKEY 알고리즘
+##<div id='6'/>2.1.  플랫폼 설치 자동화 화면 설명
+
+본 장에서는 플랫폼 설치 자동화를 구성하는 20개의 메뉴 및 로그인에 대한
+설명을 기술한다.
+
+###<div id='7'/>2.1.1. ***로그인***
+
+“로그인” 화면은 플랫폼 설치 자동화 관리자가 로그인하는 화면으로 사용자
+정보 생성 후 최초 로그인을 했을 경우 비밀번호 변경 화면을 통해 비밀번호
+정보를 변경한다.
 
 
-###<div id='22'/>2.6.3. Abacus 빌드
+#####1.  로그인
 
-  	$ cd <abacus 경로>
-  	$ npm run build
+-   플랫폼 설치 관리자는 로그인 첫 아이디와 비밀번호를(admin/admin) 입력 후 로그인 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image01]
 
-###<div id='23'/>2.6.4. Abacus 배포
+#####2.  비밀번호 변경
 
-  	$ cd <abacus 경로>
+-   비밀번호 변경 화면을 통해 비밀번호를 수정할 수 있다.
 
-  	## abacus 설치를 위한 CF 타겟 지정 5. 에서 생성한 조직 과 영역을 지정 한다 .	
-  	이미 지정한 경우 생략한다.
-  	$ bin/cfsetup
+![PaaSTa_Platform_Use_Guide_Image02]
 
-  	$ bin/cfsetup
-  	Enter your API URL [https://api.bosh-lite.com]: [https://api.bosh-lite.com](https://api.bosh-lite.com) ## CF API EndPoint
-  	Enter your user name [admin]: admin ## <계정 ID>
-  	Enter your organization [abacus]: abacus ## <조직>
-  	Enter your space [dev]: dev ## <영역>
-  	API endpoint: https://api.bosh-lite.com
-  	Password> ## <계정 비밀번호>
-  	Authenticating...
-  	OK
+#####3.  플랫폼 설치 자동화 접속
 
-  	Targeted org abacus
+![PaaSTa_Platform_Use_Guide_Image03]
 
-  	Targeted space dev
+###<div id='8'/>2.1.2. ***환경설정 및 관리 -> 설치관리자 설정***
 
-  	API endpoint: https://api.bosh-lite.com (API version: 2.62.0)
-  	User: admin
-  	Org: abacus
-  	Space: dev
-  	Creating security group abacus as admin
-  	OK
+“설치관리자 설정” 화면은 BOSH의 디렉터 정보 관리 및 설정하는 화면으로
+BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이다.
 
-  	Assigning security group abacus to space dev in org abacus as admin...
+※ 설치 관리자에서 설정을 추가하기 위해서는 먼저 BOOTSTRAP을 설치
+해야한다.
 
-  	OK
+![PaaSTa_Platform_Use_Guide_Image04]
 
-  	TIP: Changes will not apply to existing running applications until they are restarted.
+#####1.  설정 추가
 
-  	##타겟으로 지정한 조직 / 영역에 대해 abacus앱을 배포한다.
-  	※ 주의: CF의 Nodejs Build Pack 버전이 낮을 경우 cfpush는 실패한다. CF의 Nodejs build pack 버전이 낮을 경우, 반드시 Nodejs build pack을 업그레이드 한다.
-  	$ npm run cfpush
-  	## abacus 설치 형상 확인
+-   설치 관리자 정보를 등록하는 기능으로 BOSH 디렉터의 IP, 포트번호,계정, 비밀번호 입력 후 확인 버튼을 클릭한다.
 
-  	$ cf a
+![PaaSTa_Platform_Use_Guide_Image05]
 
-  	$ cf a
-  	Getting apps in org abacus / space dev as admin...
-  	OK
+#####2.  설정 수정
 
-  	name                        requested state instances memory   disk   urls
-  	abacus-pouchserver          started         1/1       1G       512M   abacus-pouchserver.bosh-lite.com
-  	abacus-authserver-plugin    started         1/1       512M     512M   abacus-authserver-plugin.bosh-lite.com
-  	abacus-account-plugin       started         1/1       512M     512M   abacus-account-plugin.bosh-lite.com
-  	abacus-usage-collector      started         1/1       512M     512M   abacus-usage-collector.bosh-lite.com
-  	abacus-usage-aggregator     started         1/1       512M     512M   abacus-usage-aggregator.bosh-lite.com
-  	abacus-provisioning-plugin  started         1/1       512M     512M   abacus-provisioning-plugin.bosh-lite.com
-  	abacus-eureka-plugin        started         1/1       512M     512M   abacus-eureka-plugin.bosh-lite.com
-  	abacus-usage-meter          started         1/1       512M     512M   abacus-usage-meter.bosh-lite.com
-  	abacus-usage-accumulator    started         1/1       512M     512M   abacus-usage-accumulator.bosh-lite.com
-  	abacus-usage-reporting      started         1/1       512M     512M   abacus-usage-reporting.bosh-lite.com
+-   설치 관리자 등록 목록에서 선택된 설치 관리자 정보를 수정하는 기능으로 계정과 비밀번호를 수정할 수 있다.
 
-※ Build Pack 업데이트 참고 사이트
+#####3.  설정 삭제
 
-[https://docs.cloudfoundry.org/adminguide/buildpacks.html](https://docs.cloudfoundry.org/adminguide/buildpacks.html)
+-   설치 관리자 등록 목록에서 선택된 설치 관리자 정보를 삭제하는 기능
 
-###<div id='24'/>2.6.5. abacus-cf-bridge 배포
+#####4.  기본 설치 관리자로 설정
 
-2.6.4 에서 배포한 abacus는 외부 사용량에 대한 수집 기능은 없다. 따라서
-실제 CF에서 발생한 앱 사용량을 수집하기 위해서는 별도의 앱을 배포해야
-한다. Abacus-cf-bridge는 CF에서 사용 중인 앱의 Container 사용량을
-수집하기 위한 앱이다.
+-   설치 관리자 등록 목록에서 선택된 설치 관리자를 기본 설치 관리자로 설정하는 기능
+
+#####5.  설치 관리자 목록
+
+-   등록된 설치 관리자 목록을 보여준다.
+
+#####6.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
 
 
-  	$ cd <abacus 경로>/lib/cf/bridge
+###<div id='9'/>2.1.3.  ***환경설정 및 관리 -> 스템셀 관리***
 
-  	## CF Bridge 빌드
-  	$ npm install && npm run babel && npm run lint && npm test && npm run cfpack
+다운로드한 스템셀 목록을 조회하고, 필요한 스템셀을 등록 및 삭제 할 수
+있는 화면이다.
 
-  	## CF 연동을 위한 Secure 정보 설정
-  	$ vi manifest.yml
- 	※ *manifest.yml**내용 및 수정 사항에 대해서는 별도 기술*
+![PaaSTa_Platform_Use_Guide_Image06]
 
-  	## CF Bridge 배포
-  	$ cf push –no-start
+#####1.  등록
 
-  	## abacus-cf-bridge 서비스 시작
-  	$ cf start abacus-cf-bridge
--   Abacus-cf-bridge의 manifest.yml
+-   등록할 스템셀 정보를 입력하여 스템셀 정보를 저장하고 스템셀 파일을 플랫폼 설치 자동화의 스템셀 디렉토리(\~/.bosh\_plugin/stemcell)로 다운로드를 수행한다.
 
-```yaml
+#####2.  삭제
 
-applications:
-- name: abacus-cf-bridge
-  host: abacus-cf-bridge
-  path: .cfpack/app.zip
-  instances: 1                                   ### 앱 인스턴스 수
-  memory: 512M                                   ### 앱 할당 메모리
-  disk_quota: 512M                               ### 앱 할당 디스크
-  env:                                           ### 앱 실행 환경 정보
-    CONF: default
-    DEBUG: e-abacus-*
-    COLLECTOR: abacus-usage-collector
-    EUREKA: abacus-eureka-plugin
-API: https://api.<CF 도메인>                  ### CF api 도메인
-    #DB: abacus-pouchserver                      ### Abacus의 Pouch서버를 DB로 사용할 경우
-    DB: http://<user_id>:<password>@<coudb_ip>:<port>      ### 외부의 CouchDB를 DB로 사용할 경우 설정 예시
-    #DB: mongodb://9a6e635e-41aa-4522-97b3-ade805ce5b89:4fa40ffd-7a78-445d-937c-82999844fb8e@192.168.40.153:27017/728b0614-5357-480e-b238-b618fcc8b957  ## Abacus를 CF MongoDB 서비스팩과 바인드하여 DB로 사용할 경우 설정 예시
-    DBCLIENT: abacus-couchclient     ## CouchDB 또는 PouchDB를 사용할 경우
-    #DBCLIENT: abacus-mongoclient    ## MongoDB를 사용할 경우
-    CF_CLIENT_ID: abacus-cf-bridge   ## CF cloud_controller.admin Client ID
-    CF_CLIENT_SECRET: secret         ## CF cloud_controller.admin Client Secret
-    NODE_MODULES_CACHE: false
-    SECURED: true                  ## Abacus를 Secured 모드로 운영할 경우: true
-    AUTH_SERVER: https://api.bosh-lite.com   ## Auth 서비스 Endpoint
-    CLIENT_ID: abacus-linux-container        ## 미터링 자원 접근 권한 ID
-    CLIENT_SECRET: secret                    ## 미터링 자원 접근 권한 secret
-    JWTKEY: |+     ### cf 배포 manifest의 properties.uaa.jwt.verification_key를 설정
-      -----BEGIN PUBLIC KEY-----
-      MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHFr+KICms+tuT1OXJwhCUmR2d
-      …
-      -----END PUBLIC KEY-----
-    JWTALGO: RS256                           ## JWTKEY 알고리즘
-    THROTTLE: 2
+-   플랫폼 설치 자동화에 다운로드 된 스템셀을 삭제하는 기능을 수행한다.
 
-```
+###<div id='10'/>2.1.4.  환경설정 및 관리 -> 릴리즈 관리
 
-<b>※	참고: cf-abacus 는 cf-abacus 가 설치 완료 된 이후 시점부터, cf 상의 app이 새로 push 되거나 cf stop 및 cf start 된 cf event 를 기반으로 데이터를 수집, 집계한다. </b>
+다운로드한 릴리즈 목록을 조회하고, 필요한 릴리즈를 등록/삭제 할 수 있는
+화면이다.
+
+![PaaSTa_Platform_Use_Guide_Image07]
+
+#####1.  등록
+
+-   등록할 릴리즈 정보를 입력하여 릴리즈 정보를 저장 하고 플랫폼 설치 자동화의 릴리즈 디렉토리(\~/.bosh\_plugin/release)로 다운로드를 수행한다.
+
+#####2.  삭제
+
+-   플랫폼 설치 자동화에 등록된 릴리즈를 삭제하는 기능을 수행한다.
 
 
-#<div id='25'/>3.  PAASTA-USAGE-REPORTING 배포
+###<div id='11'/>2.1.5.  ***플랫폼 설치 자동화 관리 -> 코드 관리***
 
-PAASTA-USAGE-REPORTING은 abacus 시스템과 연동하여 PAASTA에 앱의 사용량을
-보고하는 서비스이다.
+코드 관리 코드 그룹, 코드 목록을 조회하고, 필요한 코드 그룹을 등록,
+수정, 삭제 할 수 있고 해당 코드 그룹의 하위 코드를 등록, 수정, 삭제 할
+수 있는 화면이다.
 
-##<div id='26'/>3.1.  배포 전제 조건 
+![PaaSTa_Platform_Use_Guide_Image08]
 
-[[Abacus](#_1._배포_전제)[배포 전제 조건](#_1._배포_전제)]  참조.
+#####1.  코드 그룹 조회
 
-##<div id='27'/>3.2.  CF에 UAA 계정 등록 
+-   플랫폼 설치 자동화에 등록 된 상위 공통 코드를 조회 한다.
 
-[[Abacus](#_4._CF에_abacus)[UAA 계정 등록](#_4._CF에_abacus)]  참조.
+#####2.  코드 조회
 
-##<div id='28'/>3.3.  paasta-usage-repoting 배포 
+-   선택 한 코드 그룹에 해당 하는 플랫폼 설치 자동화에 등록 된 하위 공통 코드를 조회 한다.
 
-###<div id='29'/>3.3.1.다운로드 
+#####3.  코드 그룹 등록
 
-  	##다운로드 대상 파일
-  	PAASTA-USAGE-METERING.tar
+-   코드 그룹 정보를 등록 하는 기능으로 코드 그룹 명, 코드 그룹 값, 설명을 입력 하고 확인 버튼을 클릭한다.
 
-  	##대상 파일을<설치 경로>에 다운로드
-  	$ cd <설치 경로>
+#####4.  코드 그룹 수정
 
-  	##파일압축 해제
-  	$ tar xvf PAASTA-USAGE-METERING.zip
+-   코드 그룹 목록에서 선택 된 코드 그룹 정보를 수정하는 기능으로 코드 그룹 명과 설명을 수정 할 수 있다.
 
+#####5.  코드 그룹 삭제
 
-###<div id='30'/>3.3.2. paasta-usage-reporting 배포
+-   코드 그룹 목록에서 선택 된 코드 그룹을 삭제 하는 기능
 
-  	$ cd <설치 경로>/PAASTA-USAGE-METERING/usageReporting
+#####6.  코드 등록
 
-  	## Abacus 연동을 위한 DB 및 Secure 정보 설정
-  	$ vi manifest.yml
-  	※ manifest.yml 내용 및 수정 사항에 대해서는 별도 기술
+-   코드를 등록 하는 기능으로 하위 그룹, 코드명(영문), 코드명(한글), 코드 값, 설명을 입력 하고 확인 버튼을 클릭 한다.
 
-  	##paasta-usage-reporting 배포
-  	$ cd <설치 경로>/PAASTA-USAGE-METERING
-  	$ cf push
+#####7.  코드 수정
 
-※ paasta-usage-reporting과 연동하기 위한 인터페이스는 다음 파일을
-참조한다.
+-   코드 목록에서 선택 된 코드 정보를 수정하는 기능으로 하위 그룹, 코드명(영문), 코드명(한글), 설명을 수정 할 수 있다.
 
-paasta_usage_reporting app_인터페이스
+#####8.  코드 삭제
+
+-   코드 목록에서 선택 된 코드를 삭제 하는 기능
 
 
-※ paasta-usage-reporting manifest.yml
+###<div id='12'/>2.1.6.  ***플랫폼 설치 자동화 관리 -> 권한 관리***
 
-```yml
-applications:
-- name: paasta-usage-reporting
-  memory: 1024M
-  disk_quota: 512M
-  instances: 1
-  command: node app.js # 애플리케이션 실행 명령어
-  path: ./ # 배포될 애플리케이션의 위치
-  env: # [[6.2.](#_Abacus와_연동할_DB)[abacus manifest.yml](#_Abacus와_연동할_DB)]참조
-    DEBUG: a*
-    API: https://api.<CF 도메인 >
-    CF_CLIENT_ID: abacus-cf-bridge
-    CF_CLIENT_SECRET: secret
-    ABACUS_REPORT_SERVER: http://abacus-usage-reporting.<CF 도메인>
-    NODE_TLS_REJECT_UNAUTHORIZED: 0
-    NODE_MODULES_CACHE: false
-    SECURED: false # abacus-usage-reporting의 SECURED 설정이 true인 경우, true 설정
-    AUTH_SERVER: https://api.<CF 도메인>
-    CLIENT_ID: abacus
-    CLIENT_SECRET: secret
-    JWTKEY: |+
-       -----BEGIN PUBLIC KEY-----
-      -----END PUBLIC KEY-----
-    JWTALGO: RS256
-```
+권한 관리 권한 그룹, 권한 목록을 조회하고, 필요한 권한 그룹을 등록,
+수정, 삭제 할 수 있고 해당 권한 그룹의 상세 권한을 등록할 수 있는
+화면이다.
+
+![PaaSTa_Platform_Use_Guide_Image09]
+
+#####1.  권한 그룹 조회
+
+-   플랫폼 설치 자동화에 등록 된 권한 그룹을 조회 한다.
+
+#####2.  상세 권한 조회
+
+-   선택 한 권한 그룹에 해당 하는 플랫폼 설치 자동화에 등록 된 상세 권한을 조회 한다.
+
+#####3.  권한 그룹 등록
+
+-   권한 그룹 정보를 등록 하는 기능으로 권한 그룹 명, 설명을 입력 하고 확인 버튼을 클릭 한다.
+
+#####4.  권한 그룹 수정
+
+-   권한 그룹 목록에서 선택 된 권한 그룹 정보를 수정하는 기능으로 권한 그룹 명과 설명을 수정 할 수 있다.
+
+#####5.  권한 그룹 삭제
+
+-   권한 그룹 목록에서 선택 된 권한 그룹을 삭제 하는 기능
+
+#####6.  상세 권한 등록
+
+-   권한 그룹 목록에서 선택 된 권한 그룹에 해당하는 상세 권한 목록을 등록 하는 기능으로 권한 설정 허용/거부를 입력 후 확인 버튼을 클릭 한다.
 
 
-###<div id='31'/>3.3.3. 배포 형상
 
-  	$ cf a
+###<div id='13'/>2.1.7.  ***플랫폼 설치 자동화 관리 -> 사용자 관리***
 
-  	Getting apps in org test / space test as admin...
-  	OK
-  	name requested state instances memory disk urls
-  	paasta-usage-reporting started 1/1 512M 512M paasta-usage-reporting.bosh-lite.com
+사용자 관리 사용자 목록을 조회하고 사용자를 등록, 수정, 삭제 할 수 있는
+화면이다.
 
-###<div id='32'/>3.3.4.  api 호출 예제
+![PaaSTa_Platform_Use_Guide_Image10]
 
-  	$ curl -k -X GET https://paasta-usage-reporting.bosh-lite.com/v1/org/:org_id/space/:space_id
+#####1.  사용자 조회
 
+-   플랫폼 설치 자동화에 등록 된 사용자 목록을 조회 한다.
+
+#####2.  사용자 등록
+
+-   사용자 정보를 등록 하는 기능으로 사용자 아이디, 이름, Email, 권한 그룹을 입력하고 확인 버튼을 클릭 한다.
+
+#####3.  사용자 수정
+
+-   사용자 목록에서 선택 된 사용자 정보를 수정 하는 기능으로 비밀번호, 이름, Email, 권한을 수정 할 수 있다.
+
+#####4.  사용자 삭제
+
+-   사용자 목록에서 선택 된 사용자 정보를 삭제 하는 기능이다.
+
+###<div id='14'/>2.1.8.  ***플랫폼 설치 -> BOOTSTRAP 설치***
+
+클라우드 환경에 BOOTSTRAP(Microbosh)를 설치하는 화면으로 상단의 버튼을
+이용해서 설치/수정/삭제 기능을 제공한다.
+
+![PaaSTa_Platform_Use_Guide_Image11]
+
+#####1.  설치
+
+-   BOOTSTRAP 설치할 수 있는 기능을 수행한다.
+
+#####2.  수정
+
+-   BOOTSTRAP 목록에서 선택된 BOOTSTRAP 정보 확인 및 수정 후 재설치하는 기능을 수행한다.
+
+#####3.  삭제
+
+-   BOOTSTRAP 목록에서 선택된 BOOTSRAP을 삭제하는 기능을 수행한다.
+
+
+###<div id='15'/>2.1.9.  ***플랫폼 설치 -> BOSH 설치***
+
+클라우드 환경에 BOSH를 설치하는 화면으로 상단의 버튼을 이용해서
+설치/수정/삭제 기능을 제공한다.
+
+![PaaSTa_Platform_Use_Guide_Image12]
+
+#####1.  설치
+
+-   BOSH를 설치할 수 있는 기능을 수행한다.
+
+#####2.  수정
+
+-   BOSH 목록에서 선택된 BOSH 정보 확인 및 수정 후 재설치하는 기능을 수행한다.
+
+#####3.  삭제
+
+-   BOSH 목록에서 선택된 BOSH을 삭제하는 기능을 수행한다.
+
+#####4.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
+
+#####5.  BOSH 목록
+
+-   BOSH 설치 목록을 조회한다.
+
+
+###<div id='16'/>2.1.10. ***플랫폼 설치 -> CF 설치***
+
+설치 관리자(BOOTSTRAP 또는 BOSH)를 이용해서 PaaS-TA Controller인 CF를
+설치하는 화면으로 상단의 버튼을 이용해서 설치/수정/삭제 기능을 제공한다.
+
+![PaaSTa_Platform_Use_Guide_Image13]
+
+#####1.  설치
+
+-   CF를 설치할 수 있는 기능을 수행한다.
+
+#####2.  수정
+
+-   CF 목록에서 선택된 CF 정보 확인 및 수정 후 재설치하는 기능을 수행한다.
+
+#####3.  삭제
+
+-   CF 목록에서 선택된 CF를 삭제하는 기능을 수행한다.
+
+#####4.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
+
+#####5.  CF 목록
+
+-   CF 설치 목록을 조회한다.
+
+
+###<div id='17'/>2.1.11. ***플랫폼 설치 -> DIEGO 설치***
+
+설치 관리자(BOOTSTRAP 또는 BOSH)를 이용해서 PaaS-TA Container인 DIEGO를
+설치하는 화면으로 상단의 버튼을 이용해서 설치/수정/삭제 기능을 제공한다.
+
+![PaaSTa_Platform_Use_Guide_Image14]
+
+#####1.  설치
+
+-   DIEGO를 설치할 수 있는 기능을 수행한다.
+
+#####2.  수정
+
+-   DIEGO 목록에서 선택된 DIEGO 정보 확인 및 수정 후 재설치하는 기능을 수행한다.
+
+#####3.  삭제
+
+-   DIEGO 목록에서 선택된 DIEGO를 삭제하는 기능을 수행한다.
+
+#####4.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
+
+#####5.  DIEGO 목록
+
+-   DIEGO 설치 목록을 조회한다.
+
+
+###<div id='18'/>2.1.12. ***플랫폼 설치 -> CF & DIEGO 통합 설치***
+
+설치 관리자(BOOTSTRAP 또는 BOSH)를 이용해서 PaaS-TA Controller인 CF와
+PaaS-TA Container인 Diego를 통합 설치하는 화면으로 상단의 버튼을
+이용해서 설치/수정/삭제 기능을 제공한다.
+
+![PaaSTa_Platform_Use_Guide_Image15]
+
+#####1.  설치
+
+-   CF 및 Diego를 통합 설치할 수 있는 기능을 수행한다.
+
+#####2.  수정
+
+-   CF & Diego 통합 설치 목록에서 선택된 CF & Diego 정보 확인 및 수정 후 재설치하는 기능을 수행한다.
+
+#####3.  삭제
+
+-   CF & Diego 통합 설치 목록에서 선택된 CF & Diego를 삭제하는 기능을 수행한다.
+
+#####4.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
+
+#####5.  CF & Diego 통합 설치 목록
+
+-   CF & Diego 통합 설치 목록을 조회한다.
+
+###<div id='19'/>2.1.13. ***플랫폼 설치 -> 서비스팩 설치***
+
+설치 관리자(BOOTSTRAP 또는 BOSH)를 이용해서 PaaS-TA Controller인 CF에
+서비스팩을 설치하는 화면으로 상단의 버튼을 이용해서 설치/삭제 기능을
+제공한다.
+
+![PaaSTa_Platform_Use_Guide_Image16]
+
+#####1.  설치
+
+-   CF에 서비스팩을 설치할 수 있는 기능을 수행한다.
+
+#####2.  삭제
+
+-   서비스팩 목록에서 선택된 서비스팩을 삭제하는 기능을 수행한다.
+
+#####3.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
+
+#####4.  서비스팩 목록
+
+-   서비스팩 설치 목록을 조회한다.
+
+###<div id='20'/>2.1.14. ***정보조회 -> 스템셀 업로드***
+
+설치 관리자로부터 스템셀 정보를 조회/업로드/삭제할 수 있는 기능을
+제공하는 화면이다.
+
+![PaaSTa_Platform_Use_Guide_Image17]
+
+#####1.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
+
+#####2.  스템셀 삭제
+
+-   설치 관리자에 업로드 된 스템셀을 삭제하는 기능을 제공한다.
+
+#####.  업로드 된 스템셀 목록
+
+-   설치 관리자에 업로드 된 스템셀 목록을 보여준다.
+
+#####4.  스템셀 업로드
+
+-   설치 관리자로 스템셀을 업로드할 수 있는 기능을 제공한다.
+
+#####5.  다운로드 된 스템셀 목록
+
+-   플랫폼 설치 자동화에 다운로드 된 스템셀을 목록을 보여준다.
+
+
+###<div id='21'/>2.1.15. ***정보조회 -> 릴리즈 업로드***
+
+설치 관리자로부터 릴리즈 정보를 조회/업로드/삭제할 수 있는 기능을
+제공하는 화면이다.
+
+![PaaSTa_Platform_Use_Guide_Image18]
+
+#####1.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
+
+#####2.  업로드 된 릴리즈 목록
+
+-   설치 관리자에 업로드 된 업로드 된 릴리즈 목록을 보여준다.
+
+#####3.  다운로드 된 릴리즈 목록
+
+-   플랫폼 설치 자동화에 다운로드 된 릴리즈 목록을 보여준다.
+
+#####4.  릴리즈 삭제
+
+-   설치 관리자에 업로드 된 업로드 된 릴리즈를 삭제 하는 기능을 제공
+    한다.
+
+#####5.  릴리즈 업로드
+
+-   설치 관리자로 릴리즈 업로드할 수 있는 기능을 제공한다.
+
+
+###<div id='22'/>2.1.16. ***정보조회 -> 배포정보***
+
+설치 관리자로부터 배포된 배포 정보를 조회하는 기능을 제공하는 화면이다.
+
+![PaaSTa_Platform_Use_Guide_Image19]
+
+#####1.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
+
+#####2.  설치 목록
+
+-   설치 관리자를 이용해서 배포된 배포 목록 정보를 보여준다.
+
+###<div id='23'/>2.1.17. ***정보조회 -> Task 정보***
+
+설치 관리자가 수행한 Task 작업들에 대한 목록 조회 및 상세 로그 정보를
+확인하는 기능을 제공하는 화면이다.
+
+![PaaSTa_Platform_Use_Guide_Image20]
+
+#####1.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
+
+#####2.  Task 실행 이력
+
+-   설치 관리자가 수행한 Task의 작업 목록을 보여준다.
+
+#####3.  디버그 로그
+
+-   선택된 Task 작업에 대한 디버그 로그를 보여준다.
+
+#####4.  이벤트 로그
+
+-   선택된 Task 작업에 대한 이벤트 로그를 보여준다.
+
+
+###<div id='24'/>2.1.18. ***정보조회 -> VM 관리***
+
+VM 관리 기본 설치 관리자를 통해 배포한 VM을 조회, 관리 하는 기능을 제공
+하는 화면 이다.
+
+![PaaSTa_Platform_Use_Guide_Image21]
+
+#####1.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
+
+#####2.  배포 명 목록
+
+-   기본 설치 관리자가 배포한 VM의 배포명 목록을 보여준다.
+
+#####3.  VM 목록
+
+-   VM의 상세 명칭, 상태 값, Type, AZ, IPs, Load, Cpu 타입 등을 보여 준다.
+
+#####4.  배포 명 조회
+
+-   배포명 목록에서 선택 된 배포명을 통해 해당 배포명을 갖는 VM의 상세 목록을 조회하는 기능
+
+#####5.  로그 다운로드
+
+-   VM 목록에서 선택 된 VM의 Agent 로그, Job 로그를 선택 하여 다운로드 할 수 있는 기능
+
+#####6.  Job 시작
+
+-   VM 목록에서 선택 된 중지 상태 중인 VM을 시작하는 기능
+
+#####7.  Job 중지
+
+-   VM 목록에서 선택 된 시작 상태 중인 VM을 중지하는 기능
+
+#####8.  Job 재시작
+
+-   VM 목록에서 선택 된 VM을 재시작 하는 기능
+
+#####9.  Job 재생성
+
+-   VM 목록에서 선택 된 VM을 재생성 하는 기능
+
+
+###<div id='25'/>2.1.19. 정보조회 -> Property 관리
+
+Property 관리 설치 관리자가 배포한 VM 정보의 Property를 조회, 생성,
+수정, 삭제, 상세보기 할 수 있는 기능을 제공하는 화면
+
+![PaaSTa_Platform_Use_Guide_Image22]
+
+#####1.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
+
+#####2.  배포 명 목록
+
+-   기본 설치 관리자가 배포한 VM의 배포명 목록을 보여준다.
+
+#####3.  배포 명 조회 기능
+
+-   배포명 목록에서 선택 된 배포명을 통해 해당 배포명을 갖는 Property의 상세 목록을 조회하는 기능
+
+#####4.  Property 목록 조회
+
+-   배포 명을 통해 조회 된 해당 배포 정보의 Property 명, Property 값을 보여 준다.
+
+#####5.  Property 생성
+
+-   Property 정보를 저장하는 기능으로 Property 명, Property 값을 입력 하고 저장 버튼을 클릭 한다.
+
+#####6.  Property 수정
+
+-   선택 된 Property 정보를 수정하는 기능으로 Property 값을 수정하고 수정 버튼을 클릭 한다.
+
+#####7.  Property 삭제
+
+-   선택 된 Property 정보를 삭제하는 기능
+
+#####8.  Property 상세 보기
+
+-   선택 된 Property를 상세 보기 할 수 있는 기능
+
+###<div id='26'/>***2.1.20. 정보조회 -> 스냅샷 관리***
+
+스냅샷 관리 설치 관리자가 배포한 VM 정보의 스냅샷을 조회, 삭제, 전체
+삭제 할 수 있는 기능을 제공하는 화면
+
+![PaaSTa_Platform_Use_Guide_Image23]
+
+#####1.  설치 관리자
+
+-   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
+
+#####2.  배포 명 목록
+
+-   기본 설치 관리자가 배포한 VM의 배포명 목록을 보여준다.
+
+#####3.  배포 명 조회 기능
+
+-   배포명 목록에서 선택 된 배포명을 통해 해당 배포명을 갖는 스냅샷의 상세 목록을 조회하는 기능
+
+#####4.  스냅샷 목록 조회
+
+-   배포 명을 통해 조회 된 해당 배포 정보의 JobName, Uuid, SnapshotCid 등 스냅샷 상세 정보를 보여 준다
+
+#####5.  스냅샷 삭제
+
+-   선택 된 스냅샷을 삭제 하는 기능
+
+#####6.  스냅샷 전체 삭제
+
+-   조회 된 스냅샷을 전체 삭제 하는 기능.
+
+
+###<div id='27'/>***2.1.21. 정보조회 -> Manifest 관리***
+
+Manifest 관리 서비스팩 설치에 필요한 Manifest를 플랫폼 설치 자동화에
+업로드, 수정, 삭제, 업로드 된 Manifest 파일을 로컬에 다운로드 할 수 있는
+기능을 제공 하는 화면
+
+![PaaSTa_Platform_Use_Guide_Image24]
+
+#####1.  Manifest 목록
+
+-   플랫폼 설치 자동화에 업로드 된 Manifest 파일 목록을 보여준다.
+
+#####2.  Manifest 업로드
+
+-   로컬에 있는 Manifest 파일을 플랫폼 설치 자동화의 Manifest 관리 디렉토리(\~/.bosh\_plugin/deployment/manifest)로 업로드를 실행하는 기능.<br>
+IaaS, 설명, 파일을 입력 후 업로드 버튼을 클릭 한다.
+
+#####3.  Manifest 다운로드
+
+-   선택 한 업로드 된 Manifest 파일을 로컬 다운로드 폴더 경로로 다운로드 하는 기능
+
+#####4.  Manifest 수정
+
+-   선택 한 업로드 된 Manifest 파일을 상세 보기하여 수정 할 수 있는 기능
+
+#####5.  Manifest 삭제
+
+-   선택 한 업로드 된 Manifest 파일을 삭제 하는 기능
+
+
+[PaaSTa_Platform_Use_Guide_Image01]:/images/PaaSTa_Platform_Use_Guide/login.png
+[PaaSTa_Platform_Use_Guide_Image02]:/images/PaaSTa_Platform_Use_Guide/passwordChange.png
+[PaaSTa_Platform_Use_Guide_Image03]:/images/PaaSTa_Platform_Use_Guide/Dashboard.png
+[PaaSTa_Platform_Use_Guide_Image04]:/images/PaaSTa_Platform_Use_Guide/DirectorConfig.png
+[PaaSTa_Platform_Use_Guide_Image05]:/images/PaaSTa_Platform_Use_Guide/DirectorConfigAdd.png
+[PaaSTa_Platform_Use_Guide_Image06]:/images/PaaSTa_Platform_Use_Guide/StemcellConfig.png
+[PaaSTa_Platform_Use_Guide_Image07]:/images/PaaSTa_Platform_Use_Guide/ReleaseConfig.png
+[PaaSTa_Platform_Use_Guide_Image08]:/images/PaaSTa_Platform_Use_Guide/CodeManagement.png
+[PaaSTa_Platform_Use_Guide_Image09]:/images/PaaSTa_Platform_Use_Guide/AuthManagement.png
+[PaaSTa_Platform_Use_Guide_Image10]:/images/PaaSTa_Platform_Use_Guide/UseManagement.png
+[PaaSTa_Platform_Use_Guide_Image11]:/images/PaaSTa_Platform_Use_Guide/BootStrapInstall.png
+[PaaSTa_Platform_Use_Guide_Image12]:/images/PaaSTa_Platform_Use_Guide/BoshInstall.png
+[PaaSTa_Platform_Use_Guide_Image13]:/images/PaaSTa_Platform_Use_Guide/CfInstall.png
+[PaaSTa_Platform_Use_Guide_Image14]:/images/PaaSTa_Platform_Use_Guide/DiegoInstall.png
+[PaaSTa_Platform_Use_Guide_Image15]:/images/PaaSTa_Platform_Use_Guide/Cf_DiegoInstall.png
+[PaaSTa_Platform_Use_Guide_Image16]:/images/PaaSTa_Platform_Use_Guide/ServicePackInstall.png
+[PaaSTa_Platform_Use_Guide_Image17]:/images/PaaSTa_Platform_Use_Guide/StemcellUpload.png
+[PaaSTa_Platform_Use_Guide_Image18]:/images/PaaSTa_Platform_Use_Guide/ReleaseUpload.png
+[PaaSTa_Platform_Use_Guide_Image19]:/images/PaaSTa_Platform_Use_Guide/DeploymentInfo.png
+[PaaSTa_Platform_Use_Guide_Image20]:/images/PaaSTa_Platform_Use_Guide/TaskInfo.png
+[PaaSTa_Platform_Use_Guide_Image21]:/images/PaaSTa_Platform_Use_Guide/VmInfo.png
+[PaaSTa_Platform_Use_Guide_Image22]:/images/PaaSTa_Platform_Use_Guide/PropertyInfo.png
+[PaaSTa_Platform_Use_Guide_Image23]:/images/PaaSTa_Platform_Use_Guide/SnapshotInfo.png
+[PaaSTa_Platform_Use_Guide_Image24]:/images/PaaSTa_Platform_Use_Guide/ManifestInfo.png
