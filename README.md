@@ -1179,12 +1179,12 @@ BOSH설치가 완료되면 BOSH 디렉터 정보(디렉터IP, 포트번호, 계�
 BOSH를 설치하고 플랫폼 설치 자동화의 설치 관리자로 설정이 완료되면 CF를
 설치할 준비가 된 상태로 CF를 설치하는 절차는 다음과 같다.
 
+![PaaSTa_Platform_Use_Guide_Image66]
 
 ###3.4.1.  ***스템셀 업로드*** 
 
 1.3.1 “스템셀 업로드”에서 수행했던 것과 동일하게 BOSH 설치 관리자에
 3312.12버전의 스템셀을 업로드 합니다.
-
 
 ###3.4.2.  ***릴리즈 업로드***
 
@@ -1206,48 +1206,58 @@ cf-release(cf-release-247.tgz)를 1.2.2 “릴리즈 다운로드”와 동일�
 CF설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” -> “CF설치”
 메뉴로 이동 후 상단의 “설치” 버튼을 클릭한다. (CF 설치 화면 설명은 2.1.10참고))
 
-
 ####1.  Diego 사용 여부 선택
-
 -   Diego 사용 여부 팝업화면에서 예를 선택하고, “확인” 버튼 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image67]
 
 ####2.  CF 설치 – 기본정보 입력
-
 -   배포에 필요한 기본정보와 도메인 / 로그인 비밀번호를 입력 후 “다음” 버튼을 클릭한다.
-
 -   SSH 핑거프린트는 입력 항목은 Diego 설치 팝업 화면에서 Key 생성 후 입력한다. (below)
 
+![PaaSTa_Platform_Use_Guide_Image68]
 
 ####3.  CF 설치 – 클라우드 환경 별 네트워크 정보
 
 -   오픈스택 환경일 경우 오픈스택의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image69]
+
 -   AWS 환경일 경우 AWS의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+
+![PaaSTa_Platform_Use_Guide_Image70]
 
 -   VSPHERE 환경일 경우 VSPHERE의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image71]
 
 ####4.  CF 설치 – Key 생성
 
 -   Key 생성 정보 입력 후 “Key 생성” 버튼을 클릭하고, Key 생성 확인 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image72]
+
 ####5.  CF 설치 – 클라우드 환경 별 리소스 정보
 
 -   오픈스택/AWS 환경일 경우 오픈스택 및 AWS의 스템셀 / VM 비밀번호 / Flavor 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image73]
+
 -   VSPHERE 환경일 경우 오픈스택 및 VSPHERE의 스템셀 / VM 비밀번호 / Flavor 정보 입력 후 “다음” 버튼을 클릭한다.
 
+![PaaSTa_Platform_Use_Guide_Image74]
 
 ####6.  CF 설치 – 배포 파일 정보
 
 -   입력한 정보를 기준으로 생성한 배포 Manifest파일 정보를 확인한다.
 
+![PaaSTa_Platform_Use_Guide_Image75]
 
 ####7.  CF 설치 – 설치
 
 -   생성된 배포 Manifest파일 정보를 이용하여 PaaS-TA Controller(CF) 설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
 
+![PaaSTa_Platform_Use_Guide_Image76]
 
 ##3.5.  ***DIEGO******설치하기*** 
 
@@ -1591,3 +1601,16 @@ found참고)
 [PaaSTa_Platform_Use_Guide_Image63]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereResourceInfo.png
 [PaaSTa_Platform_Use_Guide_Image64]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshDeployInfo.png
 [PaaSTa_Platform_Use_Guide_Image65]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshInstallInfo.png
+
+
+[PaaSTa_Platform_Use_Guide_Image66]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfProcess.png
+[PaaSTa_Platform_Use_Guide_Image67]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfDiegoCheck.png
+[PaaSTa_Platform_Use_Guide_Image68]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfDefaultInfo.png
+[PaaSTa_Platform_Use_Guide_Image69]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfOpenstackNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image70]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/cfAwsNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image71]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfVsphereNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image72]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfKeyInfo.png
+[PaaSTa_Platform_Use_Guide_Image73]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfAwsOpenstackResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image66]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfVsphereResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image74]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfDeployInfo.png
+[PaaSTa_Platform_Use_Guide_Image75]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfInstallInfo.png
