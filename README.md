@@ -110,26 +110,26 @@ Node.js 애플리케이션 개발을 위해 다음과 같은 환경으로 개발
 <div id='8'></div>
 ### 2.2.1 Node.js 및 npm 설치
 
-1.  Node.js 및 npm 설치  
+####1.  Node.js 및 npm 설치  
 
-		$ sudo apt-get install curl
+	$ sudo apt-get install curl
 
-		## Node.js version 6.x를 설치할 경우
-		## Source Repository 등록
-		$ curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash –
+	## Node.js version 6.x를 설치할 경우
+	## Source Repository 등록
+	$ curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash –
 
-		## Node.js & Npm 설치
-		$ sudo apt-get install -y nodejs
+	## Node.js & Npm 설치
+	$ sudo apt-get install -y nodejs
 
- 		## Node.js & Nmp 설치 확인
- 		$ node -v
- 		$ npm -v
+		## Node.js & Nmp 설치 확인
+		$ node -v
+		$ npm -v
 
-	※ Windows 용은 다음 사이트에서 Node.js를 다운 받는다.  
-	**<a href="https://nodejs.org/ko/download/">https://nodejs.org/ko/download/</a>**
+※ Windows 용은 다음 사이트에서 Node.js를 다운 받는다.  
+**<a href="https://nodejs.org/ko/download/">https://nodejs.org/ko/download/</a>**
 
-	※ 개발도구  
-	Node.js는 javascript기반의 언어로 Notepad++, Sublim Text, EditPlus등 문서편집기를 개발도구로 사용할 수 있다. 또한 Eclipse의 플러그인 Nodeclipse를 설치하여 사용할 수 있다. 그리고 상용 개발 도구로써는 WebStome 등이 있다.
+※ 개발도구  
+Node.js는 javascript기반의 언어로 Notepad++, Sublim Text, EditPlus등 문서편집기를 개발도구로 사용할 수 있다. 또한 Eclipse의 플러그인 Nodeclipse를 설치하여 사용할 수 있다. 그리고 상용 개발 도구로써는 WebStome 등이 있다.
 
 <div id='9'></div>
 ### 2.2.2 CF-Abacus 설치
