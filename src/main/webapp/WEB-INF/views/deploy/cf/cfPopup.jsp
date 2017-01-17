@@ -314,7 +314,7 @@ function setDisabledMonitoring(val){
 		var cfReleaseVersion = val.split("/")[1];
 		
 		//paasta-controller v2.0.0 이상 PaaS-TA 모니터링 지원 checkbox
-		if( cfReleaseName.indexOf("paasta-controller") > -1 && compare(cfReleaseVersion, "2.0.0") > -1 ){
+		if( cfReleaseName.indexOf("paasta-controller") > -1 && compare(cfReleaseVersion, "2.0") > -1 ){
 			$('.w2ui-msg-body #paastaMonitoring').attr('disabled',false);
 		}else{
 			if( $(".w2ui-msg-body input:checkbox[name='paastaMonitoring']").is(":checked")){
@@ -1481,16 +1481,16 @@ function gridReload() {
 				<div class="panel-heading"><b>PaaS-TA 모니터링 정보</b></div>
 				<div class="panel-body" style="padding:5px 5% 10px 5%;">
 					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">PaaS-TA 모니터링 DB 서버 IP</label>
+						<label style="text-align: left; width: 40%; font-size: 11px;">PaaS-TA 모니터링 Ingestor 서버 IP</label>
 						<div>
 							<input name="ingestorIp" type="text" style="float: left; width: 60%;" disabled placeholder="예)10.0.0.0" />
 							<div class="isMessage ingestorIp"></div>
 						</div>
 					</div>
 					<div class="w2ui-field">
-						<label style="text-align: left; width: 40%; font-size: 11px;">PaaS-TA 모니터링 DB 서버 PORT</label>
+						<label style="text-align: left; width: 40%; font-size: 11px;">PaaS-TA 모니터링 Ingestor 서버 PORT</label>
 						<div>
-							<input name="ingestorPort" type="text" style="float: left; width: 60%;" disabled required placeholder="예)8063" />
+							<input name="ingestorPort" type="text" style="float: left; width: 60%;" disabled required placeholder="예)2514" />
 							<div class="isMessage "ingestorPort""></div>
 						</div>
 					</div>

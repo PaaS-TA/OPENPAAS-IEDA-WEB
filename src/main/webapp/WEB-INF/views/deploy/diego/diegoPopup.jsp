@@ -396,7 +396,7 @@ function setCfDeployFile(value){
 function getgardenRelease() {
 	$.ajax({
 		type :"GET",
-		url :"/common/deploy/release/list/garden",
+		url :"/common/deploy/release/list/garden-linux",
 		contentType :"application/json",
 		async :true,
 		success :function(data, status) {
@@ -510,7 +510,7 @@ function setDisabledMonitoring(val){
 		var diegoReleaseVersion = val.split("/")[1];
 		
 		//paasta-container v2.0 이상 PaaS-TA 모니터링 지원 checkbox
-		if( diegoReleaseName.indexOf("paasta-container") > -1 && compare(diegoReleaseVersion, "2.0.0") > -1 && 
+		if( diegoReleaseName.indexOf("paasta-container") > -1 && compare(diegoReleaseVersion, "2.0") > -1 && 
 				$(".w2ui-msg-body input[name='cfPaastaMonitoring']").val()=="true"){
 			$('.w2ui-msg-body #paastaMonitoring').attr('disabled',false);
 		}else{

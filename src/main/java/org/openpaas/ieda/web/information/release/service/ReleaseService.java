@@ -124,10 +124,14 @@ public class ReleaseService {
 				int idx = 0;
 				List<ReleaseDTO> releaseList = Arrays.asList(releases);
 				for ( ReleaseDTO release : releaseList ) {
-					if( type.equals(release.getName()) ||
-							(type.equals("cf") && release.getName().indexOf("-controller") > -1)  
-							|| (type.equals("diego") && release.getName().indexOf("-container") > -1) 
-							|| (type.equals("garden") && release.getName().indexOf("garden") > -1) ){
+					String releaseName = release.getName();
+					if( release.getName().indexOf("paasta-") > -1 ){
+						releaseName = release.getName().split("paasta-")[1];
+						if("controller".equals(releaseName)) releaseName = "cf";
+						else if("container".equals(releaseName)) releaseName="diego";
+						else if("garden-runc".equals(releaseName)) releaseName="garden-linux";
+					}
+					if( type.equals(releaseName)){
 						
 						List<ReleaseVersionDTO> versionList = release.getReleaseVersions();
 						for (ReleaseVersionDTO releaseVersion : versionList) {
