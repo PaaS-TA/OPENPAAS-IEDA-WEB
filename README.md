@@ -1,1616 +1,1156 @@
-# Table of Contents
-1. [문서 개요](#1)
-	* [목적](#2)
-	* [범위](#3)
-	* [참고자료](#4)
-2. [플랫폼 설치 자동화 메뉴얼](#5)
-	* [플랫폼 설치 자동화 화면 설명](#6)
-		* [로그인](#7)
-		* [환경설정 및 관리 -> 설치관리자 설정](#8)
-		* [환경설정 및 관리 -> 스템셀 관리](#9)
-		* [환경설정 및 관리 -> 릴리즈 관리](#10)
-		* [플랫폼 설치 자동화 관리 -> 코드 관리](#11)
-		* [플랫폼 설치 자동화 관리 -> 권한 관리](#12)
-		* [플랫폼 설치 자동화 관리 -> 사용자 관리](#13)
-		* [플랫폼 설치 -> BOOTSTRAP 설치](#14)
-		* [플랫폼 설치 -> BOSH 설치](#15)
-		* [플랫폼 설치 -> CF 설치](#16)
-		* [플랫폼 설치 -> DEIGO 설치](#17)
-		* [플랫폼 설치 -> CF & DEIGO 통합 설차](#18)
-		* [플랫폼 설치 -> 서비스팩 설치](#19)
-		* [정보조회 -> 스템셀 업로드](#20)
-		* [정보조회 -> 릴리즈 업로드](#21)
-		* [정보조회 -> 배포 정보](#22)
-		* [정보조회 -> Task 정보](#23)
-		* [정보조회 -> VM 관리](#24)
-		* [정보조회 -> Property 관리](#25)
-		* [정보조회 -> 스냅샷 관리](#26)
-		* [정보조회 -> Manifest 관리](#27)
-		
- 		
-#<div id='1'/>1.  문서 개요 
+## Table of Contents
 
-##<div id='2'/>1.1.  목적
+1. [개요](#1)
+	* [문서 개요](#2)
+	 * [목적](#3)
+	 * [범위](#4)
+	 * [참고자료](#5)
 
-본 문서는 플랫폼 설치 자동화 시스템의 사용 절차에 대해 기술하였다.
-
-##<div id='3'/>1.2.  범위
-
-본 문서에서는 Linux 환경(Ubuntu 14.04)을 기준으로 플랫폼 설치 자동화를
-사용하는 방법에 대해 작성되었다.
-
-##<div id='4'/>1.3.  참고자료
-
-본 문서는 Cloud Foundry의 Document를 참고로 작성하였다.<br>
-BOSH Document: **[http://bosh.io](http://bosh.io)**<br>
-CF & Diego Document:
-[http://docs.cloudfoundry.org/](http://docs.cloudfoundry.org/)
+2. [JAVA API 서비스 미터링 개발가이드](#6)
+    * [개요](#7)
+    * [개발 환경 구성](#8)
+    * [서비스 브로커 라이브러리](#9)
+     * [서비스 브로커 라이브러리란 무엇인가?](#10)
+     * [서비스 브로커 라이브러리를 다운로드 한 후, 프로젝트 import 한다](#11)
+     * [서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일들](#12)
+     * [ServiceInstanceBindingController](#13)
+     * [ServiceInstanceBinding](#14)
+     * [SampleMeteringReportService 추상화 클래스](#15)
+     * [SampleMeteringOAuthService 추상화 클래스](#16)
+    * [서비스 브로커 라이브러리](#17)
+     * [mongo-db 서비스 브로커 API](#18)
+     * [mongo-db 서비스 브로커 API 다운로드](#19)
+     * [mongo-db 서비스 브로커 API에 추가 및 수정 되는 파일](#20)
+     * [gradle build를 위한 dependency 추가](#21)
+     * [application-mvc.properties 설정](#22)
+     * [datasource.properties 설정](#23)
+     * [MongoServiceInstanceBindingService 구현체](#24)
+     * [SampleMeteringOAuthService 구현](#25)
+     * [SampleMeteringReportService 구현](#26)
+    * [미터링/등급/과금 정책](#27)
+     * [미터링 정책](#28)
+     * [등급 정책](#39)
+     * [과금 정책](#30)
+     * [정책 등록](#31)
+    * [배포](#32)
+     * [파스-타 플랫폼 로그인](#33)
+     * [mongo-db 서비스 브로커 생성](#34)
+     * [API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결](#35)
+    * [서비스 바인딩 CF-Abacus 연동 테스트](#36)
+    * [단위 테스트](#37)
 
 
-#<div id='5'/>2.  플랫폼 설치 자동화 매뉴얼
 
-플랫폼 설치 관리자는 설치관리자 등록정보 관리 및 기본 설치관리자를
-지정하는 환경 설정하는 부분과 기본 설치관리자로부터 필요한 정보를
-조회/업로드를 수행하는 부분 그리고 설치관리자를 이용해서 PaaS-TA를
-설치하는 부분으로 구성되어 있다.
+
+
+
+
+#<div id='1'/>1.  개요
+##<div id='2'/> 1.1 문서 개요
+###<div id='3'/>1.1.1.  목적
+
+
+본 문서(Java 서비스브로커 미터링 애플리케이션 개발 가이드)는 파스-타
+플랫폼 프로젝트의 서비스 브로커에 미터링 서비스를 추가하여, CF(Cloud
+Foundry) 서비스를 미터링 하는 방법에 대해 기술 한다.
+
+
+###<div id='4'/>1.1.2.  범위
+
+본 문서의 범위는 파스-타 플랫폼 프로젝트의 Cloud Foundry JAVA 서비스
+브로커 애플리케이션 미터링 개발과 CF-Abacus 연동에 대한 내용으로
+한정되어 있다. 서비스브로커 API 개발에 대해서는 별도 제공 하는
+서비스브로커 API 개발 가이드를 참고 한다.
+
+
+
+본 문서는 Ubuntu 14.04 ver의 개발 환경을 전제로 기술 한다.
+
+
+본 문서는 mongo-db 서비스 팩이 설치 되어 있는 개발 환경을 전제로 기술
+한다.
+
+mongo-db 서비스 팩 설치는 별로 로 제공 되는 문서를 참고 하여 설치 한다.
+
+**[https://github.com/OpenPaaSRnD/Documents/blob/master/Service-Guide/NOSQL/OpenPaaS_PaaSTA_ServicePack_MongoDB_BOSH-Lite_install_guide.md](https://github.com/OpenPaaSRnD/Documents/blob/master/Service-Guide/NOSQL/OpenPaaS_PaaSTA_ServicePack_MongoDB_BOSH-Lite_install_guide.md)**
+
+
+본 문서는 cf-abacus 가 설치 되어 있는 개발 환경을 전제로 기술 한다.
+(cf-abacus 설치는 별도 제공하는 Abacus 설치 가이드를 참고하여
+CF-Abacus를 설치한다.)
+
+##<div id='5'/>1.3.  참고 자료
+
+-   **[https://docs.cloudfoundry.org/devguide/](https://docs.cloudfoundry.org/devguide/)**
+-   **[http://cli.cloudfoundry.org/ko-KR/cf/](http://cli.cloudfoundry.org/ko-KR/cf/)**
+-   **[https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/](https://github.com/cloudfoundry-community/spring-boot-cf-service-broker)**
+-   **[https://github.com/cloudfoundry-incubator/cf-abacus](https://github.com/cloudfoundry-incubator/cf-abacus)**
+
+
+#<div id='6'/>2.  Java서비스 미터링 개발가이드
+
+
+##<div id='7'/>2.1.  개요
+
+
+CF Services 는 Service Broker API 라고 불리우는 cloud controller
+클라이언트 API를 구현하여 개방형 클라우드 플랫폼에서 사용된다. Services
+API는 독립적인 cloud controller API의 버전이다. 이는 플랫폼에서 외부
+application을 이용 가능하게 한다. (database, message queue, rest
+endpoint, etc.)<br>
+개방형 클라우드 플랫폼 Service API는 Cloud Controller 와 Service Broker
+사이의 규약 (catalog, provision, de provision, update provision plan,
+bind, unbind)이고 Service Broker 는 RESTful API 로 구현하고 Cloud
+Controller 에 등록한다.<br>
+서비스에 미터링 구현하고자 할 때, 이 규약들 중 서비스 정책 및 취지에
+맞는 프로세스를 선택하여, 그 프로세스에 미터링을 연동할 수 있다.<br>
+본 개발가이드에서는 mongo-db 서비스를 예시로, bind 와 unbind 시 미터링을
+하는 방법에 대해 가이드 한다.<br>
+서비스를 사용하고자 하는 애플리케이션과 API 서비스를 바인딩 할 때, CF
+CLI 바인딩 요청 request에 적용 된 애플리케이션 환경정보(org guid, space
+guid, app guid, metering plan id) 를 이용해 바인딩 정보를 획득 하여,
+서비스 요청을 처리함과 동시에 서비스의 사용 내역을 CF-ABACUS에 전송하는
+미터링 서비스 기능을 mongo-db 서비스 브로커에 추가하여 개발 한다.
+
+
+Service Broker API Architecture
+
+![Java_Service_Metering_Image01]
+
+![Java_Service_Metering_Image02]
 
 <table>
   <tr>
-    <th>분류</th>
-    <th>메뉴</th>
-    <th>설명</th>
+    <th colspan ="2">기능</th>
+     <th>설명</th>
   </tr>
   <tr>
-    <td rowspan="3">환경설정 및 관리</td>
-    <td>설치관리자 설정</td>
-    <td>BOSH 디렉터(설치관리자) 정보를 관리하는 화면</td>
+     <td rowspan="4">Runtime</td>
+     <td>미터링/등급/과금 정책</td>
+     <td>서비스 제공자가 제공하는 서비스에 대한 각종 정책 정의 정보. JSON 형식으로 되었으며, 해당 정책을 CF-ABACUS에 등록하면 정책에 정의한 내용에 따라 서비스 사용량을 집계 한다.
+정책은 서비스 제공자가 정의해야 하며, JSON 스키마는 다음을 참조한다. <br>
+<a href = "https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md" >https://github.com/cloudfoundry-incubator/cf-abacus/blob/master/doc/api.md
+</a>
+</td>
   </tr>
+   <tr>
+     <td width="160px">서비스 브로커 API</td>
+     <td>Cloud Controller와 Service 사이에서 서비스의 create, delete, update, bind, unbind를 처리한다. 본문서에서는 mongo-db 서비스 브로커 API를 대상으로 미터링 서비스를 개발 하여 추가 한다.
+</td>
+  </tr> 
   <tr>
-    <td>스템셀 관리</td>
-    <td>BOSH Public 스템셀 등록/삭제하는 화면</td>
-  </tr>
+     <td>서비스 브로커 <br>미터링 서비스
+</td>
+     <td>서비스 브로커 API 가 abacus-usage-collector 에 서비스 사용량 정보를 전송하는 서비스 (본 문서에서 가이드 할 개발 영역 이다)</td>
+  </tr> 
+   <tr>
+     <td>서비스</td>
+     <td>서비스 제공자가 제공하는 서비스 기능</td>
+  </tr> 
   <tr>
-    <td>릴리즈 관리</td>
-    <td>릴리즈 등록/삭제하는 화면</td>
+  	<td colspan ="2">CF-ABACUS</td>
+    <td>CF-ABACUS 핵심 기능으로써 수집한 사용량 정보를 집계한다.<br>
+CF-ABACUS은 CF 설치 후, CF에 마이크로 서비스 형태로 설치한다. 자세한 사항은 다음을 참조한다.<br>
+<a href = "https://github.com/cloudfoundry-incubator/cf-abacus" >https://github.com/cloudfoundry-incubator/cf-abacus</a>
+</td>
   </tr>
-  <tr>
-    <td rowspan="3">플랫폼 설치 자동화 관리</td>
-    <td>코드 관리</td>
-    <td>공통 코드를 등록/수정/삭제 등 관리하는 화면</td>
-  </tr>
-  <tr>
-    <td>권한 관리</td>
-    <td>권한 정보를 등록/수정/삭제 등 관리하는 화면</td>
-  </tr>
-  <tr>
-    <td>사용자 관리</td>
-    <td>사용자 정보를 등록/수정/삭제 등 관리하는 화면</td>
-  </tr>
-  <tr>
-    <td rowspan="6">플랫폼 설치</td>
-    <td>BOOTSTRAP 설치</td>
-    <td>BOOTSTRAP를 설치하는 화면</td>
-  </tr>
-  <tr>
-    <td>BOSH 설치</td>
-    <td>BOSH를 설치하는 화면</td>
-  </tr>
-  <tr>
-    <td>CF 설치</td>
-    <td>CF를 설치하는 화면</td>
-  </tr>
-  <tr>
-    <td>Diego 설치</td>
-    <td>Diego를 설치하는 화면</td>
-  </tr>
-  <tr>
-    <td>CF 및 Diego 설치</td>
-    <td>CF 및 Diego를 설치하는 화면</td>
-  </tr>
-  <tr>
-    <td>서비스팩 설치</td>
-    <td>서비스팩을 설치하는 화면</td>
-  </tr>
-  <tr>
-    <td rowspan="8">배포 정보 조회 및 관리</td>
-    <td>스템셀 업로드</td>
-    <td>기본 설치관리자에 스템셀 업로드 및 삭제하는 화면</td>
-  </tr>
-  <tr>
-    <td>릴리즈 업로드</td>
-    <td>기본 설치관리자에 릴리즈 업로드 및 삭제하는 화면</td>
-  </tr>
-  <tr>
-    <td>배포 정보</td>
-    <td>기본 설치관리자에 배포된 배포목록을 확인하는 화면</td>
-  </tr>
-  <tr>
-    <td>Task 정보</td>
-    <td>기본 설치관리자가 수행한 Task 정보를 확인하는 화면</td>
-  </tr>
-  <tr>
-    <td>VM 관리</td>
-    <td>기본 설치관리자에 배포된 배포의 VM을 관리하는 화면</td>
-  </tr>
-  <tr>
-    <td>Property 관리</td>
-    <td>기본 설치관리자에 배포된 배포의 Property를 관리하는 화면</td>
-  </tr>
-  <tr>
-    <td>스냅샷 관리</td>
-    <td>기본 설치관리자에 배포된 배포의 스냅샷을 관리하는 화면</td>
-  </tr>
-  <tr>
-    <td>Manifest 관리</td>
-    <td>서비스팩 설치에 필요한 Manifest를 관리하는 화면</td>
-  </tr>
+</table>                
+
+
+※ 본 개발 가이드는 <U>**애플리케이션과 서비스가 바인드 되는 시점을 서비스의 이용 시작으로 판단할 수 있는 서비스에 대해 미터링 하는 기능 개발</U>**에 대해서만 기술한다.
+
+※ <U>**서비스의 특정 API 호출 , 서비스의 특정 자원 이용 등에 대한 미터링 기능 개발에 대해서는 기술하지 않는다.**</U>
+
+※ API 호출에 대한 미터링은 API 서비스 미터링 개발 가이드를 참조한다.
+
+※ 다른 컴포넌트의 개발 또는 설치에 대해서 링크한 사이트를 참조한다.
+
+
+##<div id='8'/>2.2.  개발환경 구성
+
+
+서비스 미터링 개발을 위해 다음과 같은 환경을 개발환경을 전제 한다.
+
+-   CF release: v226 이상 (bosh-lite 설치 환경에서 테스트)
+-   gradle 2.14
+-   java version "1.8.0_101"
+-   springBootVersion: 1.3.0. BUILD-SNAPSHOT
+-   mongo-db service broker 2.5 (미터링 서비스를 추가 하기 위한 대상
+    서비스 브로커 프로젝트)
+-   springBootCfServiceBrokerVersion "2.5.0" (서비스 브로커 라이브러리)
+-   Spring Tool Suite 혹은 Eclipse
+
+
+##<div id='9'/>2.3.  서비스 브로커 라이브러리
+
+
+
+###<div id='10'/>2.3.1.  서비스 브로커 라이브러리는 무엇인가?
+
+
+CF (개방형 플랫폼) 에서는 플랫폼 상에서 서비스 할 수 있는 다양한
+서비스들이 존재한다.<br>
+이 서비스들은 각각 그 서비스 고유의 서비스 브로커를 개발 함으로써, CF
+(개방형 플랫폼) 에서 애플리케이션이 서비스를 사용 할 수 있도록 하고
+있다.<br>
+서비스는 다양하지만, 서비스를 사용하기 위한 개방형 플랫폼의 RESTAPI가
+미리 정해져 있다.<br>
+서비스 브로커 라이브러리는 각각 다른 서비스 브로커들이 서비스 브로커
+라이브러리 Jar 파일을 build path 에 추가 하고, 추상화 클래스들을 구현
+하는 것으로 이 개방형 플랫폼의 REST API에 기반 하여, 서비스가 제공 될 수
+있도록 해주는 라이브러리 이다.
+
+본 가이드에서는 mongo-db 서비스 브로커에 미터링 서비스를 구현하기
+위해서는 이 서비스 브로커 라이브러리에 미터링을 하기 위한 추상화
+클래스를 추가 한 후, mongo-db 서비스 브로커에서 이 라이브러리를
+dependency로 사용하여 빌드 한다.
+
+
+###<div id='11'/>2.3.2.  서비스 브로커 라이브러리를 다운로드 한 후, 프로젝트 import 한다.
+
+1.  오픈 소스로 제공되고 있는 서비스 브로커 소스를 git clone 으로 다운받는다.<br>
+    **[https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/tree/master/src/main/java/org/cloudfoundry/community/servicebroker/controller](https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/tree/master/src/main/java/org/cloudfoundry/community/servicebroker/controller)**
+
+
   
-</table>
+		$ git clone https://github.com/cloudfoundry-community/spring-boot-cf-service-broker.git
+  		Cloning into 'spring-boot-cf-service-broker'...
+  		remote: Counting objects: 2394, done.
+  		remote: Total 2394 (delta 0), reused 0 (delta 0), pack-reused 2394
+  		Receiving objects: 100% (2394/2394), 351.72 KiB | 279.00 KiB/s, done.
+  		Resolving deltas: 100% (939/939), done.
+  		Checking connectivity... done.
 
-##<div id='6'/>2.1.  플랫폼 설치 자동화 화면 설명
 
-본 장에서는 플랫폼 설치 자동화를 구성하는 20개의 메뉴 및 로그인에 대한
-설명을 기술한다.
+다운 받은 소스를 Java 개발 도구 Eclipse 및 Spring Tool Suite 로 import
+한다.
 
-###<div id='7'/>2.1.1. ***로그인***
+gradle 플러그인을 Eclipse 에 추가한 후, gradle import 하면 개발이 보다
+용이 해진다.
 
-“로그인” 화면은 플랫폼 설치 자동화 관리자가 로그인하는 화면으로 사용자
-정보 생성 후 최초 로그인을 했을 경우 비밀번호 변경 화면을 통해 비밀번호
-정보를 변경한다.
 
+###<div id='12'/>2.3.3.  서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일들
 
-####1.  로그인
 
--   플랫폼 설치 관리자는 로그인 첫 아이디와 비밀번호를(admin/admin) 입력 후 로그인 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image01]
-
-####2.  비밀번호 변경
-
--   비밀번호 변경 화면을 통해 비밀번호를 수정할 수 있다.
-
-![PaaSTa_Platform_Use_Guide_Image02]
-
-####3.  플랫폼 설치 자동화 접속
-
-![PaaSTa_Platform_Use_Guide_Image03]
-
-###<div id='8'/>2.1.2. ***환경설정 및 관리 -> 설치관리자 설정***
-
-“설치관리자 설정” 화면은 BOSH의 디렉터 정보 관리 및 설정하는 화면으로
-BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이다.
-
-※ 설치 관리자에서 설정을 추가하기 위해서는 먼저 BOOTSTRAP을 설치
-해야한다.
-
-![PaaSTa_Platform_Use_Guide_Image04]
-
-####1.  설정 추가
-
--   설치 관리자 정보를 등록하는 기능으로 BOSH 디렉터의 IP, 포트번호,계정, 비밀번호 입력 후 확인 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image05]
-
-####2.  설정 수정
-
--   설치 관리자 등록 목록에서 선택된 설치 관리자 정보를 수정하는 기능으로 계정과 비밀번호를 수정할 수 있다.
-
-####3.  설정 삭제
-
--   설치 관리자 등록 목록에서 선택된 설치 관리자 정보를 삭제하는 기능
-
-####4.  기본 설치 관리자로 설정
-
--   설치 관리자 등록 목록에서 선택된 설치 관리자를 기본 설치 관리자로 설정하는 기능
-
-####5.  설치 관리자 목록
-
--   등록된 설치 관리자 목록을 보여준다.
-
-####6.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-
-###<div id='9'/>2.1.3.  ***환경설정 및 관리 -> 스템셀 관리***
-
-다운로드한 스템셀 목록을 조회하고, 필요한 스템셀을 등록 및 삭제 할 수
-있는 화면이다.
-
-![PaaSTa_Platform_Use_Guide_Image06]
-
-####1.  등록
-
--   등록할 스템셀 정보를 입력하여 스템셀 정보를 저장하고 스템셀 파일을 플랫폼 설치 자동화의 스템셀 디렉토리(\~/.bosh\_plugin/stemcell)로 다운로드를 수행한다.
-
-####2.  삭제
-
--   플랫폼 설치 자동화에 다운로드 된 스템셀을 삭제하는 기능을 수행한다.
-
-###<div id='10'/>2.1.4.  환경설정 및 관리 -> 릴리즈 관리
-
-다운로드한 릴리즈 목록을 조회하고, 필요한 릴리즈를 등록/삭제 할 수 있는
-화면이다.
-
-![PaaSTa_Platform_Use_Guide_Image07]
-
-####1.  등록
-
--   등록할 릴리즈 정보를 입력하여 릴리즈 정보를 저장 하고 플랫폼 설치 자동화의 릴리즈 디렉토리(\~/.bosh\_plugin/release)로 다운로드를 수행한다.
-
-####2.  삭제
-
--   플랫폼 설치 자동화에 등록된 릴리즈를 삭제하는 기능을 수행한다.
-
-
-###<div id='11'/>2.1.5.  ***플랫폼 설치 자동화 관리 -> 코드 관리***
-
-코드 관리 코드 그룹, 코드 목록을 조회하고, 필요한 코드 그룹을 등록,
-수정, 삭제 할 수 있고 해당 코드 그룹의 하위 코드를 등록, 수정, 삭제 할
-수 있는 화면이다.
-
-![PaaSTa_Platform_Use_Guide_Image08]
-
-####1.  코드 그룹 조회
-
--   플랫폼 설치 자동화에 등록 된 상위 공통 코드를 조회 한다.
-
-####2.  코드 조회
-
--   선택 한 코드 그룹에 해당 하는 플랫폼 설치 자동화에 등록 된 하위 공통 코드를 조회 한다.
-
-####3.  코드 그룹 등록
-
--   코드 그룹 정보를 등록 하는 기능으로 코드 그룹 명, 코드 그룹 값, 설명을 입력 하고 확인 버튼을 클릭한다.
-
-####4.  코드 그룹 수정
-
--   코드 그룹 목록에서 선택 된 코드 그룹 정보를 수정하는 기능으로 코드 그룹 명과 설명을 수정 할 수 있다.
-
-####5.  코드 그룹 삭제
-
--   코드 그룹 목록에서 선택 된 코드 그룹을 삭제 하는 기능
-
-####6.  코드 등록
-
--   코드를 등록 하는 기능으로 하위 그룹, 코드명(영문), 코드명(한글), 코드 값, 설명을 입력 하고 확인 버튼을 클릭 한다.
-
-####7.  코드 수정
-
--   코드 목록에서 선택 된 코드 정보를 수정하는 기능으로 하위 그룹, 코드명(영문), 코드명(한글), 설명을 수정 할 수 있다.
-
-####8.  코드 삭제
-
--   코드 목록에서 선택 된 코드를 삭제 하는 기능
-
-
-###<div id='12'/>2.1.6.  ***플랫폼 설치 자동화 관리 -> 권한 관리***
-
-권한 관리 권한 그룹, 권한 목록을 조회하고, 필요한 권한 그룹을 등록,
-수정, 삭제 할 수 있고 해당 권한 그룹의 상세 권한을 등록할 수 있는
-화면이다.
-
-![PaaSTa_Platform_Use_Guide_Image09]
-
-####1.  권한 그룹 조회
-
--   플랫폼 설치 자동화에 등록 된 권한 그룹을 조회 한다.
-
-####2.  상세 권한 조회
-
--   선택 한 권한 그룹에 해당 하는 플랫폼 설치 자동화에 등록 된 상세 권한을 조회 한다.
-
-####3.  권한 그룹 등록
-
--   권한 그룹 정보를 등록 하는 기능으로 권한 그룹 명, 설명을 입력 하고 확인 버튼을 클릭 한다.
-
-####4.  권한 그룹 수정
-
--   권한 그룹 목록에서 선택 된 권한 그룹 정보를 수정하는 기능으로 권한 그룹 명과 설명을 수정 할 수 있다.
-
-####5.  권한 그룹 삭제
-
--   권한 그룹 목록에서 선택 된 권한 그룹을 삭제 하는 기능
-
-####6.  상세 권한 등록
-
--   권한 그룹 목록에서 선택 된 권한 그룹에 해당하는 상세 권한 목록을 등록 하는 기능으로 권한 설정 허용/거부를 입력 후 확인 버튼을 클릭 한다.
-
-
-
-###<div id='13'/>2.1.7.  ***플랫폼 설치 자동화 관리 -> 사용자 관리***
-
-사용자 관리 사용자 목록을 조회하고 사용자를 등록, 수정, 삭제 할 수 있는
-화면이다.
-
-![PaaSTa_Platform_Use_Guide_Image10]
-
-####1.  사용자 조회
-
--   플랫폼 설치 자동화에 등록 된 사용자 목록을 조회 한다.
-
-####2.  사용자 등록
-
--   사용자 정보를 등록 하는 기능으로 사용자 아이디, 이름, Email, 권한 그룹을 입력하고 확인 버튼을 클릭 한다.
-
-####3.  사용자 수정
-
--   사용자 목록에서 선택 된 사용자 정보를 수정 하는 기능으로 비밀번호, 이름, Email, 권한을 수정 할 수 있다.
-
-####4.  사용자 삭제
-
--   사용자 목록에서 선택 된 사용자 정보를 삭제 하는 기능이다.
-
-###<div id='14'/>2.1.8.  ***플랫폼 설치 -> BOOTSTRAP 설치***
-
-클라우드 환경에 BOOTSTRAP(Microbosh)를 설치하는 화면으로 상단의 버튼을
-이용해서 설치/수정/삭제 기능을 제공한다.
-
-![PaaSTa_Platform_Use_Guide_Image11]
-
-####1.  설치
-
--   BOOTSTRAP 설치할 수 있는 기능을 수행한다.
-
-####2.  수정
-
--   BOOTSTRAP 목록에서 선택된 BOOTSTRAP 정보 확인 및 수정 후 재설치하는 기능을 수행한다.
-
-####3.  삭제
-
--   BOOTSTRAP 목록에서 선택된 BOOTSRAP을 삭제하는 기능을 수행한다.
-
-
-###<div id='15'/>2.1.9.  ***플랫폼 설치 -> BOSH 설치***
-
-클라우드 환경에 BOSH를 설치하는 화면으로 상단의 버튼을 이용해서
-설치/수정/삭제 기능을 제공한다.
-
-![PaaSTa_Platform_Use_Guide_Image12]
-
-####1.  설치
-
--   BOSH를 설치할 수 있는 기능을 수행한다.
-
-####2.  수정
-
--   BOSH 목록에서 선택된 BOSH 정보 확인 및 수정 후 재설치하는 기능을 수행한다.
-
-####3.  삭제
-
--   BOSH 목록에서 선택된 BOSH을 삭제하는 기능을 수행한다.
-
-####4.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-####5.  BOSH 목록
-
--   BOSH 설치 목록을 조회한다.
-
-
-###<div id='16'/>2.1.10. ***플랫폼 설치 -> CF 설치***
-
-설치 관리자(BOOTSTRAP 또는 BOSH)를 이용해서 PaaS-TA Controller인 CF를
-설치하는 화면으로 상단의 버튼을 이용해서 설치/수정/삭제 기능을 제공한다.
-
-![PaaSTa_Platform_Use_Guide_Image13]
-
-####1.  설치
-
--   CF를 설치할 수 있는 기능을 수행한다.
-
-####2.  수정
-
--   CF 목록에서 선택된 CF 정보 확인 및 수정 후 재설치하는 기능을 수행한다.
-
-####3.  삭제
-
--   CF 목록에서 선택된 CF를 삭제하는 기능을 수행한다.
-
-####4.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-####5.  CF 목록
-
--   CF 설치 목록을 조회한다.
-
-
-###<div id='17'/>2.1.11. ***플랫폼 설치 -> DIEGO 설치***
-
-설치 관리자(BOOTSTRAP 또는 BOSH)를 이용해서 PaaS-TA Container인 DIEGO를
-설치하는 화면으로 상단의 버튼을 이용해서 설치/수정/삭제 기능을 제공한다.
-
-![PaaSTa_Platform_Use_Guide_Image14]
-
-####1.  설치
-
--   DIEGO를 설치할 수 있는 기능을 수행한다.
-
-####2.  수정
-
--   DIEGO 목록에서 선택된 DIEGO 정보 확인 및 수정 후 재설치하는 기능을 수행한다.
-
-####3.  삭제
-
--   DIEGO 목록에서 선택된 DIEGO를 삭제하는 기능을 수행한다.
-
-####4.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-####5.  DIEGO 목록
-
--   DIEGO 설치 목록을 조회한다.
-
-
-###<div id='18'/>2.1.12. ***플랫폼 설치 -> CF & DIEGO 통합 설치***
-
-설치 관리자(BOOTSTRAP 또는 BOSH)를 이용해서 PaaS-TA Controller인 CF와
-PaaS-TA Container인 Diego를 통합 설치하는 화면으로 상단의 버튼을
-이용해서 설치/수정/삭제 기능을 제공한다.
-
-![PaaSTa_Platform_Use_Guide_Image15]
-
-####1.  설치
-
--   CF 및 Diego를 통합 설치할 수 있는 기능을 수행한다.
-
-####2.  수정
-
--   CF & Diego 통합 설치 목록에서 선택된 CF & Diego 정보 확인 및 수정 후 재설치하는 기능을 수행한다.
-
-####3.  삭제
-
--   CF & Diego 통합 설치 목록에서 선택된 CF & Diego를 삭제하는 기능을 수행한다.
-
-####4.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-####5.  CF & Diego 통합 설치 목록
-
--   CF & Diego 통합 설치 목록을 조회한다.
-
-###<div id='19'/>2.1.13. ***플랫폼 설치 -> 서비스팩 설치***
-
-설치 관리자(BOOTSTRAP 또는 BOSH)를 이용해서 PaaS-TA Controller인 CF에
-서비스팩을 설치하는 화면으로 상단의 버튼을 이용해서 설치/삭제 기능을
-제공한다.
-
-![PaaSTa_Platform_Use_Guide_Image16]
-
-####1.  설치
-
--   CF에 서비스팩을 설치할 수 있는 기능을 수행한다.
-
-####2.  삭제
-
--   서비스팩 목록에서 선택된 서비스팩을 삭제하는 기능을 수행한다.
-
-####3.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-####4.  서비스팩 목록
-
--   서비스팩 설치 목록을 조회한다.
-
-###<div id='20'/>2.1.14. ***정보조회 -> 스템셀 업로드***
-
-설치 관리자로부터 스템셀 정보를 조회/업로드/삭제할 수 있는 기능을
-제공하는 화면이다.
-
-![PaaSTa_Platform_Use_Guide_Image17]
-
-####1.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-####2.  스템셀 삭제
-
--   설치 관리자에 업로드 된 스템셀을 삭제하는 기능을 제공한다.
-
-####3.  업로드 된 스템셀 목록
-
--   설치 관리자에 업로드 된 스템셀 목록을 보여준다.
-
-####4.  스템셀 업로드
-
--   설치 관리자로 스템셀을 업로드할 수 있는 기능을 제공한다.
-
-####5.  다운로드 된 스템셀 목록
-
--   플랫폼 설치 자동화에 다운로드 된 스템셀을 목록을 보여준다.
-
-
-###<div id='21'/>2.1.15. ***정보조회 -> 릴리즈 업로드***
-
-설치 관리자로부터 릴리즈 정보를 조회/업로드/삭제할 수 있는 기능을
-제공하는 화면이다.
-
-![PaaSTa_Platform_Use_Guide_Image18]
-
-####1.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-####2.  업로드 된 릴리즈 목록
-
--   설치 관리자에 업로드 된 업로드 된 릴리즈 목록을 보여준다.
-
-####3.  다운로드 된 릴리즈 목록
-
--   플랫폼 설치 자동화에 다운로드 된 릴리즈 목록을 보여준다.
-
-####4.  릴리즈 삭제
-
--   설치 관리자에 업로드 된 업로드 된 릴리즈를 삭제 하는 기능을 제공
-    한다.
-
-####5.  릴리즈 업로드
-
--   설치 관리자로 릴리즈 업로드할 수 있는 기능을 제공한다.
-
-
-###<div id='22'/>2.1.16. ***정보조회 -> 배포정보***
-
-설치 관리자로부터 배포된 배포 정보를 조회하는 기능을 제공하는 화면이다.
-
-![PaaSTa_Platform_Use_Guide_Image19]
-
-####1.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-####2.  설치 목록
-
--   설치 관리자를 이용해서 배포된 배포 목록 정보를 보여준다.
-
-###<div id='23'/>2.1.17. ***정보조회 -> Task 정보***
-
-설치 관리자가 수행한 Task 작업들에 대한 목록 조회 및 상세 로그 정보를
-확인하는 기능을 제공하는 화면이다.
-
-![PaaSTa_Platform_Use_Guide_Image20]
-
-####1.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-####2.  Task 실행 이력
-
--   설치 관리자가 수행한 Task의 작업 목록을 보여준다.
-
-####3.  디버그 로그
-
--   선택된 Task 작업에 대한 디버그 로그를 보여준다.
-
-####4.  이벤트 로그
-
--   선택된 Task 작업에 대한 이벤트 로그를 보여준다.
-
-
-###<div id='24'/>2.1.18. ***정보조회 -> VM 관리***
-
-VM 관리 기본 설치 관리자를 통해 배포한 VM을 조회, 관리 하는 기능을 제공
-하는 화면 이다.
-
-![PaaSTa_Platform_Use_Guide_Image21]
-
-####1.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-####2.  배포 명 목록
-
--   기본 설치 관리자가 배포한 VM의 배포명 목록을 보여준다.
-
-####3.  VM 목록
-
--   VM의 상세 명칭, 상태 값, Type, AZ, IPs, Load, Cpu 타입 등을 보여 준다.
-
-####4.  배포 명 조회
-
--   배포명 목록에서 선택 된 배포명을 통해 해당 배포명을 갖는 VM의 상세 목록을 조회하는 기능
-
-####5.  로그 다운로드
-
--   VM 목록에서 선택 된 VM의 Agent 로그, Job 로그를 선택 하여 다운로드 할 수 있는 기능
-
-####6.  Job 시작
-
--   VM 목록에서 선택 된 중지 상태 중인 VM을 시작하는 기능
-
-####7.  Job 중지
-
--   VM 목록에서 선택 된 시작 상태 중인 VM을 중지하는 기능
-
-####8.  Job 재시작
-
--   VM 목록에서 선택 된 VM을 재시작 하는 기능
-
-####9.  Job 재생성
-
--   VM 목록에서 선택 된 VM을 재생성 하는 기능
-
-
-###<div id='25'/>2.1.19. 정보조회 -> Property 관리
-
-Property 관리 설치 관리자가 배포한 VM 정보의 Property를 조회, 생성,
-수정, 삭제, 상세보기 할 수 있는 기능을 제공하는 화면
-
-![PaaSTa_Platform_Use_Guide_Image22]
-
-####1.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-####2.  배포 명 목록
-
--   기본 설치 관리자가 배포한 VM의 배포명 목록을 보여준다.
-
-####3.  배포 명 조회 기능
-
--   배포명 목록에서 선택 된 배포명을 통해 해당 배포명을 갖는 Property의 상세 목록을 조회하는 기능
-
-####4.  Property 목록 조회
-
--   배포 명을 통해 조회 된 해당 배포 정보의 Property 명, Property 값을 보여 준다.
-
-####5.  Property 생성
-
--   Property 정보를 저장하는 기능으로 Property 명, Property 값을 입력 하고 저장 버튼을 클릭 한다.
-
-####6.  Property 수정
-
--   선택 된 Property 정보를 수정하는 기능으로 Property 값을 수정하고 수정 버튼을 클릭 한다.
-
-####7.  Property 삭제
-
--   선택 된 Property 정보를 삭제하는 기능
-
-####8.  Property 상세 보기
-
--   선택 된 Property를 상세 보기 할 수 있는 기능
-
-###<div id='26'/>***2.1.20. 정보조회 -> 스냅샷 관리***
-
-스냅샷 관리 설치 관리자가 배포한 VM 정보의 스냅샷을 조회, 삭제, 전체
-삭제 할 수 있는 기능을 제공하는 화면
-
-![PaaSTa_Platform_Use_Guide_Image23]
-
-####1.  설치 관리자
-
--   기본 설치 관리자로 설정된 설치 관리자 정보를 보여준다.
-
-####2.  배포 명 목록
-
--   기본 설치 관리자가 배포한 VM의 배포명 목록을 보여준다.
-
-####3.  배포 명 조회 기능
-
--   배포명 목록에서 선택 된 배포명을 통해 해당 배포명을 갖는 스냅샷의 상세 목록을 조회하는 기능
-
-####4.  스냅샷 목록 조회
-
--   배포 명을 통해 조회 된 해당 배포 정보의 JobName, Uuid, SnapshotCid 등 스냅샷 상세 정보를 보여 준다
-
-####5.  스냅샷 삭제
-
--   선택 된 스냅샷을 삭제 하는 기능
-
-####6.  스냅샷 전체 삭제
-
--   조회 된 스냅샷을 전체 삭제 하는 기능.
-
-
-###<div id='27'/>***2.1.21. 정보조회 -> Manifest 관리***
-
-Manifest 관리 서비스팩 설치에 필요한 Manifest를 플랫폼 설치 자동화에
-업로드, 수정, 삭제, 업로드 된 Manifest 파일을 로컬에 다운로드 할 수 있는
-기능을 제공 하는 화면
-
-![PaaSTa_Platform_Use_Guide_Image24]
-
-####1.  Manifest 목록
-
--   플랫폼 설치 자동화에 업로드 된 Manifest 파일 목록을 보여준다.
-
-####2.  Manifest 업로드
-
--   로컬에 있는 Manifest 파일을 플랫폼 설치 자동화의 Manifest 관리 디렉토리(\~/.bosh\_plugin/deployment/manifest)로 업로드를 실행하는 기능.<br>
-IaaS, 설명, 파일을 입력 후 업로드 버튼을 클릭 한다.
-
-####3.  Manifest 다운로드
-
--   선택 한 업로드 된 Manifest 파일을 로컬 다운로드 폴더 경로로 다운로드 하는 기능
-
-####4.  Manifest 수정
-
--   선택 한 업로드 된 Manifest 파일을 상세 보기하여 수정 할 수 있는 기능
-
-####5.  Manifest 삭제
-
--   선택 한 업로드 된 Manifest 파일을 삭제 하는 기능
-
-
-#3.  플랫폼 설치 자동화 활용 
-
-BOSH는 클라우드 환경에 서비스를 배포하고 소프트웨어 릴리즈를 관리해주는
-오픈 소스로 BooStrap은 하나의 VM에 설치 관리자의 모든 컴포넌트를 설치한
-것으로 PaaS-TA 설치를 위한 관리자 기능을 담당한다.
-
-플랫폼 설치 자동화를 이용해서 클라우드 환경에 PaaS-TA를 설치하기 위해서는 **스템셀**과 **소프트웨어 릴리즈**, **배포 Manifest파일** 3가지 요소가 필요하다. 스템셀은 클라우드 환경에 VM을 생성하기 위해 사용할 기본 이미지이고, 소프트웨어 릴리즈는 VM에 설치할 소프트웨어 패키지들을 묶어 놓은 파일이고, 배포 Manifest파일은 스템셀과 소프트웨어 릴리즈를 이용해서 서비스를 어떤 식으로 구성할지를 정의해 놓은 명세서이다. 다음 그림은 BOOTSTRAP과 BOSH를 이용하여 PaaS-TA를 설치하는 절차이다.
-
-![PaaSTa_Platform_Use_Guide_Image25]
-
-##3.1.  ***플랫폼 설치 자동화 파일 관리***
-
-플랫폼 설치 관리자에서 파일 관리라 함은 배포에 필요한 스템셀과 릴리즈
-그리고 배포 파일 관리를 의미한다. 플랫폼 설치 관리자 실행 시 실행 계정의
-Home 디렉토리에 .bosh\_plugin 디렉토리를 생성하고 배포에 필요한 스템셀,
-릴리즈, 배포파일을 관리하도록 기준 디렉토리가 결정되어 있다.
-
-| 설정 디렉토리  |설명|
-|---------|---|
-| {HOME}/.bosh\_plugin        | 플랫폼 설치 자동화가 사용하는 기준 디렉토리  |
-| {HOME}/.bosh\_plugin/stemcell       |스템셀 관리 디렉토리   |
-| {HOME}/.bosh\_plugin/release         |릴리즈 관리 디렉토리   |
-| {HOME}/.bosh\_plugin/deployment       | 배포 관리 디렉토리  | 
-| {HOME}/.bosh\_plugin/deployment/manifest       |서비스팩 Manifest 관리 디렉토리   | 
-| {HOME}/.bosh\_plugin/key        |CF 및 Diego 키 관리 디렉토리   |
-| {HOME}/.bosh\_plugin/lock        |스템셀, 릴리즈, 배포 등을 수행 시 lock 관리 디렉토리   |  
-|  {HOME}/.bosh\_plugin/temp       |  임시 디렉토리 |
-
-플랫폼 설치 자동화를 이용해서 다운로드 된 스템셀과 생성된 배포 파일은
-해당 디렉토리에 각각 다운로드 또는 생성되어 관리된다.
-
-
-###3.1.2.  ***코드 관리***
-
-플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치 자동화 관리” -> “코드 관리”
-메뉴로 이동한다. 플랫폼 설치 자동화는 “코드 관리” 메뉴에서 기본적으로
-배포 유형 및 배포 상태 / 릴리즈 유형 / 권한 / IaaS 유형 / 국가 코드 / OS
-유형 등의 코드 정보를 제공한다. (코드 관리 화면 설명은 2.1.5 참고)
-
-####1.  코드 그룹 등록
-
--   코드 그룹 “등록” 버튼을 클릭 후 코드 그룹 정보를 입력하고 “확인” 버튼을 클릭한다.
--   중복된 코드 그룹 값은 등록할 수 없다.
-
-![PaaSTa_Platform_Use_Guide_Image26]
-
-####2.  코드 그룹 수정
-
--   코드 그룹 “수정” 버튼을 클릭 후 코드 그룹 정보를 수정하고 “확인” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image27]
-
-####3.  코드 등록
-
--   코드 “등록” 버튼을 클릭 후 코드 정보를 입력하고 “확인” 버튼을 클릭한다.
--   하위 그룹을 선택하지 않을 경우 해당 코드 그룹의 상위 코드가 등록된다.
--   하위 그룹을 선택했을 경우 해당 코드 그룹의 선택한 하위 그룹의 하위 코드가 등록된다.
-
-![PaaSTa_Platform_Use_Guide_Image28]
-
-####4.  코드 수정
-
--   코드 “수정” 버튼을 클릭 후 코드 정보를 수정하고 “확인” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image29]
-
-###3.1.3.  ***권한 관리*** 
-
-플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치 자동화 관리” -> “권한 관리”
-메뉴로 이동한다. 플랫폼 설치 자동화는 “권한 관리” 메뉴에서 기본적으로
-플랫폼 설치 사용자 / 플랫폼 설치 자동화 관리자 등의 권한 그룹 정보 및
-해당 권한 그룹의 상세 권한 정보를 제공한다. (권한 관리 화면 설명은 2.1.6 참고)<br>
-상세 권한 정보는 “코드 관리” 화면에서 코드 그룹 명 “ROLE”의 하위 코드를
-통해 관리할 수 있다.
-
-####1.  코드 등록
-
--   코드 그룹 목록에서 “ROLE”을 선택 후 코드 “등록” 버튼을 클릭하고 코드 등록 화면에서 권한 코드 정보를 입력 후 “확인” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image30]
-
-####2.  권한 그룹 등록
-
--   권한 그룹 “등록” 버튼을 클릭 후 권한 그룹 정보를 입력하고 “확인” 버튼을 클릭한다.
--   권한 그룹명은 중복해서 등록할 수 없다.
-
-![PaaSTa_Platform_Use_Guide_Image31]
-
-####3.  권한 그룹 수정
-
--   권한 그룹 “수정” 버튼을 클릭 후 권한 그룹 정보를 수정하고 “확인” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image32]
-
-####4.  권한 상세 등록/수정
-
--   권한 상세 “등록” 버튼을 클릭 후 권한 상세 정보를 등록/수정하고 “확인” 버튼을 클릭한다.
--   권한 설정 항목에서 대시보드 / 기본 시스템 사용자 / 기본 시스템 조회 등의 권한은 기본적으로 허용으로 설정되어 있고, 그 외의 권한은 거부로 설정되어 있다.
-
-![PaaSTa_Platform_Use_Guide_Image33]
-
-###3.1.4.  ***사용자 관리***
-
-플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치 자동화 관리” -> “사용자 관리”
-메뉴로 이동한다. 플랫폼 설치 자동화는 “사용자 관리” 메뉴에서 기본적으로
-플랫폼 설치 자동화 관리자 정보(admin/admin)를 제공한다. (사용자 관리 화면 설명은 2.1.7 참고)
-
-####1.  사용자 등록
-
--   사용자 “등록” 버튼을 클릭 후 사용자 정보 입력 및 해당 사용자의 권한을 선택하여 “확인” 버튼을 클릭한다.
--   사용자 등록 후 초기 비밀번호는 “1234” 이며, 최초 로그인 후 비밀번호를 변경할 수 있다.
-
-![PaaSTa_Platform_Use_Guide_Image34]
-
-####2.  사용자 수정
-
--   사용자 “수정” 버튼을 클릭 후 사용자 정보 및 해당 권한을 수정하여 “확인” 버튼을 클릭한다.
--   관리자는 선택한 사용자의 아이디는 수정할 수 없지만 비밀번호를 변경할 수 있다.
-
-![PaaSTa_Platform_Use_Guide_Image35]
-
-###3.1.5.  ***스템셀과 릴리즈***
-
-플랫폼 설치 자동화 설치 테스트를 위해 사용한 스템셀과 릴리즈 정보는 다음과 같다.
-
-<table>
-  <tr>
-    <td rowspan="5">BOOTSTRAP</td>
-    <td rowspan="3">스템셀</td>
-    <td>AWS</td>
-    <td>bosh-stemcell-3312.12-aws-xen-ubuntu-trusty-go_agent.tgz</td>
-  </tr>
-  <tr>
-    <td>오픈스택</td>
-    <td>bosh-stemcell-3312.12-openstack-kvm-ubuntu-trusty-go_agent.tgz</td>
-  </tr>
-  <tr>
-    <td>Vsphere</td>
-    <td>bosh-stemcell-3312.12-vsphere-esxi-ubuntu-trusty-go_agent.tgz</td>
-  </tr>
-  <tr>
-    <td rowspan="2">릴리즈</td>
-    <td>BOSH</td>
-    <td>bosh-256.tgz</td>
-  </tr>
-  <tr>
-    <td>BOSH CPI</td>
-    <td>bosh-openstack-cpi-30.tgz</td>
-  </tr>
-  <tr>
-    <td rowspan="4">BOSH</td>
-    <td rowspan="3">스템셀</td>
-    <td>AWS</td>
-    <td>bosh-stemcell-3312.12-aws-xen-ubuntu-trusty-go_agent.tgz</td>
-  </tr>
-  <tr>
-    <td>오픈스택</td>
-    <td>bosh-stemcell-3312.12-openstack-kvm-ubuntu-trusty-go_agent.tgz</td>
-  </tr>
-  <tr>
-    <td>Vsphere</td>
-    <td>bosh-stemcell-3312.12-vsphere-esxi-ubuntu-trusty-go_agent.tgz</td>
-  </tr>
-  <tr>
-    <td >릴리즈</td>
-    <td>BOSH</td>
-    <td>bosh-256.tgz</td>
-  </tr>
-  <tr>
-    <td rowspan="4">Controller</td>
-    <td rowspan="3">스템셀</td>
-    <td>AWS</td>
-    <td>bosh-stemcell-3312.12-aws-xen-ubuntu-trusty-go_agent.tgz</td>
-  </tr>
-  <tr>
-    <td>오픈스택</td>
-    <td>bosh-stemcell-3312.12-openstack-kvm-ubuntu-trusty-go_agent.tgz</td>
-  </tr>
-  <tr>
-    <td>Vsphere</td>
-    <td>bosh-stemcell-3312.12-vsphere-esxi-ubuntu-trusty-go_agent.tgz</td>
-  </tr>
-  <tr>
-    <td>릴리즈</td>
-    <td>Controller</td>
-    <td>paasta-controller.2.0.0.tgz<br>cf-release-247.tgz</td>
-  </tr>
-  <tr>
-    <td rowspan="7">Container</td>
-    <td rowspan="3">스템셀</td>
-    <td>AWS</td>
-    <td>bosh-stemcell-3312.12-aws-xen-ubuntu-trusty-go_agent.tgz</td>
-  </tr>
-  <tr>
-    <td>오픈스택</td>
-    <td>bosh-stemcell-3312.12-openstack-kvm-ubuntu-trusty-go_agent.tgz</td>
-  </tr>
-  <tr>
-    <td>Vsphere</td>
-    <td>bosh-stemcell-3312.12-vsphere-esxi-ubuntu-trusty-go_agent.tgz</td>
-  </tr>
-  <tr>
-    <td rowspan="4">릴리즈</td>
-    <td>Container</td>
-    <td>diego-release-1.1.0.tgz</td>
-  </tr>
-  <tr>
-    <td>Garden-runc</td>
-    <td>garden-runc-1.0.4.tgz<br>paasta-garden-runc-2.0.tgz</td>
-  </tr>
-  <tr>
-    <td>Cflinuxfs2-root</td>
-    <td>cflinuxfs2-root-release-1.40.0.tgz</td>
-  </tr>
-  <tr>
-    <td>ETCD</td>
-    <td>etcd-release-86.tgz</td>
-  </tr>
-</table>
-
-
-##3.2.  ***BOOTSTRAP******설치하기***
-
-플랫폼 설치 자동화를 이용하여 BOOTSTRAP 설치하고, 설치 관리자로 등록하는
-절차는 다음과 같다.
-
-![PaaSTa_Platform_Use_Guide_Image36]
-
-###3.2.1.  ***스템셀 다운로드*** 
-
-플랫폼 설치 자동화 웹 화면에서 “환경설정 및 관리” -> “스템셀 관리” 메뉴로
-이동한다. “스템셀 관리” 메뉴에서는 Cloud Foundry에서 제공하는 공개
-스템셀을 다운로드할 수 있는 기능을 제공한다.<br>
-상단에 위치한 “등록” 버튼을 클릭 후 스템셀 정보를 입력하고 “등록” 버튼을
-클릭한다. (스템셀 관리 화면 설명은 2.1.3 참고)
-
-  	※ 공개 스템셀 참조 사이트
-  	http://bosh.cloudfoundry.org/stemcells
-	
--   본 가이드에서는 버전 3312.12을 다운로드 하였다.
-
-![PaaSTa_Platform_Use_Guide_Image37]
-
-###3.2.2.  ***릴리즈 다운로드***
-
-BOOTSTRAP을 설치하기 위해서는 BOSH 릴리즈와 BOSH CPI릴리즈 2개의
-릴리즈가 필요하다<br>
-릴리즈를 다운로드하기 위해 플랫폼 설치 자동화 웹 화면에서 “환경설정 및
-관리” -> “릴리즈 관리” 메뉴로 이동 후 상단에 위치한 “등록” 버튼을
-클릭하고, 릴리즈 등록 팝업 화면에서 릴리즈 정보 입력 후 “등록” 버튼을
-클릭한다. (릴리즈 관리 화면 설명은 2.1.4참고)
-
-####1.  BOSH 릴리즈
--   릴리즈 등록 팝업화면에서BOSH 릴리즈 정보를 입력하고, “등록” 버튼 클릭한다.
--   BOSH 릴리즈 참조 사이트
-  		http://bosh.io/releases/github.com/cloudfoundry/bosh?all=1
-
-![PaaSTa_Platform_Use_Guide_Image38]
-
--   본 가이드에서는 v256을 다운로드 하였다.
-
-####2.  BOSH CPI 릴리즈
--   릴리즈 등록 팝업화면에서 BOSH CPI릴리즈 정보를 입력하고, “등록” 버튼 클릭한다.
--   BOSH-CPI 릴리즈 참조 사이트
-  		※ aws의 경우
-  		http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?all=1
-
-  		※ openstack의 경우
-  		http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-openstack-cpi-release?all=1
-
-  		※ vsphere의 경우
-  		http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-vsphere-cpi-release?all=1
-
-![PaaSTa_Platform_Use_Guide_Image39]
-
--   본 가이드에서는 v30을 다운로드 하였다.
-
-
-###3.2.3.  ***BOOTSTRAP******설치***
-
-BOOTSTRAP 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” ->
-“BOOTSTRAP 설치” 메뉴로 이동 후 상단에 위치한 “설치”버튼을 클릭한다.
-(BOOTSTRAP설치 화면 설명은 2.1.8참고)
-
-####3.  클라우드 환경 선택
--   설치할 클라우드 환경을 선택하는 팝업화면에서 설치할 클라우드를 선택하고, “확인” 버튼 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image40]
-
-####4.  BOOTSTRAP 설치 – 선택한 클라우드 환경 정보
--   오픈스택 클라우드 환경을 선택한 경우 오픈스택의 인증정보/시큐리티 그룹/키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image41]
-
--   AWS 클라우드 환경을 선택한 경우 AWS의 정보 및 키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image42]
-
--   VSPHERE 클라우드 환경을 선택한 경우 VSPHERE의 정보 및 키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image43]
-
-####5.  BOOTSTRAP 설치 – 기본 정보
-
--   BOOTSTRAP의 배포명 / 디렉터명 / NTP / BOSH 릴리즈 / BOSH CPI 릴리즈 / 스냅샷기능 사용여부 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image44]
-
-####6.  BOOTSTRAP 설치 – 클라우드 환경 별 네트워크 정보
-
--   AWS/오픈스택 클라우드 환경을 선택한 경우 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image45]
-
--   VSPHERE 클라우드 환경을 선택한 경우 네트워크 정보 입력 후 “다음”	버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image46]
-
-####7.  BOOTSTRAP 설치 – 리소스 정보
-
--   AWS/오픈스택 클라우드 환경을 선택한 경우 스템셀 / 인스턴스 유형 / VM 비밀번호 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image47]
-
--   VSPHERE 클라우드 환경을 선택한 경우 스템셀 / 리소스 풀 CPU / 리소스 풀 RAM / 리소스 풀 DISK / VM 비밀번호 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image48]
-
-####8.  BOOTSTRAP 설치 - 배포 파일 정보
-
--   입력한 정보를 기준으로 생성한 배포 Manifest파일 정보를 확인한다.
-
-![PaaSTa_Platform_Use_Guide_Image49]
-
-####9.  BOOTSTRAP 설치 - 설치
-
--   생성된 배포 Manifest파일 정보를 이용하여 BOOTSTRAP설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
-
-###3.2.4.  ***설치 관리자 설정***
-
-BOOTSTRAP설치가 완료되면 BOOTSTRAP 디렉터 정보(디렉터IP, 포트번호, 계정,
-비밀번호)를 이용해서 플랫폼 설치 자동화의 설치 관리자로 설정한다. (설치 관리자 설정 화면 설명은 2.1.2참고)
-
-![PaaSTa_Platform_Use_Guide_Image50]
-
-##3.3.  ***BOSH******설치하기***
-
-BOOTSTRAP(Microbosh)을 설치 관리자로 설정 완료 후 BOSH를 설치하는 절차는
-다음과 같다.
-
-![PaaSTa_Platform_Use_Guide_Image52]
-
-###3.3.1.  ***스템셀 업로드***
-
-플랫폼 설치 자동화 웹 화면에서 “배포 정보 조회 및 관리” -> “스템셀
-업로드”를 선택한다. “스템셀 업로드” 화면의 하단에 1.2.1 “스템셀
-다운로드” 메뉴에서 다운로드 받은3312.12버전의 스템셀을 선택하고, “스템셀
-업로드” 버튼을 클릭하여 설치 관리자에 스템셀을 업로드 한다.
-
-![PaaSTa_Platform_Use_Guide_Image53]
-
-###3.3.2.  ***릴리즈 업로드*** 
-
-플랫폼 설치 자동화 웹 화면에서 “정보 조회” -> “릴리즈 업로드”를 선택한다.
-“릴리즈 업로드” 화면의 하단에 1.2.2 “릴리즈 다운로드”에서 다운로드 한
-256버전의 BOSH 릴리즈(bosh-256.tgz)를 선택하고, “릴리즈 업로드” 버튼을
-클릭하여 설치 관리자에 릴리즈를 업로드한다.
-
-![PaaSTa_Platform_Use_Guide_Image54]
-
-###3.3.3.  ***BOSH******설치*** 
-
-BOSH설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” ->
-“BOSH설치” 메뉴로 이동 후 상단의 “설치” 버튼을 클릭한다. (BOSH 설치 화면 설명은 2.1.9참고)
-
-
-####1.  BOSH 설치 – 기본 설치 관리자에 따른 클라우드 환경 정보
-
--   오픈스택 클라우드 환경일 경우 오픈스택의 인증정보 / 시큐리티 그룹 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image55]
-
--   AWS 클라우드 환경일 경우 AWS의 인증정보 / 시큐리티 그룹 / 키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image56]
-
--   VSPHERE 클라우드 환경일 경우 VSPHERE의 인증정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image57]
-
-####2.  BOSH 설치 – 기본 정보
-
--   BOSH의 배포명 / 디렉터명 / NTP / BOSH 릴리즈 / 스냅샷 사용 여부 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image58]
-
-####3.  BOSH 설치 – 클라우드 환경 별 네트워크 정보
-
--   오픈스택 환경일 경우 오픈스택의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image59]
-
--   AWS 환경일 경우 AWS의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image60]
-
--   VSPHERE 환경일 경우 VSPHERE 의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image61]
-
-####4.  BOSH 설치 – 클라우드 환경 별 리소스 정보
-
--   오픈스택/AWS 환경일 경우 오픈스택 또는 AWS의 스템셀 / 인스턴스 유형 / VM 비밀번호 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image62]
-
--   VSPHERE 환경일 경우 VSPHERR의 스템셀 / 리소스 유형 / VM 비밀번호 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image63]
-
-####5.  BOSH 설치 – 배포파일 정보
-
--   입력한 정보를 기준으로 생성한 배포 Manifest파일 정보를 확인한다.
-
-![PaaSTa_Platform_Use_Guide_Image64]
-
-####6.  BOSH 설치 – 설치 정보
-
--   생성된 배포 Manifest파일 정보를 이용하여 BOSH설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
-
-![PaaSTa_Platform_Use_Guide_Image65]
-
-####3.2.4.  ***설치 관리자 설정***
-
-BOSH설치가 완료되면 BOSH 디렉터 정보(디렉터IP, 포트번호, 계정,
-비밀번호)를 이용해서 플랫폼 설치 자동화의 설치 관리자로 설정한다. (설치 관리자 설정 화면 설명은 2.1.2참고)
-
-##3.4.  ***CF******설치하기***
-
-BOSH를 설치하고 플랫폼 설치 자동화의 설치 관리자로 설정이 완료되면 CF를
-설치할 준비가 된 상태로 CF를 설치하는 절차는 다음과 같다.
-
-![PaaSTa_Platform_Use_Guide_Image66]
-
-###3.4.1.  ***스템셀 업로드*** 
-
-1.3.1 “스템셀 업로드”에서 수행했던 것과 동일하게 BOSH 설치 관리자에
-3312.12버전의 스템셀을 업로드 합니다.
-
-###3.4.2.  ***릴리즈 업로드***
-
-PaaS-TA개발팀에서 제공하는 PaaS-TA Controller 2.0버전의
-릴리즈(passta-controller-2.0.tgz) 또는 247버전의
-cf-release(cf-release-247.tgz)를 1.2.2 “릴리즈 다운로드”와 동일하게
-플랫폼 설치 자동화에 다운로드한다. 그리고 1.3.2 “릴리즈 업로드”와
-동일하게 설치 관리자로 업로드한다.
-
-
-| 릴리즈 명  |버전 | 다운로드 링크| 
+| 　　  |Java class | 설명|
 |---------|---|----|
-| CF 릴리즈        |  247 | http://bosh.io/releases/github.com/cloudfoundry/cf-release?all=1   |
-|  PaaS-TA Controller       | 2.0.0  | paasta-controller-2.0.0.tgz   |  
+|    수정     | ServiceIncetanceBindingController  | 클라우드 컨트롤러의 서비스 바인딩 요청을 처리하는 컨트롤러,<br> SampleMeteringOAuthService 에서 uaa token 을 취득하여, SampleMeteringReportService 의 파라메터로 호출 하는 프로세스를 추가 한다.   |
+|    수정     | ServiceInstanceBinding  | service-binding-request 가 ServiceIncetanceBindingController 에서 처리 될 때 바인딩 연결에 대해 미터링이 적용된 사용량 보고서를 abacus-usage-collector 에 리포팅 한다.   |     
+|    추가     | SampleMeteringReportService  | SampleMeteringReportService 추상화 된 인터페이스로서, 미터링/등급/과금 정책과 관련된 그 어떠한 정보도 가지고 있지 않다. 이는 이 인터페이스를 구현할 서비스 제공자가 서비스 구현체에 적용할 수 있도록 제공되고 있는 추상화 클래스 이다.<br>SampleMeteringReportService 추상화 된 인터페이스로서, 미터링/등급/과금 정책과 관련된 그 어떠한 정보도 가지고 있지 않다. 이는 이 인터페이스를 구현할 서비스 제공자가 서비스 구현체에 적용할 수 있도록 제공되고 있는 추상화 클래스 이다.|     
+|    추가     | SampleMeteringOAuthService  | 개방형 플랫폼 상의 UAA 서버에서 abacus-usage-collector 에 대한 접근 권한 토큰을 취득하여, SampleMeteringReportService 에 토큰을 전달 하기 위한 추상화 클래스 이다.   |
+
+
+서비스 브로커 라이브러리에서 미터링을 위해 추가 되거나 수정 되는 파일의
+형상
+
+![Java_Service_Metering_Image04]
+
+###<div id='13'/>2.3.4.  ServiceInstanceBindingController
+
+bindServiceInstance 프로세스 에 SampleMeteringOAuthService 에서 uaa
+token 을 취득하여, SampleMeteringReportService 의 파라메터로 호출 하는
+프로세스를 추가 한다.
+
+	@RequestMapping (value = BASE_PATH + "/{bindingId}", method = RequestMethod.PUT)
+	public ResponseEntity<ServiceInstanceBindingResponse> bindServiceInstance (
+			@PathVariable("instanceId") String instanceId, 
+			@PathVariable("bindingId") String bindingId,
+			@Valid @RequestBody CreateServiceInstanceBindingRequest request) throws
+			ServiceInstanceDoesNotExistException, ServiceInstanceBindingExistsException, 
+			ServiceBrokerException {
+		ServiceInstance instance = serviceInstanceService.getServiceInstance(instanceId);
+		if (instance == null) {
+			throw new ServiceInstanceDoesNotExistException(instanceId);
+		}
+		ServiceInstanceBinding binding = serviceInstanceBindingService.createServiceInstanceBinding(			request. withServiceInstanceId(instanceId).and (). withBindingId(bindingId));
+	
+		if (binding == null) {
+			throw new ServiceBrokerException(bindingId);
+		}
+		
+		String uaaToken = sampleMeteringOAuthService.getUAAToken();
+		
+		try {
+			int httpStatus = sampleMeteringReportService.reportServiceInstanceBinding(binding, uaaToken); 
+			if (httpStatus == 400) {
+				throw new ServiceBrokerException(bindingId);
+			} 	
+		} catch (ServiceBrokerException e) {
+			throw e;
+		}
+		
+		logger. debug ("ServiceInstanceBinding Created: " + binding. getId());
+	return new ResponseEntity<ServiceInstanceBindingResponse>(
+			new ServiceInstanceBindingResponse(binding), 
+			binding.getHttpStatus());
+	}
+
+
+###<div id='14'/>2.3.5.  ServiceInstanceBinding 
+
+ServiceInstanceBinding 에 미터링 서비스를 구현하기 위해 바인딩 되는
+애플리케이션의 환경 정보 필드를 추가 한다. 추가 된 필드 들은
+ServiceInstanceBindingService 의 구현체 에서 서비스 바인딩 request
+parameter 의 필드 값들을 매핑 처리 한 후, mongo-db repository 에 전달될
+것이다. 라이브러리를 gradle build 한다.
+
+	package org.openpaas.servicebroker.model;
+	
+	import java.util.HashMap;
+	import java.util.Map;
+	import org.springframework.http.HttpStatus;
+	import com.fasterxml.jackson.annotation.JsonIgnore;
+
+	public class ServiceInstanceBinding {
+	
+	private String id;
+	private String serviceInstanceId;
+	private Map<String,Object> credentials = new HashMap<String,Object>();
+	private String syslogDrainUrl;
+	// 미터링에 사용되는 필드
+	private String appGuid;
+	
+	// 미터링을 위해 추가 된 필드
+	private String appOrganizationId;
+	private String appSpaceId;
+	private String meteringPlanId;
+	
+	@JsonIgnore
+	private HttpStatus httpStatus = HttpStatus.CREATED;
+	public ServiceInstanceBinding (String id, 
+			String serviceInstanceId, 
+			Map<String,Object> credentials,
+			String syslogDrainUrl, String appGuid,
+			String appOrganizationId,
+			String appSpaceId,
+			String meteringPlanId			
+			) {
+		this.id = id;
+		this.serviceInstanceId = serviceInstanceId;
+		setCredentials(credentials);
+		this.syslogDrainUrl = syslogDrainUrl;
+		this.appGuid = appGuid;
+		
+		this.appOrganizationId = appOrganizationId;		
+		this.appSpaceId = appSpaceId;		
+		this.meteringPlanId = meteringPlanId;
+	}
 
 
-##3.4.3.  ***CF******설치*** 
+###<div id='15'/>2.3.6.  SampleMeteringOAuthService 추상화 클래스
 
-CF설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” -> “CF설치”
-메뉴로 이동 후 상단의 “설치” 버튼을 클릭한다. (CF 설치 화면 설명은 2.1.10참고))
-
-####1.  Diego 사용 여부 선택
--   Diego 사용 여부 팝업화면에서 예를 선택하고, “확인” 버튼 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image67]
-
-####2.  CF 설치 – 기본정보 입력
--   배포에 필요한 기본정보와 도메인 / 로그인 비밀번호를 입력 후 “다음” 버튼을 클릭한다.
--   SSH 핑거프린트는 입력 항목은 Diego 설치 팝업 화면에서 Key 생성 후 입력한다. (below)
-
-![PaaSTa_Platform_Use_Guide_Image68]
-
-####3.  CF 설치 – 클라우드 환경 별 네트워크 정보
-
--   오픈스택 환경일 경우 오픈스택의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image69]
-
--   AWS 환경일 경우 AWS의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image70]
-
--   VSPHERE 환경일 경우 VSPHERE의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image71]
-
-####4.  CF 설치 – Key 생성
-
--   Key 생성 정보 입력 후 “Key 생성” 버튼을 클릭하고, Key 생성 확인 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image72]
-
-####5.  CF 설치 – 클라우드 환경 별 리소스 정보
-
--   오픈스택/AWS 환경일 경우 오픈스택 및 AWS의 스템셀 / VM 비밀번호 / Flavor 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image73]
-
--   VSPHERE 환경일 경우 오픈스택 및 VSPHERE의 스템셀 / VM 비밀번호 / Flavor 정보 입력 후 “다음” 버튼을 클릭한다.
-
-![PaaSTa_Platform_Use_Guide_Image74]
-
-####6.  CF 설치 – 배포 파일 정보
-
--   입력한 정보를 기준으로 생성한 배포 Manifest파일 정보를 확인한다.
-
-![PaaSTa_Platform_Use_Guide_Image75]
-
-####7.  CF 설치 – 설치
-
--   생성된 배포 Manifest파일 정보를 이용하여 PaaS-TA Controller(CF) 설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
-
-![PaaSTa_Platform_Use_Guide_Image76]
-
-##3.5.  ***DIEGO******설치하기*** 
-
-CF설치가 완료되면 DIEGO를 설치할 준비가 된 상태로 DIEGO를 설치하는
-절차는 다음과 같다.
-
-
-###3.5.1.  ***스템셀 업로드***
-
-1.3.1 “스템셀 업로드”에서 수행했던 것과 동일하게 BOSH 설치 관리자에
-3312.12버전의 스템셀을 업로드 합니다.
-
-
-###3.5.2.  ***릴리즈 업로드***
-
-DIEGO설치를 위해서는 Container 역할을 하는 릴리즈와 의존 관계에 있는
-릴리즈를 다운로드, 업로드 하여야 한다. 2.0.0버전의PaaS-TA Container
-릴리즈와 1.40.0 버전의 cflinuxfs2-root 릴리즈와 2.0 버전의 PaaS-TA
-garden-runc릴리즈와 86버전의 etcd 릴리즈를 1.2.2 “릴리즈 다운로드”와
-동일하게 플랫폼 설치 자동화에 다운로드한다. 그리고 1.3.2 “릴리즈
-업로드”와 동일하게 설치 관리자로 업로드한다.
-
-
-<table>
-  <tr>
-    <th>릴리즈 명</th>
-    <th>릴리즈 버전</th>
-    <th>다운로드 링크</th>
-  </tr>
-  <tr>
-    <td rowspan ="2">PaaS-TA Container<br>DIEGO 릴리즈</td>
-    <td>2.0</td>
-    <td>paasta-container-2.2.0.tgz</td>
-  </tr>
-  <tr>
-    <td>1.1.0</td>
-    <td>http://bosh.io/releases/github.com/cloudfoundry/diego-release?all=1</td>
-  </tr>
-  <tr>
-    <td>cflinuxfs2-root 릴리즈</td>
-    <td>1.40.0</td>
-    <td>http://bosh.io/releases/github.com/cloudfoundry/cflinuxfs2-rootfs-release?all=1</td>
-  </tr>
-  <tr>
-    <td rowspan ="2">PaaS-TA garden-runc <br> (garden-runc릴리즈)</td>
-    <td>2.0</td>
-    <td>paasta-container-2.2.0.tgz</td>
-  </tr>
-  <tr>
-    <td>1.0.4</td>
-    <td>http://bosh.io/releases/github.com/cloudfoundry/diego-release?all=1</td>
-  </tr>
-   <tr>
-    <td>etcd릴리즈</td>
-    <td>86</td>
-    <td>http://bosh.io/releases/github.com/cloudfoundry-incubator/etcd-release?all=1</td>
-  </tr>
-</table>
-
-###3.5.3.  ***DIEGO******설치***
-
-DIEGO를 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” ->
-“DIEGO설치” 메뉴로 이동 후 상단의 “설치” 버튼을 클릭한다. (DIEGO 설치 화면 설명은 2.1.11참고
-
-####1.  DIEGO 설치 – 기본 정보
-
--   배포에 필요한 기본정보와 릴리즈 정보를 입력 후 “다음” 버튼을 클릭한다.
-
-
-####2.  DIEGO 설치 – 네트워크 정보
-
--   네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
-
-####3.  DIEGO 설치 – Key 생성
-
--   “Key 생성” 버튼을 클릭 후 생성된 ssh-key-fingerprint를 복사한다.
-
-
-####4.  DIEGO 설치 – CF 재설치
-
--   DIEGO 설치에 연동 할 CF정보를 수정한다.
--   복사한 fingerprint 정보를 CF 기본 정보 저장 팝업 화면에서 입력 후 CF를 재설치 한다. (CF 설치 화면 설명은 1.4.3참고)
-
-
-####5.  DIEGO 설치 – 리소스 정보
-
--   스템셀 / VM 비밀번호 정보 / 인스턴스 유형 입력 후 “다음” 버튼을 클릭한다.
-
-
-####6.  DIEGO 설치 – 배포 파일 정보
-
--   입력한 정보를 기준으로 생성한 배포 Manifest파일 정보를 확인한다.
-
-####7.  DIEGO 설치 – 설치
-
--   생성된 배포 Manifest파일 정보를 이용하여 PaaS-TA Container(DIEGO) 설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
-
-##3.6.  ***CF & DIEGO******통합 설치 하기***
-
-BOSH를 설치하고 플랫폼 설치 자동화의 설치 관리자로 설정이 되면 CF &
-DIEGO 통합 설치가 준비 된 상태로 실행 절차는 CF와 DIEDO 설치와 유사
-하다.
-
-###3.6.1.  ***스템셀 업로드***
-
-1.3.1 “스템셀 업로드”에서 수행했던 것과 동일하게 BOSH 설치 관리자에
-3312.12버전의 스템셀을 업로드 합니다.
-
-###3.6.2.  ***릴리즈 업로드***
-
-CF & DIEGO 설치를 위해서는 Controller역할을 담당하는 PaaS-TA
-Controller(CF) 릴리즈와 PaaS-TA Container(DIEGO) 릴리즈, 의존 관계
-릴리즈가 필요하다. 이 릴리즈는 PaaS-TA개발팀에서 제공 받거나 아래
-다운로드 링크를 통해 1.2.2”릴리즈 다운로드” 플랫폼 설치 자동화에
-다운로드 한다. 그리고 1.3.2 “릴리즈 업로드”와 동일하게 설치 관리자로
-업로드한다.
-
-<table>
-  <tr>
-    <th>릴리즈 명</th>
-    <th>릴리즈 버전</th>
-    <th>다운로드 링크</th>
-  </tr>
-  <tr>
-    <td rowspan ="2">PaaS-TA Controller<br>(CF 릴리즈)</td>
-    <td>2.0</td>
-    <td>paasta-controller-2.0.0.tgz</td>
-  </tr>
-  <tr>
-    <td>247</td>
-    <td>http://bosh.io/releases/github.com/cloudfoundry/cf-release?all=1</td>
-  </tr>
-  <tr>
-    <td rowspan ="2">PaaS-TA Container<br>DIEGO 릴리즈</td>
-    <td>2.0</td>
-    <td>paasta-container-2.2.0.tgz</td>
-  </tr>
-  <tr>
-    <td>1.1.0</td>
-    <td>http://bosh.io/releases/github.com/cloudfoundry/diego-release?all=1</td>
-  </tr>
-  <tr>
-    <td>cflinuxfs2-root 릴리즈</td>
-    <td>1.40.0</td>
-    <td>http://bosh.io/releases/github.com/cloudfoundry/cflinuxfs2-rootfs-release?all=1</td>
-  </tr>
-  <tr>
-    <td rowspan ="2">PaaS-TA garden-runc <br> (garden-runc릴리즈)</td>
-    <td>2.0</td>
-    <td>paasta-container-2.2.0.tgz</td>
-  </tr>
-  <tr>
-    <td>1.0.4</td>
-    <td>http://bosh.io/releases/github.com/cloudfoundry/diego-release?all=1</td>
-  </tr>
-   <tr>
-    <td>etcd릴리즈</td>
-    <td>86</td>
-    <td>http://bosh.io/releases/github.com/cloudfoundry-incubator/etcd-release?all=1</td>
-  </tr>
-</table>
-
-###3.6.3.  ***CF & DIEGO******통합 설치***
-
-CF & DIEGO를 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치”
--> “CF & DIEGO설치” 메뉴로 이동 후 상단의 “설치” 버튼을 클릭한다. (CF &
-DIEGO 설치 화면 설명은 Error: Reference source not found참고)
-
-####1.  CF & DIEGO 설치 – CF 기본 정보 입력
-
--   배포에 필요한 기본정보와 도메인 정보/로그인 비밀번호를 입력 후 “다음” 버튼을 클릭한다.
-
-####2.  CF & DIEGO 설치 – CF 기본 정보 입력
-
--   CF 네트워크 정보 입력 후 “다음” 버튼을 클릭 한다.
-
-
-####3.  CF & DIEGO 설치 – CF 키 생성
-
--   CF 설치에 필요 한 Key 를 생성하기 위해 키 정보를 입력 후 “key 생성” 버튼을 클릭 한다. 키가 생성 되면 “다음” 버튼을 클릭 한다.
-
-####4.  CF & DIEGO 설치 – CF 리소스 정보 입력
-
--   CF 설치에 필요 한 Stemcell, VM 비밀번호, 인스턴스 유형을 입력 하고 “다음” 버튼을 클릭 한다.
-
-####5.  CF & DIEGO 설치 – CF 배포 파일 정보
-
--   입력한 정보를 기준으로 생성한 CF 배포 Manifest파일 정보를 확인한다.
-
-####6.  CF & DIEGO 설치 – DIEGO 기본 정보 입력
-
--   DIEGO 배포에 필요한 기본정보와 릴리즈 정보를 입력 후 “다음” 버튼을 클릭한다.
-
-####7.  CF & DIEGO 설치 – DIEGO 네트워크 정보 입력
-
--   DIEGO 배포에 필요한 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
-
-####8.  CF & DIEGO 설치 – DIEGO 리소스 정보 입력
-
--   DIEGO 배포에 필요한 Stemcell 정보, Vm 비밀번호, 인스턴스 유형 정보 입력 후 “다음” 버튼을 클릭한다.
-
-####9.  CF & DIEGO 설치 – DIEGO 배포 파일 정보
-
--   입력한 정보를 기준으로 생성한 DIEGO 배포 Manifest파일 정보를 확인한다.
-
-####10. CF & DIEGO 설치 – CF 설치
-
--   생성된 배포 Manifest파일 정보를 이용하여 PaaS-TA Controller(CF) 설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
-
-####11. CF & DIEGO 설치 – DIEGO 설치
-
--   생성된 배포 Manifest파일 정보를 이용하여 PaaS-TA Container(DIEGO) 설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
-
-##3.7.  ***서비스팩 설치*** 
-
-CF 설치가 성공적으로 완료되고 배포할 Manifest를 업로드하면 서비스팩을
-설치할 준비가 된 상태로 서비스팩을 설치하는 절차는 다음과 같다.
-
-###3.7.1.  ***스템셀 업로드***
-
-1.3.1 “스템셀 업로드”에서 수행했던 것과 동일하게 BOSH 설치 관리자에
-설치할 서비스팩의 스템셀을 업로드 합니다.
-
-
-###3.7.2.  ***릴리즈 업로드***
-
-PaaS-TA개발팀에서 제공하는 PaaS-TA 서비스 릴리즈(passta-mysql-2.0.tgz)
-
-에서 1.2.2 “릴리즈 다운로드”를 통해 다운 받는다. 그리고 1.3.2 “릴리즈
-업로드”와 동일하게 설치 관리자로 업로드한다.
-
-###3.7.3.  ***Manifest******업로드***
-
-Manifest를 업로드 하기 위해 플랫폼 설치 자동화 웹 화면에서 “배포 정보
-조회 및 관리” -> “Manifest 관리” 메뉴로 이동 후 상단의 “업로드” 버튼을
-클릭한다. (Manifest설치 화면 설명은 2.1.21 참고)
-
-####1.  Manifest 업로드 – 업로드
-
--   서비스팩 설치를 위해서는 배포 정보를 가지고 있는 Manifest 파일이 필요하다. 서비스팩 설치에 필요한 Manifest를 작성하여 플랫폼 설치 자동화에 업로드 한다.
-
--   본 가이드에서는 PaaS-TA 서비스 MySQL Manifest를 업로드 하였다.
-
-###3.7.4.  ***서비스팩 설치***
-
-서비스팩을 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” ->
-“서비스팩 설치” 메뉴로 이동 후 상단의 “설치” 버튼을 클릭한다. (서비스팩
-설치 화면 설명은 Error: Reference source not found참고)
-
-####1.  서비스팩 설치 – Manifest 등록
-
--   배포에 필요한 Manifest 파일을 선택하고 “설치” 버튼을 클릭 한다.
-
-####2.  서비스팩 설치 – 설치
-
--   생성된 배포 Manifest파일 정보를 이용하여 서비스팩 설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
-
-##3.8.  ***Property******관리***
-
-Property를 생성하기 위해 플랫폼 설치 자동화 웹 화면에서 “배포 정보 조회
-및 관리” -> “Property 관리” 메뉴로 이동 후 배포명을 선택하고 “조회”
-버튼을 클릭한다. (Property 관리 화면 설명은 Error: Reference source not
-found참고)
-
-####1.  Property 생성
-
--   배포명 선택 콤보 박스에서 배포명을 선택하고 “조회” 버튼을 클릭 후 “Property 생성” 버튼을 클릭 하고 Property 정보 입력 후 “저장” 버튼을 클릭한다.
-
-####2.  Property 수정
-
--   “Property 수정” 버튼을 클릭 후 Property 값을 수정하고 “수정” 버튼을 클릭한다.
-
-
-
-[PaaSTa_Platform_Use_Guide_Image01]:/images/PaaSTa_Platform_Use_Guide/manual/login.png
-[PaaSTa_Platform_Use_Guide_Image02]:/images/PaaSTa_Platform_Use_Guide/manual/passwordChange.png
-[PaaSTa_Platform_Use_Guide_Image03]:/images/PaaSTa_Platform_Use_Guide/manual/Dashboard.png
-[PaaSTa_Platform_Use_Guide_Image04]:/images/PaaSTa_Platform_Use_Guide/manual/DirectorConfig.png
-[PaaSTa_Platform_Use_Guide_Image05]:/images/PaaSTa_Platform_Use_Guide/manual/DirectorConfigAdd.png
-[PaaSTa_Platform_Use_Guide_Image06]:/images/PaaSTa_Platform_Use_Guide/manual/StemcellConfig.png
-[PaaSTa_Platform_Use_Guide_Image07]:/images/PaaSTa_Platform_Use_Guide/manual/ReleaseConfig.png
-[PaaSTa_Platform_Use_Guide_Image08]:/images/PaaSTa_Platform_Use_Guide/manual/CodeManagement.png
-[PaaSTa_Platform_Use_Guide_Image09]:/images/PaaSTa_Platform_Use_Guide/manual/AuthManagement.png
-[PaaSTa_Platform_Use_Guide_Image10]:/images/PaaSTa_Platform_Use_Guide/manual/UseManagement.png
-[PaaSTa_Platform_Use_Guide_Image11]:/images/PaaSTa_Platform_Use_Guide/manual/BootStrapInstall.png
-[PaaSTa_Platform_Use_Guide_Image12]:/images/PaaSTa_Platform_Use_Guide/manual/BoshInstall.png
-[PaaSTa_Platform_Use_Guide_Image13]:/images/PaaSTa_Platform_Use_Guide/manual/CfInstall.png
-[PaaSTa_Platform_Use_Guide_Image14]:/images/PaaSTa_Platform_Use_Guide/manual/DiegoInstall.png
-[PaaSTa_Platform_Use_Guide_Image15]:/images/PaaSTa_Platform_Use_Guide/manual/Cf_DiegoInstall.png
-[PaaSTa_Platform_Use_Guide_Image16]:/images/PaaSTa_Platform_Use_Guide/manual/ServicePackInstall.png
-[PaaSTa_Platform_Use_Guide_Image17]:/images/PaaSTa_Platform_Use_Guide/manual/StemcellUpload.png
-[PaaSTa_Platform_Use_Guide_Image18]:/images/PaaSTa_Platform_Use_Guide/manual/ReleaseUpload.png
-[PaaSTa_Platform_Use_Guide_Image19]:/images/PaaSTa_Platform_Use_Guide/manual/DeploymentInfo.png
-[PaaSTa_Platform_Use_Guide_Image20]:/images/PaaSTa_Platform_Use_Guide/manual/TaskInfo.png
-[PaaSTa_Platform_Use_Guide_Image21]:/images/PaaSTa_Platform_Use_Guide/manual/VmInfo.png
-[PaaSTa_Platform_Use_Guide_Image22]:/images/PaaSTa_Platform_Use_Guide/manual/PropertyInfo.png
-[PaaSTa_Platform_Use_Guide_Image23]:/images/PaaSTa_Platform_Use_Guide/manual/SnapshotInfo.png
-[PaaSTa_Platform_Use_Guide_Image24]:/images/PaaSTa_Platform_Use_Guide/manual/ManifestInfo.png
-
-[PaaSTa_Platform_Use_Guide_Image25]:/images/PaaSTa_Platform_Use_Guide/platformProcess/PlatformProcess.png
-[PaaSTa_Platform_Use_Guide_Image26]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/codeGroupAdd.png
-[PaaSTa_Platform_Use_Guide_Image27]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/codeGroupModify.png
-[PaaSTa_Platform_Use_Guide_Image28]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/codeAdd.png
-[PaaSTa_Platform_Use_Guide_Image29]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/codeModify.png
-[PaaSTa_Platform_Use_Guide_Image30]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/authCodeADD.png
-[PaaSTa_Platform_Use_Guide_Image31]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/authGroupadd.png
-[PaaSTa_Platform_Use_Guide_Image32]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/authGroupModify.png
-[PaaSTa_Platform_Use_Guide_Image33]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/authDetailAdd.png
-[PaaSTa_Platform_Use_Guide_Image34]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/userAdd.png
-[PaaSTa_Platform_Use_Guide_Image35]:/images/PaaSTa_Platform_Use_Guide/platformProcess/management/userModify.png
-
-
-[PaaSTa_Platform_Use_Guide_Image36]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapProcess.png
-[PaaSTa_Platform_Use_Guide_Image37]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/StemcellAdd.png
-[PaaSTa_Platform_Use_Guide_Image38]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/releaseAdd.png
-[PaaSTa_Platform_Use_Guide_Image39]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/releaseAdd2.png
-[PaaSTa_Platform_Use_Guide_Image40]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapIaasSelect.png
-[PaaSTa_Platform_Use_Guide_Image41]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapOpenstackInfo.png
-[PaaSTa_Platform_Use_Guide_Image42]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapAWSInfo.png
-[PaaSTa_Platform_Use_Guide_Image43]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapVsphereInfo.png
-[PaaSTa_Platform_Use_Guide_Image44]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapDefaultInfo.png
-[PaaSTa_Platform_Use_Guide_Image45]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapOpenstackNetworkInfo.png
-[PaaSTa_Platform_Use_Guide_Image46]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapVsphereNetworkInfo.png
-[PaaSTa_Platform_Use_Guide_Image47]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapAwsOpenstackResourceInfo.png
-[PaaSTa_Platform_Use_Guide_Image48]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapVsphereResourceInfo.png
-[PaaSTa_Platform_Use_Guide_Image49]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapDeployInfo.png
-[PaaSTa_Platform_Use_Guide_Image50]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapDirectorAdd.png
-
-
-[PaaSTa_Platform_Use_Guide_Image52]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshInstallProcess.png
-[PaaSTa_Platform_Use_Guide_Image53]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/StemcellUpload.png
-[PaaSTa_Platform_Use_Guide_Image54]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/ReleaseUpload.png
-[PaaSTa_Platform_Use_Guide_Image55]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshOpenstackInfo.png
-[PaaSTa_Platform_Use_Guide_Image56]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsInfo.png
-[PaaSTa_Platform_Use_Guide_Image57]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereInfo.png
-[PaaSTa_Platform_Use_Guide_Image58]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshDefaultInfo.png
-[PaaSTa_Platform_Use_Guide_Image59]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshOpenstackNetworkInfo.png
-[PaaSTa_Platform_Use_Guide_Image60]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsNetworkInfo.png
-[PaaSTa_Platform_Use_Guide_Image61]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereNetworkInfo.png
-[PaaSTa_Platform_Use_Guide_Image62]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsOpenstackResourceInfo.png
-[PaaSTa_Platform_Use_Guide_Image63]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereResourceInfo.png
-[PaaSTa_Platform_Use_Guide_Image64]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshDeployInfo.png
-[PaaSTa_Platform_Use_Guide_Image65]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshInstallInfo.png
-
-
-[PaaSTa_Platform_Use_Guide_Image66]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfProcess.png
-[PaaSTa_Platform_Use_Guide_Image67]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfDiegoCheck.png
-[PaaSTa_Platform_Use_Guide_Image68]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfDefaultInfo.png
-[PaaSTa_Platform_Use_Guide_Image69]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfOpenstackNetworkInfo.png
-[PaaSTa_Platform_Use_Guide_Image70]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/cfAwsNetworkInfo.png
-[PaaSTa_Platform_Use_Guide_Image71]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfVsphereNetworkInfo.png
-[PaaSTa_Platform_Use_Guide_Image72]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfKeyInfo.png
-[PaaSTa_Platform_Use_Guide_Image73]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfAwsOpenstackResourceInfo.png
-[PaaSTa_Platform_Use_Guide_Image66]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfVsphereResourceInfo.png
-[PaaSTa_Platform_Use_Guide_Image74]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfDeployInfo.png
-[PaaSTa_Platform_Use_Guide_Image75]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfInstallInfo.png
+UAA OAuthToken은 Abacus가 Secured로 운영될 경우, abucus-collector
+RESTAPI에 접근 하기 위해 필요하다.<br>
+SampleMeteringOAuthService를 상속하는 클래스는 UAA OAuthToken을 취득하여
+리턴하는 처리를 구현해야 한다.
+
+	package org.openpaas.servicebroker.service;
+	import org.openpaas.servicebroker.exception.ServiceBrokerException;
+	
+	public interface SampleMeteringOAuthService {
+	String getUAAToken() throws ServiceBrokerException;
+	}
+
+
+###<div id='16'/>2.3.7.  SampleMeteringReportService 추상화 클래스
+SampleMeteringReportService를 상속하는 클래스는 create binding request와
+delete binding request를 처리 할 때, 각각 해당 이벤트 정보를
+abacus-collector에 전송하고 해당 처리에 대한 상태코드(HTTP 상태코드)를
+리턴하는 처리를 구현해야 한다.
+
+	package org.openpaas.servicebroker.service;
+	import org.openpaas.servicebroker.exception.ServiceBrokerException;
+	import org.openpaas.servicebroker.model.ServiceInstanceBinding;
+	public interface SampleMeteringReportService {
+	int reportServiceInstanceBinding(ServiceInstanceBinding serviceInstanceBinding, 
+			String uaaToken)
+			throws ServiceBrokerException;
+	
+	int reportServiceInstanceBindingDelete(ServiceInstanceBinding serviceInstanceBinding, 
+			String uaaToken)
+			throws ServiceBrokerException;	
+	
+	}
+
+
+
+
+##<div id='17'/>2.4.  서비스 브로커 라이브러리
+
+###<div id='18'/>2.4.1.  mongo-db 서비스 브로커 API
+
+지금까지 서비스 브로커 라이브러리를 개수 하여, 미터링을 위한 추상화
+클래스 및 모델 객체들을 준비 했다. 지금 부터는 서비스 브로커
+라이브러리를 구현한 mongo-db 서비스 브로커 API에서 미터링을 구현 하는
+것에 대해 기술 한다.
+
+###<div id='19'/>2.4.2.  mongo-db 서비스 브로커 API 다운로드
+
+mongo-db 서비스 브로커 API는 별도 제공되는 압축 파일 패키지를 사용한다.
+
+###<div id='20'/>2.4.3.  mongo-db 서비스 브로커 API에 추가 및 수정 되는 파일
+
+| 　　|유형 | 필수|
+|---------|---|----|
+|   수정      |build.gradle   |  빌드 설정 파일<br>미터링 사용량 객체 생성에 필요한 dependency 를 추가 한다.|     
+|   수정      | application-mvc.properties  | 서비스 바인딩 request 의 정보들을 매핑한다.<br>미터링 서비스를 구현하기 위해 바인딩 되는 애플리케이션의 환경정보 필드를 추가 한다.|     
+|   수정      | datasource.properties   | Mongo-db 서비스 정보   |     
+|   수정     | MongoServiceInstanceBindingService  |service broker binding request parameter 로 입력 받은 미터링 정보를 ServiceInstanceBinding 에 매핑하는 프로세스를 추가 한다.    |     
+|   추가      | SampleMeteringReportServiceImpl  | SampleMeteringReportService 를 구현 한다.   |     
+|   추가     |SampleMeteringOAuthServiceImpl   | SampleMeteringOAuthService 를 구현 한다.   |     
+|   수정     |Manifest.yml   | 앱을 CF에 배포할 때 필요한 설정 정보 및 앱 실행 환경에 필요한 설정 정보를 기술한다.   |
+
+
+###<div id='21'/>2.4.4.  gradle build를 위한 dependency 추가
+서비스브로커 라이브러리 mongo-db서비스 브로커 jar 파일을 적용<br>
+![Java_Service_Metering_Image03]<br>
+서비스 브로커 라이브러리를 gradle build 한다.
+
+	@openpaas-service-broker/openpaas-service-java-broker$ gradle build -x test
+	:compileJava
+	:processResources UP-TO-DATE
+	:classes
+	:findMainClass
+	:jar
+	:bootRepackage
+	:assemble
+	:check
+	:build
+	
+	BUILD SUCCESSFUL
+	
+	Total time: 58.845 secs
+
+
+
+빌드가 성공하면
+/openpaas-service-java-broker/build/libs/openpaas-service-java-broker.jar가
+생성 된다.
+
+이 jar 파일을 mongo-db 서비스 브로커의
+/openpaas-service-java-broker-mongo/libs 경로로 복사 하고, mongo-db
+서비스브로커 gradle build 파일에 dependency를 추가 한다.
+
+
+mongo-db 서비스 브로커 build.gradle 파일의 dependencies 부분
+
+	dependencies {
+	    // 서비스브로커 라이브러리 
+	    compile files('libs/openpaas-service-java-broker.jar')
+	    // 미터링 사용량 객체 생성 dependency
+	    compile("org.json:json:20160212")
+	    compile("com.googlecode.json-simple:json-simple:1.1")
+	
+	    providedRuntime("org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}")
+	    compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+	    compile("org.springframework.boot:spring-boot-starter-security:${springBootVersion}")
+	    	//testCompile("org.cloudfoundry:spring-boot-cf-service-broker-tests:${springBootCfServiceBrokerVersion}")
+	    testCompile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+	    testCompile("com.jayway.jsonpath:json-path:${jsonPathVersion}")
+	    testCompile("org.apache.httpcomponents:httpclient:4.4.1")
+	    
+	    testCompile("org.powermock:powermock-mockito-release-full:1.6.1")    
+		compile("org.apache.commons:commons-dbcp2")    
+	    compile("org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}")
+	}
+
+
+###<div id='22'/>2.4.5.  application-mvc.properties 설정
+
+	# abacus usage collector RESTAPI 의 주소
+	abacus.collector: https://abacus-usage-collector.<파스-타 도메인> /v1/metering/collected/usage
+	# abacus usage collector 가 secured 모드 true / 아닐 경우 false
+	abacus.secured: true
+	# 개발형 플랫폼의 uaa server 
+	uaa.server: https://uaa.<파스-타 도메인>
+	# abacus usage collector RESTAPI 사용권한 (UAA server 에 미리 등록한다.)
+	uaa.client.id: abacus-linux-container
+	uaa.client.secret: secret
+	uaa.client.scope: abacus.usage.linux-container.write,abacus.usage.linux-container.read 
+
+
+uaa 계정 설정 방법에 관해서 별도의 **abacus****설치 가이드**의 **Secured
+Abacus****를 위한****UAA****계정 등록**을 참고한다.
+
+
+###<div id='23'/>2.4.6.  datasource.properties 설정
+
+	# Mongo-DB 서비스 배포 manifest파일을 참조하여 설정한다.
+	mongodb.hosts = 10.244.14.2, 10.244.14.14, 10.244.14.26
+	mongodb.port = 27017
+	mongodb.dbName = mongo-broker
+	mongodb.userName = root
+	mongodb.authSource = admin
+	mongodb.password = openpaas
+
+###<div id='24'/>2.4.7.  MongoServiceInstanceBindingService 구현체
+
+애플리케이션 환경 정보는 service broker binding CLI 요청 시, parameter
+객체를 통해서 입력된다. 이 정보 들을 ServiceInstanceBinding에 미터링
+필드를 매핑한다.
+
+-   service broker binding CLI 요청 예제
+
+  	    $ cf bind-service sample-api-node-caller mongod_service -c 
+		'{"app_organization_id":"test05","app_space_id":"testspaceId","metering_plan_id":"standard"}'
+
+
+parameter 넘어온 정보들을 mongo-db 에 저장하기 위해
+ServiceInstanceBinding 객체에 매핑한다. mongo-db repository 를 통해 저장
+후, 바인딩 정보를 리턴 한다.
+	
+	// parameter 로 입력 받은 미터링 관련 정보를 취득하여 ServiceInstanceBinding 에 매핑한다.
+	Map<String, Object> paraMap = request.getParameters();
+	String appOrganizationId = (String) paraMap.get("app_organization_id");
+	String appSpaceId = (String) paraMap.get("app_space_id");
+	String meteringPlanId = (String) paraMap.get("metering_plan_id");
+	binding = new ServiceInstanceBinding(request.getBindingId(), request.getServiceInstanceId(), credentials, null,request.getAppGuid(), appOrganizationId, appSpaceId, meteringPlanId);
+	
+	repository.save(binding);
+	
+	return binding;
+
+
+###<div id='25'/>2.4.8.  SampleMeteringOAuthService 구현
+
+application-mvc.properties의 UAA server에서 UAA 토큰을 취득하기 위한
+정보들을 클래스로 호출한다.
+
+	@Component
+	@Service
+	public class SampleMeteringOAuthServiceImpl implements SampleMeteringOAuthService {
+		@Value("${uaa.server}")
+		String authServer;
+		
+		@Value("${uaa.client.id}")
+		String clientId;
+		
+		@Value("${uaa.client.secret}")
+		String clientSecret;
+		
+		@Value("${uaa.client.scope}")
+		String scope;
+		
+		@Value("${abacus.secured}")
+		String abacusSecured;
+
+
+
+SampleMeteringOAuthServiceImpl은 SampleMeteringOAuthService를 구현한다.
+
+SampleMeteringOAuthServiceImpl는 https 커넥션을 생성하여 UAA 서버에
+토큰을 요청한다. 이때 abacusSecured (abacus-collector 의 secured 설정
+여부) 에 따라 공백({}) 또는 토큰을 리턴 한다.
+
+	@Override
+	public String getUAAToken() throws ServiceBrokerException {
+		
+	if(!SECURED.equals(abacusSecured)){
+		return "";
+	} else {
+		String authToken = "";		
+		StringBuffer sb = new StringBuffer();
+		
+		HttpsURLConnection conn = (HttpsURLConnection) getConnetionUAA();
+	        conn.setRequestMethod("GET");
+	        conn.setDoInput(true);
+	        String authHeader = getAuthKey(clientId, clientSecret);
+	        conn.setRequestProperty("authorization", authHeader);
+	
+		InputStreamReader in = new InputStreamReader((InputStream) conn.getContent());
+		BufferedReader br = new BufferedReader(in);
+	
+		String line;
+		while ((line = br.readLine()) != null) {
+			sb.append(line).append("\n");
+		}
+	
+		authToken= parseAuthToken(sb.toString());
+		br.close();
+		in.close();
+		conn.disconnect();
+		return authToken;
+	} 
+
+
+###<div id='26'/>2.4.9.  SampleMeteringReportService 구현
+
+SampleMeteringReportServiceImpl에서는 SampleMeteringOAuthServiceImpl에서
+취득한 uaa token 으로 https 커넥션을 생성하여, abacus-collector에 서비스
+사용량 정보를 POST 한다.
+
+abacus-collector 에서는 미터링 정책에 따라 POST 받을 양식에 대한
+프로세스를 준비 하고 있기 때문에 abacus-collector가 알 수 있는 양식으로
+JSON을 생성 후 POST 한다.
+
+SampleMeteringReportServiceImpl 은 크게 나누어 2가지 처리를 하고 있다.
+
+
+1.  **ServiceInstanceBinding 정보를 참조 하여 ,사용량 정보 JSON을 생성 한다.**
+
+2.  **생성한 사용량 정보 JSON을 abacus-collector로 전송한다. (HTTPS, HTTP)**
+
+
+사용량 정보 JSON 을 생성 한다.<br>
+RESOURCE_ID linux-container 와 STANDARD_PLAN_ID standard 는
+abacus에서 sample 로 제공 되는 미터링 스키마이다.<br>
+본 가이드에서는 이 미터링 스키마를 mongo-db 서비스 바인딩과 언바인딩에
+대한 미터링 스키마로 이용하여 기술 했다.<br>
+서비스 제공자는 제공 하려는 서비스에 맞는 정책을 정하여, 미터링 스키마를
+abacus-프로비저닝에 등록 해야, abacus-collector 에 미터링을 전송할 수
+있게 된다. (정책 등록에 대한 자세한 내용은 본문 하기의 **미터링/과금 정책 참조**)
+
+
+다음 예제의 미터링 리포팅 용 상수들은 abacus의 linux-container 미터링
+스키마에 맞게 기술 되었고, PLAN_STANDARD_QUANTITY,
+PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 해당
+항목을 DB 또는 프로퍼티 등을 통해 설정한다.
+
+	// 미터링 리포트용 상수
+	private static final String RESOURCE_ID = "linux-container";
+	private static final int BIND = 1;
+	private static final int UNBIND = 0;
+	private static final String MEASURE_1 = "sample_service_usage_param1";
+	private static final String MEASURE_2 = "sample_service_usage_param2";
+	private static final String MEASURE_3 = "previous_sample_service_usage_param1";
+	private static final String MEASURE_4 = "previous_sample_service_usage_param2";
+	private static final String STANDARD_PLAN_ID = "standard";
+	private static final int PLAN_STANDARD_QUANTITY = 50000000;
+	private static final int PLAN_EXTRA_QUANTITY = 1000000000;
+	private static final String SECURED = "true";
+	
+	/***************************************************
+	 * @description : 리포트 용 JSON 생성
+	 * @title : buildServiceUsage
+	 * @return : JSONObject
+	 ***************************************************/
+	public JSONObject buildServiceUsage(ServiceInstanceBinding binding, int mode) {
+	
+		String orgId = (String) binding.getAppOrganizationId();
+		String spaceId = (String) binding.getAppSpaceId();
+		String planId = (String) binding.getMeteringPlanId();
+		String appId = (String) binding.getAppGuid();
+	
+		LocalDateTime now = LocalDateTime.now();
+		Timestamp timestamp = Timestamp.valueOf(now);
+	
+		JSONObject jsonObjectUsage = new JSONObject();
+		jsonObjectUsage.put("start", timestamp.getTime());
+		jsonObjectUsage.put("end", timestamp.getTime());
+		jsonObjectUsage.put("organization_id", orgId);
+		jsonObjectUsage.put("space_id", spaceId);
+		jsonObjectUsage.put("consumer_id", "app:" + appId);
+		jsonObjectUsage.put("resource_id", RESOURCE_ID);
+		jsonObjectUsage.put("plan_id", planId);
+		jsonObjectUsage.put("resource_instance_id", appId);
+		JSONArray measuredUsageArr = new JSONArray();
+		JSONObject measuredUsage1 = new JSONObject();
+		JSONObject measuredUsage2 = new JSONObject();
+		JSONObject measuredUsage3 = new JSONObject();
+		JSONObject measuredUsage4 = new JSONObject();
+	
+		int quantity = 0;
+		if (STANDARD_PLAN_ID.equals(planId)) {
+			quantity = PLAN_STANDARD_QUANTITY;
+		} else {
+			quantity = PLAN_EXTRA_QUANTITY;
+		}
+		if (mode == BIND) {
+			measuredUsage1.put("measure", MEASURE_1);
+			measuredUsage1.put("quantity", quantity);
+			measuredUsageArr.put(measuredUsage1);
+			measuredUsage2.put("measure", MEASURE_2);
+			measuredUsage2.put("quantity", 1);
+			measuredUsageArr.put(measuredUsage2);
+			measuredUsage3.put("measure", MEASURE_3);
+			measuredUsage3.put("quantity", 0);
+			measuredUsageArr.put(measuredUsage3);
+			measuredUsage4.put("measure", MEASURE_4);
+			measuredUsage4.put("quantity", 0);
+			measuredUsageArr.put(measuredUsage4);
+		} else { // UNBIND
+			measuredUsage1.put("measure", MEASURE_1);
+			measuredUsage1.put("quantity", 0);
+			measuredUsageArr.put(measuredUsage1);
+			measuredUsage2.put("measure", MEASURE_2);
+			measuredUsage2.put("quantity", 0);
+			measuredUsageArr.put(measuredUsage2);
+			measuredUsage3.put("measure", MEASURE_3);
+			measuredUsage3.put("quantity", quantity);
+			measuredUsageArr.put(measuredUsage3);
+			measuredUsage4.put("measure", MEASURE_4);
+			measuredUsage4.put("quantity", 1);
+			measuredUsageArr.put(measuredUsage4);
+		}
+		jsonObjectUsage.put("measured_usage", measuredUsageArr);
+		return jsonObjectUsage;
+	}
+
+
+**abacus-collector** **인터페이스 항목**
+
+| 항목명                 |유형             | 설명                                          | 예시                                           |
+|-----------------------|-----------------|----------------------------------------------|------------------------------------------------|
+|   start               | UNIX Timestamp  |바인드/언바인드 처리 시작 시각                   |1396421450000                                   |
+|   end                 | UNIX Timestamp  |  바인드/언바인드 처리 응답 시각                 |1396421451000                                   |
+|  organization_id      | String          | 바인드 요청을 호출한 앱의 조직 ID               | us-south:54257f98-83f0-4eca-ae04-9ea35277a538  |
+|   space_id            |String           | 서비스 바인드 요청을 호출한 앱의 영역 ID         |d98b5916-3c77-44b9-ac12-04456df23eae            |
+|  consumer_id          | String          |서비스 바인드 요청을 호출한 앱 ID                | App: d98b5916-3c77-44b9-ac12-04d61c7a4eae      |
+|  resource_id          |String           |서비스 자원 ID                                 |linux-container                                 |
+|  plan_id              |String           | 서비스 미터링 Plan ID                         |standard                                        |
+|  resource_instance_id | String          |바인드 요청을 호출한 앱 ID                      | d98b5916-3c77-44b9-ac12-04d61c7a4eae            |
+|  measured_usage       | Array           | 미터링 항목                                   | -                                         |
+|   measure             | String          | 미터링 대상 명                                |sample_service_usage_param1                     |
+|  quantity             |Number           |  서비스 사용량 예제는 메모리 사용량 (byte)      |1000000000                                       |
+
+
+※ JSON 변환 예제
+
+	{  
+	   "consumer_id":"app:d98b5916-3c77-44b9-ac12-04d61c7a4eae ",
+	   "resource_instance_id":"d98b5916-3c77-44b9-ac12-04d61c7a4eae ",
+	   "organization_id":" us-south:54257f98-83f0-4eca-ae04-9ea35277a538",
+	   "measured_usage":[  
+	      {  
+	         "measure":"sample_service_usage_param1",
+	         "quantity":50000000
+	      },
+	      {  
+	         "measure":"sample_service_usage_param2",
+	         "quantity":0
+	      },
+	      {  
+	         "measure":"previous_sample_service_usage_param1",
+	         "quantity":50000000
+	      },
+	      {  
+	         "measure":"previous_sample_service_usage_param2",
+	         "quantity":1
+	      }
+	   ],
+	   "start":1396421450000,
+	   "resource_id":"linux-container",
+	   "end":1396421450000,
+	   "space_id":" d98b5916-3c77-44b9-ac12-04456df23eae ",
+	   "plan_id":"standard"
+	}
+
+
+
+#<div id='27'/>2.5.  미터링/등급/과금 정책
+
+서비스, 그리고 서비스 제공자 마다 미터링/등급/과금 정책 다르기 때문에 본
+가이드에서는 정책의 개발 예제를 다루지는 않는다. 다만 CF-ABACUS에 적용할
+수 있는 형식에 대해 설명한다.
+
+
+###<div id='28'/>2.5.1.  미터링 정책
+
+미터링 정책이란 수집한 미터링 정보에서 미터링 대상의 지정 및 집계 방식을
+정의한 JSON 형식의 오브젝트이다. 서비스 제공자는 미터링 정책 스키마에
+맞춰 서비스에 대한 정책을 개발한다.
+
+
+#####1.  **미터링 정책 스키마**
+
+| 항목명  |유형 | 필수| 설명|
+|---------|---|----|-----|
+|   plan_id      |  String | O   |  API 서비스 미터링 Plan ID   |
+|    measures     | Array  |  최소 하나  |  API 서비스 미터링 정보 수집 대상 정의   |
+|    Name     | String  | O   |  미터링 정보 수집 대상 명   |
+|    Unit     | String  |  O  |  미터링 정보 수집 대상 단위   |
+|    metrics     | Array  | 최소 하나   | API 서비스 미터링 집계 방식 정의    |
+|    Name     |  String | O   | 미터링 정보 수집 대상 명    |
+|   unit      |  String |  O  | 미터링 정보 수집 대상 단위    |
+|    meter     |  String | X   | 미터링 정보에 대해서 수집 단계에 적용하는 계산식 또는 변환 식    |
+|   accumulate      |String   |  X  | 미터링 정보에 대해서 누적 단계에 적용하는 계산식 또는 변환식    |
+|   aggregate      |  String |  X  | 미터링 정보에 대해서 집계 단계에 적용하는 계산식 또는 변환식    |
+|   summarize      | String  |  X  | 미터링 정보를 보고할 때 적용하는 계산식 또는 변환식    |
+|   title      |  String |   X | API 서비스 미터링 제목    |
+
+#####2.  **미터링 정책 예제**
+
+	{
+	  "plan_id": "basic-linux-container",
+	  "measures": [
+	{
+	      name: 'sample_service_usage_param1',
+	      unit: ‘SAMPLE_UNIT’
+	    },
+	    {
+	      name: 'sample_service_usage_param2',
+	      unit: ‘SAMPLE_UNIT’
+	    },
+	    {
+	      name: 'previous_service_usage_param1',
+	      unit: ‘SAMPLE_UNIT’
+	    },
+	    {
+	      name: 'previous_service_usage_param2',
+	      unit: ‘SAMPLE_UNIT’
+	    } ],
+	metrics: [
+	    {
+	      name: 'sample_metric',
+	      unit: ‘SAMPLE_UNIT’,
+	      type: 'time-based',
+	
+	      meter: ((m) => ({
+	        previous_consuming: new BigNumber(m.previous_instance_memory || 0)
+	          .div(1073741824).mul(m.previous_running_instances || 0)
+	          .mul(-1).toNumber(),
+	        consuming: new BigNumber(m.current_instance_memory || 0)
+	          .div(1073741824).mul(m.current_running_instances || 0).toNumber()
+	      })).toString(),
+	
+	      accumulate: ((a, qty, start, end, from, to, twCell) => {
+	        // Do not accumulate usage out of boundary
+	        if (end < from || end >= to)
+	          return null;
+	
+	        const past = from - start;
+	        const future = to - start;
+	        const td = past + future;
+	        return {
+	          // Keep the consuming & since to the latest value
+	          consuming: a && a.since > start ? a.consuming : qty.consuming,
+	          consumed: new BigNumber(qty.consuming).mul(td)
+	            .add(new BigNumber(qty.previous_consuming).mul(td))
+	            .add(a ? a.consumed : 0).toNumber(),
+	          since: a && a.since > start ? a.since : start
+	        };
+	      }).toString(),
+	
+	      aggregate: ((a, prev, curr, aggTwCell, accTwCell) => {
+	        // Usage was rejected by accumulate
+	        if (!curr)
+	          return a;
+	
+	        const consuming = new BigNumber(curr.consuming)
+	          .sub(prev ? prev.consuming : 0);
+	        const consumed = new BigNumber(curr.consumed)
+	          .sub(prev ? prev.consumed : 0);
+	        return {
+	          consuming: consuming.add(a ? a.consuming : 0).toNumber(),
+	          consumed: consumed.add(a ? a.consumed : 0).toNumber()
+	        };
+	      }).toString(),
+	
+	      summarize: ((t, qty, from, to) => {
+	        // no usage
+	        if (!qty)
+	          return 0;
+	        // Apply stop on running instance
+	        const rt = Math.min(t, to ? to : t);
+	        const past = from - rt;
+	        const future = to - rt;
+	        const td = past + future;
+	        const consumed = new BigNumber(qty.consuming)
+	          .mul(-1).mul(td).toNumber();
+	        return new BigNumber(qty.consumed).add(consumed)
+	          .div(2).div(3600000).toNumber();
+	      }).toString()
+	    }
+	  ]
+	};
+
+
+###<div id='29'/>2.5.2.  등급 정책 
+
+등급 정책이란 각 서비스의 사용 가중치를 정의한 JSON 형식의 오브젝트이다.
+서비스 제공자는 등급 정책 스키마에 맞춰 서비스에 대한 정책을 개발한다.
+
+
+#####1.  **등급 정책 스키마**
+
+| 항목명  |유형 | 필수| 설명|
+|---------|---|----|-----|
+|   plan_id      |  String | O   |  API 서비스 미터링 Plan ID   |
+|    metrics     | Array  |  최소 하나  |  등급 정책 목록   |
+|    Name     | String  | O   |  등급 정의 대상 명   |
+|    rate     | String  |  X  |  가중치 계산식 또는 변환식   |
+|    charge     | String  | X   | 사용량에 대한 과금 계산식 또는 변환식    |
+|    title     |  String | X   | 등급 정책 명    |
+
+
+#####2.  **등급 정책 예제**
+
+	{
+	  "plan_id": "standard",
+	  "metrics": [
+	    {
+	      "name": "sample_metrics"
+	    },
+	    {
+	      "name": "sample_service_usage_param1",
+	      "rate": "(p, qty) => p ? p * qty : 0",
+	      "charge": "(t, cost) => cost"
+	    }
+	  ]
+	}
+
+
+##<div id='30'/>#2.5.3. 과금 정책 
+
+과금 정책이란 각 서비스에 대한 사용 단가를 정의한 JSON 형식의
+오브젝트이다. 서비스 제공자는 과금 정책 스키마에 맞춰 서비스에 대한
+정책을 개발한다.
+
+
+#####1.  **과금 정책 스키마**
+
+| 항목명  |유형 | 필수| 설명|
+|---------|---|----|-----|
+|   plan_id      |  String | O   |  API 서비스 미터링 Plan ID   |
+|    metrics     | Array  |  최소 하나  |  과금 정책 목록   |
+|    Name     | String  | O   |  과금 대상 명  |
+|    Price     | String  |  최소 하나  |  과금 정책 상세   |
+|    Country     | String  | O   | 서비스 사용 단가에 적용할 통화    |
+|    Price     |  String | O   | 서비스 사용 단가    |
+|    title     |  String | X   | 과금 정책 제목    |
+
+
+#####2.  **과금 정책 예제**
+
+	{
+	  "plan_id": "standard",
+	  "metrics": [
+	    {
+	      "name": "sample_service_usage_param1",
+	      "prices": [
+	        {
+	          "country": "USA",
+	          "price": 1
+	        },
+	        {
+	          "country": "EUR",
+	          "price": 0.7523
+	        },
+	        {
+	          "country": "CAN",
+	          "price": 1.06
+	        }
+	      ]
+	    },
+	    {
+	      "name": " sample_service_usage_param2",
+	      "prices": [
+	        {
+	          "country": "USA",
+	          "price": 0.03
+	        },
+	        {
+	          "country": "EUR",
+	          "price": 0.0226
+	        },
+	        {
+	          "country": "CAN",
+	          "price": 0.0317
+	        }
+	      ]
+	    }
+	  ]
+	}
+
+
+
+###<div id='31'/>2.5.4.  정책 등록
+
+정책은 2가지 방식 중 하나의 방법으로 CF-ABACUS에 등록할 수 있다.
+
+#####**1.  js 파일을 등록하는 방식**
+
+작성한 정책을 다음의 디렉토리에 저장한 후, CF에 CF-ABACUS를 배포 또는
+재배포 한다.
+
+-	미터링 정책의 경우
+
+		cf-abacus/lib/plugins/provisioning/src/plans/metering
+
+-	등급 정책의 경우
+
+		cf-abacus/lib/plugins/provisioning/src/plans/pricing
+
+-	과금 정책의 경우
+
+		cf-abacus/lib/plugins/provisioning/src/plans/rating
+
+
+#####**2.  DB에 등록하는 방식**
+
+작성한 정책을 curl 등을 이용해 DB에 저장하는 방식으로 CF-ABACUS를
+재배포할 필요는 없다. 정책 등록 시, 정책 ID는 고유해야 한다.
+
+-   미터링 정책의 경우
+
+  		POST /v1/metering/plans/:metering_plan_id
+
+
+-   등급 정책의 경우
+
+  		POST /v1/rating/plans/:rating_plan_id
+
+-   과금 정책의 경우
+
+  		POST /v1/pricing/plans/:pricing_plan_id
+
+
+##<div id='32'/>2.6  배포
+파스-타 플랫폼에 애플리케이션을 배포하면 배포한 애플리케이션과 파스-타
+플랫폼이 제공하는 서비스를 연결하여 사용할 수 있다. 파스-타 플랫폼상에서
+실행을 해야만 파스-타 플랫폼의 애플리케이션 환경변수에 접근하여 서비스에
+접속할 수 있다.
+
+###<div id='33'/>2.6.1파스-타 플랫폼 로그인
+
+아래의 과정을 수행하기 위해서 파스-타 플랫폼에 로그인
+
+  >$ cf api --skip-ssl-validation **https://api**.<***파스-타 도메인***> # **파스-타 플랫폼 TARGET 지정**
+
+  >$ cf login -u *<****user name****>* -o *<****org name****>* -s *<****space name****>***#**** **로그인 요청**
+
+
+###<div id='34'/>2.6.2.  mongo-db 서비스 브로커 생성
+
+애플리케이션에서 사용할 서비스를 파스-타 플랫폼을 통하여 생성한다.
+mongo-db 서비스 팩이 배포하고자 파스-타 플랫폼 환경에 release 되어
+있어야 한다. 애플리케이션과 바인딩 과정을 통해 접속정보를 얻을 수 있다.
+
+-   **서비스 생성 (cf marketplace 명령을 통해 서비스 목록과 각 서비스의
+    플랜을 조회할 수 있다.)**
+
+		## 서비스 브로커 CF 배포
+		$ cd openpaas-service-java-broker-mongo
+		$ cf push
+		
+		## 서비스 브로커 생성
+		$ cf create-service-broker <서비스 브로커 명> <인증ID> <인증Password> <서비스 브로커 주소>
+		
+		예)
+		$ cf create-service-broker openpaas-mongo-broker admin cloudfoundry http://openpaas-mongo-broker.bosh-lite.com
+		
+		## 서비스 브로커 확인
+		$ cf service-brokers
+		Getting service brokers as admin...
+		
+		name                url   
+		openpaas-mongo-broker http://openpaas-mongo-broker.<파스-타 도메인>
+		
+		## 서비스 카탈로그 확인
+		$ cf service-access
+		Getting service access as admin...
+		broker: sample-mongodb-broker
+		   service                                   plan       access   orgs   
+		   Mongo-DB                               default-plan none        
+		   
+		## 등록한 서비스 접근 허용
+		$ cf enable-service-access <서비스명> -p <플랜 명>
+		
+		예)
+		$ cf enable-service-access Mongo-DB
+		
+		# 서비스 생성
+		$ cf create-service Mongo-DB default-plan  mongod_service
+
+
+##<div id='35'/>2.6.3.  API 서비스 연동 샘플 애플리케이션 배포 및 서비스 연결
+
+애플리케이션과 서비스를 연결하는 과정을 '바인드(bind)라고 하며, 이
+과정을 통해 서비스에 접근할 수 있는 접속정보를 생성한다.
+
+-   애플리케이션과 서비스 연결
+
+-   이때 -c 옵션으로 미터링에 필요한 애플리케이션 환경정보를 세팅한다.
+
+		## API 서비스 연동 샘플 애플리케이션 배포
+		$ cd /binding-test-app
+		$ cf push
+		
+		## 서비스 바인드
+		$ cf bind-service <APP_NAME> <SERVICE_INSTANCE> -c <PARAMETERS_AS_JSON>
+		
+		예) 
+		$ cf bind-service binding-test-app mongod_service -c '{"app_organization_id":"test05","app_space_id":"testspaceId","metering_plan_id":"standard"}'
+		
+		## 서비스 연결 확인
+		$ cf services
+		Getting services in org real / space ops as admin...
+		OK
+		
+		name                       service                                   plan       bound apps               last operation   
+		binding-test-app mongod_service standard   binding-test-app create succeeded
+		
+		## 애플리케이션 실행
+		$ cf start <APP_NAME>
+		
+		예)
+		$ cf start binding-test-app
+		
+		## 형상 확인
+		$ cf a
+		Getting apps in org real / space ops as admin...
+		OK
+		
+		name                      requested state   instances   memory   disk   urls   
+		binding-test-app          started           1/1         512M     512M   binding-test-app.<파스-타 도메인>
+		openpaas-mongo-broker     started           1/1         512M     1G     openpaas-mongo-broker.<파스-타 도메인>
+
+
+##<div id='36'/>2.7.  서비스 바인딩 CF-Abacus 연동 테스트
+
+binding-test-app 과 mongo-db 서비스를 바인딩 실행해, CF-Abacus 연동
+테스트를 진행 할 수 있다.
+
+CF-Abacus 연동 확인
+
+	## 테스트 바인딩
+	$ cf bind-service binding-test-app mongod_service -c '{"app_organization_id":"testOrgGuid","app_space_id":"testSpaceGuId","metering_plan_id":"standard"}'
+	
+	<<후략>> 
+	
+	## API 사용량 확인
+	$ curl 'http://abacus-usage-reporting.<파스-타 도메인>/v1/metering/organizations/<샘플 애플리케이션을 배포한 조직>/aggregated/usage'
+	
+	예)
+	$ curl 'http://abacus-usage-reporting.bosh-lite.com/v1/metering/organizations/testOrgGuid /aggregated/usage'
+
+
+##<div id='37'/>2.8.  단위 테스트
+
+Junit 테스트로 구현 되어 있으며, 테스트 service class 에 대한 부분적
+mock 적용을 위하여, owermock-mockito-release-full:1.6.1 을 사용하였다.
+
+
+-   테스트를 위한 gradle.build dependency 작성
+
+
+		dependencies {
+		
+		// 서비스브로커 라이브러리 
+		compile files('libs/openpaas-service-java-broker-ex.jar')
+		
+		// 미터링 사용량 객체 생성 의존 라이브러리
+		compile("org.json:json:20160212")
+		
+		…중략
+		
+		:${springBootCfServiceBrokerVersion}")
+		
+		testCompile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+		testCompile("com.jayway.jsonpath:json-path:${jsonPathVersion}")
+		testCompile("org.apache.httpcomponents:httpclient:4.4.1")
+		testCompile("org.powermock:powermock-mockito-release-full:1.6.1")    
+		…후략
+		}
+
+
+1.  테스트 실행
+	
+	-   Spring Tool Suite 의 네비게이터 트리의 /meteringTest 경로에서 오른쪽
+			마우스 클릭 > Run As > JUNIT 테스트
+
+
+[Java_Service_Metering_Image01]:/images/Java_Service_Metering/service_broker_api_architecture.png
+[Java_Service_Metering_Image02]:/images/Java_Service_Metering/service_metering_deployment_range.png
+[Java_Service_Metering_Image03]:/images/Java_Service_Metering/mongo-db-jar.png
+[Java_Service_Metering_Image04]:/images/Java_Service_Metering/service_broker_library_architecture.png
