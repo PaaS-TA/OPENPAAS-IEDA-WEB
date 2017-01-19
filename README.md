@@ -196,17 +196,15 @@ CF & Diego Document:
 ####1.  로그인
 
 -   플랫폼 설치 관리자는 로그인 첫 아이디와 비밀번호를(admin/admin) 입력 후 로그인 버튼을 클릭한다.
-
 ![PaaSTa_Platform_Use_Guide_Image01]
 
 ####2.  비밀번호 변경
 
 -   비밀번호 변경 화면을 통해 비밀번호를 수정할 수 있다.
-
 ![PaaSTa_Platform_Use_Guide_Image02]
 
 ####3.  플랫폼 설치 자동화 접속
-
+-   DASH BOARD 화면
 ![PaaSTa_Platform_Use_Guide_Image03]
 
 ###<div id='8'/>2.1.2. ***환경설정 및 관리 -> 설치관리자 설정***
@@ -216,13 +214,11 @@ BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이�
 
 ※ 설치 관리자에서 설정을 추가하기 위해서는 먼저 BOOTSTRAP을 설치
 해야한다.
-
 ![PaaSTa_Platform_Use_Guide_Image04]
 
 ####1.  설정 추가
 
 -   설치 관리자 정보를 등록하는 기능으로 BOSH 디렉터의 IP, 포트번호,계정, 비밀번호 입력 후 확인 버튼을 클릭한다.
-
 ![PaaSTa_Platform_Use_Guide_Image05]
 
 ####2.  설정 수정
@@ -250,7 +246,6 @@ BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이�
 
 다운로드한 스템셀 목록을 조회하고, 필요한 스템셀을 등록 및 삭제 할 수
 있는 화면이다.
-
 ![PaaSTa_Platform_Use_Guide_Image06]
 
 ####1.  등록
@@ -265,7 +260,6 @@ BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이�
 
 다운로드한 릴리즈 목록을 조회하고, 필요한 릴리즈를 등록/삭제 할 수 있는
 화면이다.
-
 ![PaaSTa_Platform_Use_Guide_Image07]
 
 ####1.  등록
@@ -282,7 +276,6 @@ BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이�
 코드 관리 코드 그룹, 코드 목록을 조회하고, 필요한 코드 그룹을 등록,
 수정, 삭제 할 수 있고 해당 코드 그룹의 하위 코드를 등록, 수정, 삭제 할
 수 있는 화면이다.
-
 ![PaaSTa_Platform_Use_Guide_Image08]
 
 ####1.  코드 그룹 조회
@@ -323,7 +316,6 @@ BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이�
 권한 관리 권한 그룹, 권한 목록을 조회하고, 필요한 권한 그룹을 등록,
 수정, 삭제 할 수 있고 해당 권한 그룹의 상세 권한을 등록할 수 있는
 화면이다.
-
 ![PaaSTa_Platform_Use_Guide_Image09]
 
 ####1.  권한 그룹 조회
@@ -356,7 +348,6 @@ BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이�
 
 사용자 관리 사용자 목록을 조회하고 사용자를 등록, 수정, 삭제 할 수 있는
 화면이다.
-
 ![PaaSTa_Platform_Use_Guide_Image10]
 
 ####1.  사용자 조회
@@ -379,7 +370,6 @@ BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이�
 
 클라우드 환경에 BOOTSTRAP(Microbosh)를 설치하는 화면으로 상단의 버튼을
 이용해서 설치/수정/삭제 기능을 제공한다.
-
 ![PaaSTa_Platform_Use_Guide_Image11]
 
 ####1.  설치
@@ -399,7 +389,6 @@ BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이�
 
 클라우드 환경에 BOSH를 설치하는 화면으로 상단의 버튼을 이용해서
 설치/수정/삭제 기능을 제공한다.
-
 ![PaaSTa_Platform_Use_Guide_Image12]
 
 ####1.  설치
@@ -427,7 +416,6 @@ BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이�
 
 설치 관리자(BOOTSTRAP 또는 BOSH)를 이용해서 PaaS-TA Controller인 CF를
 설치하는 화면으로 상단의 버튼을 이용해서 설치/수정/삭제 기능을 제공한다.
-
 ![PaaSTa_Platform_Use_Guide_Image13]
 
 ####1.  설치
@@ -455,7 +443,6 @@ BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이�
 
 설치 관리자(BOOTSTRAP 또는 BOSH)를 이용해서 PaaS-TA Container인 DIEGO를
 설치하는 화면으로 상단의 버튼을 이용해서 설치/수정/삭제 기능을 제공한다.
-
 ![PaaSTa_Platform_Use_Guide_Image14]
 
 ####1.  설치
@@ -484,7 +471,6 @@ BOOTSTRAP(Microbosh) 또는 BOSH의 디렉터 정보를 관리하는 화면이�
 설치 관리자(BOOTSTRAP 또는 BOSH)를 이용해서 PaaS-TA Controller인 CF와
 PaaS-TA Container인 Diego를 통합 설치하는 화면으로 상단의 버튼을
 이용해서 설치/수정/삭제 기능을 제공한다.
-
 ![PaaSTa_Platform_Use_Guide_Image15]
 
 ####1.  설치
@@ -512,7 +498,6 @@ PaaS-TA Container인 Diego를 통합 설치하는 화면으로 상단의 버튼�
 설치 관리자(BOOTSTRAP 또는 BOSH)를 이용해서 PaaS-TA Controller인 CF에
 서비스팩을 설치하는 화면으로 상단의 버튼을 이용해서 설치/삭제 기능을
 제공한다.
-
 ![PaaSTa_Platform_Use_Guide_Image16]
 
 ####1.  설치
@@ -535,7 +520,6 @@ PaaS-TA Container인 Diego를 통합 설치하는 화면으로 상단의 버튼�
 
 설치 관리자로부터 스템셀 정보를 조회/업로드/삭제할 수 있는 기능을
 제공하는 화면이다.
-
 ![PaaSTa_Platform_Use_Guide_Image17]
 
 ####1.  설치 관리자
@@ -563,7 +547,6 @@ PaaS-TA Container인 Diego를 통합 설치하는 화면으로 상단의 버튼�
 
 설치 관리자로부터 릴리즈 정보를 조회/업로드/삭제할 수 있는 기능을
 제공하는 화면이다.
-
 ![PaaSTa_Platform_Use_Guide_Image18]
 
 ####1.  설치 관리자
@@ -591,7 +574,6 @@ PaaS-TA Container인 Diego를 통합 설치하는 화면으로 상단의 버튼�
 ###<div id='22'/>2.1.16. ***정보조회 -> 배포정보***
 
 설치 관리자로부터 배포된 배포 정보를 조회하는 기능을 제공하는 화면이다.
-
 ![PaaSTa_Platform_Use_Guide_Image19]
 
 ####1.  설치 관리자
@@ -606,7 +588,6 @@ PaaS-TA Container인 Diego를 통합 설치하는 화면으로 상단의 버튼�
 
 설치 관리자가 수행한 Task 작업들에 대한 목록 조회 및 상세 로그 정보를
 확인하는 기능을 제공하는 화면이다.
-
 ![PaaSTa_Platform_Use_Guide_Image20]
 
 ####1.  설치 관리자
@@ -630,7 +611,6 @@ PaaS-TA Container인 Diego를 통합 설치하는 화면으로 상단의 버튼�
 
 VM 관리 기본 설치 관리자를 통해 배포한 VM을 조회, 관리 하는 기능을 제공
 하는 화면 이다.
-
 ![PaaSTa_Platform_Use_Guide_Image21]
 
 ####1.  설치 관리자
@@ -674,7 +654,6 @@ VM 관리 기본 설치 관리자를 통해 배포한 VM을 조회, 관리 하�
 
 Property 관리 설치 관리자가 배포한 VM 정보의 Property를 조회, 생성,
 수정, 삭제, 상세보기 할 수 있는 기능을 제공하는 화면
-
 ![PaaSTa_Platform_Use_Guide_Image22]
 
 ####1.  설치 관리자
@@ -713,7 +692,6 @@ Property 관리 설치 관리자가 배포한 VM 정보의 Property를 조회, �
 
 스냅샷 관리 설치 관리자가 배포한 VM 정보의 스냅샷을 조회, 삭제, 전체
 삭제 할 수 있는 기능을 제공하는 화면
-
 ![PaaSTa_Platform_Use_Guide_Image23]
 
 ####1.  설치 관리자
@@ -746,7 +724,6 @@ Property 관리 설치 관리자가 배포한 VM 정보의 Property를 조회, �
 Manifest 관리 서비스팩 설치에 필요한 Manifest를 플랫폼 설치 자동화에
 업로드, 수정, 삭제, 업로드 된 Manifest 파일을 로컬에 다운로드 할 수 있는
 기능을 제공 하는 화면
-
 ![PaaSTa_Platform_Use_Guide_Image24]
 
 ####1.  Manifest 목록
@@ -779,14 +756,14 @@ BOSH는 클라우드 환경에 서비스를 배포하고 소프트웨어 릴리�
 것으로 PaaS-TA 설치를 위한 관리자 기능을 담당한다.
 
 플랫폼 설치 자동화를 이용해서 클라우드 환경에 PaaS-TA를 설치하기
-위해서는 **스템셀**과 **소프트웨어 릴리즈**,
-배포 **Manifest 파일** 3가지 요소가 필요하다. 스템셀은 클라우드
+위해서는 <b>스템셀</b>과 <b>소프트웨어 릴리즈</b>,
+배포 <b>Manifest 파일</b> 3가지 요소가 필요하다. 스템셀은 클라우드
 환경에 VM을 생성하기 위해 사용할 기본 이미지이고, 소프트웨어 릴리즈는
 VM에 설치할 소프트웨어 패키지들을 묶어 놓은 파일이고, 배포
 Manifest파일은 스템셀과 소프트웨어 릴리즈를 이용해서 서비스를 어떤
 식으로 구성할지를 정의해 놓은 명세서이다. 다음 그림은 BOOTSTRAP과 BOSH를
 이용하여 PaaS-TA를 설치하는 절차이다.
-
+![PaaSTa_Platform_Use_Guide_Image25]
 
 ##<div id='29'/>3.1.  ***플랫폼 설치 자동화 파일 관리***
 
@@ -821,21 +798,21 @@ Home 디렉토리에 .bosh_plugin 디렉토리를 생성하고 배포에 필요�
 ####1.  코드 그룹 등록
 -   코드 그룹 “등록” 버튼을 클릭 후 코드 그룹 정보를 입력하고 “확인” 버튼을 클릭한다.
 -   중복된 코드 그룹 값은 등록할 수 없다.
-
+![PaaSTa_Platform_Use_Guide_Image26]
 
 ####2.  코드 그룹 수정
 -   코드 그룹 “수정” 버튼을 클릭 후 코드 그룹 정보를 수정하고 “확인” 버튼을 클릭한다.
-
+![PaaSTa_Platform_Use_Guide_Image27]
 
 ####3.  코드 등록
 -   코드 “등록” 버튼을 클릭 후 코드 정보를 입력하고 “확인” 버튼을 클릭한다.
 -   하위 그룹을 선택하지 않을 경우 해당 코드 그룹의 상위 코드가 등록된다.
 -   하위 그룹을 선택했을 경우 해당 코드 그룹의 선택한 하위 그룹의 하위 코드가 등록된다.
-
+![PaaSTa_Platform_Use_Guide_Image28]
 
 ####4.  코드 수정
 -   코드 “수정” 버튼을 클릭 후 코드 정보를 수정하고 “확인” 버튼을 클릭한다.
-
+![PaaSTa_Platform_Use_Guide_Image29]
 
 ##<div id='31'/>3.3.  ***권한 관리***
 
@@ -849,21 +826,24 @@ Home 디렉토리에 .bosh_plugin 디렉토리를 생성하고 배포에 필요�
 
 ####1.  코드 등록
 -   코드 그룹 목록에서 “ROLE”을 선택 후 코드 “등록” 버튼을 클릭하고 코드 등록 화면에서 권한 코드 정보를 입력 후 “확인” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image30]
 
 ####2.  권한 그룹 등록
 
 -   권한 그룹 “등록” 버튼을 클릭 후 권한 그룹 정보를 입력하고 “확인” 버튼을 클릭한다.
 -   권한 그룹명은 중복해서 등록할 수 없다.
-
+![PaaSTa_Platform_Use_Guide_Image31]
 
 ####3.  권한 그룹 수정
 
 -   권한 그룹 “수정” 버튼을 클릭 후 권한 그룹 정보를 수정하고 “확인” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image32]
 
 ####4.  권한 상세 등록/수정
 
 -   권한 상세 “등록” 버튼을 클릭 후 권한 상세 정보를 등록/수정하고 “확인” 버튼을 클릭한다.
 -   권한 설정 항목에서 대시보드 / 기본 시스템 사용자 / 기본 시스템 조회 등의 권한은 기본적으로 허용으로 설정되어 있고, 그 외의 권한은 거부로 설정되어 있다.
+![PaaSTa_Platform_Use_Guide_Image33]
 
 ##<div id='32'/>3.4.  ***사용자 관리***
 
@@ -875,13 +855,13 @@ Home 디렉토리에 .bosh_plugin 디렉토리를 생성하고 배포에 필요�
 
 -   사용자 “등록” 버튼을 클릭 후 사용자 정보 입력 및 해당 사용자의 권한을 선택하여 “확인” 버튼을 클릭한다.
 -   사용자 등록 후 초기 비밀번호는 “1234” 이며, 최초 로그인 후 비밀번호를 변경할 수 있다.
+![PaaSTa_Platform_Use_Guide_Image34]
 
 ####2.  사용자 수정
 
 -   사용자 “수정” 버튼을 클릭 후 사용자 정보 및 해당 권한을 수정하여 “확인” 버튼을 클릭한다.
-
 -   관리자는 선택한 사용자의 아이디는 수정할 수 없지만 비밀번호를 변경할 수 있다.
-
+![PaaSTa_Platform_Use_Guide_Image35]
 
 ##<div id='33'/>3.5.  ***스템셀과 릴리즈***
 
@@ -1003,7 +983,7 @@ Home 디렉토리에 .bosh_plugin 디렉토리를 생성하고 배포에 필요�
 
 플랫폼 설치 자동화를 이용하여 BOOTSTRAP 설치하고, 설치 관리자로 등록하는
 절차는 다음과 같다.
-
+![PaaSTa_Platform_Use_Guide_Image36]
 
 ###<div id='35'/>3.6.1.  ***스템셀 다운로드***
 
@@ -1015,6 +995,7 @@ Home 디렉토리에 .bosh_plugin 디렉토리를 생성하고 배포에 필요�
 
 	  ※ 공개 스템셀 참조 사이트
 	  http://bosh.cloudfoundry.org/stemcells
+![PaaSTa_Platform_Use_Guide_Image37]
 
 -   본 가이드에서는 버전 3312.12을 다운로드 하였다.
 
@@ -1034,7 +1015,7 @@ BOOTSTRAP을 설치하기 위해서는 BOSH 릴리즈와 BOSH CPI릴리즈 2개�
 -   BOSH 릴리즈 참조 사이트
 
 		http://bosh.io/releases/github.com/cloudfoundry/bosh?all=1
-
+![PaaSTa_Platform_Use_Guide_Image38]
 
 -   본 가이드에서는 v256을 다운로드 하였다.
 
@@ -1045,19 +1026,19 @@ BOOTSTRAP을 설치하기 위해서는 BOSH 릴리즈와 BOSH CPI릴리즈 2개�
 -   BOSH-CPI 릴리즈 참조 사이트
 
 		※ aws의 경우
-		[http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?all=1](http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?all=1)
+		http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?all=1
 		
 		※ openstack의 경우
-		[http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-openstack-cpi-release?all=1](http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-openstack-cpi-release?all=1)
+		http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-openstack-cpi-release?all=1
 		
 		※ vsphere의 경우
-		[http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-vsphere-cpi-release?all=1](http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-vsphere-cpi-release?all=1)
-
+		http://bosh.io/releases/github.com/cloudfoundry-incubator/bosh-vsphere-cpi-release?all=1
+![PaaSTa_Platform_Use_Guide_Image39]
 
 -   본 가이드에서는 v30을 다운로드 하였다.
 
 
-###<div id='37'/>3.6.3.  ***BOOTSTRAP******설치
+###<div id='37'/>3.6.3.  ***BOOTSTRAP 설치***
 
 BOOTSTRAP 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 설치” ->
 “BOOTSTRAP 설치” 메뉴로 이동 후 상단에 위치한 “설치”버튼을 클릭한다.
@@ -1066,51 +1047,60 @@ BOOTSTRAP 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플
 ####3.  클라우드 환경 선택
 
 -   설치할 클라우드 환경을 선택하는 팝업화면에서 설치할 클라우드를 선택하고, “확인” 버튼 클릭한다.
-
+![PaaSTa_Platform_Use_Guide_Image40]
 
 ####4.  BOOTSTRAP 설치 – 선택한 클라우드 환경 정보
 
 -   오픈스택 클라우드 환경을 선택한 경우 오픈스택의 인증정보/시큐리티 그룹/키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image41]
 
 -   AWS 클라우드 환경을 선택한 경우 AWS의 정보 및 키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image42]
 
 -   VSPHERE 클라우드 환경을 선택한 경우 VSPHERE의 정보 및 키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image43]
 
 ####5.  BOOTSTRAP 설치 – 기본 정보
 
 -   BOOTSTRAP의 배포명 / 디렉터명 / NTP / BOSH 릴리즈 / BOSH CPI 릴리즈 / 스냅샷기능 사용여부 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image44]
 
 ####6.  BOOTSTRAP 설치 – 클라우드 환경 별 네트워크 정보
 
 -   AWS/오픈스택 클라우드 환경을 선택한 경우 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image45]
 
 -   VSPHERE 클라우드 환경을 선택한 경우 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image47]
 
 ####7.  BOOTSTRAP 설치 – 리소스 정보
 
 -   AWS/오픈스택 클라우드 환경을 선택한 경우 스템셀 / 인스턴스 유형 / VM 비밀번호 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image48]
 
 -   VSPHERE 클라우드 환경을 선택한 경우 스템셀 / 리소스 풀 CPU / 리소스 풀 RAM / 리소스 풀 DISK / VM 비밀번호 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image49]
 
 ####8.  BOOTSTRAP 설치 - 배포 파일 정보
 
 -   입력한 정보를 기준으로 생성한 배포 Manifest파일 정보를 확인한다.
-
+![PaaSTa_Platform_Use_Guide_Image50]
 
 ####9.  BOOTSTRAP 설치 - 설치
 
 -   생성된 배포 Manifest파일 정보를 이용하여 BOOTSTRAP설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
 
-
 ###<div id='38'/>3.6.4.  ***설치 관리자 설정***
 
 BOOTSTRAP설치가 완료되면 BOOTSTRAP 디렉터 정보(디렉터IP, 포트번호, 계정,
 비밀번호)를 이용해서 플랫폼 설치 자동화의 설치 관리자로 설정한다. (설치 관리자 설정 화면 설명은 [2.1.2](#8) 참고)
+![PaaSTa_Platform_Use_Guide_Image51]
 
-##<div id='39'/>3.7.  ***BOSH******설치하기***
+##<div id='39'/>3.7.  ***BOSH 설치하기***
 
 BOOTSTRAP(Microbosh)을 설치 관리자로 설정 완료 후 BOSH를 설치하는 절차는
 다음과 같다.
+![PaaSTa_Platform_Use_Guide_Image52]
 
 ###<div id='40'/>3.7.1.  ***스템셀 업로드***
 
@@ -1118,6 +1108,7 @@ BOOTSTRAP(Microbosh)을 설치 관리자로 설정 완료 후 BOSH를 설치하�
 업로드”를 선택한다. “스템셀 업로드” 화면의 하단에 1.2.1 “스템셀
 다운로드” 메뉴에서 다운로드 받은3312.12버전의 스템셀을 선택하고, “스템셀
 업로드” 버튼을 클릭하여 설치 관리자에 스템셀을 업로드 한다.
+![PaaSTa_Platform_Use_Guide_Image53]
 
 ###<div id='41'/>3.7.2.  ***릴리즈 업로드*** 
 
@@ -1125,7 +1116,7 @@ BOOTSTRAP(Microbosh)을 설치 관리자로 설정 완료 후 BOSH를 설치하�
 “릴리즈 업로드” 화면의 하단에 1.2.2 “릴리즈 다운로드”에서 다운로드 한
 256버전의 BOSH 릴리즈(bosh-256.tgz)를 선택하고, “릴리즈 업로드” 버튼을
 클릭하여 설치 관리자에 릴리즈를 업로드한다.
-
+![PaaSTa_Platform_Use_Guide_Image54]
 
 ###<div id='42'/>3.7.3.  ***BOSH 설치*** 
 
@@ -1135,47 +1126,57 @@ BOSH설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼
 ####1.  BOSH 설치 – 기본 설치 관리자에 따른 클라우드 환경 정보
 
 -   오픈스택 클라우드 환경일 경우 오픈스택의 인증정보 / 시큐리티 그룹 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image55]
+
 -   AWS 클라우드 환경일 경우 AWS의 인증정보 / 시큐리티 그룹 / 키 파일 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image56]
 
 -   VSPHERE 클라우드 환경일 경우 VSPHERE의 인증정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image57]
 
 ####2.  BOSH 설치 – 기본 정보
 
 -   BOSH의 배포명 / 디렉터명 / NTP / BOSH 릴리즈 / 스냅샷 사용 여부 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image58]
 
 ####3.  BOSH 설치 – 클라우드 환경 별 네트워크 정보
-
 -   오픈스택 환경일 경우 오픈스택의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
--   AWS 환경일 경우 AWS의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
--   VSPHERE 환경일 경우 VSPHERE 의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image59]
 
+-   AWS 환경일 경우 AWS의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image60]
+
+-   VSPHERE 환경일 경우 VSPHERE 의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image61]
 
 ####4.  BOSH 설치 – 클라우드 환경 별 리소스 정보
 
 -   오픈스택/AWS 환경일 경우 오픈스택 또는 AWS의 스템셀 / 인스턴스 유형 / VM 비밀번호 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image62]
+
 -   VSPHERE 환경일 경우 VSPHERR의 스템셀 / 리소스 유형 / VM 비밀번호 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image63]
 
 ####5.  BOSH 설치 – 배포파일 정보
 
 -   입력한 정보를 기준으로 생성한 배포 Manifest파일 정보를 확인한다.
-
+![PaaSTa_Platform_Use_Guide_Image64]
 
 ####6.  BOSH 설치 – 설치 정보
 
 -   생성된 배포 Manifest파일 정보를 이용하여 BOSH설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
-
+![PaaSTa_Platform_Use_Guide_Image65]
 
 ###<div id='43'/>3.7.4.  ***설치 관리자 설정*** 
 
 BOSH설치가 완료되면 BOSH 디렉터 정보(디렉터IP, 포트번호, 계정,
 비밀번호)를 이용해서 플랫폼 설치 자동화의 설치 관리자로 설정한다. (설치 관리자 설정 화면 설명은 [2.1.2](#8) 참고)
 
-
 ##<div id='44'/>3.8.  ***CF 설치하기*** 
 
 BOSH를 설치하고 플랫폼 설치 자동화의 설치 관리자로 설정이 완료되면 CF를
 설치할 준비가 된 상태로 CF를 설치하는 절차는 다음과 같다.
-
+![PaaSTa_Platform_Use_Guide_Image66]
 
 ###<div id='45'/>3.8.1.  ***스템셀 업로드***
 
@@ -1206,43 +1207,53 @@ CF설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플랫폼 �
 ####1.  Diego 사용 여부 선택
 
 -   Diego 사용 여부 팝업화면에서 예를 선택하고, “확인” 버튼 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image67]
 
 ####2.  CF 설치 – 기본정보 입력
 
 -   배포에 필요한 기본정보와 도메인 / 로그인 비밀번호를 입력 후 “다음” 버튼을 클릭한다.
 -   SSH 핑거프린트는 입력 항목은 Diego 설치 팝업 화면에서 Key 생성 후 입력한다. (below)
+![PaaSTa_Platform_Use_Guide_Image68]
 
 ####3.  CF 설치 – 클라우드 환경 별 네트워크 정보
 
 -   오픈스택 환경일 경우 오픈스택의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image69]
 
 -   AWS 환경일 경우 AWS의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image70]
 
 -   VSPHERE 환경일 경우 VSPHERE의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image71]
 
 ####4.  CF 설치 – Key 생성
 
 -   Key 생성 정보 입력 후 “Key 생성” 버튼을 클릭하고, Key 생성 확인 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image72]
 
 ####5.  CF 설치 – 클라우드 환경 별 리소스 정보
 
 -   오픈스택/AWS 환경일 경우 오픈스택 및 AWS의 스템셀 / VM 비밀번호 / Flavor 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image73]
 
 -   VSPHERE 환경일 경우 오픈스택 및 VSPHERE의 스템셀 / VM 비밀번호 / 리소스 유형 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image74]
 
 ####6.  CF 설치 – 배포 파일 정보
 
 -   입력한 정보를 기준으로 생성한 배포 Manifest파일 정보를 확인한다.
+![PaaSTa_Platform_Use_Guide_Image75]
 
 ####7.  CF 설치 – 설치
 
 -   생성된 배포 Manifest파일 정보를 이용하여 PaaS-TA Controller(CF) 설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
+![PaaSTa_Platform_Use_Guide_Image76]
 
 ##<div id='48'/>3.9.  ***DIEGO 설치하기*** 
 
 CF설치가 완료되면 DIEGO를 설치할 준비가 된 상태로 DIEGO를 설치하는
 절차는 다음과 같다.
-
+![PaaSTa_Platform_Use_Guide_Image77]
 
 ###<div id='49'/>3.9.1.  ***스템셀 업로드*** 
 
@@ -1312,18 +1323,23 @@ DIEGO를 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플�
 ####1.  DIEGO 설치 – 기본 정보
 
 -   배포에 필요한 기본정보와 릴리즈 정보를 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image78]
 
 ####2.  DIEGO – 클라우드 환경 별 네트워크 정보
 
 -   오픈스택 환경일 경우 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image79]
 
 -   AWS 환경일 경우 AWS의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image80]
 
 -   VSPHERE 환경일 경우 VSPHERE의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image81]
 
 ####3.  DIEGO 설치 – Key 생성
 
 -   “Key 생성” 버튼을 클릭 후 생성된 ssh-key-fingerprint를 복사한다.
+![PaaSTa_Platform_Use_Guide_Image82]
 
 ####4.  DIEGO 설치 – CF 재설치
 
@@ -1333,25 +1349,27 @@ DIEGO를 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 “플�
 ####5.  DIEGO 설치 – 클라우드 환경 별 리소스 정보
 
 -   오픈스택/AWS 환경일 경우 오픈스택 및 AWS의 스템셀 / VM 비밀번호 / Flavor 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image83]
 
 -   VSPHERE 환경일 경우 오픈스택 및 VSPHERE의 스템셀 / VM 비밀번호 / 리소스 유형 입력 후 “다음” 버튼을 클릭한다.
-
+![PaaSTa_Platform_Use_Guide_Image84]
 
 ####6.  DIEGO 설치 – 배포 파일 정보
 
 -   입력한 정보를 기준으로 생성한 배포 Manifest파일 정보를 확인한다.
+![PaaSTa_Platform_Use_Guide_Image85]
 
 ####7.  DIEGO 설치 – 설치
 
 -   생성된 배포 Manifest파일 정보를 이용하여 PaaS-TA Container(DIEGO) 설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
-
+![PaaSTa_Platform_Use_Guide_Image86]
 
 ##<div id='52'/>3.10.  ***CF & DIEGO 통합 설치 하기***
 
 BOSH를 설치하고 플랫폼 설치 자동화의 설치 관리자로 설정이 되면 CF &
 DIEGO 통합 설치가 준비 된 상태로 실행 절차는 CF와 DIEDO 설치와 유사
 하다.
-
+![PaaSTa_Platform_Use_Guide_Image87]
 
 ###<div id='53'/>3.10.1.  ***스템셀 업로드***
 
@@ -1429,65 +1447,81 @@ CF & DIEGO를 설치하기 위해 플랫폼 설치 자동화 웹 화면에서 �
 ####1.  CF & DIEGO 설치 – CF 기본 정보 입력
 
 -   배포에 필요한 기본정보와 도메인 정보/로그인 비밀번호를 입력 후 “다음” 버튼을 클릭한다.
-
+![PaaSTa_Platform_Use_Guide_Image88]
 
 ####2.  CF & DIEGO 설치 – 클라우드 환경 별 네트워크 정보
 
 -   오픈스택 환경일 경우 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image89]
 
 -   AWS 환경일 경우 AWS의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image90]
 
 -   VSPHERE 환경일 경우 VSPHERE의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image91]
 
 ####3.  CF & DIEGO 설치 – CF 키 생성
 
 -   CF 설치에 필요 한 Key 를 생성하기 위해 키 정보를 입력 후 “key 생성” 버튼을 클릭 한다. 키가 생성 되면 “다음” 버튼을 클릭 한다.
+![PaaSTa_Platform_Use_Guide_Image92]
 
 ####4.  CF & DIEGO 설치 – 클라우드 환경 별 리소스 정보
 
 -   오픈스택/AWS 환경일 경우 오픈스택 및 AWS의 스템셀 / VM 비밀번호 / Flavor 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image93]
 
 -   VSPHERE 환경일 경우 오픈스택 및 VSPHERE의 스템셀 / VM 비밀번호 / 리소스 유형 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image94]
 
 ####5.  CF & DIEGO 설치 – CF 배포 파일 정보
 
 -   입력한 정보를 기준으로 생성한 CF 배포 Manifest파일 정보를 확인한다.
+![PaaSTa_Platform_Use_Guide_Image95]
 
 ####6.  CF & DIEGO 설치 – DIEGO 기본 정보 입력
 
 -   DIEGO 배포에 필요한 기본정보와 릴리즈 정보를 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image96]
 
 ####7.  CF & DIEGO 설치 – 클라우드 환경 별 네트워크 정보
 
 -   오픈스택 환경일 경우 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image97]
 
 -   AWS 환경일 경우 AWS의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image98]
 
 -   VSPHERE 환경일 경우 VSPHERE의 네트워크 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image99]
 
 ####8.  CF & DIEGO 설치 – 클라우드 환경 별 리소스 정보
 
 -   오픈스택/AWS 환경일 경우 오픈스택 및 AWS의 스템셀 / VM 비밀번호 / Flavor 정보 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image100]
 
 -   VSPHERE 환경일 경우 오픈스택 및 VSPHERE의 스템셀 / VM 비밀번호 / 리소스 유형 입력 후 “다음” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image101]
 
 ####9.  CF & DIEGO 설치 – DIEGO 배포 파일 정보
 
 -   입력한 정보를 기준으로 생성한 DIEGO 배포 Manifest파일 정보를 확인한다.
+![PaaSTa_Platform_Use_Guide_Image102]
 
 ####10. CF & DIEGO 설치 – CF 설치
 
 -   생성된 배포 Manifest파일 정보를 이용하여 PaaS-TA Controller(CF) 설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
+![PaaSTa_Platform_Use_Guide_Image103]
 
 ####11. CF & DIEGO 설치 – DIEGO 설치
 
 -   생성된 배포 Manifest파일 정보를 이용하여 PaaS-TA Container(DIEGO) 설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
+![PaaSTa_Platform_Use_Guide_Image104]
 
 ##<div id='56'/>3.11.  ***서비스팩 설치***
 
 CF 설치가 성공적으로 완료되고 배포할 Manifest를 업로드하면 서비스팩을
 설치할 준비가 된 상태로 서비스팩을 설치하는 절차는 다음과 같다.
-
+![PaaSTa_Platform_Use_Guide_Image105]
 
 ###<div id='57'/>3.11.1.  ***스템셀 업로드***
 
@@ -1512,6 +1546,7 @@ Manifest를 업로드 하기 위해 플랫폼 설치 자동화 웹 화면에서 
 ####1.  Manifest 업로드 – 업로드
 
 -   서비스팩 설치를 위해서는 배포 정보를 가지고 있는 Manifest 파일이 필요하다. 서비스팩 설치에 필요한 Manifest를 작성하여 플랫폼 설치 자동화에 업로드 한다.
+![PaaSTa_Platform_Use_Guide_Image106]
 
 -   본 가이드에서는 PaaS-TA 서비스 MySQL Manifest를 업로드 하였다.
 
@@ -1523,10 +1558,12 @@ Manifest를 업로드 하기 위해 플랫폼 설치 자동화 웹 화면에서 
 ####1.  서비스팩 설치 – Manifest 등록
 
 -   배포에 필요한 Manifest 파일을 선택하고 “설치” 버튼을 클릭 한다.
+![PaaSTa_Platform_Use_Guide_Image107]
 
 ####2.  서비스팩 설치 – 설치
 
 -   생성된 배포 Manifest파일 정보를 이용하여 서비스팩 설치를 실행하고 설치 진행 과정에 대한 로그를 확인한다.
+![PaaSTa_Platform_Use_Guide_Image108]
 
 ##<div id='61'/>3.12.  ***Property 관리***
 
@@ -1537,9 +1574,121 @@ Property를 생성하기 위해 플랫폼 설치 자동화 웹 화면에서 “�
 ####1.  Property 생성
 
 -   배포명 선택 콤보 박스에서 배포명을 선택하고 “조회” 버튼을 클릭 후 “Property 생성” 버튼을 클릭 하고 Property 정보 입력 후 “저장” 버튼을 클릭한다.
-
+![PaaSTa_Platform_Use_Guide_Image109]
 
 ####2.  Property 수정
 
 -   “Property 수정” 버튼을 클릭 후 Property 값을 수정하고 “수정” 버튼을 클릭한다.
+![PaaSTa_Platform_Use_Guide_Image110]
 
+[PaaSTa_Platform_Use_Guide_Image01]:/images/PaaSTa_Platform_Use_Guide/manual/login.png
+[PaaSTa_Platform_Use_Guide_Image02]:/images/PaaSTa_Platform_Use_Guide/manual/passwordChange.png
+[PaaSTa_Platform_Use_Guide_Image03]:/images/PaaSTa_Platform_Use_Guide/manual/Dashboard.png
+[PaaSTa_Platform_Use_Guide_Image04]:/images/PaaSTa_Platform_Use_Guide/manual/DirectorConfig.png
+[PaaSTa_Platform_Use_Guide_Image05]:/images/PaaSTa_Platform_Use_Guide/manual/DirectorConfigAdd.png
+[PaaSTa_Platform_Use_Guide_Image06]:/images/PaaSTa_Platform_Use_Guide/manual/StemcellConfig.png
+[PaaSTa_Platform_Use_Guide_Image07]:/images/PaaSTa_Platform_Use_Guide/manual/ReleaseConfig.png
+[PaaSTa_Platform_Use_Guide_Image08]:/images/PaaSTa_Platform_Use_Guide/manual/CodeManagement.png
+[PaaSTa_Platform_Use_Guide_Image09]:/images/PaaSTa_Platform_Use_Guide/manual/AuthManagement.png
+[PaaSTa_Platform_Use_Guide_Image10]:/images/PaaSTa_Platform_Use_Guide/manual/UseManagement.png
+[PaaSTa_Platform_Use_Guide_Image11]:/images/PaaSTa_Platform_Use_Guide/manual/BootStrapInstall.png
+[PaaSTa_Platform_Use_Guide_Image12]:/images/PaaSTa_Platform_Use_Guide/manual/BoshInstall.png
+[PaaSTa_Platform_Use_Guide_Image13]:/images/PaaSTa_Platform_Use_Guide/manual/CfInstall.png
+[PaaSTa_Platform_Use_Guide_Image14]:/images/PaaSTa_Platform_Use_Guide/manual/DiegoInstall.png
+[PaaSTa_Platform_Use_Guide_Image15]:/images/PaaSTa_Platform_Use_Guide/manual/Cf_DiegoInstall.png
+[PaaSTa_Platform_Use_Guide_Image16]:/images/PaaSTa_Platform_Use_Guide/manual/ServicePackInstall.png
+[PaaSTa_Platform_Use_Guide_Image17]:/images/PaaSTa_Platform_Use_Guide/manual/StemcellUpload.png
+[PaaSTa_Platform_Use_Guide_Image18]:/images/PaaSTa_Platform_Use_Guide/manual/ReleaseUpload.png
+[PaaSTa_Platform_Use_Guide_Image19]:/images/PaaSTa_Platform_Use_Guide/manual/DeploymentInfo.png
+[PaaSTa_Platform_Use_Guide_Image20]:/images/PaaSTa_Platform_Use_Guide/manual/TaskInfo.png
+[PaaSTa_Platform_Use_Guide_Image21]:/images/PaaSTa_Platform_Use_Guide/manual/VmInfo.png
+[PaaSTa_Platform_Use_Guide_Image22]:/images/PaaSTa_Platform_Use_Guide/manual/PropertyInfo.png
+[PaaSTa_Platform_Use_Guide_Image23]:/images/PaaSTa_Platform_Use_Guide/manual/SnapshotInfo.png
+[PaaSTa_Platform_Use_Guide_Image24]:/images/PaaSTa_Platform_Use_Guide/manual/ManifestInfo.png
+
+[PaaSTa_Platform_Use_Guide_Image25]:/images/PaaSTa_Platform_Use_Guide/platformProcess/PlatformProcess.png
+[PaaSTa_Platform_Use_Guide_Image26]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Management/codeGroupAdd.png
+[PaaSTa_Platform_Use_Guide_Image27]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Management/codeGroupModify.png
+[PaaSTa_Platform_Use_Guide_Image28]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Management/codeAdd.png
+[PaaSTa_Platform_Use_Guide_Image29]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Management/codeModify.png
+[PaaSTa_Platform_Use_Guide_Image30]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Management/authCodeAdd.png
+[PaaSTa_Platform_Use_Guide_Image31]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Management/authGroupadd.png
+[PaaSTa_Platform_Use_Guide_Image32]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Management/authGroupModify.png
+[PaaSTa_Platform_Use_Guide_Image33]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Management/authDetailAdd.png
+[PaaSTa_Platform_Use_Guide_Image34]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Management/userAdd.png
+[PaaSTa_Platform_Use_Guide_Image35]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Management/userModify.png
+[PaaSTa_Platform_Use_Guide_Image36]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapProcess.png
+[PaaSTa_Platform_Use_Guide_Image37]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/StemcellAdd.png
+[PaaSTa_Platform_Use_Guide_Image38]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/releaseAdd.png
+[PaaSTa_Platform_Use_Guide_Image39]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/releaseAdd2.png
+[PaaSTa_Platform_Use_Guide_Image40]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapIaasSelect.png
+[PaaSTa_Platform_Use_Guide_Image41]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapOpenstackInfo.png
+[PaaSTa_Platform_Use_Guide_Image42]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapAWSInfo.png
+[PaaSTa_Platform_Use_Guide_Image43]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapVsphereInfo.png
+[PaaSTa_Platform_Use_Guide_Image44]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapDefaultInfo.png
+[PaaSTa_Platform_Use_Guide_Image45]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapOpenstackNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image46]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapAWSNetowrkInfo.png
+[PaaSTa_Platform_Use_Guide_Image47]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapVsphereNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image48]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapAwsOpenstackResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image49]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapVsphereResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image50]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapDeployInfo.png
+[PaaSTa_Platform_Use_Guide_Image51]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bootstrap/BootStrapDirectorAdd.png
+[PaaSTa_Platform_Use_Guide_Image52]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshInstallProcess.png
+[PaaSTa_Platform_Use_Guide_Image53]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/StemcellUpload.png
+[PaaSTa_Platform_Use_Guide_Image54]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/ReleaseUpload.png
+[PaaSTa_Platform_Use_Guide_Image55]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshOpenstackInfo.png
+[PaaSTa_Platform_Use_Guide_Image56]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsInfo.png
+[PaaSTa_Platform_Use_Guide_Image57]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereInfo.png
+[PaaSTa_Platform_Use_Guide_Image58]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshDefaultInfo.png
+[PaaSTa_Platform_Use_Guide_Image59]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshOpenstackNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image60]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image61]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image62]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshAwsOpenstackResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image63]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshVsphereResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image64]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshDeployInfo.png
+[PaaSTa_Platform_Use_Guide_Image65]:/images/PaaSTa_Platform_Use_Guide/platformProcess/bosh/BoshInstallInfo.png
+[PaaSTa_Platform_Use_Guide_Image66]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfProcess.png
+[PaaSTa_Platform_Use_Guide_Image67]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfDiegoCheck.png
+[PaaSTa_Platform_Use_Guide_Image68]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfDefaultInfo.png
+[PaaSTa_Platform_Use_Guide_Image69]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfOpenstackNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image70]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfAwsNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image71]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfVsphereNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image72]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfKeyInfo.png
+[PaaSTa_Platform_Use_Guide_Image73]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfAwsOpenstackResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image74]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfVsphereResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image75]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfDeployInfo.png
+[PaaSTa_Platform_Use_Guide_Image76]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf/CfInstallInfo.png
+[PaaSTa_Platform_Use_Guide_Image77]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Diego/DiegoProcess.png
+[PaaSTa_Platform_Use_Guide_Image78]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Diego/DiegoDefaultInfo.png
+[PaaSTa_Platform_Use_Guide_Image79]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Diego/DiegoOpenstackNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image80]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Diego/DiegoAwsNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image81]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Diego/DiegoVsphereNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image82]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Diego/DiegoCreateKey.png
+[PaaSTa_Platform_Use_Guide_Image83]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Diego/DiegoAwsOpenstackResourceinfo.png
+[PaaSTa_Platform_Use_Guide_Image84]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Diego/DiegoVsphereResourceinfo.png
+[PaaSTa_Platform_Use_Guide_Image85]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Diego/DiegoDeployinfo.png
+[PaaSTa_Platform_Use_Guide_Image86]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Diego/DiegoInstallInfo.png
+[PaaSTa_Platform_Use_Guide_Image87]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/CfDiegoProcess.png
+[PaaSTa_Platform_Use_Guide_Image88]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/CfDefaultInfo.png
+[PaaSTa_Platform_Use_Guide_Image89]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/CfOpenstackNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image90]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/CfAwsNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image91]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/CfVsphereNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image92]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/CfKeyInfo.png
+[PaaSTa_Platform_Use_Guide_Image93]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/CfAwsOpenstackResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image94]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/CfVsphereResourceInfo.png
+[PaaSTa_Platform_Use_Guide_Image95]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/CfDeployInfo.png
+[PaaSTa_Platform_Use_Guide_Image96]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/DiegoDefaultInfo.png
+[PaaSTa_Platform_Use_Guide_Image97]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/DiegoOpenstackNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image98]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/DiegoAwsNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image99]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/DiegoVsphereNetworkInfo.png
+[PaaSTa_Platform_Use_Guide_Image100]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/DiegoAwsOpenstackResourceinfo.png
+[PaaSTa_Platform_Use_Guide_Image101]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/DiegoVsphereResourceinfo.png
+[PaaSTa_Platform_Use_Guide_Image102]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/DiegoDeployinfo.png
+[PaaSTa_Platform_Use_Guide_Image103]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/CfInstallInfo.png
+[PaaSTa_Platform_Use_Guide_Image104]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Cf_Diego/DiegoInstallInfo.png
+[PaaSTa_Platform_Use_Guide_Image105]:/images/PaaSTa_Platform_Use_Guide/platformProcess/ServicePack/ServicePackProcess.png
+[PaaSTa_Platform_Use_Guide_Image106]:/images/PaaSTa_Platform_Use_Guide/platformProcess/ServicePack/ServicePackManifestUpload.png
+[PaaSTa_Platform_Use_Guide_Image107]:/images/PaaSTa_Platform_Use_Guide/platformProcess/ServicePack/ServicePackManifestInfo.png
+[PaaSTa_Platform_Use_Guide_Image108]:/images/PaaSTa_Platform_Use_Guide/platformProcess/ServicePack/ServicePackInstallInfo.png
+[PaaSTa_Platform_Use_Guide_Image109]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Property/PropertyAdd.png
+[PaaSTa_Platform_Use_Guide_Image110]:/images/PaaSTa_Platform_Use_Guide/platformProcess/Property/PropertyModify.png
