@@ -566,7 +566,7 @@ PAASTA-USAGE-REPORTING은 abacus 시스템과 연동하여 PAASTA에 앱의 사�
 
 ##<div id='27'/>3.2.  CF에 UAA 계정 등록 
 
-[[Abacus UAA 계정 등록](#15)]  참조.
+[[Abacus UAA 계정 등록](#14)]  참조.
 
 ##<div id='28'/>3.3.  paasta-usage-repoting 배포 
 
