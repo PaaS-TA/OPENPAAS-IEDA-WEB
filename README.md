@@ -208,18 +208,17 @@ dependency로 사용하여 빌드 한다.
 
 ###<div id='11'/>2.3.2.  서비스 브로커 라이브러리를 다운로드 한 후, 프로젝트 import 한다.
 
-1.  오픈 소스로 제공되고 있는 서비스 브로커 소스를 git clone 으로 다운받는다.<br>
-    **[https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/tree/master/src/main/java/org/cloudfoundry/community/servicebroker/controller](https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/tree/master/src/main/java/org/cloudfoundry/community/servicebroker/controller)**
+####1.  오픈 소스로 제공되고 있는 서비스 브로커 소스를 git clone 으로 다운받는다.<br>
 
-
+**[https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/tree/master/src/main/java/org/cloudfoundry/community/servicebroker/controller](https://github.com/cloudfoundry-community/spring-boot-cf-service-broker/tree/master/src/main/java/org/cloudfoundry/community/servicebroker/controller)**
   
-		$ git clone https://github.com/cloudfoundry-community/spring-boot-cf-service-broker.git
-  		Cloning into 'spring-boot-cf-service-broker'...
-  		remote: Counting objects: 2394, done.
-  		remote: Total 2394 (delta 0), reused 0 (delta 0), pack-reused 2394
-  		Receiving objects: 100% (2394/2394), 351.72 KiB | 279.00 KiB/s, done.
-  		Resolving deltas: 100% (939/939), done.
-  		Checking connectivity... done.
+	$ git clone https://github.com/cloudfoundry-community/spring-boot-cf-service-broker.git
+	Cloning into 'spring-boot-cf-service-broker'...
+	remote: Counting objects: 2394, done.
+	remote: Total 2394 (delta 0), reused 0 (delta 0), pack-reused 2394
+	Receiving objects: 100% (2394/2394), 351.72 KiB | 279.00 KiB/s, done.
+	Resolving deltas: 100% (939/939), done.
+	Checking connectivity... done.
 
 
 다운 받은 소스를 Java 개발 도구 Eclipse 및 Spring Tool Suite 로 import
@@ -586,9 +585,9 @@ JSON을 생성 후 POST 한다.
 SampleMeteringReportServiceImpl 은 크게 나누어 2가지 처리를 하고 있다.
 
 
-1.  **ServiceInstanceBinding 정보를 참조 하여 ,사용량 정보 JSON을 생성 한다.**
+####1.  **ServiceInstanceBinding 정보를 참조 하여 ,사용량 정보 JSON을 생성 한다.**
 
-2.  **생성한 사용량 정보 JSON을 abacus-collector로 전송한다. (HTTPS, HTTP)**
+####2.  **생성한 사용량 정보 JSON을 abacus-collector로 전송한다. (HTTPS, HTTP)**
 
 
 사용량 정보 JSON 을 생성 한다.<br>
@@ -745,7 +744,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 
 
 ###<div id='28'/>2.5.1.  미터링 정책
-
+미터링 정책 스키마
 미터링 정책이란 수집한 미터링 정보에서 미터링 대상의 지정 및 집계 방식을
 정의한 JSON 형식의 오브젝트이다. 서비스 제공자는 미터링 정책 스키마에
 맞춰 서비스에 대한 정책을 개발한다.
@@ -768,7 +767,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 |   summarize      | String  |  X  | 미터링 정보를 보고할 때 적용하는 계산식 또는 변환식    |
 |   title      |  String |   X | API 서비스 미터링 제목    |
 
-#####2.  **미터링 정책 예제**
+####2.  **미터링 정책 예제**
 
 	{
 	  "plan_id": "basic-linux-container",
@@ -861,7 +860,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 서비스 제공자는 등급 정책 스키마에 맞춰 서비스에 대한 정책을 개발한다.
 
 
-#####1.  **등급 정책 스키마**
+####1.  **등급 정책 스키마**
 
 | 항목명  |유형 | 필수| 설명|
 |---------|---|----|-----|
@@ -873,7 +872,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 |    title     |  String | X   | 등급 정책 명    |
 
 
-#####2.  **등급 정책 예제**
+####2.  **등급 정책 예제**
 
 	{
 	  "plan_id": "standard",
@@ -897,7 +896,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 정책을 개발한다.
 
 
-#####1.  **과금 정책 스키마**
+####1.  **과금 정책 스키마**
 
 | 항목명  |유형 | 필수| 설명|
 |---------|---|----|-----|
@@ -910,7 +909,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 |    title     |  String | X   | 과금 정책 제목    |
 
 
-#####2.  **과금 정책 예제**
+####2.  **과금 정책 예제**
 
 	{
 	  "plan_id": "standard",
@@ -958,7 +957,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 
 정책은 2가지 방식 중 하나의 방법으로 CF-ABACUS에 등록할 수 있다.
 
-#####**1.  js 파일을 등록하는 방식**
+####**1.  js 파일을 등록하는 방식**
 
 작성한 정책을 다음의 디렉토리에 저장한 후, CF에 CF-ABACUS를 배포 또는
 재배포 한다.
@@ -976,7 +975,7 @@ PLAN_EXTRA_QUANTITY 등은 임의로 정한 수치 이다. 서비스에 맞게 �
 		cf-abacus/lib/plugins/provisioning/src/plans/rating
 
 
-#####**2.  DB에 등록하는 방식**
+####**2.  DB에 등록하는 방식**
 
 작성한 정책을 curl 등을 이용해 DB에 저장하는 방식으로 CF-ABACUS를
 재배포할 필요는 없다. 정책 등록 시, 정책 ID는 고유해야 한다.
