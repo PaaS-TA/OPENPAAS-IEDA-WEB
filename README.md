@@ -8,31 +8,30 @@
 2. [Abacus 배포](#6)
     * [배포 전제 조건](#7)
     * [Node.js 설치](#8)
-    * [서비스 브로커 라이브러리](#9)
-     * [Node.js 설치 순서](#10)
-    * [pouchdb, couchdb 설치](#11)
-     * [couchdb 설치](#12)
-     * [pouchdb 설치(옵션)](#13)
-     * [설치 확인](#14)
-    * [CF에 abacus UAA 계정 등록](#15)
-     * [UAA 클라이언트 설치](#16)
-     * [CF 앱 사용량 수집을 위한 UAA 계정 드록](#17)
-     * [2.4.3.	Secured Abacus를 위한 UAA 계정 등록](#18)
-    * [cf-abacus 배포](#19)
-     * [Git을 통해 cf-abacus를 다운받는다.](#20)
-     * [gradle build를 위한 dependency 추가](#21)
-     * [Abacus와 연동할 DB 및 Secure 정보 설정](#22)
-     * [Abacus 빌드](#23)
-     * [Abacus 배포](#24)
-     * [Abaus-cf-bridge 배포](#25)
-* [PAASTA-USAGE-REPORTION 배포](#26)
-    * [배포 전제 조건](#27)
-    * [CF에 UAA 계정 등록](#28)
-    * [paasta-usage-repoting 배포](#39)
-    * [다운로드](#30)
-    * [paasta-usage-reportion 배포](#31)
-    * [배포 형상](#32)
-    * [api 호출 예제](#33)
+     * [Node.js 설치 순서](#9)
+    * [pouchdb, couchdb 설치](#10)
+     * [couchdb 설치](#11)
+     * [pouchdb 설치(옵션)](#12)
+     * [설치 확인](#13)
+    * [CF에 abacus UAA 계정 등록](#14)
+     * [UAA 클라이언트 설치](#15)
+     * [CF 앱 사용량 수집을 위한 UAA 계정 드록](#16)
+     * [Secured Abacus를 위한 UAA 계정 등록](#17)
+    * [cf-abacus 배포](#18)
+     * [Git을 통해 cf-abacus를 다운받는다.](#19)
+     * [gradle build를 위한 dependency 추가](#20)
+     * [Abacus와 연동할 DB 및 Secure 정보 설정](#21)
+     * [Abacus 빌드](#22)
+     * [Abacus 배포](#23)
+     * [Abaus-cf-bridge 배포](#24)
+* [PAASTA-USAGE-REPORTION 배포](#25)
+    * [배포 전제 조건](#26)
+    * [CF에 UAA 계정 등록](#27)
+    * [paasta-usage-repoting 배포](#28)
+    * [다운로드](#29)
+    * [paasta-usage-reportion 배포](#30)
+    * [배포 형상](#31)
+    * [api 호출 예제](#32)
 
 #<div id='1'/>1.  개요
 ##<div id='2'/>1.1.  문서 개요
@@ -567,7 +566,7 @@ PAASTA-USAGE-REPORTING은 abacus 시스템과 연동하여 PAASTA에 앱의 사�
 
 ##<div id='27'/>3.2.  CF에 UAA 계정 등록 
 
-[[Abacus UAA 계정 등록](#15)]  참조
+[[Abacus UAA 계정 등록](#15)]  참조.
 
 ##<div id='28'/>3.3.  paasta-usage-repoting 배포 
 
