@@ -35,8 +35,8 @@
 ##<div id='5'/>2.1.  Request Parameters 
 
 |  이름  |설명 |기본값| 유효값| 예시값|
-|---------|---|--|--|-----|
-|org_id |	조직 아이디	|-|	org_guid	|‘7726b51e-b7b4-4b9f-a1cf-78eab2710e2d’|
+|--------|----|-----|------|-------|
+|org_id   |조직 아이디       |-|	org_guid	        |‘7726b51e-b7b4-4b9f-a1cf-78eab2710e2d’|
 |space_id`|	스페이스 아이디	|-|	space_guid, ‘all’	|‘b5e7f478-6f26-457f-97ce-c57a31afe157’|
 
 ##<div id='6'/>2.2.  cURL
