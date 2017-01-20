@@ -99,11 +99,11 @@ space_id parameter 가 ‘all’ 인 경우, org 전체의 값을 리턴한다.
 ##<div id='9'/>3.1.  Request Parameters
 
 |  이름  |설명 |기본값| 유효값| 예시값|
-|---------|---|--|--|-----|
-|org_id	|조직 아이디|	-	|org_guid|    ‘7726b51e-b7b4-4b9f-a1cf-78eab2710e2d’|
-|space_id |	스페이스 아이디	| -|	space_guid,‘all’|	‘b5e7f478-6f26-457f-97ce-c57a31afe157’|
-|from_month|	집계 시작 년월 yyyymm|-|		yyyymm 형식 String |  ‘201601’|
-|to_month|	집계 종료 년월 yyyymm|-|		yyyymm 형식 String | ‘201603’|
+|--------|---|------|-------|-----|
+|org_id	      |조직 아이디           |-|org_guid        |    ‘7726b51e-b7b4-4b9f-a1cf-78eab2710e2d’|
+|space_id     |	스페이스 아이디	    |-|space_guid,‘all’|	‘b5e7f478-6f26-457f-97ce-c57a31afe157’|
+|from_month   |	집계 시작 년월 yyyymm|-|yyyymm 형식 String |  ‘201601’|
+|to_month     |	집계 종료 년월 yyyymm|-|yyyymm 형식 String | ‘201603’|
 
 ##<div id='10'/>3.2.  cURL 
 
@@ -131,7 +131,7 @@ space_id parameter 가 ‘all’ 인 경우, org 전체의 값을 리턴한다.
 |app_memory|	메모리(CF이벤트  기준)|	512,1024|	512|
 |app_usage|	현재까지의 집계 사용량|	number	|8.5|
 |total_app_usage_arr|	집계 기간내 앱별 총사용량 배열 객체|   -  |  -	|	
-|app_id	앱 guid  app guid    ‘4566f4e8-ec03-4aae-a006-3d6b12ce7a9c’|
+|app_id	앱 |guid | app guid |   ‘4566f4e8-ec03-4aae-a006-3d6b12ce7a9c’|
 |app_name|	앱 명칭 |  string |   ‘java_demo’|
 |app_usage|	집계 기간내 앱별 총사용량	|number|	3345|
 
