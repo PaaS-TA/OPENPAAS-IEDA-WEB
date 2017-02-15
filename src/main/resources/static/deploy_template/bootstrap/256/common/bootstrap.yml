@@ -58,7 +58,7 @@ jobs:
       provider: dav
       director: 
         user: (( merge || "director" ))
-        password: (( merge || "director-password ))
+        password: (( merge || "director-password" ))
       agent:
         user: (( merge || "agent" ))
         password: (( merge || "agent-password" ))
