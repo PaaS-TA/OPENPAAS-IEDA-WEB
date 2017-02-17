@@ -131,6 +131,9 @@ public class ReleaseService {
 						else if("container".equals(releaseName)) releaseName="diego";
 						else if("garden-runc".equals(releaseName)) releaseName="garden-linux";
 					}
+					if("garden-runc".equals(releaseName)){
+						releaseName="garden-linux";
+					}
 					if( type.equals(releaseName)){
 						
 						List<ReleaseVersionDTO> versionList = release.getReleaseVersions();
