@@ -211,6 +211,10 @@ jobs:
     templates:
       - name: consul_agent
         release: (( meta.cf_release.name || "cf" ))
+      - name: java-buildpack
+        release: (( meta.cf_release.name || "cf" ))
+      - name: java-offline-buildpack
+        release: (( meta.cf_release.name || "cf" ))
       - name: go-buildpack
         release: (( meta.cf_release.name || "cf" ))
       - name: binary-buildpack
@@ -224,6 +228,8 @@ jobs:
       - name: python-buildpack
         release: (( meta.cf_release.name || "cf" ))
       - name: staticfile-buildpack
+        release: (( meta.cf_release.name || "cf" ))
+      - name: dotnet-core-buildpack
         release: (( meta.cf_release.name || "cf" ))
       - name: cloud_controller_ng
         release: (( meta.cf_release.name || "cf" ))
