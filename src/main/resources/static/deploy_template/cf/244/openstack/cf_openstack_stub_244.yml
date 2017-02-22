@@ -182,6 +182,10 @@ jobs:
     templates:
       - name: consul_agent
         release: (( meta.cf_release.name || "cf" ))
+      - name: java-buildpack
+        release: (( meta.cf_release.name || "cf" ))
+      - name: java-offline-buildpack
+        release: (( meta.cf_release.name || "cf" ))
       - name: go-buildpack
         release: (( meta.cf_release.name || "cf" ))
       - name: binary-buildpack
