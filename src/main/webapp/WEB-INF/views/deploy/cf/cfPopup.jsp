@@ -1669,7 +1669,7 @@ function gridReload() {
 								</div>
 							</div>
 							<div class="w2ui-field">
-								<label style="text-align: left;width:40%;font-size:11px;">IP할당 대역(최소 20개)</label> 
+								<label style="text-align: left;width:40%;font-size:11px;">IP할당 대역</label> 
 								<div>
 									<input name="publicStaticFrom" type="url" style="float:left;width:27%;" placeholder="예) 10.0.0.100" />
 									<span style="float: left; width: 6%; text-align: center;">&nbsp;&ndash; &nbsp;</span>
@@ -1727,7 +1727,7 @@ function gridReload() {
 								</div>
 							</div>
 							<div class="w2ui-field">
-								<label style="text-align: left; width: 40%; font-size: 11px;">IP할당 대역</label>
+								<label style="text-align: left; width: 40%; font-size: 11px;">IP할당 대역(최소 20개)</label>
 								<div>
 									<input name="subnetStaticFrom" type="url" style="float:left;width:27%;" placeholder="예) 10.0.0.100" />
 									<span style="float: left; width: 6%; text-align: center;">&nbsp;&ndash; &nbsp;</span>
